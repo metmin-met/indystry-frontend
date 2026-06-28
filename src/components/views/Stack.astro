@@ -10,7 +10,7 @@ const de = lang === "de";
 const b = de ? "" : "/en";
 const L = (d: string, e: string) => (de ? d : e);
 // Logos, die wir lokal gebündelt haben (simple-icons, MIT). Sonst Monogramm-Fallback.
-const LOGOS = new Set(["astro","caddy","directus","umami","odoo","postgresql","metabase","grafana","jupyter","meilisearch","mermaid","mistral","nextcloud","collabora","matrix","n8n","docker","proxmox","authentik","timescale","kafka","redis"]);
+const LOGOS = new Set(["astro","caddy","directus","umami","odoo","postgresql","metabase","grafana","jupyter","meilisearch","mermaid","mistral","nextcloud","collabora","matrix","n8n","docker","proxmox","authentik","timescale","kafka","redis","zabbix","graylog","rustdesk"]);
 const ERP = "https://erp-demo.indystry.works", BI = "https://bi-demo.indystry.works", COCKPIT = "https://grafana-demo.indystry.works", LAB = "https://lab-demo.indystry.works";
 type It = { n: string; d: string; lic: string; href: string; key?: string; demo?: string; demoExt?: boolean };
 const groups: { name: string; items: It[] }[] = [
@@ -48,6 +48,13 @@ const groups: { name: string; items: It[] }[] = [
     { n: "Proxmox VE", d: L("Virtualisierung", "virtualisation"), lic: "AGPL-3", href: "https://www.proxmox.com", key: "proxmox", demo: "/status/" },
     { n: "NetBird", d: L("Mesh-VPN", "mesh VPN"), lic: "BSD-3", href: "https://netbird.io" },
     { n: "Authentik", d: L("SSO / Login", "SSO / login"), lic: "MIT", href: "https://goauthentik.io", key: "authentik" },
+    { n: "RustDesk", d: L("Fernwartung – selbst gehostet", "remote support – self-hosted"), lic: "AGPL-3", href: "https://rustdesk.com", key: "rustdesk" },
+  ]},
+  { name: L("Betrieb, Sicherheit & Audit", "Operations, security & audit"), items: [
+    { n: "Wazuh", d: L("SIEM: Angriffserkennung & Host-Audit", "SIEM: intrusion detection & host audit"), lic: "GPL-2.0", href: "https://wazuh.com", demo: "/status/" },
+    { n: "Zabbix", d: L("Infra-Metriken & Alarme", "infra metrics & alerts"), lic: "AGPL-3", href: "https://www.zabbix.com", key: "zabbix", demo: "/status/" },
+    { n: "Graylog", d: L("zentrale Log-Sammlung", "central log aggregation"), lic: "SSPL-1.0", href: "https://www.graylog.org", key: "graylog", demo: "/status/" },
+    { n: "Grafana", d: L("Live-Cockpits & Alerts", "live cockpits & alerts"), lic: "AGPL-3", href: "https://grafana.com", key: "grafana", demo: COCKPIT, demoExt: true },
   ]},
 ];
 // Daten-Backbone & Resilienz — was das Rückgrat trägt + wann es greift
