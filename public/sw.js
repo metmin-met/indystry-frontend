@@ -1,4 +1,4 @@
-const C = "indystry-v1";
+const C = "indystry-v2";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => e.waitUntil((async () => {
   const ks = await caches.keys();
