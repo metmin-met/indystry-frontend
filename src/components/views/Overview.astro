@@ -115,6 +115,16 @@ const fxExamples = de
 // Daten für Finder-Island
 const finderData = baust.map((x) => ({ nr:x.nr, name:x.n, desc:x.d, color:x.color, href:`${S}/saeule/${x.slug}/`, kw:x.kw }));
 const kick = (n:string) => n; // helper noop
+const branchen = [
+  { n:L("Zerspanung & Metallbearbeitung","Machining & metalworking"), d:L("CNC-Fräsen, Drehen, viele Varianten, enge Toleranzen.","CNC milling, turning, many variants, tight tolerances."), c:"#c4673f" },
+  { n:L("Anlagen- & Maschinenbau","Plant & machine building"), d:L("Einzel- und Sondermaschinen, Projektfertigung, lange Stücklisten.","One-off and special machines, project builds, long BOMs."), c:"#2a86a8" },
+  { n:L("Serien- & Variantenfertigung","Series & variant production"), d:L("Wiederkehrende Aufträge, Chargen, lückenlose Rückverfolgung.","Recurring orders, batches, seamless traceability."), c:"#3d4fc0" },
+  { n:L("Verfahrens- & Prozesstechnik","Process technology"), d:L("Misch-, Reaktions- und Chargenprozesse mit vielen Messwerten.","Mixing, reaction and batch processes with lots of readings."), c:"#7b5cc4" },
+  { n:L("Blech, Schweiß & Metallbau","Sheet, welding & metal fab"), d:L("Zuschnitt, Umformung, Baugruppen, Endkontrolle.","Cutting, forming, assemblies, final inspection."), c:"#4a6fa5" },
+  { n:L("Kunststoff & Spritzguss","Plastics & injection moulding"), d:L("Werkzeuge, Zyklen, Qualität pro Schuss.","Tools, cycles, quality per shot."), c:"#c08a2e" },
+  { n:L("Elektronik & Baugruppen","Electronics & assembly"), d:L("Bestückung, Prüfung, Seriennummern.","Placement, testing, serial numbers."), c:"#b03f93" },
+  { n:L("Lohnfertigung & Job-Shop","Contract & job-shop"), d:L("Viele Kunden, viele Teile, knappe Termine.","Many customers, many parts, tight dates."), c:"#5a8a98" },
+];
 ---
 <!-- Fortschrittsbalken + Readout -->
 <div class="ov-prog-wrap"><div class="prog ov-prog"></div></div>
@@ -184,6 +194,23 @@ const kick = (n:string) => n; // helper noop
     <h2 class="ov-sys-h rv1" set:html={L("Ein System.<br><span class='gold'>Eine Wahrheit.</span>","One system.<br><span class='gold'>One truth.</span>")}></h2>
     <p class="ov-sys-p rv2">{L("Montagfrüh kein Abgleich von drei Listen mehr — ein Blick, und alle reden über dieselbe Zahl. Was gestern Stunden Tabellenpflege war, läuft heute von selbst mit.","No more reconciling three lists on Monday morning — one glance and everyone talks about the same number. What was hours of spreadsheet upkeep yesterday now runs along by itself.")}</p>
   </div>
+</section>
+
+<!-- FÜR WEN -->
+<section class="ov-wrap ov-sec ov-sec-tight2">
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Für wen","Who it's for")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Gebaut für produzierende Betriebe.","Built for manufacturers.")}</h2>
+  <p class="ov-sub rv1">{L("Die Branche ist zweitrangig. Wenn ihr Maschinen lauft, Aufträge abwickelt und in Tabellen ertrinkt — passt es. Ein paar typische Fälle:","The industry is secondary. If you run machines, process orders and drown in spreadsheets — it fits. A few typical cases:")}</p>
+  <div class="ov-4col">
+    {branchen.map((x) => (
+      <div class="lift ov-card rv1">
+        <div class="ov-br-top"><span class="ov-br-dot" style={`background:${x.c}`}></span></div>
+        <h3 class="ov-card-h ov-br-h">{x.n}</h3>
+        <p class="ov-card-d">{x.d}</p>
+      </div>
+    ))}
+  </div>
+  <p class="rv2 ov-br-note">{L("Nicht dabei? Die Bausteine sind dieselben — egal welches Werk. ","Not listed? The building blocks are the same — whatever the works. ")}<a class="navx" href={`${b}/kontakt/`}>{L("Schick uns deine Pain-List","Send us your pain list")} →</a></p>
 </section>
 
 <!-- §02 LÖSUNG -->
@@ -715,6 +742,12 @@ const kick = (n:string) => n; // helper noop
   .ov-cmp-card.good .ov-cmp-d { color:#C7D8D2; }
 
   /* Mitmachen */
+  .ov-sec-tight2 { padding-top:clamp(2rem,3vw,3rem); }
+  .ov-br-top { margin-bottom:.7rem; }
+  .ov-br-dot { display:inline-block; width:.7rem; height:.7rem; border-radius:50%; }
+  .ov-br-h { font-size:1.08rem; }
+  .ov-br-note { margin-top:1.6rem; font-size:.96rem; color:#5C5E63; }
+  .ov-br-note a { color:#16463E; font-weight:600; text-decoration:none; }
   .ov-mm-k { font-family:var(--font-mono); font-weight:700; font-size:1.1rem; color:#fff; background:#123A33; width:2rem; height:2rem; border-radius:7px; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; }
   .ov-mm-h { font-size:1.12rem; }
 
