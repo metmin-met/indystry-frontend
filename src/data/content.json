@@ -1,0 +1,652 @@
+{
+  "generated_at": "2026-06-19T08:18:13.257Z",
+  "brand": {
+    "codename": "indystry",
+    "name": "Indystry",
+    "domain": "indystry.works",
+    "url": "https://indystry.works",
+    "tagline": {
+      "de": "Die souveräne Smart Factory — selbst gehostet, offen, deins.",
+      "en": "The sovereign smart factory — self-hosted, open, yours."
+    },
+    "claim": {
+      "de": "Industrie 4.0 ohne Cloud-Abhängigkeit. Vom Sensor bis zur Auswertung läuft alles auf deinem eigenen Stack.",
+      "en": "Industry 4.0 without cloud lock-in. From sensor to insight, everything runs on your own stack."
+    }
+  },
+  "meta": {
+    "pillars": 10,
+    "demos": 6,
+    "locales": [
+      "de",
+      "en"
+    ],
+    "default_locale": "de"
+  },
+  "pillars": [
+    {
+      "slug": "basis-betrieb",
+      "sequence": 10,
+      "icon": "server",
+      "color": 211,
+      "demo": {
+        "url": "https://status-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Die Technik, die im Hintergrund für dich läuft.",
+          "subline": "Alles gesichert, immer erreichbar — und passt auf sich selbst auf.",
+          "body": "Deine Programme und Daten laufen rund um die Uhr. Es gibt automatische Sicherungen\nund einen geschützten Zugang. Eine Überwachung schlägt Alarm, bevor etwas kaputtgeht.\nDu musst dich um nichts kümmern — es ist einfach da.\n"
+        },
+        "story": {
+          "title": "Wenn nachts eine Platte ausfällt — und du es erst aus dem Bericht erfährst",
+          "body": "Stell dir vor, in der Nacht fällt eine Festplatte aus. Das System merkt es selbst,\nzieht im Hintergrund eine zweite heran und macht weiter. Am Morgen steht eine Zeile\nim Bericht — kein Stillstand, kein Notruf, kein Datenverlust. Genau dafür ist die Basis da.\n"
+        },
+        "deep": {
+          "body": "Eine selbst gehostete Virtualisierungsschicht trägt alle Dienste als isolierte\nContainer und VMs. Ein verschlüsseltes Mesh verbindet die Standorte ohne offene Ports\nins Internet, Single-Sign-On bündelt alle Logins, und ein dreistufiges Monitoring\n(Metriken, Security-Events, Logs) meldet Probleme, bevor sie sichtbar werden. Der Clou:\ndie ganze Anlage ist als Code beschrieben und liegt in Git — Server, Dienste, Zugänge.\nÄnderungen laufen über eine Pipeline, sind sauber versioniert und auf Knopfdruck\nreproduzierbar; verschlüsselte Offsite-Backups sichern alles automatisch. Fällt etwas\naus, baust du es aus dem Repository neu auf — kein Bastel-Wissen in einzelnen Köpfen,\nkeine Cloud-Abhängigkeit. Sogar diese Website wird so betrieben.\n",
+          "components": [
+            "Proxmox VE",
+            "Git / GitLab",
+            "CI/CD-Pipeline",
+            "Ansible (IaC)",
+            "WireGuard-Mesh",
+            "SSO/IdP",
+            "Offsite-Backup (PBS)",
+            "Monitoring (Metriken · SIEM · Logs)"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "The technology that quietly works for you.",
+          "subline": "Everything backed up, always reachable — and it looks after itself.",
+          "body": "Your programs and data run around the clock. There are automatic backups and a\nprotected login. A watchdog raises the alarm before anything breaks. You don't have\nto worry about a thing — it's simply there.\n"
+        },
+        "story": {
+          "title": "When a disk dies at night — and you only learn it from the report",
+          "body": "Imagine a hard disk fails overnight. The system notices on its own, pulls in a second\none in the background and keeps going. In the morning there's one line in the report —\nno downtime, no emergency call, no data loss. That's what the foundation is for.\n"
+        },
+        "deep": {
+          "body": "A self-hosted virtualization layer carries every service as an isolated container or VM.\nAn encrypted mesh connects sites with no open ports to the internet, single sign-on\nbundles every login, and a three-tier monitoring stack (metrics, security events, logs)\nsurfaces problems before they become visible. The key part: the whole estate is described\nas code and lives in Git — servers, services, access. Changes go through a pipeline, are\ncleanly versioned and reproducible at the push of a button; encrypted offsite backups keep\neverything safe automatically. If something fails, you rebuild it from the repository — no\ntribal knowledge in a few people's heads, no cloud lock-in. Even this website runs this way.\n",
+          "components": [
+            "Proxmox VE",
+            "Git / GitLab",
+            "CI/CD pipeline",
+            "Ansible (IaC)",
+            "WireGuard mesh",
+            "SSO/IdP",
+            "offsite backup (PBS)",
+            "monitoring (metrics · SIEM · logs)"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "automatisierung-leittechnik",
+      "sequence": 20,
+      "icon": "cpu",
+      "color": 8,
+      "demo": {
+        "url": "https://scada-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Deine Anlage im Blick — in Echtzeit.",
+          "subline": "Sehen, was die Maschinen gerade tun. Eingreifen, bevor etwas stockt.",
+          "body": "Auf einem Bildschirm siehst du, was gerade läuft: welche Maschine arbeitet, wo es\nklemmt, welcher Wert aus dem Rahmen fällt. Du musst nicht zur Anlage laufen, um\nnachzusehen — und wenn etwas nicht stimmt, meldet es sich von selbst.\n"
+        },
+        "story": {
+          "title": "Ein Wert läuft aus dem Ruder — und du siehst es, bevor der Ausschuss entsteht",
+          "body": "Eine Temperatur steigt langsam über den grünen Bereich. Noch ist nichts kaputt, aber\ndie Leitwarte zeigt den Trend in Gelb. Eine kurze Korrektur, der Wert fängt sich — und\ndie nächsten Stunden Produktion bleiben gut, statt im Ausschuss zu landen.\n"
+        },
+        "deep": {
+          "body": "Die Leitebene (SCADA/HMI) visualisiert den Anlagenzustand und führt Bediener durch\nAbläufe und Alarme. Darunter steuern speicherprogrammierbare Steuerungen die Maschinen\nund Antriebe über ein dediziertes Feldnetz. Ein offener Maschinen-Standard (OPC UA)\ntrennt die proprietäre Steuerungswelt sauber von der offenen Datenwelt: jeder Messwert\nwird zyklisch abgegriffen und nach oben in die Datenhaltung gestreamt — ohne die\nSteuerung zu belasten.\n",
+          "components": [
+            "SCADA/HMI",
+            "SPS / Antriebe",
+            "Feldbus (PROFINET)",
+            "OPC UA",
+            "Alarm-Management"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Your line at a glance — in real time.",
+          "subline": "See what the machines are doing. Step in before anything stalls.",
+          "body": "On one screen you see what's running right now: which machine is working, where it's\njammed, which value is out of range. You don't have to walk to the line to check — and\nwhen something's off, it speaks up on its own.\n"
+        },
+        "story": {
+          "title": "A value drifts — and you catch it before scrap is made",
+          "body": "A temperature slowly climbs past the green band. Nothing is broken yet, but the control\nroom shows the trend in amber. A quick correction, the value settles — and the next hours\nof production stay good instead of turning into scrap.\n"
+        },
+        "deep": {
+          "body": "The control layer (SCADA/HMI) visualizes plant state and guides operators through\nprocedures and alarms. Below it, programmable logic controllers drive machines and motors\nover a dedicated field network. An open machine standard (OPC UA) cleanly separates the\nproprietary control world from the open data world: every measurement is polled cyclically\nand streamed up into storage — without loading the controller.\n",
+          "components": [
+            "SCADA/HMI",
+            "PLC / drives",
+            "fieldbus (PROFINET)",
+            "OPC UA",
+            "alarm management"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "digital-twin-simulation",
+      "sequence": 30,
+      "icon": "orbit",
+      "color": 268,
+      "demo": {
+        "url": "https://twin-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Erst ausprobieren, dann umstellen.",
+          "subline": "Was-wäre-wenn am Bildschirm — bevor du an der echten Anlage drehst.",
+          "body": "Du willst schneller fahren oder ein Rezept ändern? Probier es zuerst am digitalen\nZwilling aus. Du siehst, was passieren würde, ohne Material zu verschwenden oder die\nProduktion anzuhalten. Erst wenn es passt, geht es an die echte Anlage.\n"
+        },
+        "story": {
+          "title": "Eine neue Einstellung testen, ohne eine einzige Charge zu riskieren",
+          "body": "Bevor die Schicht eine schnellere Fahrweise probiert, spielt der Zwilling sie durch:\nAusbeute rauf, ein Engpass an einer Station sichtbar. Die Station wird vorher entlastet —\nund die echte Umstellung läuft glatt, beim ersten Versuch.\n"
+        },
+        "deep": {
+          "body": "Ein digitales Abbild der Anlage wird aus den historischen Prozessdaten gespeist und\nerlaubt What-if-Szenarien: Parameter verschieben, Durchsatz und Qualität vorhersagen,\nEngpässe erkennen. Interaktive Modelle laufen als browserbasierte Apps — von einfachen\nKennzahl-Rechnern bis zu datengetriebenen Vorhersagemodellen. So wird aus\ngesammelten Daten ein Werkzeug für Entscheidungen, nicht nur ein Archiv.\n",
+          "components": [
+            "Digital Twin",
+            "R Shiny",
+            "Python-Modelle (scikit-learn)",
+            "What-if-Simulation"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Try it first, then switch.",
+          "subline": "What-if on screen — before you touch the real line.",
+          "body": "Want to run faster or change a recipe? Try it on the digital twin first. You see what\nwould happen without wasting material or stopping production. Only when it fits does it\ngo to the real line.\n"
+        },
+        "story": {
+          "title": "Test a new setting without risking a single batch",
+          "body": "Before the shift tries a faster run, the twin plays it through: yield up, a bottleneck\nat one station made visible. The station is relieved beforehand — and the real changeover\nruns smoothly, on the first attempt.\n"
+        },
+        "deep": {
+          "body": "A digital replica of the line is fed from the historical process data and enables what-if\nscenarios: shift parameters, predict throughput and quality, spot bottlenecks. Interactive\nmodels run as browser-based apps — from simple KPI calculators to data-driven prediction\nmodels. That turns collected data into a tool for decisions, not just an archive.\n",
+          "components": [
+            "digital twin",
+            "R Shiny",
+            "Python models (scikit-learn)",
+            "what-if simulation"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "historian-datalake",
+      "sequence": 40,
+      "icon": "database",
+      "color": 168,
+      "demo": {
+        "url": "https://stream-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Nichts geht verloren.",
+          "subline": "Jeder Messwert — sicher aufgehoben und in Sekunden wieder da.",
+          "body": "Alle Mess- und Sensordaten landen automatisch an einem sicheren Ort. Nichts muss von\nHand kopiert werden. Du kommst jederzeit an alte Werte heran — auch nach Jahren, und in\nSekunden statt in Stunden.\n"
+        },
+        "story": {
+          "title": "Ein Kunde fragt nach Werten von vor zwei Jahren — und du hast sie in einer Minute",
+          "body": "Reklamation zu einer alten Charge. Früher hieße das: Ordner wälzen, Tabellen suchen.\nJetzt tippst du die Chargennummer ein und siehst sofort den kompletten Verlauf —\njede Messung, jeder Parameter, lückenlos. Der Kunde bekommt seine Antwort am selben Tag.\n"
+        },
+        "deep": {
+          "body": "Eine Zeitreihen-Datenbank (Historian) ist die Single-Source-of-Truth: jeder Wert aus der\nAnlage wird mit Zeitstempel als Hypertable abgelegt, komprimiert und langfristig\nvorgehalten. Rohdateien und Dokumente wandern parallel in ein S3-kompatibles Objektarchiv.\nWatcher und ETL halten alles aktuell, fertige Auswertungs-Views lösen die Roh-Referenzen\nauf — so liest jede Analyse aus derselben Wahrheit, statt aus Kopien.\n",
+          "components": [
+            "TimescaleDB (Hypertables)",
+            "S3-Objektarchiv (SeaweedFS)",
+            "ETL / Watcher",
+            "Analytics-Views"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Nothing gets lost.",
+          "subline": "Every measurement — safely kept and back in seconds.",
+          "body": "All measurement and sensor data lands in a safe place automatically. Nothing has to be\ncopied by hand. You can reach old values any time — even years later, and in seconds\ninstead of hours.\n"
+        },
+        "story": {
+          "title": "A customer asks for values from two years ago — and you have them in a minute",
+          "body": "A complaint about an old batch. The old way: dig through binders, hunt for spreadsheets.\nNow you type the batch number and see the full history at once — every measurement, every\nparameter, gap-free. The customer gets their answer the same day.\n"
+        },
+        "deep": {
+          "body": "A time-series database (historian) is the single source of truth: every value from the\nline is stored with a timestamp as a hypertable, compressed and retained long-term. Raw\nfiles and documents move in parallel into an S3-compatible object archive. Watchers and ETL\nkeep everything current; ready-made analytical views resolve the raw references — so every\nanalysis reads from the same truth, not from copies.\n",
+          "components": [
+            "TimescaleDB (hypertables)",
+            "S3 object store (SeaweedFS)",
+            "ETL / watcher",
+            "analytics views"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "bi-analytics",
+      "sequence": 50,
+      "icon": "line-chart",
+      "color": 24,
+      "demo": {
+        "url": "https://grafana-demo.indystry.works",
+        "login": "offen / kein Login",
+        "status": "live"
+      },
+      "de": {
+        "hook": {
+          "headline": "Zahlen, die du sofort verstehst.",
+          "subline": "Sehen, was läuft — in Bildern statt in Tabellen.",
+          "body": "Klare Übersichten zeigen dir auf einen Blick, wie es um Produktion und Qualität steht.\nDu erkennst Trends, bevor sie zum Problem werden. Kein Suchen in Excel, kein Rätselraten.\n"
+        },
+        "story": {
+          "title": "Das Montags-Meeting, das von 60 auf 15 Minuten schrumpft",
+          "body": "Früher trug jeder seine eigenen Zahlen zusammen, und die Hälfte der Zeit ging fürs\nAbgleichen drauf. Jetzt liegt ein Cockpit auf dem Schirm, alle sehen dieselben Werte,\nlive. Die Diskussion dreht sich um Entscheidungen, nicht mehr darum, wessen Tabelle stimmt.\n"
+        },
+        "deep": {
+          "body": "Drei Werkzeuge lesen aus derselben Master-Datenbank, je nach Aufgabe: ein BI-Tool für\nwiederkehrende Cockpits und Drilldowns, ein Monitoring-Tool für Live-Streams und\nDrift-Erkennung, und eine Data-Science-Umgebung für Computer-Vision, Machine-Learning\nund Ad-hoc-Analysen. Weil die Datenquelle dieselbe ist, widersprechen sich die Auswertungen nie.\n",
+          "components": [
+            "Metabase (BI)",
+            "Grafana (Monitoring)",
+            "JupyterLab (Data Science)",
+            "R Shiny"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Numbers you understand at a glance.",
+          "subline": "See what's going on — in pictures, not spreadsheets.",
+          "body": "Clear overviews show you the state of production and quality in a second. You spot trends\nbefore they become problems. No digging through Excel, no guessing.\n"
+        },
+        "story": {
+          "title": "The Monday meeting that shrinks from 60 to 15 minutes",
+          "body": "It used to be that everyone gathered their own numbers, and half the time went into\nreconciling them. Now a cockpit is on the screen, everyone sees the same values, live.\nThe discussion is about decisions, not about whose spreadsheet is right.\n"
+        },
+        "deep": {
+          "body": "Three tools read from the same master database, by task: a BI tool for recurring cockpits\nand drilldowns, a monitoring tool for live streams and drift detection, and a data-science\nenvironment for computer vision, machine learning and ad-hoc analysis. Because the data\nsource is the same, the analyses never contradict each other.\n",
+          "components": [
+            "Metabase (BI)",
+            "Grafana (monitoring)",
+            "JupyterLab (data science)",
+            "R Shiny"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "erp-betrieb",
+      "sequence": 60,
+      "icon": "factory",
+      "color": 288,
+      "demo": {
+        "url": "https://erp-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Ein Programm für die ganze Firma.",
+          "subline": "Von der Schicht bis zur Rechnung — alles arbeitet zusammen.",
+          "body": "Aufträge, Qualität, Lager, Arbeitszeit und Rechnungen liegen an einem Ort. Du gibst\netwas einmal ein, und alle sehen es sofort. Kein Hin und Her mit Listen, kein doppeltes\nTippen. Geht auch vom Handy.\n"
+        },
+        "story": {
+          "title": "Ein Auftrag, der ohne ein einziges Zuruf-Telefonat durchs Haus läuft",
+          "body": "Der Auftrag kommt rein, die Planung sieht ihn sofort, die Fertigung bekommt die\nArbeitsschritte aufs Tablet, die Qualität hängt ihre Prüfung dran, und die Rechnung\nzieht sich die Daten von allein. Niemand muss irgendwo anrufen, um den Stand zu erfahren.\n"
+        },
+        "deep": {
+          "body": "Ein quelloffenes ERP trägt die Betriebsprozesse in einem System: Produktion, Planung mit\nGantt, Chargen-Rückverfolgung, Qualitätsprüfung, Wartung, Kostenrechnung und Fakturierung.\nEigene Module bilden Branchenspezifika ab. Eine mobile App bringt Anwesenheit,\nZeiterfassung und Behälter-Tracking per NFC direkt an die Maschine. Ein Datenmodell,\nkein Daten-Hin-und-Her.\n",
+          "components": [
+            "Odoo 18",
+            "eigene Module",
+            "Mobile-App (Flutter)",
+            "NFC-Tracking"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "One program for the whole company.",
+          "subline": "From shift to invoice — everything works together.",
+          "body": "Orders, quality, stock, working hours and invoices all in one place. You enter something\nonce and everyone sees it right away. No juggling lists, no typing things twice. Works on\nyour phone, too.\n"
+        },
+        "story": {
+          "title": "An order that flows through the company without a single shouted phone call",
+          "body": "The order comes in, planning sees it instantly, production gets the work steps on a tablet,\nquality attaches its inspection, and the invoice pulls its data on its own. Nobody has to\ncall anyone to find out the status.\n"
+        },
+        "deep": {
+          "body": "An open-source ERP carries the operational processes in one system: production, planning\nwith Gantt, lot traceability, quality control, maintenance, costing and invoicing. Custom\nmodules cover industry specifics. A mobile app brings attendance, time tracking and NFC\ncontainer tracking right to the machine. One data model, no data shuffling.\n",
+          "components": [
+            "Odoo 18",
+            "custom modules",
+            "mobile app (Flutter)",
+            "NFC tracking"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "zusammenarbeit",
+      "sequence": 65,
+      "icon": "messages-square",
+      "color": 158,
+      "demo": {
+        "url": "https://chat-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Zusammenarbeiten — ohne fremde Cloud.",
+          "subline": "Chat, Videocall, Dateien und Office: alles im Haus, alles deins.",
+          "body": "Schreib einer Kollegin, starte einen Videocall, teile eine Datei, bearbeite ein\nDokument zu zweit — alles in deinen eigenen Programmen. Nichts liegt bei einem fremden\nAnbieter, niemand liest mit. Und es fühlt sich an wie die Tools, die du schon kennst.\n"
+        },
+        "story": {
+          "title": "Der Werkstatt-Chat, der nicht bei einem fremden Konzern landet",
+          "body": "Die Frühschicht meldet eine Störung im Gruppen-Chat, hängt ein Foto an, die Technik\nantwortet mit einer Sprachnachricht — und am Nachmittag wird dasselbe Angebot zu zweit\nim Browser-Dokument fertig getippt. Alles auf dem eigenen Server. Keine Lizenz pro Kopf,\nkeine Daten in Übersee.\n"
+        },
+        "deep": {
+          "body": "Ein föderierter Messenger mit Ende-zu-Ende-Verschlüsselung, Gruppen, Videocalls und\nBrücken zu anderen Systemen. Dateien, Kalender und Kontakte über eine eigene Datei-Cloud\nmit Desktop- und Handy-Sync. Dokumente, Tabellen und Präsentationen bearbeitest du\ngemeinsam und gleichzeitig im Browser. Diagramme und Skizzen entstehen direkt daneben.\nFöderation heißt: ihr bleibt nach außen erreichbar, ohne euch an einen Anbieter zu ketten.\n",
+          "components": [
+            "Matrix / Element (Chat + Video)",
+            "Nextcloud (Files + Kalender)",
+            "Collabora / OnlyOffice",
+            "drawio / Mermaid",
+            "Ende-zu-Ende-Verschlüsselung"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Work together — without someone else's cloud.",
+          "subline": "Chat, video calls, files and office: all in-house, all yours.",
+          "body": "Message a colleague, start a video call, share a file, edit a document together — all in\nyour own apps. Nothing sits with an external vendor, nobody reads along. And it feels like\nthe tools you already know.\n"
+        },
+        "story": {
+          "title": "The shop-floor chat that doesn't land at a foreign tech giant",
+          "body": "The early shift reports a fault in the group chat, attaches a photo, maintenance replies\nwith a voice message — and in the afternoon the same quote gets finished together in a\nbrowser document. All on your own server. No per-seat licence, no data overseas.\n"
+        },
+        "deep": {
+          "body": "A federated messenger with end-to-end encryption, groups, video calls and bridges to other\nsystems. Files, calendars and contacts via your own file cloud with desktop and phone sync.\nDocuments, spreadsheets and slides are edited together, simultaneously, in the browser.\nDiagrams and sketches happen right next to them. Federation means you stay reachable to the\noutside world without chaining yourself to one vendor.\n",
+          "components": [
+            "Matrix / Element (chat + video)",
+            "Nextcloud (files + calendar)",
+            "Collabora / OnlyOffice",
+            "drawio / Mermaid",
+            "end-to-end encryption"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "ki-suche-nlp",
+      "sequence": 70,
+      "icon": "sparkles",
+      "color": 322,
+      "demo": {
+        "url": "https://search.indystry.works",
+        "login": "offen / kein Login",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Fragen statt suchen.",
+          "subline": "Eine Suche, die alles findet — und nur das zeigt, was du sehen darfst.",
+          "body": "Tipp ein, was du brauchst — in ganz normaler Sprache. Die Suche schaut überall\ngleichzeitig nach: Dokumente, Notizen, Mails, Dateien. Du bekommst nur, worauf du Zugriff\nhast. Schluss mit dem Suchen in zehn Programmen.\n"
+        },
+        "story": {
+          "title": "\"Welche Aufträge sind diese Woche offen?\" — und die Antwort kommt sofort",
+          "body": "Statt drei Programme zu öffnen und zu filtern, fragst du einfach im Chat. Die Antwort\nkommt aus euren eigenen Daten, mit Quellenangabe, in einem Satz. Wer mehr will, klickt\nsich in die Details — wer nur die Zahl braucht, hat sie schon.\n"
+        },
+        "deep": {
+          "body": "Eine föderierte Suche indexiert alle Quellen und filtert pro Dokument nach Berechtigung —\nniemand sieht, was er nicht darf. Darauf sitzt ein Assistent, der in natürlicher Sprache\nantwortet (RAG über die eigene Doku) und Belege lesen kann. Alle Bausteine sind zugleich\nals MCP-Server für KI-Agenten verfügbar. Die Sprachmodelle laufen on-prem über einen\nProxy — Daten bleiben im Haus, DSGVO-fest.\n",
+          "components": [
+            "Meilisearch (föderiert)",
+            "RAG-Assistent",
+            "MCP-Server",
+            "On-Prem-LLM (LiteLLM)"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Ask instead of search.",
+          "subline": "One search that finds everything — and shows only what you're allowed to see.",
+          "body": "Type what you need — in plain language. The search looks everywhere at once: documents,\nnotes, emails, files. You only get what you have access to. No more hunting through ten\nprograms.\n"
+        },
+        "story": {
+          "title": "\"Which orders are open this week?\" — and the answer comes right away",
+          "body": "Instead of opening three programs and filtering, you just ask in chat. The answer comes\nfrom your own data, with sources, in one sentence. Anyone who wants more clicks into the\ndetails — anyone who just needs the number already has it.\n"
+        },
+        "deep": {
+          "body": "A federated search indexes every source and filters per document by permission — nobody\nsees what they shouldn't. On top sits an assistant that answers in natural language (RAG\nover your own docs) and can read documents. Every building block is also available as an\nMCP server for AI agents. The language models run on-prem behind a proxy — data stays\nin-house, GDPR-safe.\n",
+          "components": [
+            "Meilisearch (federated)",
+            "RAG assistant",
+            "MCP servers",
+            "on-prem LLM (LiteLLM)"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "wissen-compliance-kiosk",
+      "sequence": 80,
+      "icon": "shield-check",
+      "color": 142,
+      "demo": {
+        "url": "https://kiosk-demo.indystry.works",
+        "login": "demo / demo",
+        "status": "planned"
+      },
+      "de": {
+        "hook": {
+          "headline": "Immer bereit fürs Audit — und alles griffbereit.",
+          "subline": "Regeln, Nachweise und Anleitungen, aktuell und an einem Ort.",
+          "body": "Alle Vorschriften und Nachweise liegen ordentlich beieinander. Du kannst sie sogar in\nnormaler Sprache fragen. Anleitungen halten sich von selbst aktuell. Und am Bildschirm in\nder Halle startest du jedes Programm mit einem Tipp.\n"
+        },
+        "story": {
+          "title": "Der Auditor fragt nach einem Nachweis — und er liegt in zehn Sekunden auf dem Tisch",
+          "body": "Beim Audit zählt Tempo und Lückenlosigkeit. Statt Ordner zu wälzen, fragst du das System\nin normaler Sprache nach der Regel und dem passenden Nachweis — beides erscheint mit\nDatum und Quelle. Der Auditor nickt, ihr seid in der nächsten Frage.\n"
+        },
+        "deep": {
+          "body": "Ein Compliance-Stack (ISMS, QMS, branchenspezifische Normen) hält Regeln und Nachweise\nrevisionssicher und beantwortet Fragen per RAG über hunderte Normenseiten. Ein\n\"lebendes Handbuch\" hält Anleitungen automatisch aktuell (Quelle → Screenshots → Wiki),\nergänzt um Tooltips, User-Stories und geführte Touren. In der Fertigung bündelt ein\nKiosk-/Launcher-Startbildschirm alle Anwendungen; verwaltete Geräte kommen aus einem MDM.\n",
+          "components": [
+            "ISMS / QMS",
+            "Living-Handbuch",
+            "Wiki",
+            "App-Kiosk (Launcher)",
+            "MDM"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Always ready for the audit — and everything at hand.",
+          "subline": "Rules, records and guides, current and in one place.",
+          "body": "All rules and records sit tidily together. You can even ask them in plain language. Guides\nkeep themselves up to date. And on the screen out in the hall you start every program with\none tap.\n"
+        },
+        "story": {
+          "title": "The auditor asks for a record — and it's on the table in ten seconds",
+          "body": "In an audit, speed and completeness count. Instead of digging through binders, you ask the\nsystem in plain language for the rule and the matching record — both appear with date and\nsource. The auditor nods, you're on to the next question.\n"
+        },
+        "deep": {
+          "body": "A compliance stack (ISMS, QMS, industry standards) keeps rules and records audit-proof and\nanswers questions via RAG over hundreds of standards pages. A \"living handbook\" keeps guides\ncurrent automatically (source → screenshots → wiki), plus tooltips, user stories and guided\ntours. On the shop floor a kiosk/launcher home screen bundles every application; managed\ndevices come from an MDM.\n",
+          "components": [
+            "ISMS / QMS",
+            "living handbook",
+            "wiki",
+            "app kiosk (launcher)",
+            "MDM"
+          ]
+        }
+      }
+    },
+    {
+      "slug": "web-aussenauftritt",
+      "sequence": 90,
+      "icon": "globe",
+      "color": 38,
+      "demo": {
+        "url": "https://indystry.works",
+        "login": "diese Seite selbst",
+        "status": "live"
+      },
+      "de": {
+        "hook": {
+          "headline": "Dein Auftritt nach außen — auf deinem eigenen Stack.",
+          "subline": "Schnell, sicher, selbst gepflegt. Diese Seite ist das beste Beispiel.",
+          "body": "Deine Website liegt nicht bei einem fremden Anbieter, sondern läuft auf deinem eigenen\nSystem. Texte pflegst du selbst, Anfragen landen direkt im Firmensystem — ohne Umweg.\nUnd ja: genau diese Seite, die du gerade liest, ist so gebaut.\n"
+        },
+        "story": {
+          "title": "Eine Website, die sich nachts selbst neu baut — ohne Agentur, ohne Rechnung",
+          "body": "Du änderst einen Text im Editor. In der Nacht baut sich die Seite selbst neu, prüft sich\ngegen Leak-Regeln und ist am Morgen live. Keine Agentur, kein Monatsabo, keine fremde\nCloud, die deine Besucherdaten mitliest.\n"
+        },
+        "deep": {
+          "body": "Eine statische Website (vorgerendert, winzige Angriffsfläche) wird aus einem\nHeadless-CMS gespeist und ist mehrsprachig. Sie ist auf Auffindbarkeit getrimmt: für\nklassische Suchmaschinen (strukturierte Daten, Sitemap) und für KI-Antwortmaschinen\n(maschinenlesbare Inhalts-Karte). Eine On-Site-Suche beantwortet Fragen direkt aus dem\nveröffentlichten Inhalt. Selbst gehostet, cookieless gemessen — volle Datenhoheit.\n",
+          "components": [
+            "Astro (SSG)",
+            "Directus (Headless-CMS)",
+            "JSON-LD / Sitemap / llms.txt",
+            "On-Site-RAG-Suche",
+            "cookieless Analytics"
+          ]
+        }
+      },
+      "en": {
+        "hook": {
+          "headline": "Your face to the world — on your own stack.",
+          "subline": "Fast, secure, self-managed. This very site is the best example.",
+          "body": "Your website doesn't sit with some external vendor — it runs on your own system. You edit\nthe texts yourself, and inquiries land straight in the company system, no detour. And yes:\nthe very page you're reading is built this way.\n"
+        },
+        "story": {
+          "title": "A website that rebuilds itself at night — no agency, no invoice",
+          "body": "You change a text in the editor. Overnight the site rebuilds itself, checks itself against\nleak rules and is live by morning. No agency, no monthly subscription, no foreign cloud\nreading along over your visitors' shoulders.\n"
+        },
+        "deep": {
+          "body": "A static website (pre-rendered, tiny attack surface) is fed from a headless CMS and is\nmultilingual. It's tuned for discoverability: for classic search engines (structured data,\nsitemap) and for AI answer engines (a machine-readable content map). An on-site search\nanswers questions straight from the published content. Self-hosted, measured cookieless —\nfull data sovereignty.\n",
+          "components": [
+            "Astro (SSG)",
+            "Directus (headless CMS)",
+            "JSON-LD / sitemap / llms.txt",
+            "on-site RAG search",
+            "cookieless analytics"
+          ]
+        }
+      }
+    }
+  ],
+  "demos": [
+    {
+      "slug": "grafana-cockpit",
+      "sequence": 10,
+      "color": 24,
+      "status": "live",
+      "url": "https://grafana-demo.indystry.works",
+      "login": "",
+      "title": {
+        "de": "Werks-Cockpit · Live-Monitoring",
+        "en": "Factory cockpit · live monitoring"
+      },
+      "desc": {
+        "de": "Echtzeit-Dashboards auf synthetischen Maschinen- und Sensordaten. Temperatur, Vibration, Ausschuss. Ohne Login.",
+        "en": "Real-time dashboards on synthetic machine & sensor data. Temperature, vibration, scrap. No login."
+      }
+    },
+    {
+      "slug": "metabase-bi",
+      "sequence": 20,
+      "color": 168,
+      "status": "live",
+      "url": "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c",
+      "login": "",
+      "title": {
+        "de": "BI-Cockpit · Auswertungen",
+        "en": "BI cockpit · analytics"
+      },
+      "desc": {
+        "de": "Produktion, Qualität und Ausschussquote als interaktives Dashboard. Ohne Login.",
+        "en": "Production, quality and scrap rate as an interactive dashboard. No login."
+      }
+    },
+    {
+      "slug": "app",
+      "sequence": 25,
+      "color": 200,
+      "status": "live",
+      "url": "https://app-demo.indystry.works",
+      "login": "",
+      "title": {
+        "de": "Mobile App · Werker-App",
+        "en": "Mobile app · shop-floor app"
+      },
+      "desc": {
+        "de": "Anwesenheit, Zeiterfassung, Fertigung und Behälter — die Werker-App direkt im Browser. Ohne Login, einfach durchtippen.",
+        "en": "Attendance, time tracking, manufacturing and containers — the shop-floor app right in your browser. No login, just tap through."
+      }
+    },
+    {
+      "slug": "erp",
+      "sequence": 30,
+      "color": 288,
+      "status": "live",
+      "url": "https://erp-demo.indystry.works/web/login",
+      "login": "demo / demo",
+      "title": {
+        "de": "ERP · ein System für die Firma",
+        "en": "ERP · one system for the company"
+      },
+      "desc": {
+        "de": "Aufträge, Qualität, Lager, Wartung — eine Demo-Instanz zum Durchklicken.",
+        "en": "Orders, quality, stock, maintenance — a demo instance to click through."
+      }
+    },
+    {
+      "slug": "jupyter",
+      "sequence": 40,
+      "color": 211,
+      "status": "live",
+      "url": "https://lab-demo.indystry.works",
+      "login": "",
+      "title": {
+        "de": "Data-Science-Sandbox",
+        "en": "Data-science sandbox"
+      },
+      "desc": {
+        "de": "Notebooks auf den synthetischen Werksdaten — Computer-Vision, ML, Korrelationen.",
+        "en": "Notebooks on the synthetic factory data — computer vision, ML, correlations."
+      }
+    },
+    {
+      "slug": "shiny",
+      "sequence": 50,
+      "color": 268,
+      "status": "live",
+      "url": "https://twin-demo.indystry.works",
+      "login": "",
+      "title": {
+        "de": "Digital-Twin · interaktive Simulation",
+        "en": "Digital twin · interactive simulation"
+      },
+      "desc": {
+        "de": "What-if am Modell: Parameter schieben, Durchsatz und Qualität vorhersagen.",
+        "en": "What-if on the model: shift parameters, predict throughput and quality."
+      }
+    }
+  ]
+}

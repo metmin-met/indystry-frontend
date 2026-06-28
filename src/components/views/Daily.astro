@@ -1,0 +1,269 @@
+---
+// /daily/ — Daily Industrie 4.0 als Editorial-Magazin (indystry-Palette, Serif/Fraunces).
+// Handgezeichnete Linien-SVG-Icons (KEINE Emojis). Liest same-origin /daily.json.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+---
+<section class="dl-mast">
+  <div class="dl-mast-inner">
+    <p class="dl-eyebrow">{L("Daily · Industrie 4.0", "Daily · Industry 4.0")}</p>
+    <h1 class="dl-masthead">{L("Industrie-4.0-Rundschau", "Industry 4.0 Review")}</h1>
+    <p class="dl-edition" id="dl-edition"></p>
+    <p class="dl-note">{L("Selbst gehostet, kein fremder Cloud-Dienst — kuratiert und bewertet von genau der KI-/Such-Pipeline, die wir auch im Haus betreiben.", "Self-hosted, no third-party cloud — curated and rated by the very AI/search pipeline we run in-house.")} <a href={b + "/schnittstellen/"}>{L("Wie das geht", "How it works")} →</a></p>
+  </div>
+</section>
+
+<section class="dl-body">
+  <div class="dl-wrap">
+    <div class="dl-toolbar">
+      <div id="dl-filters" class="dl-chips"></div>
+      <div class="dl-controls">
+        <span class="dl-search">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+          <input type="search" id="dl-q" placeholder={L("Suchen…", "Search…")} aria-label={L("Suchen", "Search")} />
+        </span>
+        <select id="dl-sort" class="dl-select" aria-label={L("Sortierung", "Sort")}>
+          <option value="rel">{L("Relevanz", "Relevance")}</option>
+          <option value="date">{L("Neueste", "Newest")}</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="dl-stats" class="dl-stats"></div>
+    <div id="dl-hero" class="dl-hero"></div>
+
+    <div class="dl-layout">
+      <div id="dl-main" class="dl-main"></div>
+      <aside class="dl-side">
+        <div id="dl-themes" class="dl-widget"></div>
+        <div id="dl-sources" class="dl-widget"></div>
+        <div class="dl-widget dl-about">
+          <p class="dl-wh">{L("Über diesen Digest", "About this digest")}</p>
+          <p class="dl-about-t">{L("Täglich frisch: eine KI durchsucht und bewertet Quellen zu Industrie 4.0, IIoT, OPC-UA, digitalen Zwillingen, MES, Predictive Maintenance und Produktions-KI. Alles selbst gehostet, read-only.", "Fresh daily: an AI searches and rates sources on Industry 4.0, IIoT, OPC-UA, digital twins, MES, predictive maintenance and production AI. All self-hosted, read-only.")}</p>
+          <a class="dl-about-link" href={b + "/stack/"}>{L("Der Stack dahinter", "The stack behind it")} →</a>
+        </div>
+      </aside>
+    </div>
+
+    <p id="dl-empty" class="dl-empty" hidden>{L("Keine Meldungen für diesen Filter.", "No items for this filter.")}</p>
+    <noscript><p class="dl-empty">{L("Bitte JavaScript aktivieren, um den Digest zu laden.", "Please enable JavaScript to load the digest.")}</p></noscript>
+  </div>
+</section>
+
+<style is:global>
+  .dl-mast { background:#0E2E29; color:#F4F6F5; border-bottom:3px solid #E6B23A; }
+  .dl-mast-inner { max-width:1180px; margin:0 auto; padding:clamp(52px,7vw,96px) clamp(24px,5vw,56px) clamp(34px,4vw,48px); }
+  .dl-eyebrow { font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px; }
+  .dl-masthead { font-family:var(--font-serif); font-weight:700; font-size:clamp(44px,8vw,96px); line-height:0.95; letter-spacing:-0.02em; margin:0 0 16px; }
+  .dl-edition { font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#E6B23A; margin:0 0 18px; }
+  .dl-note { font-size:clamp(14px,1.4vw,16.5px); line-height:1.65; color:#BBD0CA; max-width:64ch; margin:0; }
+  .dl-note a { color:#E6B23A; text-decoration:none; font-weight:600; white-space:nowrap; }
+
+  .dl-body { background:#FCFBF8; }
+  .dl-wrap { max-width:1180px; margin:0 auto; padding:clamp(20px,2.5vw,30px) clamp(24px,5vw,56px) clamp(80px,9vw,120px); }
+
+  .dl-toolbar { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid #E7E2D6; }
+  .dl-chips { display:flex; flex-wrap:wrap; gap:7px; }
+  .dl-pill { font-family:var(--font-mono); font-size:11.5px; padding:7px 13px; border:1px solid #D9D2C4; border-radius:999px; background:transparent; cursor:pointer; color:#5C5E63; transition:all .15s; }
+  .dl-pill:hover { border-color:#0E2E29; color:#0E2E29; }
+  .dl-pill.on { background:#0E2E29; color:#fff; border-color:#0E2E29; }
+  .dl-controls { display:flex; gap:8px; align-items:center; }
+  .dl-search { display:inline-flex; align-items:center; gap:7px; border:1px solid #D9D2C4; border-radius:999px; padding:0 13px; background:#fff; color:#92938F; }
+  .dl-search input { border:0; background:transparent; font:inherit; font-size:13.5px; padding:9px 2px; color:#1B1C1E; min-width:170px; }
+  .dl-search input:focus { outline:none; }
+  .dl-search:focus-within { border-color:#0E2E29; color:#0E2E29; }
+  .dl-select { font:inherit; font-size:13px; background:#fff; border:1px solid #D9D2C4; border-radius:999px; padding:9px 14px; color:#1B1C1E; cursor:pointer; }
+
+  .dl-stats { display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:18px 0 2px; }
+  .dl-stat { font-family:var(--font-mono); font-size:11.5px; letter-spacing:.04em; color:#7A7466; }
+  .dl-stat b { color:#0E2E29; font-weight:700; }
+  .dl-stat + .dl-stat::before { content:"·"; margin-right:10px; color:#C9C2B2; }
+  .dl-subnav { display:flex; flex-wrap:wrap; gap:6px; margin-left:auto; }
+  .dl-snav { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; color:#5C5E63; text-decoration:none; border:1px solid #E7E2D6; border-radius:999px; padding:4px 10px; }
+  .dl-snav:hover { border-color:#16463E; color:#16463E; }
+  .dl-snav b { color:#A79C82; font-weight:600; }
+
+  /* Hero */
+  .dl-hero { margin:clamp(22px,3vw,34px) 0 0; display:grid; gap:18px; }
+  .dl-hero-sub { display:grid; grid-template-columns:1fr; gap:16px; }
+  @media(min-width:680px){ .dl-hero-sub { grid-template-columns:1fr 1fr; gap:18px; } }
+
+  .dl-layout { display:grid; grid-template-columns:1fr; gap:clamp(32px,4vw,52px); margin-top:clamp(40px,5vw,64px); }
+  @media(min-width:1000px){ .dl-layout { grid-template-columns:minmax(0,1fr) 300px; } }
+  .dl-side { display:flex; flex-direction:column; gap:18px; }
+  @media(min-width:1000px){ .dl-side { position:sticky; top:90px; align-self:start; } }
+
+  .dl-sec { margin:0 0 clamp(32px,4vw,46px); scroll-margin-top:84px; }
+  .dl-sec-head { display:flex; align-items:center; gap:11px; margin:0 0 18px; padding-bottom:11px; border-bottom:2px solid #1B1C1E; }
+  .dl-sec-ico { display:inline-flex; color:var(--cc,#16463E); }
+  .dl-sec-h { font-family:var(--font-serif); font-weight:700; font-size:clamp(20px,2.3vw,27px); color:#1B1C1E; margin:0; letter-spacing:-0.01em; flex:1; }
+  .dl-sec-n { font-family:var(--font-mono); font-size:12px; color:#A79C82; }
+  .dl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:18px; }
+
+  /* Kicker (Icon + Kategorie statt Emoji/Relevanz-Zahl) */
+  .dl-kicker { display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:10.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--cc,#16463E); }
+  .dl-kicker svg { flex:none; }
+
+  /* Card */
+  .dl-card { display:flex; flex-direction:column; gap:9px; text-decoration:none; color:#1B1C1E; background:#fff; border:1px solid #EAE4D6; border-radius:10px; padding:18px 19px; transition:border-color .15s, box-shadow .15s, transform .15s; }
+  .dl-card:hover { border-color:#16463E; box-shadow:0 12px 28px rgba(14,46,41,.09); transform:translateY(-3px); }
+  .dl-card .dl-title { font-family:var(--font-serif); font-weight:600; font-size:19px; line-height:1.26; color:#1B1C1E; letter-spacing:-0.01em; transition:color .15s; }
+  .dl-card:hover .dl-title { color:#16463E; }
+  .dl-sum { font-size:14px; line-height:1.6; color:#55514A; margin:0; }
+  .dl-meta { font-family:var(--font-mono); font-size:11px; color:#A79C82; letter-spacing:.02em; }
+  .dl-meta b { color:#16463E; font-weight:600; }
+
+  /* Lead-Aufmacher */
+  .dl-lead { display:grid; gap:14px; text-decoration:none; color:#1B1C1E; background:#fff; border:1px solid #EAE4D6; border-top:4px solid var(--cc,#16463E); border-radius:4px; padding:clamp(24px,3.2vw,40px); }
+  .dl-lead:hover { box-shadow:0 18px 40px rgba(14,46,41,.09); }
+  @media(min-width:760px){ .dl-lead { grid-template-columns:1.6fr 1fr; align-items:start; gap:clamp(24px,3vw,44px); } }
+  .dl-lead .dl-title { font-family:var(--font-serif); font-weight:700; font-size:clamp(26px,3.4vw,42px); line-height:1.08; letter-spacing:-0.02em; }
+  .dl-lead:hover .dl-title { color:#16463E; }
+  .dl-lead .dl-sum { font-size:clamp(15px,1.5vw,17px); line-height:1.65; }
+  .dl-lead-side { display:flex; flex-direction:column; gap:12px; }
+  .dl-rule { height:1px; background:#EAE4D6; }
+
+
+  /* Widgets */
+  .dl-widget { background:#fff; border:1px solid #EAE4D6; border-radius:6px; padding:18px 20px; }
+  .dl-wh { font-family:var(--font-serif); font-weight:700; font-size:16px; color:#1B1C1E; margin:0 0 12px; padding-bottom:9px; border-bottom:1px solid #EAE4D6; }
+  .dl-wlist { list-style:none; margin:0; padding:0; }
+  .dl-wrow { display:flex; align-items:center; gap:9px; justify-content:space-between; padding:8px 7px; margin:0 -7px; border-radius:7px; cursor:pointer; transition:background .12s; font-size:13.5px; }
+  .dl-wrow:hover { background:#F6F3EC; }
+  .dl-wrow.on { background:#EDF3F0; box-shadow:inset 2px 0 0 var(--cc,#16463E); }
+  .dl-wname { display:flex; align-items:center; gap:9px; color:#2A2A2A; min-width:0; }
+  .dl-wname svg { flex:none; color:var(--cc,#16463E); }
+  .dl-wn { font-family:var(--font-mono); font-size:11px; font-weight:600; color:#A79C82; flex:none; }
+  .dl-about-t { font-size:13px; line-height:1.6; color:#55514A; margin:0 0 12px; }
+  .dl-about-link { font-family:var(--font-mono); font-size:12px; font-weight:600; color:#16463E; text-decoration:none; }
+  .dl-empty { color:#A79C82; font-size:14px; padding:28px 0; }
+  @media (prefers-reduced-motion: reduce) { .dl-card, .dl-lead { transition:none; } }
+</style>
+
+<script>
+  const DE = document.documentElement.lang !== "en";
+  const T = (d, e) => DE ? d : e;
+  const $ = (id) => document.getElementById(id);
+  const CATCOLOR = { "IIoT/Konnektivität":"#3d7d8c", "Digital Twin":"#6b54b0", "Predictive Maintenance":"#3344a8", "MES/Produktion":"#b05a36", "Edge/Cloud":"#2477a0", "OT-Security":"#a23a86", "KI/Analytics":"#a8761f", "Robotik/Automation":"#3f5e95", "SPS/SCADA":"#3f5e95", "Standards/Interoperabilität":"#357a47", "Nachhaltigkeit":"#357a47", "Software/Simulation":"#6b54b0", "Forschung/Studie":"#3d7d8c", "Markt/Business":"#a8761f", "Events":"#7a7466" };
+  // Handgezeichnete Linien-Icons (stroke=currentColor) — KEINE Emojis
+  const P = {
+    conn:'<circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="5.5" r="2.2"/><circle cx="19" cy="18.5" r="2.2"/><path d="M7 11 17 6M7 13 17 18"/>',
+    twin:'<rect x="4" y="4" width="11" height="11" rx="1.5"/><rect x="9" y="9" width="11" height="11" rx="1.5"/>',
+    wrench:'<path d="M15.5 7.5a3.5 3.5 0 0 1-4.6 4.4L5 18l1 1 6.1-5.9a3.5 3.5 0 0 0 4.4-4.6l-2 2-1.9-.5-.5-1.9z"/>',
+    factory:'<path d="M3 21V11l5 3V11l5 3V8l5 3v10z"/><path d="M3 21h18"/>',
+    cloud:'<path d="M7.5 18h8.5a3.2 3.2 0 0 0 .3-6.4A5 5 0 0 0 7 9.8 3.6 3.6 0 0 0 7.5 18z"/>',
+    shield:'<path d="M12 3.5 19 6.2v4.6c0 4.3-3 7.4-7 9.2-4-1.8-7-4.9-7-9.2V6.2z"/>',
+    chip:'<rect x="7.5" y="7.5" width="9" height="9" rx="1.2"/><path d="M10 3.5v3M14 3.5v3M10 17.5v3M14 17.5v3M3.5 10h3M3.5 14h3M17.5 10h3M17.5 14h3"/>',
+    robot:'<rect x="6" y="9" width="12" height="9" rx="2"/><path d="M12 9V6.5"/><circle cx="12" cy="4.8" r="1.4"/><circle cx="9.5" cy="13.5" r="1.1"/><circle cx="14.5" cy="13.5" r="1.1"/><path d="M4 13h2M18 13h2"/>',
+    sliders:'<path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/>',
+    ruler:'<rect x="3" y="8" width="18" height="8" rx="1"/><path d="M7 8v3.5M11 8v4.5M15 8v3.5M19 8v4.5"/>',
+    leaf:'<path d="M5 19c0-7.7 6-13 14-13 0 7.7-6 13-14 13z"/><path d="M5 19c3-4.5 6.5-7 11-8.5"/>',
+    code:'<path d="M9.5 8 5.5 12l4 4M14.5 8l4 4-4 4"/>',
+    flask:'<path d="M9 3.5h6M10.5 3.5v5.5l-5 8.5a1.8 1.8 0 0 0 1.6 2.8h9.8a1.8 1.8 0 0 0 1.6-2.8l-5-8.5V3.5"/><path d="M8 15h8"/>',
+    chart:'<path d="M4 4v16h16"/><path d="M7.5 15l3.5-4 3 2 4.5-6"/>',
+    cal:'<rect x="4" y="5.5" width="16" height="14.5" rx="1.5"/><path d="M4 10h16M9 3.5v4M15 3.5v4"/>',
+    paper:'<rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  };
+  const ICONMAP = { "IIoT/Konnektivität":"conn","Digital Twin":"twin","Predictive Maintenance":"wrench","MES/Produktion":"factory","Edge/Cloud":"cloud","OT-Security":"shield","KI/Analytics":"chip","Robotik/Automation":"robot","SPS/SCADA":"sliders","Standards/Interoperabilität":"ruler","Nachhaltigkeit":"leaf","Software/Simulation":"code","Forschung/Studie":"flask","Markt/Business":"chart","Events":"cal" };
+  const CATLABEL_EN = { "IIoT/Konnektivität":"IIoT/Connectivity", "Digital Twin":"Digital Twin", "Predictive Maintenance":"Predictive Maintenance", "MES/Produktion":"MES/Production", "Edge/Cloud":"Edge/Cloud", "OT-Security":"OT Security", "KI/Analytics":"AI/Analytics", "Robotik/Automation":"Robotics/Automation", "SPS/SCADA":"PLC/SCADA", "Standards/Interoperabilität":"Standards/Interoperability", "Nachhaltigkeit":"Sustainability", "Software/Simulation":"Software/Simulation", "Forschung/Studie":"Research/Study", "Markt/Business":"Market/Business", "Events":"Events" };
+  const cl = (c) => DE ? (c || "News") : (CATLABEL_EN[c] || c || "News");
+  const cc = (c) => CATCOLOR[c] || "#16463E";
+  function ico(c, sz) { const p = P[ICONMAP[c]] || P.paper; return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`; }
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[m]));
+  const slug = (c) => "sec-" + String(c).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  let DATA = [], gen = "", cat = "", q = "", sort = "rel";
+
+  function kicker(a) { return `<span class="dl-kicker" style="--cc:${cc(a.cat)}">${ico(a.cat, 14)} ${esc(cl(a.cat))}</span>`; }
+  function metaRow(a) { return `<div class="dl-meta"><b>${esc(a.source)}</b>${a.date ? " · " + esc(a.date) : ""}</div>`; }
+
+  function card(a) {
+    return `<a class="dl-card" href="${esc(a.url)}" target="_blank" rel="noopener">
+      ${kicker(a)}<div class="dl-title">${esc(a.title)}</div>
+      <p class="dl-sum">${esc(a.summary)}</p>${metaRow(a)}</a>`;
+  }
+  function lead(a) {
+    return `<a class="dl-lead" href="${esc(a.url)}" target="_blank" rel="noopener" style="--cc:${cc(a.cat)}">
+      <div>${kicker(a)}<div class="dl-title" style="margin-top:10px">${esc(a.title)}</div></div>
+      <div class="dl-lead-side"><p class="dl-sum">${esc(a.summary)}</p><div class="dl-rule"></div>${metaRow(a)}</div></a>`;
+  }
+
+  function bySort(arr) {
+    const c = arr.slice();
+    if (sort === "date") c.sort((a, b) => String(b.date).localeCompare(String(a.date)) || (b.rel||0)-(a.rel||0));
+    else c.sort((a, b) => (b.rel||0)-(a.rel||0) || String(b.date).localeCompare(String(a.date)));
+    return c;
+  }
+  const matchQ = (a) => !q || (a.title + " " + a.summary).toLowerCase().includes(q);
+
+  function render() {
+    const filtered = bySort(DATA.filter((a) => (!cat || a.cat === cat) && matchQ(a)));
+    const filtering = !!cat || !!q;
+    const hero = $("dl-hero"), main = $("dl-main");
+    const ncat = new Set(DATA.map((a) => a.cat).filter(Boolean)).size;
+    $("dl-stats").innerHTML =
+      `<span class="dl-stat"><b>${filtered.length}</b> ${T("Meldungen","items")}</span>` +
+      `<span class="dl-stat"><b>${ncat}</b> ${T("Kategorien","categories")}</span>` +
+      `<span class="dl-stat">${T("Stand","As of")} ${esc(gen)}</span>` +
+      (filtering ? "" : subnav());
+    $("dl-empty").hidden = filtered.length > 0;
+
+    if (filtering) {
+      hero.innerHTML = "";
+      main.innerHTML = filtered.length ? `<div class="dl-grid">${filtered.map(card).join("")}</div>` : "";
+      return;
+    }
+    const top = filtered.slice(0, 3), rest = filtered.slice(3);
+    hero.innerHTML = (top[0] ? lead(top[0]) : "") +
+      (top.length > 1 ? `<div class="dl-hero-sub">${top.slice(1).map(card).join("")}</div>` : "");
+    const groups = {};
+    rest.forEach((a) => { const k = a.cat || "News"; (groups[k] = groups[k] || []).push(a); });
+    const order = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+    main.innerHTML = order.map((k) => `
+      <section class="dl-sec" id="${slug(k)}">
+        <div class="dl-sec-head"><span class="dl-sec-ico" style="--cc:${cc(k)}">${ico(k, 20)}</span><h2 class="dl-sec-h">${esc(cl(k))}</h2><span class="dl-sec-n">${groups[k].length}</span></div>
+        <div class="dl-grid">${groups[k].map(card).join("")}</div>
+      </section>`).join("");
+  }
+
+  function subnav() {
+    const g = {}; DATA.forEach((a) => { const k = a.cat || "News"; g[k] = (g[k]||0)+1; });
+    const order = Object.keys(g).sort((a, b) => g[b]-g[a]).slice(0, 6);
+    return `<nav class="dl-subnav">${order.map((k) => `<a class="dl-snav" href="#${slug(k)}">${esc(cl(k))} <b>${g[k]}</b></a>`).join("")}</nav>`;
+  }
+  function setCat(c) { cat = (cat === c) ? "" : c; sync(); render(); }
+  function sync() {
+    document.querySelectorAll(".dl-pill").forEach((p) => p.classList.toggle("on", p.dataset.cat === cat));
+    document.querySelectorAll(".dl-wrow").forEach((w) => w.classList.toggle("on", w.dataset.cat === cat));
+  }
+  function buildChips() {
+    const g = {}; DATA.forEach((a) => { if (a.cat) g[a.cat] = (g[a.cat]||0)+1; });
+    const order = Object.keys(g).sort((a, b) => g[b]-g[a]);
+    const f = $("dl-filters");
+    const all = document.createElement("button"); all.className = "dl-pill on"; all.dataset.cat = ""; all.textContent = T("Alle","All") + " · " + DATA.length; all.onclick = () => setCat(""); f.appendChild(all);
+    order.forEach((k) => { const btn = document.createElement("button"); btn.className = "dl-pill"; btn.dataset.cat = k; btn.textContent = cl(k); btn.onclick = () => setCat(k); f.appendChild(btn); });
+  }
+  function buildWidgets() {
+    const g = {}; DATA.forEach((a) => { if (a.cat) g[a.cat] = (g[a.cat]||0)+1; });
+    const order = Object.keys(g).sort((a, b) => g[b]-g[a]);
+    $("dl-themes").innerHTML = `<p class="dl-wh">${T("Themen heute","Topics today")}</p><ul class="dl-wlist">` +
+      order.map((k) => `<li class="dl-wrow" data-cat="${esc(k)}" style="--cc:${cc(k)}"><span class="dl-wname">${ico(k, 16)} ${esc(cl(k))}</span><span class="dl-wn">${g[k]}</span></li>`).join("") + `</ul>`;
+    $("dl-themes").querySelectorAll(".dl-wrow").forEach((w) => w.addEventListener("click", () => setCat(w.dataset.cat)));
+    const s = {}; DATA.forEach((a) => { if (a.source) s[a.source] = (s[a.source]||0)+1; });
+    const so = Object.keys(s).sort((a, b) => s[b]-s[a]).slice(0, 7);
+    $("dl-sources").innerHTML = `<p class="dl-wh">${T("Top-Quellen","Top sources")}</p><ul class="dl-wlist">` +
+      so.map((x) => `<li class="dl-wrow" style="cursor:default"><span class="dl-wname">${esc(x)}</span><span class="dl-wn">${s[x]}</span></li>`).join("") + `</ul>`;
+  }
+
+  fetch("/daily.json", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+    DATA = d.items || []; gen = d.generated || "";
+    $("dl-edition").textContent = T(`Ausgabe ${gen} · ${DATA.length} Meldungen`, `Edition ${gen} · ${DATA.length} items`);
+    buildChips(); buildWidgets(); render();
+    $("dl-q").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); render(); });
+    $("dl-sort").addEventListener("change", (e) => { sort = e.target.value; render(); });
+  }).catch(() => { $("dl-edition").textContent = T("Digest derzeit nicht ladbar.", "Digest currently unavailable."); });
+</script>

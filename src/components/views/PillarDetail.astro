@@ -1,0 +1,150 @@
+---
+// Säulen-Detailseite im Handoff-Stil (Bone/Pinie/Gold, Schibsted, editorial Spine-Kopf).
+import { pillars, type Lang, type Pillar } from "../../lib/content";
+import { STACK } from "../../lib/stack";
+import { t } from "../../lib/i18n";
+interface Props { pillar: Pillar; lang: Lang }
+const { pillar, lang } = Astro.props;
+const de = lang === "de";
+const c = pillar[lang];
+const ui = t(lang);
+const back = de ? "/#saeulen" : "/en/#saeulen";
+const related = pillars.filter((p) => p.slug !== pillar.slug).slice(0, 3);
+const stack = STACK[pillar.slug];
+const nr = String(Math.round(pillar.sequence / 10)).padStart(2, "0");
+const CAT: Record<string, string> = {
+  "basis-betrieb": "Betrieb", "automatisierung-leittechnik": "Produktion", "digital-twin-simulation": "Produktion",
+  "historian-datalake": "Daten", "bi-analytics": "Daten", "erp-betrieb": "Betrieb", "zusammenarbeit": "Team",
+  "ki-suche-nlp": "KI", "wissen-compliance-kiosk": "Wissen", "web-aussenauftritt": "Betrieb",
+};
+const cat = CAT[pillar.slug] || "";
+const detailUrl = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s + "/");
+---
+<article style="background:#F8F9FA;">
+  <div style="max-width:880px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <a href={back} style="text-decoration:none; font-size:14px; font-weight:500; color:#5C5E63; border-bottom:1.5px solid #16463E; padding-bottom:2px;">← {ui.back}</a>
+
+    <!-- Spine-Kopf -->
+    <div style="display:flex; align-items:center; gap:20px; margin:clamp(40px,5vw,64px) 0 clamp(32px,4vw,44px);">
+      <span style="font-size:13px; font-weight:600; color:#16463E;">{nr}</span>
+      <span style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F;">{cat} — {de ? "Baustein" : "Building block"}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <h1 style="font-weight:600; font-size:clamp(36px,6vw,72px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px); max-width:16ch;">{c.hook.headline}</h1>
+    <p style="font-size:clamp(18px,2vw,24px); line-height:1.45; color:#3C3E42; margin:0 0 20px; max-width:46ch;">{c.hook.subline}</p>
+    <p style="font-size:17px; line-height:1.7; color:#5C5E63; margin:0; max-width:62ch;">{c.hook.body}</p>
+
+    <!-- Spec-Badges + Modul-Mockup (Stitch-Produktlook) -->
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:clamp(28px,4vw,40px) 0 0;">
+      {[de ? "Quelloffen" : "Open source", "Self-hosted", "DSGVO", "NIS2-ready"].map((b) => (
+        <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#16463E; border:1px solid #C0C8C5; border-radius:9999px; padding:5px 12px;">{b}</span>
+      ))}
+    </div>
+    {c.deep.components.length > 0 && (
+      <div style="margin-top:clamp(28px,4vw,40px); background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 18px 50px rgba(15,23,42,0.06); overflow:hidden; max-width:560px;">
+        <div style="display:flex; align-items:center; gap:14px; padding:12px 16px; background:#F4F4EF; border-bottom:1px solid #E2E8F0;">
+          <span style="display:flex; gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span></span>
+          <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#92938F;">{pillar.slug.toUpperCase().replaceAll("-", "_")}</span>
+        </div>
+        <div style="padding:clamp(20px,3vw,28px);">
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{cat} — {de ? "Modul" : "Module"}</p>
+          <div style="display:grid; gap:10px; margin:0 0 18px;">
+            {c.deep.components.slice(0, 5).map((x) => (
+              <div style="display:flex; align-items:center; gap:10px; font-size:15px; color:#1B1C1E;">
+                <span style="color:#16463E; font-weight:700;">✓</span><span>{x}</span>
+              </div>
+            ))}
+          </div>
+          <div style="background:#123A33; border-radius:8px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; color:#A6CFC5;">
+            <span>{de ? "BETRIEB" : "DEPLOYMENT"}</span><span style="color:#E6B23A;">SELF-HOSTED · ON-PREM</span>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {pillar.slug === "erp-betrieb" && (
+      <a href={de ? "/erp/" : "/en/erp/"} class="pd-rel" style="text-decoration:none; color:#1B1C1E; display:inline-flex; align-items:center; gap:8px; margin-top:clamp(28px,4vw,40px); font-weight:600; font-size:15px; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{de ? "Zur ERP-Produktseite" : "To the ERP product page"} →</a>
+    )}
+
+    <!-- Story -->
+    <section style="margin-top:clamp(48px,6vw,72px); border-top:1px solid #E2E8F0; padding-top:clamp(32px,4vw,44px);">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 20px;">{ui.story_label}</p>
+      <h2 style="font-weight:600; font-size:clamp(24px,3vw,36px); line-height:1.1; letter-spacing:-0.02em; margin:0 0 18px; max-width:24ch;">{c.story.title}</h2>
+      <p style="font-size:17px; line-height:1.7; color:#5C5E63; margin:0; max-width:62ch;">{c.story.body}</p>
+    </section>
+
+    <!-- Tiefe -->
+    <details style="margin-top:clamp(40px,5vw,56px); border-top:1px solid #E2E8F0; padding-top:24px;">
+      <summary style="list-style:none; cursor:pointer; font-weight:600; font-size:18px; display:flex; align-items:center; justify-content:space-between; gap:16px;">{ui.deep_title} <span style="color:#16463E; font-weight:400; font-size:22px;">+</span></summary>
+      <div style="padding-top:18px;">
+        <p style="font-size:16px; line-height:1.7; color:#5C5E63; margin:0; max-width:62ch;">{c.deep.body}</p>
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:24px 0 12px;">{ui.components_label}</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          {c.deep.components.map((x) => <a href={pillar.demo.status === "live" ? pillar.demo.url : (de ? "/kontakt/" : "/en/kontakt/")} class="chip-link" style="text-decoration:none; font-size:13px; font-weight:500; color:#1B1C1E; border:1px solid #E2E8F0; padding:7px 14px;">{x}</a>)}
+        </div>
+      </div>
+    </details>
+
+    <!-- Worauf das aufbaut -->
+    {stack && stack.length > 0 && (
+      <section style="margin-top:clamp(48px,6vw,72px); border-top:1px solid #E2E8F0; padding-top:clamp(32px,4vw,44px);">
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(24px,3vw,36px);">{ui.stack_label}</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:clamp(24px,3vw,40px);">
+          {stack.map((s) => (
+            <div style="border-top:2px solid #1B1C1E; padding-top:20px;">
+              <strong style="font-weight:600; font-size:17px;">{s.name}</strong>
+              <p style="color:#5C5E63; margin:10px 0 0; font-size:15px; line-height:1.6;">{de ? s.de : s.en}</p>
+              {(de ? s.who_de : s.who_en) && (
+                <p style="margin:12px 0 0; font-size:13px; color:#92938F;">{ui.stack_who}: {de ? s.who_de : s.who_en}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Demo CTA -->
+    <section style="margin-top:clamp(48px,6vw,72px); border-top:2px solid #1B1C1E; padding-top:28px; display:flex; flex-wrap:wrap; align-items:center; gap:18px;">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0; flex:1; min-width:200px;">{ui.demo_label}</p>
+      {pillar.demo.status === "live" ? (
+        <a href={pillar.demo.url} style="text-decoration:none; background:#1B1C1E; color:#F8F9FA; font-weight:500; font-size:15px; padding:15px 26px;">{ui.demo_open} ↗</a>
+      ) : (
+        <span style="font-size:14px; color:#92938F;">{ui.demo_soon}{pillar.demo.login && pillar.demo.login !== "diese Seite selbst" ? " · " + ui.demo_login + ": " + pillar.demo.login : ""}</span>
+      )}
+    </section>
+
+    <!-- Weiter stöbern -->
+    <nav aria-label={ui.related_label} style="margin-top:clamp(48px,6vw,72px); border-top:1px solid #E2E8F0; padding-top:clamp(32px,4vw,44px);">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 8px;">{ui.related_label}</p>
+      <div>
+        {related.map((p) => (
+          <a href={detailUrl(p.slug)} style="text-decoration:none; color:#1B1C1E; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline; padding:20px 0; border-bottom:1px solid #E2E8F0;" class="pd-rel">
+            <span style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-weight:600; font-size:18px; letter-spacing:-0.015em;">{p[lang].hook.headline}</span>
+              <span style="color:#5C5E63; font-size:14px;">{p[lang].hook.subline}</span>
+            </span>
+            <span style="color:#92938F;">↗</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+</article>
+
+<!-- Dunkler Pain-List-CTA (konsistent zur Landing) -->
+<section style="background:#123A33; color:#F8F9FA;">
+  <div style="max-width:880px; margin:0 auto; padding:clamp(72px,10vw,128px) clamp(24px,5vw,56px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Pain-List → Lösung" : "Pain list → solution"}</p>
+    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(28px,4vw,40px);">{de ? "Schick uns deine Pain-List." : "Send us your pain list."}</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center;">
+      <a href={de ? "/kontakt/" : "/en/kontakt/"} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px;">{de ? "Pain-List schicken →" : "Send pain list →"}</a>
+      <a href="mailto:hallo@datendrang.com" style="text-decoration:none; font-size:15px; color:#F8F9FA; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "oder direkt: hallo@datendrang.com" : "or email: hallo@datendrang.com"}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pd-rel:hover { color: #16463E; }
+  .chip-link:hover { border-color: #16463E; color: #16463E; }
+  details > summary::-webkit-details-marker { display: none; }
+</style>

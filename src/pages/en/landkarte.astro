@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Landkarte from "../../components/views/Landkarte.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Factory map · indystry" description="The whole company as a clickable map: every phase, every tool, every live demo — filter by act, area or live only." path="/en/landkarte/" altPath="/landkarte/">
+  <Landkarte lang={lang} />
+</Base>

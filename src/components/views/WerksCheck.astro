@@ -1,0 +1,285 @@
+---
+// Werks-Check — interaktiver Selbsttest (ADHS-Test-Stil) → Profil-Typ + Empfehlungen.
+// Teaser frei, Vollergebnis (Empfehlungen + Demos) nach Kontakt-Gate. Lead → /_lead/submit.
+import { type Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const ph = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s + "/");
+
+// 5 Profil-Typen (Kundentyp/Bedarf) → Empfehlungen (Säulen) + Demos
+const P: Record<string, any> = {
+  jongleur: {
+    name: de ? "Der Tabellen-Jongleur" : "The spreadsheet juggler",
+    blurb: de ? "Du hältst zehn Listen gleichzeitig in der Luft — und betest, dass keine runterfällt. Jede Auswertung ist Handarbeit, jede Zahl wohnt woanders." : "You keep ten lists in the air at once — praying none drops. Every report is manual, every number lives elsewhere.",
+    recs: [
+      { l: de ? "ERP & Betrieb — ein System statt zehn Tabellen" : "ERP & operations — one system instead of ten sheets", h: ph("erp-betrieb") },
+      { l: de ? "BI & Analytics — Auswertungen, die sich selbst aktualisieren" : "BI & analytics — reports that refresh themselves", h: ph("bi-analytics") },
+    ],
+    demos: [{ l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "BI-Dashboard ansehen ↗" : "View BI dashboard ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }],
+  },
+  inseln: {
+    name: de ? "Der Insel-Sammler" : "The island collector",
+    blurb: de ? "Viele Tools, keine Brücken. Jedes kann was, aber sie reden nicht miteinander — also kopierst du Daten von Hand hin und her." : "Many tools, no bridges. Each does something, but they don't talk — so you copy data back and forth by hand.",
+    recs: [
+      { l: de ? "Historian & Data-Lake — eine Quelle statt Inseln" : "Historian & data lake — one source instead of islands", h: ph("historian-datalake") },
+      { l: de ? "ERP & Betrieb — der Kern, an den alles andockt" : "ERP & operations — the core everything docks onto", h: ph("erp-betrieb") },
+    ],
+    demos: [{ l: de ? "BI-Dashboard ansehen ↗" : "View BI dashboard ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }, { l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }],
+  },
+  blindflug: {
+    name: de ? "Der Blindflieger" : "The blind flyer",
+    blurb: de ? "Du siehst nicht in Echtzeit, was die Maschinen und die Produktion gerade tun. Probleme bemerkst du erst, wenn's zu spät ist." : "You can't see in real time what the machines and production are doing. You spot problems only when it's too late.",
+    recs: [
+      { l: de ? "Automatisierung & Leittechnik — Daten direkt von der Maschine" : "Automation & control — data straight from the machine", h: ph("automatisierung-leittechnik") },
+      { l: de ? "BI & Analytics — Live-Monitoring & Drift-Erkennung" : "BI & analytics — live monitoring & drift detection", h: ph("bi-analytics") },
+    ],
+    demos: [{ l: de ? "Live-Cockpit ansehen ↗" : "View live cockpit ↗", h: "https://grafana-demo.indystry.works" }, { l: de ? "Digital-Twin ausprobieren ↗" : "Try the digital twin ↗", h: "https://twin-demo.indystry.works" }],
+  },
+  souveraen: {
+    name: de ? "Der Souveränitäts-Sucher" : "The sovereignty seeker",
+    blurb: de ? "Deine Daten sollen dir gehören — kein Vendor-Lock-in, kein US-Cloud-Zugriff, sauber für DSGVO & Audit. Genau dafür ist der dritte Weg gebaut." : "You want your data to be yours — no vendor lock-in, no US-cloud access, clean for GDPR & audits. That's exactly what the third way is built for.",
+    recs: [
+      { l: de ? "Betrieb & Infrastruktur — alles im eigenen Haus" : "Operations & infrastructure — all in-house", h: ph("basis-betrieb") },
+      { l: de ? "Digitale Souveränität — der ganze Ansatz auf einen Blick" : "Digital sovereignty — the whole approach at a glance", h: (de ? "/#souv" : "/en/#souv") },
+    ],
+    demos: [{ l: de ? "Alle 10 Bausteine ansehen ↗" : "See all 10 building blocks ↗", h: (de ? "/#saeulen" : "/en/#saeulen") }],
+  },
+  wachstum: {
+    name: de ? "Der Wachstums-Werker" : "The growth maker",
+    blurb: de ? "Ihr wachst — und die Software kommt nicht mehr mit. Ihr braucht Struktur, die mitwächst, ohne euch in Konzern-Software zu zwingen." : "You're growing — and the software can't keep up. You need structure that scales with you, without forcing you into enterprise software.",
+    recs: [
+      { l: de ? "ERP & Betrieb — Struktur für die ganze Firma" : "ERP & operations — structure for the whole company", h: ph("erp-betrieb") },
+      { l: de ? "Zusammenarbeit — Team, Wissen & Abläufe an einem Ort" : "Collaboration — team, knowledge & processes in one place", h: ph("zusammenarbeit") },
+    ],
+    demos: [{ l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "Werker-App ausprobieren ↗" : "Try the shop-floor app ↗", h: "https://app-demo.indystry.works" }],
+  },
+};
+
+// 7 Fragen — jede Option zählt auf einen Profil-Typ
+const Q = de ? [
+  { q: "Wenn du wissen willst, wie viel ihr letzte Woche produziert habt — wie kommst du an die Zahl?", o: [
+    { t: "Mehrere Excel-Listen zusammensuchen", p: "jongleur" },
+    { t: "In drei verschiedenen Programmen nachschauen", p: "inseln" },
+    { t: "Gar nicht in Echtzeit — ich muss jemanden fragen", p: "blindflug" },
+    { t: "Wir wachsen so schnell, dass die Zahl ständig veraltet ist", p: "wachstum" } ] },
+  { q: "Wo liegen eure wichtigsten Betriebsdaten?", o: [
+    { t: "In Tabellen auf Laufwerken und in Mail-Anhängen", p: "jongleur" },
+    { t: "Verteilt über viele einzelne Insel-Tools", p: "inseln" },
+    { t: "In der Cloud eines US-Anbieters", p: "souveraen" },
+    { t: "Da, wo gerade Platz war — es wird schnell unübersichtlich", p: "wachstum" } ] },
+  { q: "Was nervt dich Montag früh am meisten?", o: [
+    { t: "Zahlen aus verschiedenen Listen abgleichen", p: "jongleur" },
+    { t: "Daten zwischen Programmen hin- und herkopieren", p: "inseln" },
+    { t: "Keiner weiß, was die Maschinen am Wochenende wirklich getan haben", p: "blindflug" },
+    { t: "Abläufe, die mit dem Wachstum nicht mehr mithalten", p: "wachstum" } ] },
+  { q: "Ein Kunde oder Auditor fragt nach einem Nachweis. Was passiert?", o: [
+    { t: "Panik-Suche quer durch Ordner und Tabellen", p: "jongleur" },
+    { t: "Zusammenstückeln aus mehreren Tools", p: "inseln" },
+    { t: "Sorge wegen Datenschutz, DSGVO und Cloud-Zugriff", p: "souveraen" },
+    { t: "Wir merken, dass unsere Prozesse nicht skalieren", p: "wachstum" } ] },
+  { q: "Eure Software-Landschaft fühlt sich an wie …", o: [
+    { t: "Ein Tabellen-Dschungel", p: "jongleur" },
+    { t: "Viele Inseln ohne Brücken", p: "inseln" },
+    { t: "Eine Blackbox — ich seh nicht rein", p: "blindflug" },
+    { t: "Gemietet — wir hängen am Anbieter", p: "souveraen" } ] },
+  { q: "Was würde euch gerade am meisten bringen?", o: [
+    { t: "Ein System statt zehn Tabellen", p: "jongleur" },
+    { t: "Dass die Programme endlich miteinander reden", p: "inseln" },
+    { t: "Live sehen, was in der Produktion passiert", p: "blindflug" },
+    { t: "Mitwachsen können — ohne Konzern-Software", p: "wachstum" } ] },
+  { q: "Wie wichtig ist euch, dass Daten und System wirklich euch gehören?", o: [
+    { t: "Sehr — Unabhängigkeit ist ein Hauptgrund", p: "souveraen" },
+    { t: "Wichtig, aber zuerst muss der Alltag laufen", p: "jongleur" },
+    { t: "Wir wollen vor allem den Überblick zurück", p: "blindflug" },
+    { t: "Hauptsache, es trägt unser Wachstum", p: "wachstum" } ] },
+] : [
+  { q: "When you want to know how much you produced last week — how do you get the number?", o: [
+    { t: "Piece it together from several Excel sheets", p: "jongleur" },
+    { t: "Check in three different programs", p: "inseln" },
+    { t: "Not in real time — I have to ask someone", p: "blindflug" },
+    { t: "We grow so fast the number is always outdated", p: "wachstum" } ] },
+  { q: "Where do your most important operational data live?", o: [
+    { t: "In spreadsheets on drives and email attachments", p: "jongleur" },
+    { t: "Spread across many separate island tools", p: "inseln" },
+    { t: "In a US provider's cloud", p: "souveraen" },
+    { t: "Wherever there was room — it gets messy fast", p: "wachstum" } ] },
+  { q: "What annoys you most on Monday morning?", o: [
+    { t: "Reconciling numbers across lists", p: "jongleur" },
+    { t: "Copying data between programs", p: "inseln" },
+    { t: "Nobody knows what the machines actually did", p: "blindflug" },
+    { t: "Processes that can't keep up with growth", p: "wachstum" } ] },
+  { q: "A customer or auditor asks for proof. What happens?", o: [
+    { t: "Panic search through folders and sheets", p: "jongleur" },
+    { t: "Stitching it together from several tools", p: "inseln" },
+    { t: "Worry about privacy, GDPR and cloud access", p: "souveraen" },
+    { t: "We realise our processes don't scale", p: "wachstum" } ] },
+  { q: "Your software landscape feels like …", o: [
+    { t: "A spreadsheet jungle", p: "jongleur" },
+    { t: "Many islands without bridges", p: "inseln" },
+    { t: "A black box — I can't see inside", p: "blindflug" },
+    { t: "Rented — we depend on the vendor", p: "souveraen" } ] },
+  { q: "What would help you most right now?", o: [
+    { t: "One system instead of ten spreadsheets", p: "jongleur" },
+    { t: "Getting the programs to finally talk", p: "inseln" },
+    { t: "Seeing live what happens in production", p: "blindflug" },
+    { t: "Being able to scale — without enterprise software", p: "wachstum" } ] },
+  { q: "How important is it that the data and system are truly yours?", o: [
+    { t: "Very — independence is a main reason", p: "souveraen" },
+    { t: "Important, but daily ops come first", p: "jongleur" },
+    { t: "We mostly want the overview back", p: "blindflug" },
+    { t: "As long as it carries our growth", p: "wachstum" } ] },
+];
+
+const order = ["jongleur", "inseln", "blindflug", "souveraen", "wachstum"];
+const tx = {
+  eyebrow: de ? "Diagnose — Werks-Check" : "Diagnosis — factory check",
+  h1: de ? "Welcher Typ Werk seid ihr?" : "What kind of plant are you?",
+  lead: de ? "7 Fragen, zwei Minuten. Am Ende weißt du, wo's bei euch wirklich klemmt — und welche Bausteine zuerst etwas bringen." : "7 questions, two minutes. At the end you'll know where it really pinches — and which building blocks help first.",
+  start: de ? "Check starten →" : "Start the check →",
+  of: de ? "von" : "of",
+  back: de ? "← zurück" : "← back",
+  resultKicker: de ? "Dein Ergebnis" : "Your result",
+  gateTitle: de ? "Empfehlungen freischalten" : "Unlock your recommendations",
+  gateText: de ? "Sag uns, wohin wir dein vollständiges Ergebnis schicken dürfen — du bekommst die passenden Bausteine, Demos und einen konkreten ersten Schritt." : "Tell us where to send your full result — you'll get the matching building blocks, demos and a concrete first step.",
+  name: de ? "Name" : "Name", email: de ? "E-Mail" : "Email", company: de ? "Firma (optional)" : "Company (optional)",
+  consent: de ? "Ihr dürft mich zu meinem Ergebnis kontaktieren." : "You may contact me about my result.",
+  submit: de ? "Ergebnis freischalten →" : "Unlock result →",
+  sending: de ? "Wird gesendet …" : "Sending …",
+  required: de ? "Bitte Name und gültige E-Mail angeben." : "Please enter a name and valid email.",
+  err: de ? "Hat nicht geklappt — bitte nochmal." : "Didn't work — please try again.",
+  recsTitle: de ? "Deine Bausteine — der Reihe nach" : "Your building blocks — in order",
+  demosTitle: de ? "Zum Anfassen" : "Try it",
+  restart: de ? "Check nochmal machen" : "Retake the check",
+  contactCta: de ? "Pain-List schicken →" : "Send pain list →",
+  privacy: de ? "Keine Weitergabe, kein Verteiler. Nur für dein Ergebnis." : "No sharing, no mailing list. Only for your result.",
+};
+const contactHref = de ? "/kontakt/" : "/en/kontakt/";
+---
+<section style="background:#F8F9FA; min-height:70vh;">
+  <div style="max-width:760px; margin:0 auto; padding:clamp(64px,8vw,112px) clamp(24px,5vw,56px) clamp(96px,12vw,168px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(28px,4vw,40px);">{tx.eyebrow}</p>
+    <div id="wc-app" data-contact={contactHref}>
+      <!-- Start -->
+      <div id="wc-start">
+        <h1 style="font-weight:600; font-size:clamp(40px,7vw,88px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{tx.h1}</h1>
+        <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:52ch; margin:0 0 clamp(36px,5vw,48px);">{tx.lead}</p>
+        <button id="wc-go" type="button" style="cursor:pointer; font-family:inherit; background:#1B1C1E; color:#F8F9FA; border:none; font-weight:600; font-size:16px; padding:18px 32px;">{tx.start}</button>
+      </div>
+    </div>
+    <noscript><p style="color:#5C5E63;">Der Werks-Check braucht JavaScript. <a href={contactHref} style="color:#16463E;">Schreib uns stattdessen direkt →</a></p></noscript>
+  </div>
+</section>
+
+<script is:inline define:vars={{ Q, P, order, tx }}>
+  (function () {
+    var app = document.getElementById("wc-app");
+    if (!app) return;
+    var contactHref = app.getAttribute("data-contact") || "/kontakt/";
+    var answers = [], step = 0;
+    var esc = function (s) { return String(s || "").replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+
+    function render(html) { app.innerHTML = html; }
+    function start() { step = 0; answers = []; question(); }
+
+    function question() {
+      var qi = step, item = Q[qi];
+      var opts = item.o.map(function (o, i) {
+        return '<button type="button" class="wc-opt" data-p="' + o.p + '" style="cursor:pointer;text-align:left;font-family:inherit;font-size:clamp(16px,1.7vw,18px);color:#1B1C1E;background:#fff;border:1px solid #E2E8F0;border-radius:4px;padding:18px 20px;display:block;width:100%;margin-bottom:12px;transition:border-color .15s ease,color .15s ease;">' + esc(o.t) + "</button>";
+      }).join("");
+      render(
+        '<p style="font-size:13px;font-weight:600;letter-spacing:0.04em;color:#16463E;margin:0 0 18px;">' + (qi + 1) + " " + tx.of + " " + Q.length + "</p>" +
+        '<div style="height:3px;background:#E2E8F0;margin:0 0 clamp(28px,4vw,40px);"><div style="height:3px;background:#16463E;width:' + Math.round(((qi) / Q.length) * 100) + '%;transition:width .3s ease;"></div></div>' +
+        '<h2 style="font-weight:600;font-size:clamp(24px,3.4vw,40px);line-height:1.1;letter-spacing:-0.02em;margin:0 0 clamp(28px,4vw,36px);max-width:22ch;">' + esc(item.q) + "</h2>" +
+        opts +
+        (qi > 0 ? '<button type="button" id="wc-back" style="cursor:pointer;font-family:inherit;background:none;border:none;color:#92938F;font-size:14px;font-weight:600;margin-top:10px;padding:6px 0;">' + tx.back + "</button>" : "")
+      );
+      Array.prototype.forEach.call(app.querySelectorAll(".wc-opt"), function (b) {
+        b.addEventListener("mouseenter", function () { b.style.borderColor = "#16463E"; b.style.color = "#16463E"; });
+        b.addEventListener("mouseleave", function () { b.style.borderColor = "#E2E8F0"; b.style.color = "#1B1C1E"; });
+        b.addEventListener("click", function () {
+          answers[qi] = { p: b.getAttribute("data-p"), t: b.textContent };
+          if (step < Q.length - 1) { step++; question(); } else { result(); }
+        });
+      });
+      var bk = document.getElementById("wc-back");
+      if (bk) bk.addEventListener("click", function () { step--; question(); });
+    }
+
+    function topProfile() {
+      var c = {}; order.forEach(function (k) { c[k] = 0; });
+      answers.forEach(function (a) { if (a && c[a.p] != null) c[a.p]++; });
+      var best = order[0];
+      order.forEach(function (k) { if (c[k] > c[best]) best = k; });
+      return best;
+    }
+
+    function result() {
+      var key = topProfile(), prof = P[key];
+      render(
+        '<p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#92938F;margin:0 0 14px;">' + tx.resultKicker + "</p>" +
+        '<h1 style="font-weight:600;font-size:clamp(32px,6vw,72px);line-height:1.0;letter-spacing:-0.03em;margin:0 0 18px;">' + esc(prof.name) + "</h1>" +
+        '<p style="font-size:clamp(17px,1.7vw,20px);line-height:1.6;color:#3C3E42;max-width:54ch;margin:0 0 clamp(36px,5vw,48px);">' + esc(prof.blurb) + "</p>" +
+        // Gate
+        '<div id="wc-gate" style="border-top:2px solid #1B1C1E;padding-top:clamp(28px,4vw,36px);">' +
+          '<h2 style="font-weight:600;font-size:clamp(20px,2.2vw,26px);letter-spacing:-0.015em;margin:0 0 10px;">' + tx.gateTitle + "</h2>" +
+          '<p style="font-size:15px;line-height:1.6;color:#5C5E63;max-width:48ch;margin:0 0 22px;">' + tx.gateText + "</p>" +
+          '<form id="wc-form" novalidate style="display:flex;flex-direction:column;gap:14px;max-width:440px;">' +
+            '<input name="name" type="text" placeholder="' + tx.name + '" maxlength="200" style="font:inherit;padding:14px 16px;border:1px solid #E2E8F0;border-radius:4px;background:#fff;" />' +
+            '<input name="email" type="email" placeholder="' + tx.email + '" maxlength="254" style="font:inherit;padding:14px 16px;border:1px solid #E2E8F0;border-radius:4px;background:#fff;" />' +
+            '<input name="company" type="text" placeholder="' + tx.company + '" maxlength="200" style="font:inherit;padding:14px 16px;border:1px solid #E2E8F0;border-radius:4px;background:#fff;" />' +
+            '<label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#5C5E63;line-height:1.5;"><input name="consent" type="checkbox" style="margin-top:3px;" /> <span>' + tx.consent + "</span></label>" +
+            '<div style="position:absolute;left:-9999px;" aria-hidden="true"><input name="website" type="text" tabindex="-1" autocomplete="off" /></div>' +
+            '<button type="submit" style="cursor:pointer;font-family:inherit;background:#1B1C1E;color:#F8F9FA;border:none;font-weight:600;font-size:16px;padding:16px 28px;align-self:flex-start;">' + tx.submit + "</button>" +
+            '<p id="wc-status" style="margin:0;font-weight:600;min-height:1.2em;font-size:14px;"></p>' +
+            '<p style="color:#92938F;font-size:13px;margin:0;">' + tx.privacy + "</p>" +
+          "</form>" +
+        "</div>"
+      );
+      var form = document.getElementById("wc-form");
+      var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var st = document.getElementById("wc-status"); st.style.color = "#b4232a";
+        var fd = new FormData(form);
+        var name = (fd.get("name") || "").trim(), email = (fd.get("email") || "").trim(), company = (fd.get("company") || "").trim();
+        if (fd.get("website")) { reveal(key); return; } // Honeypot → still reveal, kein Lead
+        if (!name || !emailRe.test(email)) { st.textContent = tx.required; return; }
+        var msg = "Werks-Check — Ergebnis: " + prof.name + "\n\n" + answers.map(function (a, i) { return (i + 1) + ". " + Q[i].q + "\n   → " + a.t; }).join("\n");
+        var btn = form.querySelector("button[type=submit]"); btn.disabled = true; st.style.color = "#5C5E63"; st.textContent = tx.sending;
+        fetch("/_lead/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: name, email: email, company: company, message: msg, page: location.pathname }) })
+          .then(function (r) { if (!r.ok) throw new Error("http"); reveal(key); })
+          .catch(function () { st.style.color = "#b4232a"; st.textContent = tx.err; btn.disabled = false; });
+      });
+    }
+
+    function reveal(key) {
+      var prof = P[key];
+      var recs = prof.recs.map(function (r) {
+        return '<a href="' + r.h + '" class="wc-rec" style="text-decoration:none;color:#1B1C1E;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;padding:20px 0;border-bottom:1px solid #E2E8F0;"><span style="font-weight:600;font-size:clamp(17px,1.8vw,20px);letter-spacing:-0.015em;">' + esc(r.l) + '</span><span style="color:#92938F;">↗</span></a>';
+      }).join("");
+      var demos = prof.demos.map(function (d) {
+        return '<a href="' + d.h + '" style="text-decoration:none;color:#16463E;font-weight:600;font-size:15px;display:inline-block;margin:0 22px 12px 0;">' + esc(d.l) + "</a>";
+      }).join("");
+      var gate = document.getElementById("wc-gate");
+      gate.innerHTML =
+        '<p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#16463E;margin:0 0 8px;">✓ ' + tx.resultKicker + " · " + esc(prof.name) + "</p>" +
+        '<h2 style="font-weight:600;font-size:clamp(22px,2.6vw,30px);letter-spacing:-0.02em;margin:0 0 clamp(20px,3vw,28px);">' + tx.recsTitle + "</h2>" +
+        '<div style="border-top:2px solid #1B1C1E;">' + recs + "</div>" +
+        '<p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#92938F;margin:clamp(32px,4vw,44px) 0 16px;">' + tx.demosTitle + "</p>" +
+        "<div>" + demos + "</div>" +
+        '<div style="margin-top:clamp(36px,5vw,48px);display:flex;flex-wrap:wrap;gap:18px;align-items:center;">' +
+          '<a href="' + contactHref + '" style="text-decoration:none;background:#1B1C1E;color:#F8F9FA;font-weight:600;font-size:15px;padding:15px 26px;">' + tx.contactCta + "</a>" +
+          '<button type="button" id="wc-restart" style="cursor:pointer;font-family:inherit;background:none;border:none;color:#92938F;font-size:14px;font-weight:600;">' + tx.restart + "</button>" +
+        "</div>";
+      var rs = document.getElementById("wc-restart"); if (rs) rs.addEventListener("click", start);
+      Array.prototype.forEach.call(document.querySelectorAll(".wc-rec"), function (a) {
+        a.addEventListener("mouseenter", function () { a.style.color = "#16463E"; });
+        a.addEventListener("mouseleave", function () { a.style.color = "#1B1C1E"; });
+      });
+      gate.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    document.getElementById("wc-go").addEventListener("click", start);
+  })();
+</script>

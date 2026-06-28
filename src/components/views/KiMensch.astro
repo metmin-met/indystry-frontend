@@ -1,0 +1,61 @@
+---
+// „KI & Mensch" (lang-aware): ehrliche Positionierung — was die KI übernimmt und wofür es
+// weiter Menschen braucht. Human-in-the-loop, kein Hype, Souveränität.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const P = (path: string) => (de ? "" : "/en") + path;
+const ki = [
+  L("Findet in Sekunden über alle Systeme — Produkte, Maschinen, Aufträge, Handbuch.", "Finds in seconds across all systems — products, machines, orders, handbook."),
+  L("Fasst zusammen und antwortet in ganzen Sätzen — nur auf Basis der eigenen Firmendaten, mit Quellen.", "Summarises and answers in full sentences — only from the company's own data, with sources."),
+  L("Erkennt Muster und Drift früher als das Auge — etwa eine schleichende Maßabweichung.", "Spots patterns and drift earlier than the eye — e.g. a slow dimensional deviation."),
+  L("Nimmt die Routine ab: Tabellen pflegen, suchen, abtippen, Vorschläge vorbereiten.", "Takes the routine off your plate: maintaining spreadsheets, searching, retyping, drafting suggestions."),
+  L("Schlägt vor — Bestellmengen, ähnliche Altfälle, den nächsten sinnvollen Schritt.", "Suggests — order quantities, similar past cases, the next sensible step."),
+];
+const mensch = [
+  L("Entscheidet und verantwortet — die KI schlägt vor, unterschreiben tut ein Mensch.", "Decides and owns it — the AI suggests, a human signs off."),
+  L("Urteilt im Grenzfall, mit Kontext, den keine Datenbank kennt.", "Judges the edge case, with context no database holds."),
+  L("Legt Hand an: rüstet die Maschine, behebt die Störung, prüft das Teil in der Hand.", "Gets hands-on: sets up the machine, fixes the fault, checks the part by hand."),
+  L("Hält die Kundenbeziehung — Vertrauen entsteht zwischen Menschen, nicht aus einem Modell.", "Holds the customer relationship — trust grows between people, not from a model."),
+  L("Trägt Verantwortung, Haftung und das Warum — setzt Prioritäten und Grenzen.", "Carries responsibility, liability and the why — sets priorities and limits."),
+];
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:920px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,5vw,60px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("KI & Mensch", "AI & humans")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Die KI hilft. Entscheiden tun Menschen.", "AI helps. People decide.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:62ch; margin:0;">{L("Bei Nordwerk arbeitet die KI auf den eigenen Firmendaten — read-only, mit Quellen, keine Blackbox. Sie beschleunigt und entlastet. Aber sie ersetzt kein Urteil, keine Hand an der Maschine und keine Verantwortung.", "At Nordwerk the AI works on the company's own data — read-only, with sources, no black box. It speeds things up and takes load off. But it replaces no judgement, no hand at the machine and no responsibility.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1000px; margin:0 auto; padding:clamp(40px,5vw,72px) clamp(24px,5vw,56px) clamp(40px,5vw,64px);">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;">
+      <div style="border:1px solid #E2E8F0; border-top:3px solid #16794a; border-radius:14px; background:#fff; padding:clamp(20px,2.5vw,28px);">
+        <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#16794a; margin:0 0 14px;">{L("Was die KI übernimmt", "What the AI takes on")}</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;">
+          {ki.map((x) => (
+            <li style="display:flex; gap:11px; font-size:15px; line-height:1.55; color:#1B1C1E;"><span style="color:#16794a; font-weight:700; flex:none;">✓</span><span>{x}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div style="border:1px solid #E2E8F0; border-top:3px solid #E6B23A; border-radius:14px; background:#fff; padding:clamp(20px,2.5vw,28px);">
+        <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#9a6b00; margin:0 0 14px;">{L("Wofür es Menschen braucht", "What still needs humans")}</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;">
+          {mensch.map((x) => (
+            <li style="display:flex; gap:11px; font-size:15px; line-height:1.55; color:#1B1C1E;"><span style="color:#E6B23A; font-weight:700; flex:none;">●</span><span>{x}</span></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:clamp(28px,3.5vw,44px); border-left:3px solid #123A33; background:#fff; border:1px solid #E2E8F0; border-radius:0 12px 12px 0; padding:clamp(18px,2.5vw,26px);">
+      <p style="font-size:16px; line-height:1.65; color:#3C3E42; margin:0 0 14px;">{L("Das Prinzip: Mensch-in-der-Schleife. Die KI bereitet vor, der Mensch entscheidet — und weil alles selbst gehostet ist, bleiben Daten und Modellwahl im eigenen Haus. Kein Konzern liest mit.", "The principle: human-in-the-loop. The AI prepares, the human decides — and because everything is self-hosted, data and model choice stay in-house. No corporation reading along.")}</p>
+      <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        <a href={P("/suche/")} style="text-decoration:none; background:#123A33; color:#fff; font-weight:600; padding:11px 20px; border-radius:10px;">{L("KI live ausprobieren", "Try the AI live")} →</a>
+        <a href={P("/stack/")} style="text-decoration:none; border:1px solid #C0C8C5; color:#16463E; font-weight:600; padding:11px 20px; border-radius:10px;">{L("Womit (der Stack)", "With what (the stack)")}</a>
+      </div>
+    </div>
+  </div>
+</section>

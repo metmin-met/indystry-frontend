@@ -1,0 +1,112 @@
+---
+// KI-Suche „Frag die Firma" (read-only, lang-aware): client-seitige Volltextsuche über einen
+// gebackenen Nordwerk-Korpus (/data/nordwerk-corpus.json). Dependency-frei. Die LLM-Antwortebene
+// (zusammenfassen statt nur finden) kommt mit einem Mistral-Schlüssel dazu.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+---
+<section style="background:#F8F9FA; min-height:70vh;" data-de={String(de)}>
+  <div style="max-width:880px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("KI-Suche · Volltext · read-only","AI search · full text · read-only")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Frag die Firma.","Ask the company.")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 24px;">{L("Eine Suche über alles: Produkte, Maschinen, Aufträge, Handbuch, Kennzahlen. Tipp ein Stichwort — die Treffer verlinken direkt ins passende System.","One search across everything: products, machines, orders, handbook, metrics. Type a keyword — hits link straight into the right system.")}</p>
+
+    <div style="display:flex; gap:10px; align-items:stretch;">
+      <input id="q" type="search" autocomplete="off" placeholder={L("z. B. Lagerbock, Schaltschrank, Wartung, OEE …","e.g. bearing block, cabinet, maintenance, OEE …")}
+        style="flex:1; min-width:0; box-sizing:border-box; font-size:18px; padding:16px 18px; border:1px solid #C0C8C5; border-radius:12px; background:#fff; outline:none; font-family:inherit;" />
+      <button id="askbtn" style="flex:none; font-family:var(--font-head); font-weight:600; font-size:16px; padding:0 22px; border:none; border-radius:12px; background:#123A33; color:#fff; cursor:pointer;">✦ {L("Fragen","Ask")}</button>
+    </div>
+    <div id="chips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
+    <div id="answerbox" hidden style="margin-top:18px; border:1px solid #C0C8C5; border-left:3px solid #123A33; border-radius:12px; padding:18px 20px; background:#fff;">
+      <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#16463E; margin:0 0 8px;">✦ {L("Antwort","Answer")}</p>
+      <div id="answer" style="font-size:15px; line-height:1.6; color:#1B1C1E; white-space:pre-wrap;"></div>
+      <div id="sources" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
+    </div>
+
+    <p id="count" style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:22px 0 14px;"></p>
+    <div id="results" style="display:flex; flex-direction:column; gap:12px;"></div>
+
+    <p style="margin-top:clamp(32px,4vw,48px); font-size:13px; line-height:1.6; color:#92938F;">{L("Antworten von einem Sprachmodell auf Basis der Firmendaten — mit Quellenangabe, read-only. Treffer unten verlinken direkt ins jeweilige System.","Answers from a language model grounded in the company data — with sources, read-only. The hits below link straight into each system.")}</p>
+  </div>
+</section>
+
+<script>
+  const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
+  const $ = (s) => document.querySelector(s);
+  const TYPE = DE
+    ? { produkt:"Produkt", maschine:"Maschine", handbuch:"Handbuch", kpi:"Kennzahl", glossar:"Glossar" }
+    : { produkt:"Product", maschine:"Machine", handbuch:"Handbook", kpi:"Metric", glossar:"Glossary" };
+  const TCOL = { produkt:"#16794a", maschine:"#123A33", handbuch:"#9a6b00", kpi:"#1d4ed8", glossar:"#7c3aed" };
+  const EXAMPLES = DE ? ["Lagerbock","Schaltschrank","Wartung","OEE","SPS","Reklamation"]
+                      : ["bearing block","cabinet","maintenance","OEE","PLC","complaint"];
+  const norm = (s) => (s||"").toLowerCase();
+  let CORPUS = [];
+
+  function score(item, terms) {
+    const hay = norm(item.title + " " + item.text + " " + TYPE[item.type]);
+    let sc = 0;
+    for (const t of terms) {
+      if (!t) continue;
+      if (norm(item.title).includes(t)) sc += 5;
+      if (hay.includes(t)) sc += 2; else return -1; // alle Terme müssen vorkommen
+    }
+    return sc;
+  }
+  function resolve(item) {
+    if (item.ext) return item.href;
+    return (DE ? "" : "/en") + item.href;
+  }
+  function render(q) {
+    const terms = norm(q).split(/\s+/).filter(Boolean);
+    let list;
+    if (!terms.length) list = CORPUS.map(x => ({ x, s: 0 }));
+    else list = CORPUS.map(x => ({ x, s: score(x, terms) })).filter(r => r.s >= 0).sort((a,b)=>b.s-a.s);
+    $("#count").textContent = terms.length
+      ? `${list.length} ${DE ? "Treffer für" : "hits for"} „${q}“`
+      : `${CORPUS.length} ${DE ? "Einträge — tipp ein Stichwort" : "entries — type a keyword"}`;
+    $("#results").innerHTML = list.map(({x}) => {
+      const c = TCOL[x.type] || "#123A33";
+      return `<a href="${resolve(x)}" ${x.ext?'target="_blank" rel="noopener"':''} style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 18px; display:block;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+          <span style="font-family:monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:${c}; border:1px solid ${c}33; border-radius:999px; padding:2px 8px;">${TYPE[x.type]||x.type}</span>
+          <span style="font-weight:600; font-size:16px;">${x.title}</span>
+          <span style="margin-left:auto; color:#92938F; font-size:13px;">${x.ext?"↗":"→"}</span>
+        </div>
+        <div style="font-size:14px; line-height:1.5; color:#5C5E63;">${x.text}</div></a>`;
+    }).join("") || `<p style="color:#92938F; font:15px monospace;">${DE?"Nichts gefunden — anderes Stichwort?":"Nothing found — try another keyword?"}</p>`;
+  }
+
+  const chips = $("#chips");
+  EXAMPLES.forEach(e => {
+    const b = document.createElement("button");
+    b.textContent = e;
+    b.style.cssText = "font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#3C3E42;";
+    b.onclick = () => { $("#q").value = e; render(e); };
+    chips.appendChild(b);
+  });
+
+  fetch("/data/nordwerk-corpus.json").then(r=>r.json()).then(d=>{
+    CORPUS = d; render("");
+    const q = $("#q");
+    q.addEventListener("input", () => render(q.value));
+    q.addEventListener("keydown", (e) => { if (e.key === "Enter") askLLM(); });
+    q.focus();
+  }).catch(()=>{ $("#count").textContent = DE?"Korpus konnte nicht geladen werden.":"Could not load corpus."; });
+
+  async function askLLM() {
+    const q = $("#q").value.trim();
+    if (!q) return;
+    const box = $("#answerbox"), ans = $("#answer"), src = $("#sources");
+    box.hidden = false; ans.textContent = DE ? "denkt nach …" : "thinking …"; src.innerHTML = "";
+    try {
+      const r = await fetch("/_ask/", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ q, lang: DE?"de":"en" }) });
+      const d = await r.json();
+      if (!r.ok || d.error || !d.answer) { ans.textContent = DE ? "Antwort gerade nicht verfügbar — die Treffer unten helfen weiter." : "Answer not available right now — see the hits below."; return; }
+      ans.textContent = d.answer;
+      src.innerHTML = (d.sources||[]).map(s2 => `<a href="${s2.ext?s2.href:(DE?'':'/en')+s2.href}" ${s2.ext?'target="_blank" rel="noopener"':''} style="text-decoration:none;font-family:var(--font-mono);font-size:11px;color:#16463E;border:1px solid #C0C8C5;border-radius:999px;padding:3px 9px;">${s2.title} ${s2.ext?'↗':'→'}</a>`).join("");
+    } catch(e) { ans.textContent = DE ? "Antwort gerade nicht verfügbar — die Treffer unten helfen weiter." : "Answer not available right now — see the hits below."; }
+  }
+  document.getElementById("askbtn")?.addEventListener("click", askLLM);
+</script>

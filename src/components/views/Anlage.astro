@@ -1,0 +1,318 @@
+---
+// Anlagen-Drilldown (lang-aware, read-only): Werk-Übersicht → Maschine (3D) → Schaltschrank (3D)
+// → ANIMIERTER Stromlaufplan: fließender Strom, schaltbarer Hauptschalter, laufende Motoren,
+// Prognose-Modus (precognitive manufacturing: vorhergesagter Lagerschaden Achse Y).
+import Twin from "./Twin.astro";
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const lines = [
+  { name: "Linie Nord", kind: L("Zerspanung", "Machining"), machines: [
+    { name: "CNC-Fräse A1", suffix: "A1", status: "run" },
+    { name: "CNC-Fräse A2", suffix: "A2", status: "run" },
+    { name: "Drehzentrum B1", suffix: "B1", status: "warn" },
+  ]},
+  { name: "Linie Süd", kind: L("Montage / Prüfung", "Assembly / inspection"), machines: [
+    { name: "Montagezelle M1", suffix: "M1", status: "run" },
+    { name: "Montagezelle M2", suffix: "M2", status: "idle" },
+    { name: "Prüfstand P1", suffix: "P1", status: "run" },
+  ]},
+  { name: "Linie West", kind: L("Zuschnitt / Umformung", "Cutting / forming"), machines: [
+    { name: "Laserschneider L1", suffix: "L1", status: "run" },
+    { name: "Abkantpresse K1", suffix: "K1", status: "run" },
+  ]},
+];
+const ST: Record<string, { c: string; t: string }> = {
+  run:  { c: "#16794a", t: L("läuft", "running") },
+  warn: { c: "#E6B23A", t: L("Wartung fällig", "maintenance due") },
+  idle: { c: "#92938F", t: L("Leerlauf", "idle") },
+  stop: { c: "#b4232a", t: L("Störung", "fault") },
+};
+const WERK = L("Werk", "Plant");
+const SCHRANK = L("Schaltschrank", "Cabinet");
+---
+<section style="background:#F8F9FA;" data-de={String(de)} data-werk={WERK} data-schrank={SCHRANK}>
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Anlage · Digitaler Zwilling · read-only", "Plant · digital twin · read-only")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Bis auf den Stromlaufplan.", "Down to the wiring plan.")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{L("Das ganze Werk: drei Linien, acht Maschinen. Wähl eine Maschine, klick in den Schaltschrank — und sieh Schalter und Leitungen in Aktion, inklusive Ausfall-Prognose.", "The whole plant: three lines, eight machines. Pick a machine, click into the cabinet — and see switches and wiring in action, including failure prediction.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,44px);">{L("Status = aktueller Demo-Stand der Anlage", "Status = current demo state of the plant")}</p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:clamp(36px,5vw,56px);">
+      {lines.map((line) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; overflow:hidden;">
+          <div style="padding:12px 16px; border-bottom:1px solid #EFEAE0; display:flex; align-items:baseline; justify-content:space-between;">
+            <span style="font-family:var(--font-head); font-weight:600; font-size:16px; color:#1B1C1E;">{line.name}</span>
+            <span style="font-family:var(--font-mono); font-size:11px; color:#92938F;">{line.kind}</span>
+          </div>
+          <div>
+            {line.machines.map((m) => (
+              <button class="mtile" data-name={m.name} data-suffix={m.suffix} data-line={line.name} data-status={m.status} data-stext={ST[m.status].t} data-scolor={ST[m.status].c}>
+                <span class="dot" style={`background:${ST[m.status].c};`}></span>
+                <span class="mname">{m.name}</span>
+                <span class="mstat" style={`color:${ST[m.status].c};`}>{ST[m.status].t}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p id="bc" style="font-family:var(--font-mono); font-size:13px; color:#92938F; margin:0 0 16px;">{WERK} › Linie Nord › CNC-Fräse A1</p>
+
+    <div id="machine3d" style="background:#123A33; border-radius:12px; overflow:hidden; position:relative;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #2E5A52;">
+        <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#A6CFC5;"><span id="mv-title">CNC-FRÄSE A1</span> · <span id="mv-status" style="color:#16794a;">● {ST.run.t}</span></span>
+        <span style="font-family:var(--font-mono); font-size:11px; color:#7C9A92;">{L("Hotspot klicken", "click a hotspot")}</span>
+      </div>
+      <model-viewer id="mv-machine" src="/anlage/cnc-maschine.glb" camera-controls auto-rotate touch-action="pan-y" exposure="1.15" shadow-intensity="1" camera-orbit="40deg 68deg 5m" style="width:100%; height:min(60vh,520px); background:#123A33;">
+        <button class="hot" slot="hotspot-schrank" data-position="1.15 1.55 0.25" data-normal="0 0 1" data-act="schrank" data-label={SCHRANK}>{SCHRANK}</button>
+        <button class="hot" slot="hotspot-hmi" data-position="0.85 1.45 0.5" data-normal="0 0 1" data-act="info" data-label={L("Steuerung / HMI","Control / HMI")} data-info={L("Steuerung / HMI — Bedienpult. Aufträge starten, Rüsten, Störungen quittieren.","Control / HMI — operator panel. Start orders, set up, acknowledge faults.")}>HMI</button>
+        <button class="hot" slot="hotspot-spindel" data-position="-0.45 1.35 0.45" data-normal="0 0 1" data-act="info" data-label={L("Spindel","Spindle")} data-info={L("Spindel — Hauptantrieb. Drehzahl/Temperatur live im Cockpit.","Spindle — main drive. Speed/temperature live in the cockpit.")}>Spindle</button>
+      </model-viewer>
+    </div>
+    <p id="machine-info" style="font-size:15px; color:#3C3E42; margin:16px 0 0; min-height:1.4em;"></p>
+
+    <div id="cabinet" style="margin-top:clamp(40px,5vw,64px);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E;">{SCHRANK} <span id="cab-suffix">A1</span> · {L("Stromlaufplan", "Wiring plan")}</span>
+        <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+        <button id="back" style="cursor:pointer; font-family:var(--font-mono); font-size:12px; color:#92938F; background:none; border:none;">← {L("zurück zur Maschine","back to machine")}</button>
+      </div>
+      <div style="display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr); gap:20px; align-items:start;" class="cab-grid">
+        <div style="background:#0E2E29; border-radius:12px; overflow:hidden;">
+          <model-viewer id="mv-cab" src="/anlage/schaltschrank.glb" camera-controls auto-rotate rotation-per-second="12deg" touch-action="pan-y" exposure="1.35" shadow-intensity="1" camera-orbit="20deg 70deg 3.9m" style="width:100%; height:min(55vh,460px); background:#15453D;">
+            <button class="hot" slot="hotspot-sps" data-position="-0.22 1.42 0.36" data-normal="0 0 1" data-sys="sps" data-label="SPS / CPU">SPS</button>
+            <button class="hot" slot="hotspot-ant" data-position="0.10 1.05 0.36" data-normal="0 0 1" data-sys="antriebe" data-label={L("Antriebe","Drives")}>Antriebe</button>
+            <button class="hot" slot="hotspot-kl" data-position="0 0.55 0.36" data-normal="0 0 1" data-sys="klemmen" data-label={L("Klemmenblock","Terminals")}>Klemmen</button>
+            <button class="hot" slot="hotspot-si" data-position="0.18 1.62 0.36" data-normal="0 0 1" data-sys="sicherungen" data-label={L("Sicherungen","Fuses")}>Sicherungen</button>
+          </model-viewer>
+        </div>
+
+        <div class="sp-panel">
+          <div class="sp-controls">
+            <button id="sp-power" class="sp-btn on" type="button">● {L("Strom", "Power")}</button>
+            <button id="sp-prog-btn" class="sp-btn" type="button">⚠ {L("Prognose", "Prediction")}</button>
+            <span id="sp-status" class="sp-status">{L("Strom fließt · Anlage aktiv", "current flowing · plant active")}</span>
+          </div>
+          <div id="sp-progcard" class="sp-progcard" hidden>
+            ⚠ {L("Prognose · Achse Y", "Prediction · axis Y")} — {L("Lagerschaden wahrscheinlich · Restlebensdauer ~9 Tage · Wartung einplanen, bevor die Linie steht.", "bearing failure likely · remaining life ~9 days · schedule maintenance before the line stops.")}
+          </div>
+          <svg id="sp-svg" class="sp-svg energized" viewBox="0 0 900 560" role="img" aria-label={L("Animierter Stromlaufplan", "Animated wiring plan")}>
+            <!-- Sammelschienen -->
+            <text class="sp-txt sm" x="30" y="58">L1</text><text class="sp-txt sm" x="30" y="74">L2</text><text class="sp-txt sm" x="30" y="90">L3</text><text class="sp-txt sm" x="30" y="122">PE</text>
+            <path class="sp-bus" d="M62 54 H838"/><path class="sp-bus" d="M62 70 H838"/><path class="sp-bus" d="M62 86 H838"/>
+            <path class="sp-pe" d="M62 118 H838"/>
+            <!-- Hauptschalter Q1 (klickbar) -->
+            <g id="sp-q1" style="cursor:pointer;">
+              <rect class="sp-node" x="120" y="40" width="44" height="58" rx="4"/>
+              <line id="sp-q1-lever" x1="130" y1="92" x2="156" y2="48" stroke="#3FBF7F" stroke-width="3" stroke-linecap="round"/>
+              <text class="sp-txt" x="142" y="34" text-anchor="middle">Q1</text>
+            </g>
+            <!-- Sicherungen -->
+            <g class="sp-group" data-sys="sicherungen">
+              <path class="sp-wire" d="M250 86 V140"/><rect class="sp-fuse" x="241" y="140" width="18" height="32" rx="2"/><path class="sp-wire" d="M250 172 V235"/><text class="sp-txt sm" x="266" y="162">F1</text>
+              <path class="sp-wire" d="M470 86 V140"/><rect class="sp-fuse" x="461" y="140" width="18" height="32" rx="2"/><path class="sp-wire" d="M470 172 V235"/><text class="sp-txt sm" x="486" y="162">F2</text>
+              <path class="sp-wire" d="M620 86 V140"/><rect class="sp-fuse" x="611" y="140" width="18" height="32" rx="2"/><path class="sp-wire" d="M620 172 V235"/><text class="sp-txt sm" x="636" y="162">F3</text>
+              <path class="sp-wire" d="M760 86 V140"/><rect class="sp-fuse" x="751" y="140" width="18" height="32" rx="2"/><path class="sp-wire" d="M760 172 V235"/><text class="sp-txt sm" x="776" y="162">F4</text>
+            </g>
+            <!-- SPS -->
+            <g class="sp-group" data-sys="sps">
+              <rect class="sp-node" x="180" y="235" width="180" height="140" rx="6"/>
+              <text class="sp-txt" x="270" y="262" text-anchor="middle">SPS / CPU</text>
+              <text class="sp-txt sm" x="196" y="300">{L("Eingänge", "Inputs")}</text>
+              <circle class="sp-dot" cx="180" cy="320" r="4"/><circle class="sp-dot" cx="180" cy="345" r="4"/>
+              <text class="sp-txt sm" x="344" y="300" text-anchor="end">{L("Ausgänge", "Outputs")}</text>
+              <circle class="sp-dot" cx="360" cy="320" r="4"/><circle class="sp-dot" cx="360" cy="345" r="4"/>
+              <path class="sp-wire" d="M360 320 H395 V212"/>
+            </g>
+            <!-- Antriebe -->
+            <g class="sp-group" data-sys="antriebe">
+              <path class="sp-wire ctrl" d="M395 212 H778"/>
+              <rect class="sp-node" x="425" y="235" width="90" height="66" rx="5"/><text class="sp-txt" x="470" y="274" text-anchor="middle">FU1</text>
+              <rect class="sp-node" x="575" y="235" width="90" height="66" rx="5"/><text class="sp-txt" x="620" y="274" text-anchor="middle">FU2</text>
+              <rect class="sp-node predict-node" x="725" y="235" width="90" height="66" rx="5" style="display:none;"/>
+              <rect class="sp-node" x="715" y="235" width="90" height="66" rx="5"/><text class="sp-txt" x="760" y="274" text-anchor="middle">FU3</text>
+              <path class="sp-wire ctrl" d="M470 212 V235"/><path class="sp-wire ctrl" d="M620 212 V235"/><path class="sp-wire ctrl" d="M760 212 V235"/>
+              <!-- FU -> Motor -->
+              <path class="sp-wire" d="M470 301 V440"/>
+              <path class="sp-wire predict" d="M620 301 V440"/>
+              <path class="sp-wire" d="M760 301 V440"/>
+              <!-- Motoren -->
+              <circle class="sp-motor" cx="470" cy="470" r="30"/><line class="sp-rotor" x1="470" y1="470" x2="470" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="470" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="470" y="518" text-anchor="middle">{L("Achse X", "Axis X")}</text>
+              <circle class="sp-motor predict-node" cx="620" cy="470" r="30"/><line class="sp-rotor" x1="620" y1="470" x2="620" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="620" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="620" y="518" text-anchor="middle">{L("Achse Y", "Axis Y")}</text>
+              <circle class="sp-motor" cx="760" cy="470" r="30"/><line class="sp-rotor" x1="760" y1="470" x2="760" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="760" y="475" text-anchor="middle">SP</text><text class="sp-txt sm" x="760" y="518" text-anchor="middle">{L("Spindel", "Spindle")}</text>
+            </g>
+            <!-- Klemmen -->
+            <g class="sp-group" data-sys="klemmen">
+              <text class="sp-txt sm" x="186" y="396">{L("Klemmen X1", "Terminals X1")}</text>
+              <path class="sp-wire" d="M360 345 V410"/>
+              <rect class="sp-fuse" x="190" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="212" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="234" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="256" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="278" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="300" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="322" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="344" y="404" width="14" height="26" rx="2"/>
+              <path class="sp-wire" d="M197 404 V392 H360"/>
+            </g>
+          </svg>
+          <p class="sp-hint">{L("Hotspots im Schaltschrank (links) heben die Baugruppe hervor · Q1 oder „Strom“ schaltet · „Prognose“ zeigt den vorhergesagten Ausfall.", "Cabinet hotspots (left) highlight a subsystem · Q1 or “Power” switches · “Prediction” shows the predicted failure.")}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<Twin lang={lang} embed={true} />
+
+<style>
+  .mtile { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; width:100%; text-align:left; padding:11px 16px; background:none; border:none; border-top:1px solid #F1F3F2; cursor:pointer; font-family:inherit; }
+  .mtile:first-child { border-top:none; }
+  .mtile:hover { background:#F8F9FA; }
+  .mtile[aria-current="true"] { background:#EFEAE0; }
+  .mtile .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .mtile .mname { font-size:15px; color:#1B1C1E; }
+  .mtile .mstat { font-family:var(--font-mono); font-size:11px; }
+  .hot { width:18px; height:18px; border-radius:50%; border:2px solid #E6B23A; background:#123A33; color:transparent; cursor:pointer; padding:0; position:relative; box-shadow:0 0 0 4px rgba(18,58,51,0.35); font-size:0; }
+  model-viewer .hot { --min-hotspot-opacity:0; }
+  .hot:hover { background:#E6B23A; }
+  @media (max-width:760px){ .cab-grid{ grid-template-columns:1fr !important; } }
+
+  .sp-panel { border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px; }
+  .sp-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:10px; }
+  .sp-btn { font-family:var(--font-mono); font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; border:1px solid #C0C8C5; background:#fff; color:#3C3E42; cursor:pointer; }
+  .sp-btn.on { background:#123A33; color:#fff; border-color:#123A33; }
+  .sp-btn#sp-prog-btn.on { background:#9a6b00; border-color:#9a6b00; color:#fff; }
+  .sp-status { font-family:var(--font-mono); font-size:11px; color:#92938F; }
+  .sp-progcard { background:#fff7e6; border:1px solid #E6B23A; border-radius:9px; padding:10px 13px; font-size:13px; line-height:1.45; color:#7a5500; margin-bottom:10px; }
+  .sp-svg { width:100%; height:auto; background:#0E2E29; border-radius:10px; display:block; }
+  .sp-hint { font-family:var(--font-mono); font-size:10.5px; line-height:1.5; color:#92938F; margin:10px 0 0; }
+  .sp-bus { fill:none; stroke:#5b7d74; stroke-width:3; stroke-linecap:round; }
+  .sp-pe  { fill:none; stroke:#3FBF7F; stroke-width:2; opacity:.6; }
+  .sp-wire { fill:none; stroke:#4d6b63; stroke-width:2.4; stroke-linecap:round; }
+  .sp-wire.ctrl { stroke:#3a5a7a; stroke-dasharray:2 6; }
+  .sp-node { fill:#13322D; stroke:#3a554e; stroke-width:1.6; }
+  .sp-fuse { fill:#15453D; stroke:#6f9a8e; stroke-width:1.2; }
+  .sp-dot { fill:#A6CFC5; }
+  .sp-motor { fill:#0E2E29; stroke:#3a554e; stroke-width:2; }
+  .sp-rotor { transform-box:fill-box; transform-origin:center; opacity:.5; }
+  .sp-txt { fill:#CFE3DC; font-family:var(--font-mono,monospace); font-weight:600; font-size:12px; }
+  .sp-txt.sm { font-weight:400; font-size:10px; fill:#8FB3AA; }
+  /* energized */
+  .sp-svg.energized .sp-bus { stroke:#3FBF7F; }
+  .sp-svg.energized .sp-wire:not(.ctrl) { stroke:#3FBF7F; stroke-dasharray:8 7; animation:sp-flow 1s linear infinite; }
+  .sp-svg.energized .sp-wire.ctrl { stroke:#7ba3e0; animation:sp-flow 1.7s linear infinite; }
+  .sp-svg.energized .sp-node { stroke:#3FBF7F; }
+  .sp-svg.energized .sp-motor { stroke:#3FBF7F; }
+  .sp-svg.energized .sp-rotor { opacity:1; animation:sp-spin 1.3s linear infinite; }
+  @keyframes sp-flow { to { stroke-dashoffset:-30; } }
+  @keyframes sp-spin { to { transform:rotate(360deg); } }
+  @keyframes sp-pulse { 50% { opacity:.4; } }
+  /* prognose */
+  .sp-svg.prognose .predict { stroke:#E6B23A !important; stroke-dasharray:8 6; animation:sp-flow .7s linear infinite, sp-pulse 1.3s ease-in-out infinite; }
+  .sp-svg.prognose .predict-node { stroke:#E6B23A !important; animation:sp-pulse 1.3s ease-in-out infinite; }
+  /* focus highlight */
+  .sp-group.focus .sp-node, .sp-group.focus .sp-fuse, .sp-group.focus .sp-motor { stroke:#E6B23A; }
+  .sp-group.focus text { fill:#fff; }
+</style>
+
+<script>
+  import "@google/model-viewer";
+  const root = document.querySelector("[data-werk]")!;
+  const WERK = root.getAttribute("data-werk") || "Werk";
+  const DE = root.getAttribute("data-de") === "true";
+  const info = document.getElementById("machine-info")!;
+  const bc = document.getElementById("bc")!;
+  const mvTitle = document.getElementById("mv-title")!;
+  const mvStatus = document.getElementById("mv-status")!;
+  const cabSuffix = document.getElementById("cab-suffix")!;
+  const machine3d = document.getElementById("machine3d")!;
+  const cab = document.getElementById("cabinet")!;
+  let cur = { name: "CNC-Fräse A1", suffix: "A1", line: "Linie Nord", stext: "läuft", scolor: "#16794a" };
+
+  function renderCur() {
+    mvTitle.textContent = cur.name.toUpperCase();
+    mvStatus.textContent = "● " + cur.stext;
+    mvStatus.setAttribute("style", "color:" + cur.scolor + ";");
+    cabSuffix.textContent = cur.suffix;
+    bc.textContent = WERK + " › " + cur.line + " › " + cur.name;
+  }
+  document.querySelectorAll<HTMLButtonElement>(".mtile").forEach((t) => {
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".mtile").forEach((x) => x.removeAttribute("aria-current"));
+      t.setAttribute("aria-current", "true");
+      cur = { name: t.dataset.name!, suffix: t.dataset.suffix!, line: t.dataset.line!, stext: t.dataset.stext!, scolor: t.dataset.scolor! };
+      info.textContent = ""; renderCur();
+      machine3d.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+  document.querySelectorAll("#mv-machine .hot").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.getAttribute("data-act") === "schrank") { renderCur(); cab.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      else info.textContent = btn.getAttribute("data-info") || "";
+    });
+  });
+  document.getElementById("back")!.addEventListener("click", () => { renderCur(); machine3d.scrollIntoView({ behavior: "smooth", block: "center" }); });
+
+  // --- Stromlaufplan: Strom / Prognose / Fokus ---
+  const svg = document.getElementById("sp-svg")!;
+  const statusEl = document.getElementById("sp-status")!;
+  const powerBtn = document.getElementById("sp-power")!;
+  const progBtn = document.getElementById("sp-prog-btn")!;
+  const progCard = document.getElementById("sp-progcard") as HTMLElement;
+  function refreshStatus() {
+    const on = svg.classList.contains("energized");
+    const pr = svg.classList.contains("prognose");
+    statusEl.textContent = pr
+      ? (DE ? "Prognose aktiv · Achse Y kritisch" : "prediction active · axis Y critical")
+      : on ? (DE ? "Strom fließt · Anlage aktiv" : "current flowing · plant active")
+           : (DE ? "spannungsfrei" : "de-energized");
+  }
+  function setPower(on: boolean) {
+    svg.classList.toggle("energized", on);
+    powerBtn.classList.toggle("on", on);
+    const lever = document.getElementById("sp-q1-lever");
+    if (lever) lever.setAttribute("transform", on ? "" : "rotate(28 130 92)");
+    refreshStatus();
+  }
+  powerBtn.addEventListener("click", () => setPower(!svg.classList.contains("energized")));
+  document.getElementById("sp-q1")!.addEventListener("click", () => setPower(!svg.classList.contains("energized")));
+  progBtn.addEventListener("click", () => {
+    twinSetProg = false;
+    const on = !svg.classList.contains("prognose");
+    svg.classList.toggle("prognose", on);
+    progBtn.classList.toggle("on", on);
+    progCard.hidden = !on;
+    refreshStatus();
+  });
+  // Twin-Last koppelt an die Plan-Prognose (precognitive)
+  let twinSetProg = false;
+  window.addEventListener("twin:state", (e: any) => {
+    const d = e.detail || {};
+    const crit = d.worst >= 2 || (d.life != null && d.life < 14);
+    if (crit && !svg.classList.contains("prognose")) {
+      svg.classList.add("prognose"); progBtn.classList.add("on"); progCard.hidden = false; twinSetProg = true; refreshStatus();
+    } else if (!crit && twinSetProg) {
+      svg.classList.remove("prognose"); progBtn.classList.remove("on"); progCard.hidden = true; twinSetProg = false; refreshStatus();
+    }
+  });
+  // Schaltschrank-Hotspots heben Baugruppe im Plan hervor
+  document.querySelectorAll("#mv-cab .hot").forEach((b) => {
+    b.addEventListener("click", () => {
+      const sys = b.getAttribute("data-sys");
+      document.querySelectorAll(".sp-group").forEach((g) => g.classList.toggle("focus", g.getAttribute("data-sys") === sys));
+      document.querySelector(".sp-panel")!.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  // Maschinen-Ampel live aus /_live (Fallback: statischer Demo-Stand)
+  const ST2 = { run:{c:"#16794a",t:DE?"läuft":"running"}, warn:{c:"#E6B23A",t:DE?"Wartung fällig":"maintenance due"}, idle:{c:"#92938F",t:DE?"Leerlauf":"idle"} };
+  fetch("/_live/telemetry",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d||!d.machines) return; const byName={}; d.machines.forEach(m=>byName[m.name]=m.id); const lat=d.latest||{};
+    document.querySelectorAll(".mtile").forEach(t=>{
+      const id=byName[t.dataset.name]; if(!id) return;
+      const temp=lat[id+"_temperatur_c"], vib=lat[id+"_vibration_mm_s"];
+      const st=(temp==null&&vib==null)?"idle":((temp>46||vib>3.4)?"warn":"run"); const sc=ST2[st];
+      t.dataset.status=st; t.dataset.stext=sc.t; t.dataset.scolor=sc.c;
+      const dot=t.querySelector(".dot"); if(dot) dot.style.background=sc.c;
+      const ms=t.querySelector(".mstat"); if(ms){ ms.textContent=sc.t; ms.style.color=sc.c; }
+      if(cur.name===t.dataset.name){ cur.stext=sc.t; cur.scolor=sc.c; renderCur(); }
+    });
+  }).catch(()=>{});
+</script>

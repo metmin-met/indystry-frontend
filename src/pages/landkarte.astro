@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Landkarte from "../components/views/Landkarte.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Werks-Landkarte · indystry" description="Die ganze Firma als klickbare Landkarte: jede Phase, jedes Tool, jede Live-Demo — gefiltert nach Akt, Bereich oder nur Live." path="/landkarte/" altPath="/en/landkarte/">
+  <Landkarte lang={lang} />
+</Base>

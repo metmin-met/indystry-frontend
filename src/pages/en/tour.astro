@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Tour from "../../components/views/Tour.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="The thread · guided tour" description="One order step by step through the whole company — with a live link per step." path="/en/tour/" altPath="/tour/">
+  <Tour lang={lang} />
+</Base>

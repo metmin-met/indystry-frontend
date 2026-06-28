@@ -1,0 +1,143 @@
+---
+// „Ein Tag bei Nordwerk" (lang-aware) — 3-Schicht-Modell (Früh/Spät/Nacht) als erzählte Timeline.
+// Jede Szene folgt einer Persona und verlinkt in die passende Live-Demo. Umschalter pro Schicht.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const P = (path: string) => (de ? "" : "/en") + path;
+const ERP = "https://erp-demo.indystry.works/odoo";
+const TWIN = "https://twin-demo.indystry.works";
+const BI = "https://bi-demo.indystry.works";
+const shifts = [
+  { key: "frueh", name: L("Frühschicht", "Early shift"), time: "06–14" },
+  { key: "spaet", name: L("Spätschicht", "Late shift"), time: "14–22" },
+  { key: "nacht", name: L("Nachtschicht", "Night shift"), time: "22–06" },
+];
+type Scene = { sh: string; t: string; who: string; role: string; akt: string; text: string; href: string; cta: string; ext?: boolean };
+const scenes: Scene[] = [
+  // FRÜHSCHICHT
+  { sh:"frueh", t:"06:30", who:"Frank", role:L("Schichtleiter","Shift lead"), akt:"kern",
+    text:L("Erster Kaffee, erster Blick auf den Leitstand. Sieben Maschinen grün — nur das Drehzentrum B1 blinkt gelb: „Wartung fällig“.","First coffee, first look at the control room. Seven machines green — only lathe B1 blinks amber: “maintenance due”."),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
+  { sh:"frueh", t:"07:00", who:"Ali", role:L("Maschinenbediener","Operator"), akt:"kern",
+    text:L("Ali rüstet die CNC-Fräse A1, lädt das Programm für 200× Lagerbock NW-1001 und startet — Rückmeldung direkt an der Maschine.","Ali sets up CNC mill A1, loads the program for 200× bearing block NW-1001 and starts — feedback right at the machine."),
+    href:P("/anlage/"), cta:L("Maschine & Schaltschrank","Machine & cabinet") },
+  { sh:"frueh", t:"08:15", who:"Lena", role:L("Vertrieb Innendienst","Inside sales"), akt:"anbahnung",
+    text:L("Eine Anfrage von Alpentech wird zum Lead. Thomas spielt sie am Digital Twin durch, Lena schickt ein Angebot mit echtem Termin.","An inquiry from Alpentech becomes a lead. Thomas runs it through the digital twin, Lena sends a quote with a real date."),
+    href:TWIN, ext:true, cta:L("Digital Twin","Digital twin") },
+  { sh:"frueh", t:"09:30", who:"Bernd", role:L("Einkauf","Purchasing"), akt:"kern",
+    text:L("Das MRP rechnet den Materialbedarf aus dem Auftrag — Bernd bestätigt die Bestellvorschläge für Stahl mit zwei Klicks.","MRP computes material demand from the order — Bernd confirms the steel purchase suggestions in two clicks."),
+    href:ERP, ext:true, cta:L("Im ERP","In the ERP") },
+  { sh:"frueh", t:"10:00", who:"Jens", role:L("Instandhaltung","Maintenance"), akt:"kern",
+    text:L("Jens klickt von der Maschine in den Schaltschrank bis zum Stromlaufplan, prüft die Vibrationskurve — und plant B1 ein.","Jens clicks from the machine into the cabinet down to the wiring plan, checks the vibration trend — and schedules B1."),
+    href:P("/historian/"), cta:L("Historian","Historian") },
+  { sh:"frueh", t:"11:30", who:"Petra", role:L("Qualität","Quality"), akt:"kern",
+    text:L("Bei der Flanschplatte NW-2010 driftet die Maßhaltigkeit. Die BI sieht es vor der Endprüfung — Petra greift ein.","On flange plate NW-2010 the dimensions drift. BI sees it before final inspection — Petra steps in."),
+    href:BI, ext:true, cta:L("Process-Drift (BI)","Process drift (BI)") },
+  { sh:"frueh", t:"13:00", who:"Klaus", role:L("Lager & Versand","Warehouse & shipping"), akt:"kern",
+    text:L("Die 200 Lagerböcke sind fertig und geprüft. Klaus kommissioniert mit Echtzeit-Bestand — NW-1001 geht raus.","The 200 bearing blocks are done and inspected. Klaus picks with real-time stock — NW-1001 ships."),
+    href:ERP, ext:true, cta:L("Im ERP","In the ERP") },
+  // SPÄTSCHICHT
+  { sh:"spaet", t:"14:30", who:"Nadia", role:L("Schichtleiterin Spät","Late shift lead"), akt:"kern",
+    text:L("Schichtübergabe in 5 Minuten statt 30: Nadia liest am Leitstand ab, was läuft, was offen ist, wo B1 steht.","Handover in 5 minutes instead of 30: Nadia reads off the control room what's running, what's open, where B1 stands."),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
+  { sh:"spaet", t:"15:30", who:L("Kunde","Customer"), role:"Helvetia Pumpen AG", akt:"nach",
+    text:L("Der Einkäufer beim Kunden öffnet das Portal: Auftrag geliefert, Rechnung offen, Servicevertrag aktiv — ohne eine Rückfrage.","The customer's buyer opens the portal: order delivered, invoice open, service contract active — without a single query."),
+    href:P("/portal/"), cta:L("Kundenportal","Customer portal") },
+  { sh:"spaet", t:"16:30", who:"Sven", role:L("Servicetechniker","Service tech"), akt:"nach",
+    text:L("Eine Reklamation trifft ein. Sven legt den Reparaturauftrag an; die KI-Suche zeigt sofort einen ähnlichen Altfall samt Lösung.","A complaint arrives. Sven opens the repair order; the AI search instantly surfaces a similar past case and its fix."),
+    href:P("/suche/"), cta:L("Frag die Firma","Ask the company") },
+  { sh:"spaet", t:"18:00", who:"Tomasz", role:L("Maschinenbediener Spät","Operator, late"), akt:"kern",
+    text:L("Serienlauf NW-2010 auf dem Laserschneider L1. Tomasz meldet Gut- und Ausschussmengen laufend zurück — die BI füllt sich in Echtzeit.","Series run NW-2010 on laser cutter L1. Tomasz reports good and scrap quantities continuously — BI fills up in real time."),
+    href:P("/anlage/"), cta:L("Anlage","Plant") },
+  { sh:"spaet", t:"20:30", who:"Mara", role:L("Qualität Spät","Quality, late"), akt:"kern",
+    text:L("Endprüfung der Charge: Maße, Oberfläche, Gewicht automatisch bewertet, Prüfprotokoll erzeugt. Kein Zettel, kein Suchen beim Audit.","Final inspection of the batch: dimensions, surface, weight auto-graded, inspection record generated. No paper, no audit search."),
+    href:BI, ext:true, cta:L("Qualität in der BI","Quality in BI") },
+  // NACHTSCHICHT
+  { sh:"nacht", t:"22:30", who:"Elias", role:L("Werker Nacht","Operator, night"), akt:"kern",
+    text:L("Schwach besetzte Nacht: Laser L1 läuft weiter, Elias überwacht drei Linien vom Leitstand aus statt herumzulaufen.","Thinly staffed night: laser L1 keeps running, Elias watches three lines from the control room instead of walking around."),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
+  { sh:"nacht", t:"00:30", who:L("System · KI","System · AI"), role:L("Autonome Prognose","Autonomous prediction"), akt:"nach",
+    text:L("Mitten in der Nacht erkennt die Prognose steigende Vibration an Achse Y — und legt selbsttätig einen Wartungsauftrag an. Precognitive: der Ausfall wird verhindert, bevor er passiert.","In the middle of the night the prediction spots rising vibration on axis Y — and opens a maintenance order by itself. Precognitive: the failure is prevented before it happens."),
+    href:P("/anlage/"), cta:L("Prognose im Plan","Prediction in the plan") },
+  { sh:"nacht", t:"02:00", who:"Ravi", role:L("Instandhaltung Rufbereitschaft","On-call maintenance"), akt:"kern",
+    text:L("Ravi bekommt den Auftrag aufs Handy, kommt vorbereitet — das Lager ist schon reserviert. Tausch in 40 Minuten, die Linie steht nie still.","Ravi gets the order on his phone, arrives prepared — the bearing is already reserved. Swap in 40 minutes, the line never stops."),
+    href:P("/historian/"), cta:L("Zustandsdaten","Condition data") },
+  { sh:"nacht", t:"04:01", who:L("System","System"), role:"Historian", akt:"nach",
+    text:L("Jeder Messwert der Nacht ist sicher gespeichert. Um vier Uhr steht der Snapshot, aus dem morgens das GF-Cockpit rechnet.","Every reading of the night is safely stored. At four the snapshot is ready, from which the management cockpit computes in the morning."),
+    href:P("/status/"), cta:L("Betrieb & Backups","Ops & backups") },
+  { sh:"nacht", t:"05:30", who:"Frank", role:L("Schichtleiter","Shift lead"), akt:"kern",
+    text:L("Frank kommt zurück, Achse Y ist getauscht, alles grün. Übergabe an die Frühschicht — und der Tag beginnt von vorn.","Frank returns, axis Y is swapped, everything green. Handover to the early shift — and the day starts over."),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
+];
+const aktColor: Record<string,string> = { anbahnung:"#1d4ed8", kern:"#16794a", nach:"#9a6b00" };
+const aktLabel: Record<string,string> = de
+  ? { anbahnung:"Anbahnung", kern:"Auftrag → Lieferung", nach:"Nach der Lieferung" }
+  : { anbahnung:"Lead-in", kern:"Order → delivery", nach:"After delivery" };
+---
+<section style="background:#123A33; color:#F4F6F5;" data-de={String(de)}>
+  <div style="max-width:920px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,5vw,60px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ein Tag bei Nordwerk · 3 Schichten", "A day at Nordwerk · 3 shifts")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{L("24 Stunden. Eine Datenkette.", "24 hours. One data chain.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Von der Frühschicht bis tief in die Nacht — sogar wenn niemand da ist, denkt die Anlage mit. Wähl eine Schicht und sieh, wer was tut und in welchem System.", "From the early shift to deep into the night — even when nobody's there, the plant thinks along. Pick a shift and see who does what, in which system.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:920px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div id="shift-tabs" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:clamp(28px,4vw,40px);">
+      {shifts.map((s) => (
+        <button class="shtab" data-sh={s.key}>{s.name} <span style="opacity:.6;">· {s.time}</span></button>
+      ))}
+      <button class="shtab" data-sh="all">{L("Ganzer Tag", "Whole day")}</button>
+    </div>
+
+    <div class="tl">
+      {scenes.map((s) => (
+        <div class="sc" data-sh={s.sh}>
+          <div class="sc-rail"><span class="sc-time">{s.t}</span><span class="sc-dot" style={`background:${aktColor[s.akt]};`}></span></div>
+          <div class="sc-card">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="font-family:var(--font-head); font-weight:600; font-size:17px; color:#1B1C1E;">{s.who}</span>
+              <span style="font-size:13px; color:#5C5E63;">· {s.role}</span>
+              <span style={`margin-left:auto; font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:${aktColor[s.akt]}; border:1px solid ${aktColor[s.akt]}44; border-radius:999px; padding:2px 9px;`}>{aktLabel[s.akt]}</span>
+            </div>
+            <p style="font-size:16px; line-height:1.6; color:#3C3E42; margin:0 0 14px;">{s.text}</p>
+            <a href={s.href} target={s.ext ? "_blank" : undefined} rel={s.ext ? "noopener" : undefined} style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-weight:600; font-size:14px; color:#16463E;">{s.cta} {s.ext ? "↗" : "→"}</a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div style="margin-top:clamp(40px,5vw,64px); border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(22px,3vw,32px); text-align:center;">
+      <p style="font-family:var(--font-head); font-weight:600; font-size:clamp(20px,2.5vw,26px); color:#1B1C1E; margin:0 0 8px;">{L("Drei Schichten, eine Wahrheit. Klick dich durch die ganze Firma.", "Three shifts, one truth. Click through the whole company.")}</p>
+      <a href={P("/demos/")} style="text-decoration:none; background:#123A33; color:#fff; font-weight:600; padding:13px 24px; border-radius:10px; display:inline-block; margin-top:8px;">{L("Zur Demo-Firma", "To the demo company")} →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .shtab { font-family:var(--font-mono); font-size:13px; padding:8px 15px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#3C3E42; }
+  .shtab:hover { border-color:#123A33; }
+  .shtab[aria-pressed="true"] { background:#123A33; color:#fff; border-color:#123A33; }
+  .sc { display:grid; grid-template-columns:72px 1fr; gap:18px; align-items:start; }
+  .sc-rail { position:relative; display:flex; flex-direction:column; align-items:center; }
+  .sc-time { font-family:var(--font-mono); font-size:13px; font-weight:600; color:#16463E; padding-top:14px; }
+  .sc-dot { width:13px; height:13px; border-radius:50%; margin-top:10px; box-shadow:0 0 0 4px #F8F9FA, 0 0 0 5px #E2E8F0; z-index:1; }
+  .sc:not(:last-child) .sc-rail::after { content:""; position:absolute; top:24px; bottom:-24px; width:2px; background:#E2E8F0; }
+  .sc-card { border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:18px 20px; margin-bottom:24px; }
+  .sc-card a:hover { text-decoration:underline; }
+  @media (max-width:560px) { .sc { grid-template-columns:54px 1fr; gap:12px; } }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll(".shtab"));
+  const rows = Array.from(document.querySelectorAll(".sc"));
+  function pick(sh) {
+    tabs.forEach((t) => t.setAttribute("aria-pressed", String(t.dataset.sh === sh)));
+    rows.forEach((r) => { r.style.display = (sh === "all" || r.dataset.sh === sh) ? "" : "none"; });
+  }
+  tabs.forEach((t) => t.addEventListener("click", () => pick(t.dataset.sh)));
+  pick("frueh");
+</script>

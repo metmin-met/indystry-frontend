@@ -1,0 +1,249 @@
+---
+// Demo-Firma-Hub: alle read-only Demos als EINE Firma „Nordwerk Manufacturing", nach Prozess-Stufe
+// gruppiert, + Beispiel-Spuren über die Systeme. DE/EN via lang.
+import { demos, type Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const live = demos.filter((d) => d.status === "live");
+const soon = demos.filter((d) => d.status !== "live");
+
+// URL-Helfer (robust, ohne slug-Abhängigkeit)
+const find = (frag: string) => (live.find((d) => d.url.includes(frag)) || ({} as any)).url || "#";
+const U = { erp: find("erp-demo"), bi: find("bi-demo"), cockpit: find("grafana-demo"), twin: find("twin-demo"), lab: find("lab-demo"), app: find("app-demo") };
+const P = (path) => (de ? "" : "/en") + path;
+const ANLAGE = P("/anlage/");
+
+// Prozess-Stufen
+const STAGES = de
+  ? [
+      ["betrieb", "Auftrag & Betrieb", "ERP — vom Angebot bis zur Rechnung"],
+      ["fertigung", "Fertigung & Leitstand", "Was die Maschinen gerade tun"],
+      ["anlage", "Anlage & Schaltschrank", "Runter bis auf den Stromlaufplan"],
+      ["bi", "Qualität & Auswertung", "Zahlen statt Tabellen"],
+      ["data", "Data-Science", "Eigene Analysen auf den Werksdaten"],
+      ["status", "Betrieb & Status", "Läuft alles, ist alles gesichert"],
+      ["wissen", "Wissen & Suche", "Handbuch, Suche, Compliance"],
+      ["collab", "Zusammenarbeit", "Dokumente, geteilt und versioniert"],
+      ["aussen", "Außenauftritt & Kunde", "Firmen-Website + Kundenportal"],
+      ["story", "Verstehen & Story", "Ein Tag, Glossar, KI & Mensch"],
+    ]
+  : [
+      ["betrieb", "Orders & operations", "ERP — from quote to invoice"],
+      ["fertigung", "Production & control room", "What the machines are doing"],
+      ["anlage", "Plant & control cabinet", "Down to the wiring plan"],
+      ["bi", "Quality & analytics", "Numbers, not spreadsheets"],
+      ["data", "Data science", "Your own analyses on the factory data"],
+      ["status", "Operations & status", "Is everything up and backed up"],
+      ["wissen", "Knowledge & search", "Handbook, search, compliance"],
+      ["collab", "Collaboration", "Documents, shared and versioned"],
+      ["aussen", "Web & customer", "Company website + customer portal"],
+      ["story", "Understand & story", "A day, glossary, AI & humans"],
+    ];
+
+const stageOf = (url: string) =>
+  url.includes("erp-demo") ? "betrieb"
+  : url.includes("grafana-demo") || url.includes("app-demo") ? "fertigung"
+  : url.includes("twin-demo") ? "anlage"
+  : url.includes("bi-demo") ? "bi"
+  : url.includes("lab-demo") ? "data" : "data";
+
+const cards = live.map((d) => ({ title: d.title[lang], desc: d.desc[lang], href: d.url, login: d.login, stage: stageOf(d.url) }));
+// Interne Anlage-Demo (nicht in demos.yaml) einhängen
+cards.push({
+  title: de ? "Anlage & Schaltschrank · 3D" : "Plant & control cabinet · 3D",
+  desc: de ? "Von der Maschine in den Schaltschrank bis zum Stromlaufplan — klickbarer 3D-Drilldown." : "From the machine into the control cabinet down to the wiring plan — clickable 3D drilldown.",
+  href: ANLAGE, login: "", stage: "anlage",
+});
+cards.push({
+  title: de ? "Digitaler Zwilling · Live + Optimizer" : "Digital twin · live + optimizer",
+  desc: de ? "Echtbetrieb, Röntgenblick, übersteuern — und den KI-Optimizer fragen." : "Real operation, X-ray view, override — and ask the AI optimizer.",
+  href: P("/twin/"), login: "", stage: "anlage",
+});
+cards.push({
+  title: de ? "Wissensgraph · 3D" : "Knowledge graph · 3D",
+  desc: de ? "Die ganze Firma als 3D-Netz — Linie, Maschine, Produkt, Auftrag, Kunde, Charge." : "The whole company as a 3D network — line, machine, product, order, customer, batch.",
+  href: P("/graph/"), login: "", stage: "anlage",
+});
+cards.push({
+  title: de ? "Werkstoff-Analyse" : "Material analysis",
+  desc: de ? "Oberfläche, Schliff, Mikroskopie + Messwerte je Charge." : "Surface, cross-section, microscopy + measurements per batch.",
+  href: P("/analyse/"), login: "", stage: "anlage",
+});
+cards.push({
+  title: de ? "Leitstand · SCADA" : "Control room · SCADA",
+  desc: de ? "Alle Maschinen auf einen Blick — Status und Live-Messwerte in der Operator-Sicht." : "Every machine at a glance — status and live readings in the operator view.",
+  href: P("/leitstand/"), login: "", stage: "fertigung",
+});
+cards.push({
+  title: de ? "Historian-Explorer" : "Historian explorer",
+  desc: de ? "Zeitreihen-Browser über alle Maschinen und Messreihen — dieselben Sensordaten wie in der BI." : "Time-series browser across all machines and metrics — the same sensor data as in BI.",
+  href: P("/historian/"), login: "", stage: "data",
+});
+cards.push({
+  title: de ? "Status-Board" : "Status board",
+  desc: de ? "Welche Dienste laufen, wann das letzte Backup lief, wie stabil alles ist." : "Which services are up, when the last backup ran, how stable everything is.",
+  href: P("/status/"), login: "", stage: "status",
+});
+cards.push({
+  title: de ? "KI-Suche · Frag die Firma" : "AI search · Ask the company",
+  desc: de ? "Volltextsuche über Produkte, Maschinen, Aufträge, Handbuch und Kennzahlen." : "Full-text search across products, machines, orders, handbook and metrics.",
+  href: P("/suche/"), login: "", stage: "wissen",
+});
+cards.push({
+  title: de ? "Wissen & Kiosk" : "Knowledge & kiosk",
+  desc: de ? "Handbuch, Compliance-Register und der App-Launcher der Firma." : "Handbook, compliance register and the company app launcher.",
+  href: P("/wissen/"), login: "", stage: "wissen",
+});
+cards.push({
+  title: de ? "Zusammenarbeit · Dateiraum" : "Collaboration · file room",
+  desc: de ? "Angebote, Zeichnungen, Prüfprotokolle — geteilt, versioniert, kommentierbar." : "Quotes, drawings, inspection records — shared, versioned, commentable.",
+  href: P("/zusammenarbeit/"), login: "", stage: "collab",
+});
+cards.push({
+  title: de ? "Nordwerk-Homepage" : "Nordwerk homepage",
+  desc: de ? "Die eigene Firmen-Website der Demo-Firma — selbst gehostet." : "The demo company's own website — self-hosted.",
+  href: P("/werk/"), login: "", stage: "aussen",
+});
+cards.push({
+  title: de ? "Kundenportal · Self-Service" : "Customer portal · self-service",
+  desc: de ? "Aufträge, Rechnungen, Service, Reklamation aus Kundensicht." : "Orders, invoices, service, complaints from the customer's view.",
+  href: P("/portal/"), login: "", stage: "aussen",
+});
+cards.push({
+  title: de ? "Ein Tag bei Nordwerk" : "A day at Nordwerk",
+  desc: de ? "Eine Schicht als Geschichte — jede Szene führt ins echte System." : "One shift as a story — each scene leads into the real system.",
+  href: P("/tag/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Geführte Tour · Der rote Faden" : "Guided tour · The thread",
+  desc: de ? "Eine Bestellung Schritt für Schritt durch alle Systeme." : "One order step by step through all systems.",
+  href: P("/tour/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Ich bin … (Rollen-Einstieg)" : "I am … (role entry)",
+  desc: de ? "Wähl deine Rolle — was indystry für dich tut, mit den passenden Demos." : "Pick your role — what indystry does for you, with the matching demos.",
+  href: P("/ich-bin/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Aus Erfahrung gebaut" : "Built from experience",
+  desc: de ? "Was schon läuft: Daten/Twin, Finanzen, Instandhaltung, Wissen, IT & Geräte." : "What's already running: data/twin, finance, maintenance, knowledge, IT & devices.",
+  href: P("/koennen/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Daily Industrie 4.0" : "Daily Industry 4.0",
+  desc: de ? "Selbst gehosteter KI-News-Digest zur vernetzten Fabrik." : "Self-hosted AI news digest on the connected factory.",
+  href: P("/daily/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Datenschutz & KI-Souveränität" : "Privacy & AI sovereignty",
+  desc: de ? "Von Cloud-KI bis zum eigenen, on-prem trainierten Modell." : "From cloud AI to your own on-prem trained model.",
+  href: P("/datenhoheit/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Schnittstellen" : "Interfaces",
+  desc: de ? "Womit reden wir? SPS, OPC-UA, API, MCP, PEPPOL, DATEV …" : "What do we talk to? PLC, OPC-UA, API, MCP, PEPPOL, DATEV …",
+  href: P("/schnittstellen/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Werks-Landkarte" : "Factory map",
+  desc: de ? "Jede Phase, jedes Tool, jede Live-Demo — klickbar & gefiltert." : "Every phase, every tool, every live demo — clickable & filtered.",
+  href: P("/landkarte/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "So skaliert das System" : "How the system scales",
+  desc: de ? "Core bleibt gleich, Hardware wächst — und wann sich Kafka lohnt." : "Core stays the same, hardware grows — and when Kafka pays off.",
+  href: P("/rechner/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Glossar" : "Glossary",
+  desc: de ? "Alle Begriffe, jeder mit Link zum Thema." : "Every term, each linked to its topic.",
+  href: P("/glossar/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "Onboarding & Lernen" : "Onboarding & learning",
+  desc: de ? "Lernpfad mit Lektion + Quiz, Fortschritt gespeichert." : "Learning path with lesson + quiz, progress saved.",
+  href: P("/lernen/"), login: "", stage: "story",
+});
+cards.push({
+  title: de ? "KI & Mensch" : "AI & humans",
+  desc: de ? "Was die KI übernimmt — und wofür es Menschen braucht." : "What the AI takes on — and what still needs humans.",
+  href: P("/ki-mensch/"), login: "", stage: "story",
+});
+
+const ph = "background:#EFEAE0; border:1px solid #E2E8F0; border-radius:8px; height:clamp(150px,16vw,200px); display:flex; align-items:center; justify-content:center; color:#92938F; font-size:13px; text-align:center; padding:16px; margin-bottom:18px;";
+const open = de ? "öffnen ↗" : "open ↗";
+const ro = de ? "read-only" : "read-only";
+---
+<section style="background:#F8F9FA;">
+  <div style="max-width:1280px; margin:0 auto; padding:clamp(64px,8vw,112px) clamp(24px,5vw,56px) clamp(96px,12vw,168px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 clamp(24px,3vw,36px);">{de ? "Demo-Firma · Nordwerk Manufacturing" : "Demo company · Nordwerk Manufacturing"}</p>
+    <h1 style="font-weight:600; font-size:clamp(40px,7vw,84px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{de ? "Eine ganze Firma zum Durchklicken." : "A whole company to click through."}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0;">{de ? "„Nordwerk Manufacturing“ ist eine fiktive Metallteile-Fertigung — komplett auf indystry. Auftrag, Maschinen, Schaltschrank, Qualität, Auswertung: alles dieselbe Firma, dieselben Daten. Alles zum Ansehen, nichts kann kaputtgehen." : "“Nordwerk Manufacturing” is a fictional metal-parts shop — fully on indystry. Orders, machines, control cabinet, quality, analytics: one company, one set of data. All read-only, nothing can break."}</p>
+    <p style="font-family:var(--font-mono); font-size:13px; color:#92938F; margin:14px 0 0;">{de ? "synthetische Daten · alle Demos read-only" : "synthetic data · all demos read-only"}</p>
+
+    <!-- Beispiel-Spuren -->
+    <div style="margin-top:clamp(40px,5vw,60px); border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:clamp(22px,3vw,32px);">
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{de ? "Folg dem roten Faden" : "Follow the thread"}</p>
+      <p style="font-size:16px; line-height:1.7; color:#1B1C1E; margin:0 0 10px;">
+        <strong>{de ? "Produkt NW-1001 „Lagerbock Typ A“" : "Product NW-1001 “Bearing block A”"}:</strong>
+        <a href={U.erp} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "Auftrag im ERP" : "order in ERP"}</a> →
+        <a href={U.bi} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "Auswertung in der BI" : "analytics in BI"}</a> →
+        <a href={U.cockpit} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "Fertigung im Live-Cockpit" : "production in the live cockpit"}</a>
+      </p>
+      <p style="font-size:16px; line-height:1.7; color:#1B1C1E; margin:0;">
+        <strong>{de ? "Maschine CNC-Fräse A1" : "Machine CNC mill A1"}:</strong>
+        <a href={U.cockpit} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "live im Cockpit" : "live in the cockpit"}</a> →
+        <a href={ANLAGE} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "Anlage & Schaltschrank" : "plant & cabinet"}</a> →
+        <a href={U.twin} style="color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;">{de ? "Simulation im Digital Twin" : "simulation in the digital twin"}</a>
+      </p>
+    </div>
+
+    <!-- Gruppen nach Prozess-Stufe -->
+    {STAGES.map(([key, name, sub]) => {
+      const cs = cards.filter((c) => c.stage === key);
+      return cs.length === 0 ? null : (
+        <div style="margin-top:clamp(48px,6vw,72px);">
+          <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:clamp(24px,3vw,32px);">
+            <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E;">{name}</span>
+            <span style="font-size:14px; color:#92938F;">{sub}</span>
+            <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(24px,3vw,40px);">
+            {cs.map((d) => (
+              <a href={d.href} class="demo-card" style="text-decoration:none; color:#1B1C1E; display:flex; flex-direction:column;">
+                <span style={ph}>{d.title}</span>
+                <span style="display:flex; gap:10px; align-items:center;">
+                  <span style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#16463E;">● live</span>
+                  <span style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#92938F; border:1px solid #C0C8C5; border-radius:999px; padding:2px 8px;">{ro}</span>
+                </span>
+                <span style="font-weight:600; font-size:clamp(19px,2vw,23px); letter-spacing:-0.02em; line-height:1.14; margin:12px 0 12px;">{d.title}</span>
+                <span style="font-size:15px; line-height:1.5; color:#5C5E63; flex:1;">{d.desc}</span>
+                {d.login && <span style="font-size:13px; color:#92938F; margin-top:14px;">Login: {d.login}</span>}
+                <span style="font-size:14px; font-weight:600; color:#16463E; margin-top:18px;">{open}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+
+    {soon.length > 0 && (
+      <div style="margin-top:clamp(56px,7vw,88px);">
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(20px,3vw,28px);">{de ? "In Vorbereitung" : "Coming soon"}</p>
+        <div style="border-top:1px solid #1B1C1E;">
+          {soon.map((d) => (
+            <a href={de ? "/kontakt/" : "/en/kontakt/"} class="soon-row" style="text-decoration:none; color:#1B1C1E; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline; padding:22px 0; border-bottom:1px solid #E2E8F0;">
+              <span style="display:flex; flex-direction:column; gap:6px;">
+                <span style="font-weight:600; font-size:18px; letter-spacing:-0.015em;">{d.title[lang]}</span>
+                <span style="font-size:14px; color:#5C5E63;">{d.desc[lang]}</span>
+              </span>
+              <span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#92938F; border:1px solid #C0C8C5; padding:4px 12px; border-radius:999px; justify-self:end;">{de ? "in Vorbereitung" : "coming soon"} →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+<style>.demo-card:hover { transform: translateY(-5px); } .soon-row:hover { color: #16463E; }</style>

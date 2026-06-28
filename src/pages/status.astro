@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import StatusBoard from "../components/views/StatusBoard.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Status-Board · Nordwerk" description="Betriebssicht der Demo-Firma: Dienste, Backups, Uptime — read-only." path="/status/" altPath="/en/status/" noindex={true}>
+  <StatusBoard lang={lang} />
+</Base>

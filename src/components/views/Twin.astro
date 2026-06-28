@@ -1,0 +1,266 @@
+---
+// /twin/ — Digitaler Zwilling: Echtbetrieb (live), Röntgenblick (Innenansicht + Restlebensdauer),
+// Übersteuern (Slider → Anlage reagiert), Optimizer fragen (Mistral via /_ask mode=optimize).
+interface Props { lang: "de" | "en"; embed?: boolean }
+const { lang, embed = false } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+---
+{!embed && (<section style="background:#0E2522; color:#F4F6F5;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(40px,5vw,56px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Digitaler Zwilling · Live", "Digital twin · live")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Der CNC-Fräse beim Denken zusehen.", "Watch the CNC mill think.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Echtbetrieb mit Röntgenblick: sieh hinein, übersteuere die Parameter und schau, wie die Anlage reagiert — und frag den KI-Optimizer, ob er Verbesserungen oder Probleme sieht.", "Real operation with X-ray vision: look inside, override the parameters and watch the plant react — then ask the AI optimizer whether it sees improvements or problems.")}</p>
+  </div>
+</section>)}
+
+<section style="background:#F8F9FA;" data-de={String(de)} data-embed={String(embed)}>
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    {embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Ebene 3 · Digitaler Zwilling — der Maschine beim Arbeiten zusehen", "Level 3 · Digital twin — watch the machine work")}</p>}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; align-items:start;">
+
+      <!-- Echtbetrieb -->
+      <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(18px,2.5vw,26px);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <span id="tw-led" style="width:11px;height:11px;border-radius:50%;background:#16794a;box-shadow:0 0 8px #16794a;"></span>
+          <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Echtbetrieb", "Real operation")}</span>
+          <span id="tw-state" style="margin-left:auto; font-family:var(--font-mono); font-size:11px; color:#16794a;">{L("stabil", "stable")}</span>
+        </div>
+        <div id="tw-metrics"></div>
+        <button id="tw-xray" class="tw-btn" type="button" style="margin-top:16px;">🔎 {L("Röntgenblick", "X-ray view")}</button>
+        <div id="tw-inside" hidden style="margin-top:14px; border-top:1px dashed #C0C8C5; padding-top:14px;">
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Innenansicht", "Inside view")}</p>
+          <div id="tw-internals"></div>
+        </div>
+      </div>
+
+      <!-- Übersteuern -->
+      <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(18px,2.5vw,26px);">
+        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E; margin:0 0 4px;">{L("Übersteuern", "Override")}</p>
+        <p style="font-size:13px; color:#5C5E63; margin:0 0 18px;">{L("Schieb die Parameter — die Anlage reagiert live.", "Move the parameters — the plant reacts live.")}</p>
+        <div id="tw-sliders"></div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+          <button class="tw-chip" data-preset="eco" type="button">{L("Schonend", "Gentle")}</button>
+          <button class="tw-chip" data-preset="max" type="button">{L("Max. Durchsatz", "Max throughput")}</button>
+          <button class="tw-chip" data-preset="reset" type="button">{L("Zurücksetzen", "Reset")}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prozess-Röntgenblick + Ghost-Vergleich -->
+    <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; align-items:start;">
+      <div style="border:1px solid #214740; border-radius:14px; background:#0E2522; padding:clamp(16px,2vw,22px);">
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#A6CFC5; margin:0 0 12px;">{L("Prozess-Röntgenblick", "Process X-ray")}</p>
+        <svg id="tw-proc" viewBox="0 0 400 300" style="width:100%; height:auto; display:block;">
+          <defs><radialGradient id="tw-hg"><stop offset="0" stop-color="#ff8a3c"/><stop offset="1" stop-color="#ff8a3c" stop-opacity="0"/></radialGradient></defs>
+          <rect x="110" y="205" width="180" height="55" rx="3" fill="#22443d" stroke="#3a554e"/>
+          <text x="200" y="282" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Werkstück NW-1001","Workpiece NW-1001")}</text>
+          <circle id="tw-heat" cx="200" cy="206" r="44" fill="url(#tw-hg)" opacity="0"/>
+          <g id="tw-cool" opacity="0">
+            <line class="tw-coolL" x1="118" y1="150" x2="186" y2="198" stroke="#7ba3e0" stroke-width="2" stroke-dasharray="2 6"/>
+            <line class="tw-coolL" x1="282" y1="150" x2="214" y2="198" stroke="#7ba3e0" stroke-width="2" stroke-dasharray="2 6"/>
+          </g>
+          <g id="tw-spindle">
+            <rect x="172" y="24" width="56" height="120" rx="6" fill="#13322D" stroke="#3FBF7F"/>
+            <rect x="194" y="144" width="12" height="48" fill="#A6CFC5"/>
+            <g transform="translate(200 196)"><g id="tw-tool"><line x1="-15" y1="0" x2="15" y2="0" stroke="#E6B23A" stroke-width="3"/><line x1="0" y1="-15" x2="0" y2="15" stroke="#E6B23A" stroke-width="3"/></g></g>
+          </g>
+          <circle id="tw-bear" cx="348" cy="92" r="20" fill="#16794a" stroke="#0E2522" stroke-width="3"/>
+          <text x="348" y="128" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Lager Y","Bearing Y")}</text>
+          <text id="tw-rpmlbl" x="200" y="16" text-anchor="middle" font-family="monospace" font-size="11" fill="#A6CFC5"></text>
+        </svg>
+      </div>
+      <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2vw,22px);">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0;">{L("Ghost-Vergleich · Vibration","Ghost compare · vibration")}</p>
+          <span id="tw-dev" style="font-family:var(--font-mono); font-size:12px; color:#16794a;"></span>
+        </div>
+        <svg id="tw-ghost" viewBox="0 0 400 140" preserveAspectRatio="none" style="width:100%; height:140px; display:block; background:#F8F9FA; border-radius:8px;"></svg>
+        <p style="font-size:12px; line-height:1.5; color:#92938F; margin:8px 0 0;">{L("Ghost = idealer Referenzlauf. Weicht die Live-Kurve ab, erkennt der Zwilling das früh — bevor Ausschuss entsteht.","Ghost = ideal reference run. When the live curve drifts, the twin sees it early — before scrap happens.")}</p>
+      </div>
+    </div>
+    <div style="margin-top:20px; border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2vw,22px);">
+      <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0 0 10px;">{L("Schichtbuch · Ereignisse","Shift log · events")}</p>
+      <div id="tw-log" style="font-family:var(--font-mono); font-size:12px; line-height:1.8; color:#3C3E42;"></div>
+    </div>
+
+    <!-- Optimizer -->
+    <div style="margin-top:20px; border:1px solid #E2E8F0; border-left:3px solid #123A33; border-radius:0 14px 14px 0; background:#fff; padding:clamp(20px,2.5vw,28px);">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+        <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Optimizer fragen", "Ask the optimizer")}</span>
+        <span style="font-size:13px; color:#5C5E63;">{L("KI bewertet den aktuellen Zustand — Verbesserungen & Risiken.", "AI assesses the current state — improvements & risks.")}</span>
+        <button id="tw-ask" class="tw-btn primary" type="button" style="margin-left:auto;">✦ {L("Analysieren", "Analyse")}</button>
+      </div>
+      <div id="tw-answer" hidden style="margin-top:16px; font-size:15px; line-height:1.6; color:#1B1C1E; white-space:pre-wrap;"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tw-row { display:grid; grid-template-columns:130px 64px 1fr; align-items:center; gap:10px; margin:9px 0; }
+  .tw-row .lbl { font-size:13px; color:#5C5E63; }
+  .tw-row .val { font-family:var(--font-mono); font-weight:600; font-size:14px; color:#1B1C1E; text-align:right; }
+  .tw-track { height:7px; border-radius:999px; background:#EFEAE0; overflow:hidden; }
+  .tw-fill { height:100%; border-radius:999px; background:#16794a; transition:width .4s ease, background .4s ease; }
+  .tw-slider { margin:14px 0; }
+  .tw-slider label { display:flex; justify-content:space-between; font-size:13px; color:#3C3E42; margin-bottom:5px; }
+  .tw-slider label b { font-family:var(--font-mono); color:#123A33; }
+  .tw-slider input { width:100%; accent-color:#123A33; }
+  .tw-btn { font-family:var(--font-mono); font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; border:1px solid #C0C8C5; background:#fff; color:#16463E; cursor:pointer; }
+  .tw-btn.on { background:#123A33; color:#fff; border-color:#123A33; }
+  .tw-btn.primary { background:#123A33; color:#fff; border-color:#123A33; }
+  .tw-chip { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border-radius:999px; border:1px solid #C0C8C5; background:#fff; color:#3C3E42; cursor:pointer; }
+  #tw-tool { transform-box:fill-box; transform-origin:center; animation:tw-spin 1s linear infinite; }
+  @keyframes tw-spin { to { transform:rotate(360deg); } }
+  #tw-spindle.tw-shake { animation:tw-shake .12s linear infinite; }
+  @keyframes tw-shake { 0%,100%{transform:translate(0,0);} 25%{transform:translate(.7px,0);} 75%{transform:translate(-.7px,0);} }
+  #tw-cool .tw-coolL { animation:tw-cflow .5s linear infinite; }
+  @keyframes tw-cflow { to { stroke-dashoffset:-16; } }
+  #tw-bear.tw-crit { animation:tw-bpulse 1s ease-in-out infinite; }
+  @keyframes tw-bpulse { 50% { opacity:.4; } }
+</style>
+
+<script>
+  const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
+  const $ = (s) => document.querySelector(s);
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  // Override-Parameter
+  let P = { rpm: 9000, feed: 80, cool: 60 };
+  const DEF = { ...P };
+  let adj = { temp:0, vib:0 };
+  const sliders = [
+    { k:"rpm",  label: DE?"Drehzahl":"Speed",   min:4000, max:14000, step:100, unit:"rpm" },
+    { k:"feed", label: DE?"Vorschub":"Feed",    min:40,   max:110,   step:1,   unit:"%" },
+    { k:"cool", label: DE?"Kühlung":"Cooling",  min:0,    max:100,   step:1,   unit:"%" },
+  ];
+  // Modell: abgeleitete Live-Kennzahlen
+  function model() {
+    const n = () => (Math.random()-0.5);
+    const temp = clamp(38 + (P.rpm-9000)/220 + (P.feed-80)*0.28 - P.cool*0.16 + adj.temp + n()*1.2, 28, 95);
+    const vib  = clamp(1.8 + (P.rpm-9000)/4200 + (P.feed-80)*0.02 + Math.max(0,temp-55)*0.05 + adj.vib + n()*0.15, 0.6, 9);
+    const yld  = clamp(97 - Math.max(0,P.feed-90)*0.5 - Math.max(0,temp-58)*0.4 - Math.max(0,vib-3.5)*1.2, 70, 99.5);
+    const scrap= clamp(100 - yld + n()*0.2, 0.3, 30);
+    const thru = Math.round(60 * (P.feed/80) * (P.rpm/9000) * (yld/100));
+    // Innen / Prognose
+    const bearY = clamp(temp + 6 + Math.max(0,vib-2)*3 + n(), 30, 110);
+    const ampFU2 = clamp(11 + (P.rpm-9000)/900 + (P.feed-80)*0.05, 4, 30);
+    const life = clamp(Math.round(70 - (P.rpm-9000)/130 - Math.max(0,vib-2)*11 - Math.max(0,temp-55)*1.6), 1, 180);
+    return { temp, vib, yld, scrap, thru, bearY, ampFU2, life };
+  }
+  function bar(v,min,max,color){ const pct=clamp((v-min)/(max-min)*100,0,100); return `<div class="tw-track"><div class="tw-fill" style="width:${pct}%;background:${color};"></div></div>`; }
+  function col(ok,warn,v){ return v<ok?"#16794a":v<warn?"#E6B23A":"#b4232a"; }
+
+  function render() {
+    const m = model();
+    const tempC = col(55,65,m.temp), vibC = col(3.5,4.5,m.vib);
+    const worst = Math.max(m.temp<55?0:m.temp<65?1:2, m.vib<3.5?0:m.vib<4.5?1:2, m.scrap<5?0:m.scrap<10?1:2);
+    const led = ["#16794a","#E6B23A","#b4232a"][worst];
+    const st = [DE?"stabil":"stable", DE?"erhöht":"elevated", DE?"kritisch":"critical"][worst];
+    $("#tw-led").style.background = led; $("#tw-led").style.boxShadow = `0 0 8px ${led}`;
+    const se = $("#tw-state"); se.textContent = st; se.style.color = led;
+    $("#tw-metrics").innerHTML =
+      row(DE?"Drehzahl":"Speed", P.rpm+" rpm", bar(P.rpm,4000,14000,"#123A33")) +
+      row(DE?"Vorschub":"Feed", P.feed+" %", bar(P.feed,40,110,"#123A33")) +
+      row(DE?"Spindeltemp.":"Spindle temp", m.temp.toFixed(1)+" °C", bar(m.temp,28,95,tempC)) +
+      row(DE?"Vibration":"Vibration", m.vib.toFixed(2)+" mm/s", bar(m.vib,0.6,9,vibC)) +
+      row(DE?"Ausbeute":"Yield", m.yld.toFixed(1)+" %", bar(m.yld,70,100,"#16794a")) +
+      row(DE?"Ausschuss":"Scrap", m.scrap.toFixed(1)+" %", bar(m.scrap,0,30,col(5,10,m.scrap))) +
+      row(DE?"Durchsatz":"Throughput", m.thru+" /h", bar(m.thru,0,120,"#123A33"));
+    const lifeC = col(14,30,m.life>180?0:(m.life<14?99:m.life<30?60:0)); // low life = bad
+    const lc = m.life<14?"#b4232a":m.life<30?"#E6B23A":"#16794a";
+    $("#tw-internals").innerHTML =
+      row(DE?"Lager Achse Y":"Bearing axis Y", m.bearY.toFixed(0)+" °C", bar(m.bearY,30,110,col(60,80,m.bearY))) +
+      row(DE?"Strom FU2":"Current FU2", m.ampFU2.toFixed(1)+" A", bar(m.ampFU2,4,30,"#123A33")) +
+      `<div class="tw-row"><span class="lbl">${DE?"Restlebensdauer Y":"Remaining life Y"}</span><span class="val" style="color:${lc};">${m.life} ${DE?"Tage":"days"}</span>${bar(m.life,0,120,lc)}</div>`;
+    lastM = m;
+    updateProcess(m); updateGhost(m); logTick(worst);
+    try { window.dispatchEvent(new CustomEvent("twin:state", { detail: { worst, life: m.life } })); } catch(e) {}
+  }
+  function row(l,v,b){ return `<div class="tw-row"><span class="lbl">${l}</span><span class="val">${v}</span>${b}</div>`; }
+  let lastM = null;
+
+  // Sliders
+  $("#tw-sliders").innerHTML = sliders.map(s =>
+    `<div class="tw-slider"><label>${s.label} <b id="sv-${s.k}">${P[s.k]} ${s.unit}</b></label>
+     <input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${P[s.k]}" data-k="${s.k}" data-u="${s.unit}"></div>`).join("");
+  document.querySelectorAll("#tw-sliders input").forEach(inp => {
+    inp.addEventListener("input", () => { P[inp.dataset.k] = +inp.value; document.getElementById("sv-"+inp.dataset.k).textContent = inp.value+" "+inp.dataset.u; render(); });
+  });
+  document.querySelectorAll(".tw-chip").forEach(c => c.addEventListener("click", () => {
+    const p = c.dataset.preset;
+    if (p==="eco") P={rpm:7000,feed:65,cool:80};
+    else if (p==="max") P={rpm:13000,feed:108,cool:45};
+    else P={...DEF};
+    document.querySelectorAll("#tw-sliders input").forEach(inp => { inp.value=P[inp.dataset.k]; document.getElementById("sv-"+inp.dataset.k).textContent = P[inp.dataset.k]+" "+inp.dataset.u; });
+    render(); logEvent("Preset · "+p);
+  }));
+  $("#tw-xray").addEventListener("click", () => {
+    const ins = $("#tw-inside"); const on = ins.hidden; ins.hidden = !on; $("#tw-xray").classList.toggle("on", on);
+  });
+
+  // Optimizer
+  $("#tw-ask").addEventListener("click", async () => {
+    const a = $("#tw-answer"), btn = $("#tw-ask");
+    a.hidden = false; a.textContent = DE?"Optimizer analysiert …":"Optimizer analysing …"; btn.disabled = true; logEvent(DE?"Optimizer befragt":"Optimizer asked");
+    const m = lastM || model();
+    const params = { rpm:P.rpm, feed:P.feed, cool:P.cool, temp:m.temp.toFixed(1), vib:m.vib.toFixed(2), yield:m.yld.toFixed(1), scrap:m.scrap.toFixed(1) };
+    try {
+      const r = await fetch("/_ask/", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ mode:"optimize", params, lang: DE?"de":"en" }) });
+      const d = await r.json();
+      a.textContent = (r.ok && d.answer) ? d.answer : (DE?"Optimizer gerade nicht verfügbar.":"Optimizer not available right now.");
+    } catch(e) { a.textContent = DE?"Optimizer gerade nicht verfügbar.":"Optimizer not available right now."; }
+    btn.disabled = false;
+  });
+
+  // --- Prozess-Visual, Ghost & Schichtbuch ---
+  const GHOST = Array.from({ length: 48 }, (_, i) => 2.0 + 0.22 * Math.sin(i / 3));
+  const hist = [];
+  const procTool = document.getElementById("tw-tool");
+  const procHeat = document.getElementById("tw-heat");
+  const procCool = document.getElementById("tw-cool");
+  const procBear = document.getElementById("tw-bear");
+  const procSp = document.getElementById("tw-spindle");
+  const procRpm = document.getElementById("tw-rpmlbl");
+  const ghostSvg = document.getElementById("tw-ghost");
+  const devEl = document.getElementById("tw-dev");
+  const logEl = document.getElementById("tw-log");
+  const logs = [];
+  function ts(){ const t=new Date(); const p=(n)=>String(n).padStart(2,"0"); return p(t.getHours())+":"+p(t.getMinutes())+":"+p(t.getSeconds()); }
+  function logEvent(txt){ logs.unshift(ts()+" · "+txt); if(logs.length>7) logs.pop(); if(logEl) logEl.innerHTML = logs.map((l,i)=>`<div style="opacity:${1-i*0.1};">${l}</div>`).join(""); }
+  function updateProcess(m){
+    if(procTool) procTool.style.animationDuration = Math.max(0.18, 8000/P.rpm).toFixed(2)+"s";
+    if(procHeat) procHeat.setAttribute("opacity", String(clamp((m.temp-38)/45,0,0.9)));
+    if(procCool) procCool.setAttribute("opacity", String(clamp(P.cool/120,0,0.85)));
+    if(procRpm) procRpm.textContent = P.rpm+" rpm";
+    if(procSp) procSp.classList.toggle("tw-shake", m.vib>3.6);
+    if(procBear){ const c = m.life<14?"#b4232a":m.life<30?"#E6B23A":"#16794a"; procBear.setAttribute("fill",c); procBear.classList.toggle("tw-crit", m.life<14); }
+  }
+  function updateGhost(m){
+    hist.push(m.vib); if(hist.length>48) hist.shift();
+    const W=400,H=140, y=(v)=>H-12-(clamp(v,0.6,6)-0.6)/5.4*(H-24), x=(i,n)=>i/(Math.max(1,n-1))*W;
+    const gp = GHOST.map((v,i)=>(i?"L":"M")+x(i,GHOST.length).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+    const lp = hist.map((v,i)=>(i?"L":"M")+x(i,hist.length).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+    const dev = hist.length?Math.abs(hist[hist.length-1]-GHOST[(hist.length-1)%GHOST.length]):0;
+    const col = dev>1.2?"#b4232a":dev>0.7?"#E6B23A":"#16794a";
+    if(ghostSvg) ghostSvg.innerHTML = `<path d="${gp}" fill="none" stroke="#C0C8C5" stroke-width="1.6" stroke-dasharray="3 4"/><path d="${lp}" fill="none" stroke="${col}" stroke-width="2.2"/>`;
+    if(devEl){ devEl.textContent = (DE?"Abweichung ":"deviation ")+dev.toFixed(2)+" mm/s"; devEl.style.color = col; }
+  }
+  let lastLevel = -1;
+  function logTick(worst){
+    if(worst!==lastLevel){
+      lastLevel=worst;
+      logEvent((DE?"Status: ":"Status: ")+[DE?"stabil":"stable", DE?"erhöht":"elevated", DE?"kritisch — Achse Y":"critical — axis Y"][worst]);
+    }
+  }
+  logEvent(DE?"Anlage gestartet · Echtbetrieb":"Plant started · live operation");
+
+  render();
+  fetch("/_live/telemetry",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d||!d.latest) return;
+    const lt=d.latest["1_temperatur_c"], lv=d.latest["1_vibration_mm_s"];
+    if(lt!=null) adj.temp = lt - (38 + (DEF.rpm-9000)/220 + (DEF.feed-80)*0.28 - DEF.cool*0.16);
+    if(lv!=null) adj.vib  = lv - (1.8 + (DEF.rpm-9000)/4200);
+    logEvent(DE?"An Live-Daten verankert (CNC-Fräse A1)":"Anchored to live data (CNC mill A1)");
+  }).catch(()=>{});
+  setInterval(render, 1300);
+</script>

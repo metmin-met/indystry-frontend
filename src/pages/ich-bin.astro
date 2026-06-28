@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import IchBin from "../components/views/IchBin.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Ich bin … · indystry" description="Wähl deine Rolle — was indystry für dich tut, mit den passenden Live-Demos." path="/ich-bin/" altPath="/en/ich-bin/">
+  <IchBin lang={lang} />
+</Base>

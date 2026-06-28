@@ -1,0 +1,46 @@
+---
+// 404 — keine Sackgasse: immer ein Weg zurück in die Seite (DE + EN).
+import Base from "../layouts/Base.astro";
+const links = [
+  { href: "/", de: "Startseite", en: "Home" },
+  { href: "/#saeulen", de: "Die 10 Bausteine", en: "The 10 building blocks" },
+  { href: "/demos/", de: "Live-Demos", en: "Live demos" },
+  { href: "/faq/", de: "Häufige Fragen", en: "FAQ" },
+  { href: "/kontakt/", de: "Kontakt", en: "Contact" },
+];
+---
+<Base lang="de" title="Seite nicht gefunden" description="Diese Seite gibt es nicht — aber einen Weg weiter." path="/404" altPath="/404" noindex={true}>
+  <section style="background:#F8F9FA;">
+    <div style="max-width:48rem; margin:0 auto; padding:clamp(72px,9vw,128px) clamp(24px,5vw,56px) clamp(96px,12vw,168px);">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(28px,4vw,40px);">404 · Seite nicht gefunden</p>
+      <h1 style="font-weight:600; font-size:clamp(40px,7vw,88px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 20px; max-width:14ch;">Hier ist die Straße zu Ende.</h1>
+      <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; margin:0 0 6px; max-width:52ch;">Diese Seite gibt es nicht (mehr) — aber Sackgassen mögen wir nicht. Hier geht's weiter:</p>
+      <p style="font-size:14px; color:#92938F; margin:0 0 clamp(40px,5vw,56px);">Page not found — but we don't do dead ends. Pick a way forward:</p>
+
+      <nav style="border-top:1px solid #1B1C1E;">
+        {links.map((l) => (
+          <a href={l.href} class="nf-row" style="text-decoration:none; color:#1B1C1E; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline; padding:20px 0; border-bottom:1px solid #E2E8F0;">
+            <span style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-weight:600; font-size:clamp(18px,2vw,22px); letter-spacing:-0.015em;">{l.de}</span>
+              <span style="font-size:13px; color:#92938F;">{l.en}</span>
+            </span>
+            <span style="color:#92938F;">↗</span>
+          </a>
+        ))}
+      </nav>
+    </div>
+  </section>
+
+  <section style="background:#123A33; color:#F8F9FA;">
+    <div style="max-width:48rem; margin:0 auto; padding:clamp(64px,9vw,120px) clamp(24px,5vw,56px);">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">Pain-List → Lösung</p>
+      <h2 style="font-weight:600; font-size:clamp(30px,5vw,56px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(28px,4vw,40px); max-width:18ch;">Schon hier? Erzähl uns, was klemmt.</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center;">
+        <a href="/kontakt/" style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px;">Pain-List schicken →</a>
+        <a href="mailto:hallo@datendrang.com" style="text-decoration:none; font-size:15px; color:#F8F9FA; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">oder direkt: hallo@datendrang.com</a>
+      </div>
+    </div>
+  </section>
+
+  <style>.nf-row:hover { color: #16463E; }</style>
+</Base>

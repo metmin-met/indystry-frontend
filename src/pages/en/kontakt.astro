@@ -1,0 +1,24 @@
+---
+import Base from "../../layouts/Base.astro";
+import ContactForm from "../../components/ContactForm.astro";
+import { t } from "../../lib/i18n";
+const lang = "en" as const;
+const ui = t(lang);
+---
+<Base lang={lang} title={ui.contact_title} description={ui.contact_intro} path="/en/kontakt/" altPath="/kontakt/">
+  <div class="wrap contact-grid">
+    <ContactForm lang={lang} bare />
+    <aside class="contact-aside" data-reveal>
+      <h2>What happens next</h2>
+      <ol class="contact-steps">
+        <li><span class="step-n">1</span><span>You send us where it pinches — raw, unsorted.</span></li>
+        <li><span class="step-n">2</span><span>We get back to you with a concrete solution sketch.</span></li>
+        <li><span class="step-n">3</span><span>No mailing list, no sales fluff.</span></li>
+      </ol>
+      <div class="contact-direct">
+        <p class="cd-label">Prefer email?</p>
+        <a href="mailto:hallo@datendrang.com">hallo@datendrang.com</a>
+      </div>
+    </aside>
+  </div>
+</Base>

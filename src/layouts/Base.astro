@@ -1,0 +1,371 @@
+---
+import "@fontsource-variable/hanken-grotesk";
+import "@fontsource-variable/fraunces";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import { brand, type Lang } from "../lib/content";
+import { t } from "../lib/i18n";
+import Critter from "../components/Critter.astro";
+import Feedback from "../components/Feedback.astro";
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  noindex?: boolean; // robots noindex (interne Tool-Seiten)
+  path: string;      // canonical path for THIS page, e.g. "/" or "/saeule/erp-betrieb/"
+  altPath: string;   // same page in the other language
+}
+const { lang, title, description, path, altPath, noindex = false } = Astro.props;
+const ui = t(lang);
+const site = brand.url;
+const canonical = new URL(path, site).href;
+const enHref = new URL(lang === "en" ? path : altPath, site).href;
+const deHref = new URL(lang === "de" ? path : altPath, site).href;
+const otherHref = lang === "de" ? altPath : altPath; // (legacy)
+const isKi = path === "/ki/";
+const deRel = isKi ? "/" : (lang === "de" ? path : altPath);
+const enRel = isKi ? "/en/" : (lang === "en" ? path : altPath);
+const fullTitle = `${title} · ${brand.name}`;
+const ogMap: Record<string, string> = {
+  "/landkarte/": "/og/landkarte.png", "/daily/": "/og/daily.png", "/schnittstellen/": "/og/schnittstellen.png",
+  "/datenhoheit/": "/og/datenhoheit.png", "/stack/": "/og/stack.png", "/ablauf/": "/og/ablauf.png",
+  "/rechner/": "/og/rechner.png", "/tour/": "/og/tour.png",
+};
+const ogImage = new URL(ogMap[deRel] || "/og.png", site).href;
+const b = lang === "de" ? "" : "/en";
+const L = (d: string, e: string) => (lang === "de" ? d : e);
+const navGroups = [
+  { title: L("Lösungen", "Solutions"), links: [
+    { label: L("Datenschutz & KI-Souveränität", "Privacy & AI sovereignty"), href: `${b}/datenhoheit/` },
+    { label: L("Aus Erfahrung gebaut", "Built from experience"), href: `${b}/koennen/` },
+    { label: ui.nav_pillars, href: `${b}/#saeulen` },
+    { label: "ERP", href: `${b}/erp/` },
+    { label: L("Vergleich", "Compare"), href: `${b}/#vergleich` },
+    { label: L("So skaliert das System", "How it scales"), href: `${b}/rechner/` },
+  ] },
+  { title: L("Erleben", "Experience"), links: [
+    { label: L("Daily Industrie 4.0", "Daily Industry 4.0"), href: `${b}/daily/` },
+    { label: L("Werks-Landkarte", "Factory map"), href: `${b}/landkarte/` },
+    { label: L("Geführte Tour", "Guided tour"), href: `${b}/tour/` },
+    { label: L("Ich bin …", "I am …"), href: `${b}/ich-bin/` },
+    { label: ui.nav_demos, href: `${b}/demos/` },
+    { label: L("Ein Tag", "A day"), href: `${b}/tag/` },
+    { label: L("Ablauf", "Process"), href: `${b}/ablauf/` },
+    { label: L("Digitaler Zwilling", "Digital twin"), href: `${b}/twin/` },
+    { label: L("Wissensgraph 3D", "Knowledge graph 3D"), href: `${b}/graph/` },
+    { label: L("Werkstoff-Analyse", "Material analysis"), href: `${b}/analyse/` },
+    { label: L("Werks-Check", "Check"), href: `${b}/check/` },
+  ] },
+  { title: L("Verstehen", "Understand"), links: [
+    { label: L("Onboarding & Lernen", "Onboarding & learning"), href: `${b}/lernen/` },
+    { label: L("Glossar", "Glossary"), href: `${b}/glossar/` },
+    { label: L("KI & Mensch", "AI & humans"), href: `${b}/ki-mensch/` },
+  ] },
+  { title: L("Plattform", "Platform"), links: [
+    { label: L("Schnittstellen", "Interfaces"), href: `${b}/schnittstellen/` },
+    { label: L("Der Stack", "The stack"), href: `${b}/stack/` },
+    { label: "Status", href: `${b}/status/` },
+    { label: "Team", href: `${b}/#team` },
+  ] },
+];
+const relLabels: Record<string,[string,string]> = {
+  "/daily/": ["Daily Industrie 4.0","Daily Industry 4.0"],
+  "/datenhoheit/": ["Datenschutz & KI-Souveränität","Privacy & AI sovereignty"],
+  "/schnittstellen/": ["Schnittstellen","Interfaces"],
+  "/landkarte/": ["Werks-Landkarte","Factory map"], "/ablauf/": ["Auftragsfluss","Order flow"],
+  "/twin/":["Digitaler Zwilling","Digital twin"], "/anlage/":["Anlage & Stromlaufplan","Plant & wiring"],
+  "/historian/":["Historian","Historian"], "/leitstand/":["Leitstand","Control room"],
+  "/analyse/":["Werkstoff-Analyse","Material analysis"], "/graph/":["Wissensgraph 3D","Knowledge graph 3D"],
+  "/suche/":["KI-Suche","AI search"], "/tour/":["Geführte Tour","Guided tour"],
+  "/ablauf/":["Auftragsfluss","Order flow"], "/tag/":["Ein Tag · 3 Schichten","A day · 3 shifts"],
+  "/ich-bin/":["Ich bin … (Rollen)","I am … (roles)"], "/lernen/":["Onboarding & Lernen","Onboarding & learning"],
+  "/wissen/":["Wissen & Kiosk","Knowledge & kiosk"], "/glossar/":["Glossar","Glossary"],
+  "/ki-mensch/":["KI & Mensch","AI & humans"], "/stack/":["Der Stack","The stack"],
+  "/koennen/":["Aus Erfahrung gebaut","Built from experience"], "/status/":["Status","Status"],
+  "/werk/":["Nordwerk-Homepage","Nordwerk homepage"], "/portal/":["Kundenportal","Customer portal"],
+  "/demos/":["Demo-Firma","Demo company"], "/rechner/":["So skaliert das System","How the system scales"],
+};
+const relDesc: Record<string,[string,string]> = {
+  "/daily/":["Täglicher KI-Digest zu Industrie 4.0, OPC-UA, MES & Co.","Daily AI digest on Industry 4.0, OPC-UA, MES & more"],
+  "/datenhoheit/":["Von Cloud-KI bis zum eigenen, on-prem trainierten Modell","From cloud AI to your own on-prem trained model"],
+  "/schnittstellen/":["SPS, OPC-UA, API, MCP, PEPPOL — offene Standards","PLC, OPC-UA, API, MCP, PEPPOL — open standards"],
+  "/landkarte/":["Jede Phase, jedes Tool, jede Live-Demo — klickbar","Every phase, tool & live demo — clickable"],
+  "/ablauf/":["Vom Bestelleingang bis zur Lieferung, mit jedem Status","From order intake to delivery, every state"],
+  "/twin/":["Simulieren & optimieren, bevor du umstellst","Simulate & optimise before you switch"],
+  "/anlage/":["Anlage in 3D + animierter Stromlaufplan","Plant in 3D + animated wiring diagram"],
+  "/historian/":["Millionen Messpunkte, blitzschnell ausgewertet","Millions of data points, analysed in a flash"],
+  "/leitstand/":["Echtzeit-Maschinenstatus — live & read-only","Real-time machine status — live & read-only"],
+  "/analyse/":["Werkstoff- & Gefüge-Galerie je Charge","Material & structure gallery per batch"],
+  "/graph/":["Die ganze Firma als 3D-Wissensgraph","The whole company as a 3D knowledge graph"],
+  "/suche/":["Frag die Firma — Antworten mit echten Daten","Ask the company — answers from real data"],
+  "/tour/":["Ein Auftrag als roter Faden durch alle Systeme","One order as the thread through every system"],
+  "/tag/":["Drei Schichten, echte Rollen, echte Abläufe","Three shifts, real roles, real workflows"],
+  "/ich-bin/":["Finde deine Rolle und deinen Arbeitstag","Find your role and your working day"],
+  "/lernen/":["Lernpfade mit Mini-Quiz & Fortschritt","Learning paths with mini-quiz & progress"],
+  "/wissen/":["Handbuch, Compliance-Register & App-Kiosk","Handbook, compliance register & app kiosk"],
+  "/glossar/":["41 Begriffe, klar erklärt und verlinkt","41 terms, clearly explained and linked"],
+  "/ki-mensch/":["Was die KI übernimmt — und was der Mensch","What the AI takes on — and what humans do"],
+  "/stack/":["Offene Bausteine, selbst gehostet, kein Lock-in","Open building blocks, self-hosted, no lock-in"],
+  "/koennen/":["Aus echten Projekten gebaute Fähigkeiten","Capabilities built from real projects"],
+  "/status/":["Dienste, Backups & Stabilität auf einen Blick","Services, backups & stability at a glance"],
+  "/werk/":["Die selbst gehostete Website der Demo-Firma","The demo company's self-hosted website"],
+  "/portal/":["Aufträge, Rechnungen, Service — aus Kundensicht","Orders, invoices, service — the customer view"],
+  "/demos/":["Eine ganze Firma zum Durchklicken","A whole company to click through"],
+  "/rechner/":["Core bleibt, Hardware wächst — Kafka-Break-even","Core stays, hardware grows — Kafka break-even"],
+};
+const relMap: Record<string,string[]> = {
+  "/daily/": ["/schnittstellen/","/stack/","/datenhoheit/"],
+  "/datenhoheit/": ["/stack/","/ki-mensch/","/schnittstellen/"],
+  "/schnittstellen/": ["/stack/","/koennen/","/landkarte/"], "/stack/": ["/schnittstellen/","/status/","/koennen/"],
+  "/landkarte/": ["/tour/","/ablauf/","/demos/"], "/ablauf/": ["/landkarte/","/tour/","/demos/"],
+  "/twin/":["/anlage/","/historian/","/ki-mensch/"], "/anlage/":["/twin/","/leitstand/","/graph/"],
+  "/historian/":["/leitstand/","/analyse/","/twin/"], "/leitstand/":["/anlage/","/historian/","/status/"],
+  "/analyse/":["/graph/","/historian/","/ablauf/"], "/graph/":["/analyse/","/ablauf/","/twin/"],
+  "/suche/":["/ki-mensch/","/wissen/","/graph/"], "/tour/":["/ablauf/","/demos/","/tag/"],
+  "/ablauf/":["/tour/","/graph/","/demos/"], "/tag/":["/tour/","/ich-bin/","/ablauf/"],
+  "/ich-bin/":["/tag/","/lernen/","/koennen/"], "/lernen/":["/wissen/","/ich-bin/","/ablauf/"],
+  "/wissen/":["/lernen/","/suche/","/glossar/"], "/glossar/":["/ablauf/","/suche/","/stack/"],
+  "/ki-mensch/":["/suche/","/stack/","/twin/"], "/stack/":["/status/","/ki-mensch/","/koennen/"],
+  "/koennen/":["/demos/","/tour/","/stack/"], "/status/":["/stack/","/leitstand/","/demos/"],
+  "/werk/":["/portal/","/demos/","/tour/"], "/portal/":["/werk/","/ablauf/","/tour/"],
+  "/demos/":["/tour/","/tag/","/ich-bin/"], "/rechner/":["/stack/","/koennen/","/ki-mensch/"], "/stack/":["/status/","/rechner/","/koennen/"],
+};
+const relBase = (path.replace(/^\/en/, "") || "/");
+const relItems = (relMap[relBase] || []).filter((rp) => relLabels[rp]).map((rp) => ({ href: `${b}${rp}`, label: L(relLabels[rp][0], relLabels[rp][1]), desc: L((relDesc[rp]||["",""])[0], (relDesc[rp]||["",""])[1]) }));
+
+const jsonld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: brand.name,
+      url: site,
+      slogan: brand.tagline[lang],
+      description: brand.claim[lang],
+    },
+    {
+      "@type": "WebSite",
+      name: brand.name,
+      url: site,
+      inLanguage: lang,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${site}/search?q={query}`,
+        "query-input": "required name=query",
+      },
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="de" href={deHref} />
+    <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="alternate" hreflang="x-default" href={deHref} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={brand.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === "de" ? "de_DE" : "en_US"} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#F8F9FA" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="indystry" />
+    <script is:inline>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+    <!-- Cookieless Web-Analytics (Umami, self-hosted). data-do-not-track respektiert den DNT-Header. -->
+    <script is:inline defer src="https://analytics.indystry.works/script.js" data-website-id="1a48580e-dbd8-4218-b0f2-3ab3c15a9232" data-do-not-track="true"></script>
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <div class="wrap header-inner">
+        <a class="brand" href={lang === "de" ? "/" : "/en/"} aria-label={`${brand.name}.works`}>
+          <svg class="brand-mark" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+            <rect width="26" height="26" rx="7" fill="#123A33"></rect>
+            <rect x="6" y="13.5" width="3.4" height="6.5" rx="1" fill="#ffffff"></rect>
+            <rect x="11.3" y="9.5" width="3.4" height="10.5" rx="1" fill="#ffffff"></rect>
+            <rect x="16.6" y="6" width="3.4" height="14" rx="1" fill="#E6B23A"></rect>
+          </svg>
+          <span class="brand-word">{brand.name}<span class="tld">.works</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Hauptnavigation">
+          <a class="link-accent nav-quick" href={`${b}/#saeulen`}>{ui.nav_pillars}</a>
+          <a class="link-accent nav-quick" href={`${b}/demos/`}>{ui.nav_demos}</a>
+          <a class="link-accent nav-quick" href={`${b}/check/`}>{L("Werks-Check", "Check")}</a>
+          <span class="lang-switch" role="group" aria-label="Sprache">
+            <a href={deRel} class={!isKi && lang === "de" ? "on" : ""}>DE</a>
+            <a href={enRel} class={!isKi && lang === "en" ? "on" : ""}>EN</a>
+            <a href="/ki/" class={isKi ? "on" : ""}>KI</a>
+          </span>
+          <a class="header-cta nav-quick" href={`${b}/kontakt/`}>{ui.nav_cta}</a>
+          <button class="nav-burger" type="button" data-nav-open aria-label="Menü" aria-expanded="false" aria-controls="nav-panel">
+            <span class="nav-burger-box" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="nav-burger-label">{L("Menü", "Menu")}</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="nav-scrim" data-nav-scrim hidden></div>
+    <aside id="nav-panel" class="nav-panel" data-nav-panel aria-hidden="true" aria-label="Hauptmenü">
+      <div class="nav-panel-head">
+        <span class="nav-panel-title">{L("Menü", "Menu")}</span>
+        <button class="nav-panel-close" type="button" data-nav-close aria-label={L("Menü schließen", "Close menu")}>✕</button>
+      </div>
+      <div class="nav-panel-body">
+        {navGroups.map((g) => (
+          <div class="nav-group">
+            <p class="nav-group-title">{g.title}</p>
+            {g.links.map((l) => <a class="nav-row" href={l.href}>{l.label}</a>)}
+          </div>
+        ))}
+      </div>
+      <a class="nav-panel-cta" href={`${b}/kontakt/`}>{ui.nav_cta}</a>
+    </aside>
+
+    <main>
+      <slot />
+    </main>
+
+    {relItems.length > 0 && (
+      <aside class="related" aria-label={L("Das könnte Sie auch interessieren","You might also like")}>
+        <div class="wrap">
+          <p class="related-h">{L("Das könnte Sie auch interessieren","You might also like")}</p>
+          <div class="related-grid">
+            {relItems.map((r) => (
+              <a class="related-card" href={r.href}>
+                <span class="related-tx"><span class="related-label">{r.label}</span>{r.desc && <span class="related-desc">{r.desc}</span>}</span>
+                <span class="related-arrow">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    )}
+
+    <footer class="site-footer" style="background:#123A33;color:#9FB8B0;border-top:1px solid #23514A;">
+      <div class="wrap" style="padding-block:48px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center;">
+        <p style="font-size:14px;margin:0;max-width:42ch;line-height:1.6;">{ui.footer_note}</p>
+        <span style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px;font-weight:500;">
+          <a href={lang === "de" ? "/stack/" : "/en/stack/"} style="text-decoration:none;">Stack</a>
+          <a href={lang === "de" ? "/glossar/" : "/en/glossar/"} style="text-decoration:none;">Glossar</a>
+          <a href={lang === "de" ? "/faq/" : "/en/faq/"} style="text-decoration:none;">{ui.nav_faq}</a>
+          <a href={lang === "de" ? "/kontakt/" : "/en/kontakt/"} style="text-decoration:none;">{ui.nav_contact}</a>
+          <a href={lang === "de" ? "/impressum/" : "/en/impressum/"} style="text-decoration:none;">{ui.nav_imprint}</a>
+          <a href={lang === "de" ? "/datenschutz/" : "/en/datenschutz/"} style="text-decoration:none;">{ui.nav_privacy}</a>
+        </span>
+      </div>
+      <div style="border-top:1px solid #23514A;">
+        <div class="wrap" style="padding-block:18px;font-size:12px;letter-spacing:0.04em;color:#5E7E76;">© {new Date().getFullYear()} indystry.works — {lang === "de" ? "Der dritte Weg." : "The third way."}</div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      (function () {
+        var els = document.querySelectorAll("[data-reveal]");
+        if (!("IntersectionObserver" in window) || !els.length) {
+          els.forEach(function (e) { e.classList.add("is-visible"); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add("is-visible"); io.unobserve(en.target); }
+          });
+        }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+        els.forEach(function (e) { io.observe(e); });
+      })();
+    </script>
+    <script is:inline>
+      (function () {
+        var header = document.querySelector("[data-header]");
+        if (!header) return;
+        var lastY = window.scrollY, ticking = false;
+        function update() {
+          var y = window.scrollY;
+          header.classList.toggle("scrolled", y > 8);
+          if (y > 140 && y > lastY + 6) header.classList.add("nav-hidden");
+          else if (y < lastY - 6 || y <= 140) header.classList.remove("nav-hidden");
+          lastY = y; ticking = false;
+        }
+        update();
+        window.addEventListener("scroll", function () { if (!ticking) { requestAnimationFrame(update); ticking = true; } }, { passive: true });
+      })();
+    </script>
+    <style is:global>
+      .nav-burger{display:inline-flex;align-items:center;gap:8px;background:none;border:1px solid var(--line-strong,#C0C8C5);border-radius:9999px;padding:7px 13px;cursor:pointer;font:inherit;font-size:.82rem;font-weight:600;color:inherit;line-height:1;}
+      .nav-burger:hover{background:rgba(18,58,51,.06);}
+      .nav-burger-box{display:inline-flex;flex-direction:column;justify-content:center;gap:3px;width:16px;}
+      .nav-burger-box span{height:2px;width:100%;background:currentColor;border-radius:2px;display:block;}
+      .nav-scrim{position:fixed;inset:0;background:rgba(11,28,25,.5);opacity:0;transition:opacity .25s ease;z-index:1200;}
+      .nav-scrim.show{opacity:1;}
+      .nav-panel{position:fixed;top:0;right:0;height:100dvh;width:min(380px,92vw);background:#fff;box-shadow:-24px 0 70px rgba(11,28,25,.22);transform:translateX(102%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:1201;display:flex;flex-direction:column;overflow-y:auto;}
+      .nav-panel.open{transform:none;}
+      .nav-panel-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #EFEAE0;position:sticky;top:0;background:#fff;}
+      .nav-panel-title{font-family:var(--font-mono,monospace);font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#16463E;}
+      .nav-panel-close{background:none;border:none;font-size:1.3rem;line-height:1;cursor:pointer;color:#5C5E63;padding:2px 6px;}
+      .nav-panel-close:hover{color:#16463E;}
+      .nav-panel-body{padding:8px 24px 4px;flex:1;}
+      .nav-group{padding:14px 0;border-bottom:1px solid #F1F3F2;}
+      .nav-group:last-child{border-bottom:none;}
+      .nav-group-title{font-family:var(--font-mono,monospace);font-size:.66rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#92938F;margin:0 0 6px;}
+      .nav-panel-body .nav-row{display:block;text-decoration:none;color:#1B1C1E;font-size:1.06rem;font-weight:500;padding:7px 0;}
+      .nav-panel-body .nav-row:hover{color:#16463E;}
+      .nav-panel-cta{margin:10px 24px 28px;text-align:center;background:var(--accent,#123A33);color:#fff;text-decoration:none;font-weight:600;padding:13px;border-radius:10px;}
+      .nav-panel-cta:hover{background:var(--accent-ink,#0E2E29);}
+      .brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;}
+      .brand-mark{flex:none;display:block;border-radius:7px;}
+      .nav-panel-body .nav-row{transition:color .12s ease, padding-left .12s ease;}
+      .nav-panel-body .nav-row:hover{padding-left:7px;color:#16463E;}
+      body.nav-open{overflow:hidden;}
+      .related{background:#F8F9FA;border-top:1px solid #E2E8F0;}
+      .related .wrap{padding-block:clamp(40px,5vw,64px);}
+      .related-h{font-family:var(--font-mono,monospace);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#16463E;margin:0 0 16px;}
+      .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;}
+      .related-card{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;text-decoration:none;border:1px solid #E2E8F0;border-radius:12px;background:#fff;padding:18px;color:#1B1C1E;transition:transform .12s,box-shadow .12s,border-color .12s;}
+      .related-tx{display:flex;flex-direction:column;gap:5px;min-width:0;}
+      .related-label{font-weight:600;font-size:16px;letter-spacing:-0.01em;}
+      .related-desc{font-size:13.5px;line-height:1.5;color:#5C5E63;}
+      .related-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(11,28,25,.08);border-color:#123A33;}
+      .related-arrow{color:#16463E;flex:none;margin-top:2px;}
+      @media (max-width:760px){ .nav-quick{display:none!important;} }
+    </style>
+    <script is:inline>
+      (function(){
+        var openBtn=document.querySelector("[data-nav-open]"),
+            panel=document.querySelector("[data-nav-panel]"),
+            scrim=document.querySelector("[data-nav-scrim]"),
+            closeBtn=document.querySelector("[data-nav-close]");
+        if(!openBtn||!panel||!scrim)return;
+        var t=null;
+        function open(){clearTimeout(t);scrim.hidden=false;requestAnimationFrame(function(){scrim.classList.add("show");panel.classList.add("open");});document.body.classList.add("nav-open");openBtn.setAttribute("aria-expanded","true");panel.setAttribute("aria-hidden","false");}
+        function close(){panel.classList.remove("open");scrim.classList.remove("show");document.body.classList.remove("nav-open");openBtn.setAttribute("aria-expanded","false");panel.setAttribute("aria-hidden","true");t=setTimeout(function(){scrim.hidden=true;},300);}
+        openBtn.addEventListener("click",open);
+        closeBtn&&closeBtn.addEventListener("click",close);
+        scrim.addEventListener("click",close);
+        document.addEventListener("keydown",function(e){if(e.key==="Escape"&&panel.classList.contains("open"))close();});
+        panel.querySelectorAll("a").forEach(function(a){a.addEventListener("click",close);});
+      })();
+    </script>
+    <Critter />
+    <Feedback lang={lang} />
+  </body>
+</html>

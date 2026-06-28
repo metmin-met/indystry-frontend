@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Analyse from "../components/views/Analyse.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Werkstoff-Analyse · Nordwerk" description="Oberfläche, Schliff und Mikroskopie plus Messwerte je Charge — rückverfolgbar, read-only." path="/analyse/" altPath="/en/analyse/" noindex={true}>
+  <Analyse lang={lang} />
+</Base>

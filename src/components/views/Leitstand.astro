@@ -1,0 +1,99 @@
+---
+// Leitstand / SCADA (read-only, lang-aware): HMI-Kachelsicht der Nordwerk-Maschinen mit
+// aktuellen Sensorwerten + Trend, aus demselben Warehouse-Snapshot wie Historian/Grafana.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+---
+<section style="background:#0E2522;" data-de={String(de)}>
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(20px,4vw,48px) clamp(64px,8vw,110px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#A6CFC5; margin:0 0 14px;">{de ? "Leitstand · SCADA · read-only" : "Control room · SCADA · read-only"}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,5.5vw,60px); line-height:1.0; letter-spacing:-0.03em; color:#F4F6F5; margin:0 0 12px;">{de ? "Das Werk auf einen Blick." : "The plant at a glance."}</h1>
+    <p style="font-size:clamp(16px,1.5vw,19px); line-height:1.6; color:#A6CFC5; max-width:60ch; margin:0 0 6px;">{de ? "Jede Maschine, ihr Zustand, ihre aktuellen Messwerte — die Operator-Sicht. Dieselben Daten wie im Historian und in der BI." : "Every machine, its state, its current readings — the operator view. The same data as in the historian and BI."}</p>
+    <p id="meta" style="font-family:var(--font-mono); font-size:12px; color:#6E8C84; margin:0 0 clamp(26px,3.5vw,38px);">{de ? "Snapshot wird geladen …" : "Loading snapshot …"}</p>
+    <div id="tiles" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px;"></div>
+  </div>
+</section>
+
+<script>
+  const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
+  const L = DE ? "de-DE" : "en-GB";
+  const $ = (s) => document.querySelector(s);
+  const ST = DE
+    ? { run:{c:"#3FBF7F",t:"läuft"}, warn:{c:"#E6B23A",t:"Warnung"}, idle:{c:"#8A9A95",t:"kein Sensor"} }
+    : { run:{c:"#3FBF7F",t:"running"}, warn:{c:"#E6B23A",t:"warning"}, idle:{c:"#8A9A95",t:"no sensor"} };
+
+  function spark(vs, color) {
+    if (!vs || !vs.length) return "";
+    let v0 = Math.min(...vs), v1 = Math.max(...vs); if (v0===v1){v0--;v1++;}
+    const w=240,h=40;
+    const d = vs.map((v,i)=>(i?"L":"M")+(i/(vs.length-1)*w).toFixed(1)+" "+((h-3)-(h-6)*(v-v0)/(v1-v0)).toFixed(1)).join(" ");
+    const lx=w.toFixed(1), ly=((h-3)-(h-6)*(vs[vs.length-1]-v0)/(v1-v0)).toFixed(1);
+    return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6"/><circle cx="${lx}" cy="${ly}" r="2.4" fill="${color}"><animate attributeName="opacity" values="1;.25;1" dur="1.4s" repeatCount="indefinite"/></circle></svg>`;
+  }
+  const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
+
+  // Live-Modell: echte Baseline aus /_live, dazwischen sanftes Ticken (Sensor-Rauschen)
+  let base=null; const buf={}; let metaDt=null, metaLive=false;
+  function seed(d){
+    base=d; metaLive=!!d.live; metaDt=new Date(d.generated*1000);
+    const byM={}; d.series.forEach(x=>{ (byM[x.machine_id]=byM[x.machine_id]||{})[x.metric]=x; });
+    const lat=d.latest||{};
+    d.machines.forEach(m=>{
+      const t=byM[m.id]&&byM[m.id].temperatur_c, v=byM[m.id]&&byM[m.id].vibration_mm_s;
+      const has=!!(t||v);
+      const baseT=lat[m.id+"_temperatur_c"], baseV=lat[m.id+"_vibration_mm_s"];
+      const series=(t&&t.pts)?t.pts.map(p=>p.v).slice(-30):[];
+      buf[m.id]={ has, name:m.name, line:m.line, kind:m.kind,
+        baseT:(baseT!=null?baseT:(series.length?series[series.length-1]:42)),
+        baseV:(baseV!=null?baseV:2),
+        curT:(baseT!=null?baseT:(series.length?series[series.length-1]:42)),
+        curV:(baseV!=null?baseV:2),
+        temps: series.length?series:[baseT!=null?baseT:42] };
+    });
+  }
+  function tick(){
+    if(!base) return; const now=Date.now()/1000;
+    base.machines.forEach((m,i)=>{ const b=buf[m.id]; if(!b||!b.has) return;
+      b.curT=clamp(b.baseT + 1.1*Math.sin(now/3.1+i*1.7) + (Math.random()-0.5)*0.9, 24, 96);
+      b.curV=clamp(b.baseV + 0.32*Math.sin(now/2.3+i*0.9) + (Math.random()-0.5)*0.22, 0.5, 9.5);
+      b.temps.push(b.curT); if(b.temps.length>30) b.temps.shift();
+    });
+    paint();
+  }
+  function paint(){
+    if(!base) return;
+    $("#meta").textContent = `${metaLive?"\u25CF Live":"Snapshot"} ${metaDt.toLocaleDateString(L)} ${metaDt.toLocaleTimeString(L,{hour:"2-digit",minute:"2-digit"})} \u00B7 ${base.machines.length} ${DE ? "Maschinen \u00B7 read-only" : "machines \u00B7 read-only"}`;
+    const tiles = $("#tiles"); tiles.innerHTML = "";
+    base.machines.forEach(m => {
+      const b=buf[m.id];
+      const hasData=b&&b.has;
+      let st="idle";
+      if (hasData) { st="run"; if (b.curT>46 || b.curV>3.4) st="warn"; }
+      const led = ST[st];
+      const tile = document.createElement("div");
+      tile.style.cssText = "border:1px solid #214740; border-radius:12px; background:#13322D; padding:16px; color:#E8EFEC;";
+      tile.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+          <span style="font:600 16px var(--font-head,sans-serif);">${m.name}</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font:11px monospace;color:${led.c};">
+            <span style="width:9px;height:9px;border-radius:50%;background:${led.c};box-shadow:0 0 8px ${led.c};animation:nwpulse 1.4s ease-in-out infinite;"></span>${led.t}</span>
+        </div>
+        <div style="font:11px monospace; color:#6E8C84; margin-bottom:12px;">${m.line} \u00B7 ${m.kind}</div>
+        ${hasData ? `
+          <div style="display:flex; gap:18px; margin-bottom:10px;">
+            <div><div style="font:10px monospace;color:#6E8C84;">TEMP</div><div style="font:600 22px var(--font-mono,monospace);color:#E6B23A;">${b.curT.toFixed(1)}<span style="font-size:12px;color:#6E8C84;"> \u00B0C</span></div></div>
+            <div><div style="font:10px monospace;color:#6E8C84;">VIBR</div><div style="font:600 22px var(--font-mono,monospace);color:#3FBF7F;">${b.curV.toFixed(2)}<span style="font-size:12px;color:#6E8C84;"> mm/s</span></div></div>
+          </div>
+          ${spark(b.temps, "#E6B23A")}`
+        : `<div style="padding:14px 0 18px; color:#6E8C84; font:13px monospace;">${DE ? "Montage/Pr\u00FCfung \u2014<br>keine Sensor-Messreihe" : "Assembly/inspection \u2014<br>no sensor metric"}</div>`}
+      `;
+      tiles.appendChild(tile);
+    });
+  }
+  function loadTel(){ return fetch("/_live/telemetry",{cache:"no-store"}).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{if(!d||!d.machines)throw 0;return d;}).catch(()=>fetch("/data/nordwerk-telemetry.json").then(r=>r.json())); }
+  loadTel().then(d=>{ seed(d); paint(); }).catch(()=>{ $("#meta").textContent = DE ? "Daten nicht ladbar." : "Could not load data."; });
+  setInterval(()=>loadTel().then(seed).catch(()=>{}), 30000);
+  setInterval(tick, 2000);
+</script>
+<style>@keyframes nwpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.55}}</style>

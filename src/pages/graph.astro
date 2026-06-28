@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Graph from "../components/views/Graph.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Wissensgraph · 3D · Nordwerk" description="Die ganze Firma als 3D-Netz: Linien, Maschinen, Produkte, Aufträge, Kunden, Chargen — klickbar." path="/graph/" altPath="/en/graph/" noindex={true}>
+  <Graph lang={lang} />
+</Base>

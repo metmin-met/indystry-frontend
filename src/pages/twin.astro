@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Twin from "../components/views/Twin.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Digitaler Zwilling · Live & Optimizer" description="Echtbetrieb mit Röntgenblick, Parameter übersteuern und den KI-Optimizer fragen — Nordwerk Demo." path="/twin/" altPath="/en/twin/" noindex={true}>
+  <Twin lang={lang} />
+</Base>

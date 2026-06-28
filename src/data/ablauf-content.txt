@@ -1,0 +1,914 @@
+<h1 id="nordwerk--auftragsfluss--zustände-mit-stack-abdeckung">Nordwerk
+— Auftragsfluss &amp; Zustände (mit Stack-Abdeckung)</h1>
+<blockquote>
+<p><strong>Zweck:</strong> Der komplette Betrieb der Demo-Firma
+<strong>Nordwerk Manufacturing</strong> (fiktiver
+B2B-CNC-/Metallteile-Hersteller, <em>make-to-order</em>) als <strong>ein
+durchgehender Fluss</strong> — von der ersten Anfrage über den
+<strong>Bestelleingang</strong> bis zur <strong>fertigen
+Lieferung</strong>, und weiter bis Service und Reklamation. Für jede
+Phase steht: welche <strong>Zustände</strong> ein Auftrag durchläuft
+(Geschäftssprache <strong>+ echter System-Status</strong>) und
+<strong>was unser Stack dabei tut</strong> — inkl. <strong>Anlagen,
+Produktionsoptimierung und Digital Twin</strong>.</p>
+<p>Schwester-Dokument: <strong><code>PROZESS-ROADMAP.md</code></strong>
+(Schritte P0–P12, Personas, Coverage). Dieses hier ist die
+<strong>Zustands-/Ablauf-Sicht</strong> mit Stack-Zuordnung.</p>
+<p><strong>Lesehilfe:</strong> Status stehen als
+<em>Geschäftssprache</em> <code>technischer Odoo-Status</code>. ✅ =
+klickbare read-only Demo vorhanden. Alle Zahlen/Status sind aus der
+laufenden Demo-DB (<code>met18</code>/<code>nordwerk</code>)
+verifiziert, nicht erfunden.</p>
+</blockquote>
+<hr />
+<h2 id="1--gesamtüberblick">1 · Gesamtüberblick</h2>
+<pre class="mermaid"><code>flowchart TD
+    subgraph A[&quot;AKT I · Anbahnung&quot;]
+      P0[&quot;Web / Marketing\n(Anfrage)&quot;] --&gt; P1[&quot;Lead / CRM\nqualifizieren&quot;]
+      P1 --&gt; P2[&quot;Angebot + Kalkulation\n(Digital-Twin-What-if)&quot;]
+      P2 --&gt; P3[&quot;Auftrag / AB\n★ BESTELLEINGANG&quot;]
+    end
+    subgraph B[&quot;AKT II · Auftrag → Lieferung (Kern)&quot;]
+      P3 --&gt; P4[&quot;Arbeitsvorbereitung\nMRP / Routing&quot;]
+      P4 --&gt; P5[&quot;Beschaffung\nEinkauf + Wareneingang&quot;]
+      P4 --&gt; P6[&quot;Fertigung\nLeitstand · Anlage · Twin&quot;]
+      P5 --&gt; P6
+      P6 --&gt; P7[&quot;Qualitätssicherung\ni.O. / n.i.O.&quot;]
+      P7 --&gt; P8[&quot;Lager / Kommissionierung\n+ Versand&quot;]
+      P8 --&gt; P9[&quot;★ LIEFERUNG\n+ Rechnung&quot;]
+    end
+    subgraph C[&quot;AKT III · Nach der Lieferung&quot;]
+      P9 --&gt; P10[&quot;Service / Wartung\n(Servicevertrag)&quot;]
+      P9 --&gt; P11[&quot;Reklamation /\nSchadensfall&quot;]
+      P10 --&gt; P12[&quot;Auswertung\nKPIs · KVP&quot;]
+      P11 --&gt; P12
+      P9 --&gt; P12
+    end
+    P6 -. &quot;Telemetrie&quot; .-&gt; HIST[(&quot;Historian&quot;)]
+    HIST -. &quot;Optimierung / vorausschauende Wartung&quot; .-&gt; P6
+    HIST -. &quot;Process-Drift / OEE&quot; .-&gt; P12</code></pre>
+<h3 id="stack-auf-einen-blick">Stack auf einen Blick</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Baustein</th>
+<th>Rolle im Fluss</th>
+<th>Demo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ERP</strong> (Odoo)</td>
+<td>Heimat aller Auftrags-Zustände: Lead, Angebot, Auftrag, Einkauf,
+Fertigung, Lager, Rechnung, Wartung, Reklamation</td>
+<td><code>erp-demo.indystry.works</code> (demo/demo) ✅</td>
+</tr>
+<tr class="even">
+<td><strong>BI</strong> (Metabase + Grafana)</td>
+<td>Auslastung, OEE, Ausschuss, <strong>Process-Drift</strong>,
+<strong>Mass-Balance</strong>, Liefertreue, GF-Cockpit</td>
+<td><code>bi-demo</code> · <code>grafana-demo</code> ✅</td>
+</tr>
+<tr class="odd">
+<td><strong>Historian</strong></td>
+<td>Zeitreihen (Temperatur/Vibration) je Maschine → Optimierung +
+vorausschauende Wartung</td>
+<td><code>/historian/</code> ✅</td>
+</tr>
+<tr class="even">
+<td><strong>Leitstand / SCADA</strong></td>
+<td>Live-Zustand jeder Maschine (läuft / Wartung fällig / Leerlauf /
+Störung)</td>
+<td><code>/leitstand/</code> ✅</td>
+</tr>
+<tr class="odd">
+<td><strong>Anlagen-Twin / 3D</strong></td>
+<td>Werk → Linie → Maschine → <strong>Schaltschrank</strong> →
+<strong>Stromlaufplan</strong> (beherrschen, entstören)</td>
+<td><code>/anlage/</code> ✅</td>
+</tr>
+<tr class="even">
+<td><strong>Digital Twin</strong></td>
+<td><strong>What-if-Simulation</strong> Durchsatz/Ausschuss/Kosten —
+Angebot + Produktionsoptimierung</td>
+<td><code>twin-demo.indystry.works</code> ✅</td>
+</tr>
+<tr class="odd">
+<td><strong>KI-Suche</strong></td>
+<td>„Frag die Firma" über Produkte/Maschinen/Aufträge/Handbuch</td>
+<td><code>/suche/</code> ✅</td>
+</tr>
+<tr class="even">
+<td><strong>Zusammenarbeit</strong></td>
+<td>Dateiraum (Angebote/Zeichnungen/Prüfprotokolle), versioniert,
+kommentierbar</td>
+<td><code>/zusammenarbeit/</code> ✅</td>
+</tr>
+<tr class="odd">
+<td><strong>Wissen / Kiosk</strong></td>
+<td>Handbuch, Compliance-Register, App-Launcher</td>
+<td><code>/wissen/</code> ✅</td>
+</tr>
+<tr class="even">
+<td><strong>Betrieb / Status</strong></td>
+<td>Dienste, Backups, Uptime — alles selbst gehostet</td>
+<td><code>/status/</code> ✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="akt-i--anbahnung">AKT I · Anbahnung</h2>
+<h3 id="p0p1--erstkontakt--lead-qualifizierung">P0–P1 · Erstkontakt
+&amp; Lead-Qualifizierung</h3>
+<p><strong>Ziel:</strong> Anfrage erfassen, qualifizieren, zur Chance
+machen. <strong>Schritte:</strong> Website/Anfrage → Lead anlegen →
+Bedarf erfassen → Qualifizierung → Opportunity.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>crm.lead</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+<th>Nächster Schritt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Neuer Lead</td>
+<td><code>Neu</code> (New)</td>
+<td>Anfrage / Formular</td>
+<td>Sandra, Marco</td>
+<td>qualifizieren</td>
+</tr>
+<tr class="even">
+<td>Qualifiziert</td>
+<td><code>Qualifiziert</code> (Qualified)</td>
+<td>Bedarf/Budget geklärt</td>
+<td>Marco, Lena</td>
+<td>Angebot erstellen</td>
+</tr>
+<tr class="odd">
+<td>Im Angebot</td>
+<td><code>Angebot</code> (Proposition)</td>
+<td>Angebot raus</td>
+<td>Lena</td>
+<td>nachfassen</td>
+</tr>
+<tr class="even">
+<td>Gewonnen / Verloren</td>
+<td><code>Gewonnen</code> (Won) / <em>lost</em></td>
+<td>Zu-/Absage</td>
+<td>Marco</td>
+<td>→ Auftrag (P3)</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Neu
+    Neu --&gt; Qualifiziert
+    Qualifiziert --&gt; Angebot
+    Angebot --&gt; Gewonnen
+    Angebot --&gt; Verloren
+    Gewonnen --&gt; [*]
+    Verloren --&gt; [*]</code></pre>
+<p><strong>Was unser Stack hier macht:</strong> <strong>ERP/CRM</strong>
+führt die Pipeline (Demo-Stand: 2 neu · 1 qualifiziert · 1 im Angebot ·
+2 gewonnen). <strong>KI-Suche</strong> findet Kundenhistorie/ähnliche
+Anfragen. <strong>Web</strong> liefert den Lead.
+<strong>Personas:</strong> Sandra (Marketing), Marco (Außendienst), Lena
+(Innendienst), Kunde.</p>
+<h3 id="p2--angebot-kalkulation--digital-twin-what-if">P2 · Angebot,
+Kalkulation &amp; Digital-Twin-What-if</h3>
+<p><strong>Ziel:</strong> Technische Klärung + belastbares Angebot mit
+Liefertermin. <strong>Schritte:</strong> Zeichnung/Spez prüfen →
+Machbarkeit → Kalkulation (Material + Zeit + Maschine) →
+<strong>Twin-Simulation</strong> → Angebot.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>sale.order</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+<th>Nächster Schritt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Angebot (Entwurf)</td>
+<td><code>draft</code></td>
+<td>aus Chance erzeugt</td>
+<td>Lena</td>
+<td>versenden</td>
+</tr>
+<tr class="even">
+<td>Angebot gesendet</td>
+<td><code>sent</code></td>
+<td>an Kunde</td>
+<td>Lena</td>
+<td>nachfassen / bestätigen</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Was unser Stack hier macht:</strong> <strong>ERP</strong>
+kalkuliert aus <strong>Stückliste (BOM)</strong> + Arbeitsplan
+automatisch. <strong>Digital Twin</strong> (<code>twin-demo</code>)
+simuliert <strong>Durchsatz / Ausschuss / Kosten</strong> als
+<em>What-if</em>, bevor zugesagt wird → realistischer Preis + Termin.
+<strong>Zusammenarbeit</strong> hält Zeichnungen/Angebote versioniert.
+<strong>Personas:</strong> Lena, Thomas (AV), Petra (Machbarkeit),
+Kunde.</p>
+<h3 id="p3--auftrag--auftragsbestätigung---bestelleingang">P3 · Auftrag
+&amp; Auftragsbestätigung — ★ Bestelleingang</h3>
+<p><strong>Ziel:</strong> Bestellung verbindlich machen — <strong>hier
+beginnt der Auftragsdurchlauf</strong>. <strong>Schritte:</strong>
+Kundenbestellung → Prüfung → <strong>Bestätigen</strong> → Auftrag im
+ERP, AB an Kunde.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>sale.order</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+<th>Nächster Schritt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Auftrag (Bestelleingang)</strong></td>
+<td><code>sale</code></td>
+<td>„Bestätigen"</td>
+<td>Lena</td>
+<td>löst MRP + Lieferung aus</td>
+</tr>
+<tr class="even">
+<td>Abgeschlossen / gesperrt</td>
+<td><code>done</code> (locked)</td>
+<td>nach Abwicklung</td>
+<td>System</td>
+<td>Archiv</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Angebot_draft
+    Angebot_draft --&gt; Angebot_sent: versenden
+    Angebot_sent --&gt; Auftrag_sale: bestätigen ★
+    Angebot_draft --&gt; Auftrag_sale: bestätigen ★
+    Auftrag_sale --&gt; Abgeschlossen_done
+    Abgeschlossen_done --&gt; [*]</code></pre>
+<p><strong>Was unser Stack hier macht:</strong> Mit dem Bestätigen
+erzeugt <strong>ERP</strong> automatisch die <strong>Fertigungsaufträge
+(MRP)</strong> und die <strong>Lieferung (Picking)</strong> — keine
+Doppelerfassung. Demo-Stand: <strong>22 bestätigte Aufträge</strong>
+(<code>sale</code>) + 6 offene Angebote (<code>draft</code>).
+<strong>Personas:</strong> Lena, Birgit (Konditionen), Kunde.</p>
+<hr />
+<h2 id="akt-ii--auftrag--lieferung-kern">AKT II · Auftrag → Lieferung
+(Kern)</h2>
+<h3 id="p4--arbeitsvorbereitung--planung">P4 · Arbeitsvorbereitung &amp;
+Planung</h3>
+<p><strong>Ziel:</strong> Auftrag fertigungsreif machen + einplanen.
+<strong>Schritte:</strong> Stückliste → Arbeitsplan/Routing →
+Materialbedarf (MRP) → Terminierung → Maschinen-/Schichtbelegung.</p>
+<p><strong>Was unser Stack hier macht:</strong> <strong>ERP/MRP</strong>
+erzeugt Bedarfe + Fertigungsaufträge aus dem Auftrag.
+<strong>BI</strong> zeigt <strong>Maschinen-Auslastung je Linie</strong>
+(Engpässe früh). <strong>Leitstand</strong> zeigt, welche Maschine
+frei/belegt ist. <strong>Anlagen-Twin</strong> liefert die
+Maschinen-/Linienstruktur (3 Linien, 8 Maschinen).
+<strong>Personas:</strong> Thomas (AV/PPS), Frank (Fertigungsleiter),
+Bernd (Einkauf-Trigger).</p>
+<h3 id="p5--beschaffung--wareneingang">P5 · Beschaffung &amp;
+Wareneingang</h3>
+<p><strong>Ziel:</strong> Material termin- und mengengerecht
+bereitstellen.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>purchase.order</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Anfrage / RFQ</td>
+<td><code>draft</code></td>
+<td>Bedarf aus MRP</td>
+<td>Bernd</td>
+</tr>
+<tr class="even">
+<td>Bestellung bestätigt</td>
+<td><code>purchase</code></td>
+<td>Lieferant gewählt</td>
+<td>Bernd</td>
+</tr>
+<tr class="odd">
+<td>Erledigt</td>
+<td><code>done</code></td>
+<td>abgeschlossen</td>
+<td>System</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; RFQ_draft
+    RFQ_draft --&gt; Bestellung_purchase: bestätigen
+    Bestellung_purchase --&gt; Erledigt_done
+    Erledigt_done --&gt; [*]</code></pre>
+<p>Wareneingang läuft als <code>stock.picking</code> (siehe P8-Diagramm,
+Richtung <em>eingehend</em>). <strong>Was unser Stack hier
+macht:</strong> <strong>ERP</strong> schlägt Bestellungen aus dem Bedarf
+vor (Demo: 4 RFQ · 4 bestätigt), bucht <strong>Wareneingang</strong> +
+Eingangsprüfung ins Lager. <strong>Wissen</strong> hält
+Lieferanten-Zertifikate. <strong>Personas:</strong> Bernd (Einkauf),
+Klaus (Lager), Petra (Eingangs-QS), Lieferant.</p>
+<h3 id="p6--fertigung--leittechnik--bis-auf-den-schaltschrank">P6 ·
+Fertigung &amp; Leittechnik — bis auf den Schaltschrank</h3>
+<p><strong>Ziel:</strong> Teile in Qualität + Termin produzieren; Anlage
+beherrschen. <strong>Schritte:</strong> Fertigungsauftrag freigeben →
+Rüsten → Produktion → <strong>Live-Leitstand</strong> →
+Werker-Rückmeldung → Störungsbehandlung.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>mrp.production</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Entwurf</td>
+<td><code>draft</code></td>
+<td>aus Auftrag erzeugt</td>
+<td>System</td>
+</tr>
+<tr class="even">
+<td>Bestätigt / eingeplant</td>
+<td><code>confirmed</code></td>
+<td>freigegeben</td>
+<td>Thomas/Frank</td>
+</tr>
+<tr class="odd">
+<td>In Arbeit</td>
+<td><code>progress</code></td>
+<td>Rüsten/Start</td>
+<td>Ali (Werker)</td>
+</tr>
+<tr class="even">
+<td>Abzuschließen</td>
+<td><code>to_close</code></td>
+<td>Menge gemeldet</td>
+<td>Ali</td>
+</tr>
+<tr class="odd">
+<td>Erledigt</td>
+<td><code>done</code></td>
+<td>gebucht</td>
+<td>Frank</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Entwurf_draft
+    Entwurf_draft --&gt; Bestätigt_confirmed: freigeben
+    Bestätigt_confirmed --&gt; InArbeit_progress: rüsten/starten
+    InArbeit_progress --&gt; Abzuschließen_to_close: Menge melden
+    Abzuschließen_to_close --&gt; Erledigt_done: buchen
+    Erledigt_done --&gt; [*]</code></pre>
+<p><em>Demo-Stand: 18 <code>confirmed</code> + 22 <code>to_close</code>
+(laufender Betrieb).</em></p>
+<p><strong>Was unser Stack hier macht (Kernstück):</strong></p>
+<ul>
+<li><strong>Leitstand / SCADA</strong> (<code>/leitstand/</code>) —
+Echtzeit-Kacheln aller 8 Maschinen mit <strong>läuft / Wartung fällig /
+Leerlauf / Störung</strong> + Live-Temperatur/Vibration.</li>
+<li><strong>Anlagen-Twin / 3D</strong> (<code>/anlage/</code>) —
+Drilldown <strong>Werk → Linie → Maschine → Schaltschrank →
+Stromlaufplan</strong> (SPS, Antriebe/FU, Klemmen, Sicherungen). Für
+Rüsten, Verstehen, <strong>Entstören</strong>.</li>
+<li><strong>Digital Twin</strong> (<code>twin-demo</code>) — Simulation
+der Linie (Parameter, Engpass).</li>
+<li><strong>Historian</strong> (<code>/historian/</code>) — jede
+Messreihe je Maschine.</li>
+<li><strong>BI</strong> — Live-Cockpit (Stückzahlen, Ausschuss,
+OEE).</li>
+<li><strong>ERP/BDE</strong> — Werker-Rückmeldung Gut/Ausschuss/Zeit
+(treibt die <code>mrp.production</code>-Zustände oben).
+<strong>Personas:</strong> Frank (Schichtleiter), Ali (Werker), Jens
+(Instandhaltung/Automatisierung).</li>
+</ul>
+<h3 id="p7--qualitätssicherung">P7 · Qualitätssicherung</h3>
+<p><strong>Ziel:</strong> Konformität sichern + dokumentieren.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>Status</th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prüfung offen</td>
+<td>— (Prüfauftrag)</td>
+<td>nach Fertigung</td>
+<td>Petra/Ali</td>
+</tr>
+<tr class="even">
+<td><strong>i.O.</strong></td>
+<td><code>passed = true</code></td>
+<td>im Grenzbereich</td>
+<td>Petra</td>
+</tr>
+<tr class="odd">
+<td><strong>n.i.O.</strong></td>
+<td><code>passed = false</code></td>
+<td>außerhalb Grenzwert</td>
+<td>Petra → Sperre</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Was unser Stack hier macht:</strong> Messwerte je Auftrag
+(Maßhaltigkeit, Oberflächenrauheit, Gewicht) liegen im
+<strong>Warehouse</strong> (<code>factory.quality_check</code>) mit
+Grenzwerten; <strong>automatische i.O./n.i.O.-Bewertung</strong>.
+<strong>BI</strong> wertet <strong>Ausschussquote / Cpk</strong> aus.
+<strong>Wissen</strong> liefert Prüfprotokoll/Zertifikat. <em>(Kein
+separates Odoo-Quality-Modul — QS läuft über Warehouse + BI.)</em>
+<strong>Personas:</strong> Petra (QS), Ali (Selbstprüfung), Frank.</p>
+<h3 id="p8--lager-kommissionierung--versand">P8 · Lager,
+Kommissionierung &amp; Versand</h3>
+<p><strong>Ziel:</strong> Fertigware bereitstellen + verpacken.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>stock.picking</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Entwurf</td>
+<td><code>draft</code></td>
+<td>aus Auftrag</td>
+<td>System</td>
+</tr>
+<tr class="even">
+<td>Wartet auf Material</td>
+<td><code>waiting</code> / <code>confirmed</code></td>
+<td>Bestand fehlt</td>
+<td>System</td>
+</tr>
+<tr class="odd">
+<td><strong>Bereit</strong></td>
+<td><code>assigned</code></td>
+<td>Bestand reserviert</td>
+<td>Klaus</td>
+</tr>
+<tr class="even">
+<td><strong>Erledigt</strong></td>
+<td><code>done</code></td>
+<td>validiert/gebucht</td>
+<td>Klaus</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Entwurf_draft
+    Entwurf_draft --&gt; Wartet_confirmed: reservieren
+    Wartet_confirmed --&gt; Bereit_assigned: Bestand da
+    Bereit_assigned --&gt; Erledigt_done: validieren ★ Lieferung
+    Erledigt_done --&gt; [*]</code></pre>
+<p><em>Demo-Stand: 6 <code>assigned</code> (bereit) · 8
+<code>confirmed</code> (wartet) · 12 <code>done</code> (geliefert).</em>
+<strong>Was unser Stack hier macht:</strong> <strong>ERP/Stock</strong>
+führt Bestände in Echtzeit, <strong>Picking</strong> + Lieferschein;
+<strong>Werker-App</strong> für mobiles Kommissionieren.
+<strong>Personas:</strong> Klaus (Lager/Versand), Lena.</p>
+<h3 id="p9---auslieferung--fakturierung">P9 · ★ Auslieferung &amp;
+Fakturierung</h3>
+<p><strong>Ziel:</strong> Liefern + abrechnen + Zahlung.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>account.move</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lieferung gebucht</td>
+<td><code>stock.picking = done</code></td>
+<td>Versand</td>
+<td>Klaus</td>
+</tr>
+<tr class="even">
+<td>Rechnung (Entwurf)</td>
+<td><code>draft</code></td>
+<td>aus Lieferung</td>
+<td>Birgit</td>
+</tr>
+<tr class="odd">
+<td><strong>Rechnung gebucht</strong></td>
+<td><code>posted</code></td>
+<td>bestätigt</td>
+<td>Birgit</td>
+</tr>
+<tr class="even">
+<td>Offen / Bezahlt</td>
+<td><code>payment_state</code> not_paid → paid</td>
+<td>Zahlung</td>
+<td>Birgit</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Lieferung_done
+    Lieferung_done --&gt; Rechnung_draft: fakturieren
+    Rechnung_draft --&gt; Rechnung_posted: buchen
+    Rechnung_posted --&gt; Offen_not_paid
+    Offen_not_paid --&gt; Bezahlt_paid: Zahlungseingang
+    Bezahlt_paid --&gt; [*]</code></pre>
+<p><em>Demo-Stand: 12 gebuchte Rechnungen (<code>posted</code>, offen).
+Auftrags-Faktura: 12 fakturiert · 10 zu fakturieren · 6 offen.</em>
+<strong>Was unser Stack hier macht:</strong>
+<strong>ERP/Accounting</strong> erzeugt die Rechnung aus der Lieferung
+(Ziel: E-Rechnung/PEPPOL), Zahlungsabgleich + Mahnwesen.
+<strong>Status-Board</strong> zeigt, dass alles selbst gehostet +
+gesichert läuft. <strong>Personas:</strong> Birgit (Buchhaltung), Lena,
+Kunde.</p>
+<hr />
+<h2 id="akt-iii--nach-der-lieferung">AKT III · Nach der Lieferung</h2>
+<h3 id="p10--service--wartung-servicevertrag">P10 · Service &amp;
+Wartung (Servicevertrag)</h3>
+<p><strong>Ziel:</strong> Anlagen/Produkte im Betrieb halten;
+wiederkehrende Umsätze.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>maintenance.request</code></th>
+<th>Typ</th>
+<th>Auslöser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Neue Anfrage</td>
+<td><code>New Request</code></td>
+<td>präventiv/korrektiv</td>
+<td>Plan oder Störung</td>
+</tr>
+<tr class="even">
+<td>In Bearbeitung</td>
+<td><code>In Progress</code></td>
+<td>—</td>
+<td>Disposition</td>
+</tr>
+<tr class="odd">
+<td>Repariert</td>
+<td><code>Repaired</code></td>
+<td>—</td>
+<td>Einsatz erledigt</td>
+</tr>
+<tr class="even">
+<td>Ausschuss</td>
+<td><code>Scrap</code></td>
+<td>—</td>
+<td>nicht reparabel</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; NeueAnfrage
+    NeueAnfrage --&gt; InBearbeitung
+    InBearbeitung --&gt; Repariert
+    InBearbeitung --&gt; Ausschuss
+    Repariert --&gt; [*]
+    Ausschuss --&gt; [*]</code></pre>
+<p><em>Demo-Stand: 6 Anfragen über die 8 Maschinen (präventiv +
+korrektiv); z. B. „Drehzentrum B1: Wartung fällig" — deckt sich mit dem
+Leitstand-Status.</em> <strong>Was unser Stack hier macht:</strong>
+<strong>ERP/Maintenance</strong> führt Equipment (= die 8 Maschinen) +
+Wartungsanfragen. <strong>Historian</strong> liefert Zustandsdaten
+(Vibration/Temperatur) für <strong>vorausschauende Wartung</strong>.
+<strong>Anlagen-Twin</strong> zeigt am selben Objekt Schaltschrank +
+letzte Wartung. <strong>Personas:</strong> Sven (Servicetechniker), Jens
+(Instandhaltung), Birgit, Kunde.</p>
+<h3 id="p11--schadens---reklamationsmanagement">P11 · Schadens- &amp;
+Reklamationsmanagement</h3>
+<p><strong>Ziel:</strong> Fehler/Schäden strukturiert lösen +
+Wiederholung verhindern.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Geschäftssprache</th>
+<th>System-Status <code>repair.order</code></th>
+<th>Auslöser</th>
+<th>Wer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reklamation erfasst</td>
+<td><code>draft</code></td>
+<td>Kundenmeldung</td>
+<td>Petra/Lena</td>
+</tr>
+<tr class="even">
+<td>Bestätigt</td>
+<td><code>confirmed</code></td>
+<td>angenommen</td>
+<td>Petra</td>
+</tr>
+<tr class="odd">
+<td>In Reparatur</td>
+<td><code>under_repair</code></td>
+<td>Bearbeitung</td>
+<td>Sven</td>
+</tr>
+<tr class="even">
+<td>Erledigt</td>
+<td><code>done</code></td>
+<td>Abschluss</td>
+<td>Petra</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Erfasst_draft
+    Erfasst_draft --&gt; Bestätigt_confirmed
+    Bestätigt_confirmed --&gt; InReparatur_under_repair
+    InReparatur_under_repair --&gt; Erledigt_done
+    Erledigt_done --&gt; [*]</code></pre>
+<p><em>Demo-Stand: 4 Reklamationen (<code>draft</code>) auf NW-Produkte
+(Maßabweichung, Kratzer, Riss, Toleranz).</em> <strong>Was unser Stack
+hier macht:</strong> <strong>ERP/Repair</strong> führt den Fall;
+<strong>Wissen</strong> dokumentiert Ursachenanalyse (8D/CAPA);
+<strong>KI-Suche</strong> findet ähnliche Fälle;
+<strong>Zusammenarbeit</strong> für die fallbezogene Abstimmung.
+<strong>Personas:</strong> Petra (QM), Sven (Service), Lena, GF,
+Kunde.</p>
+<h3 id="p12--auswertung-kpis--kvp">P12 · Auswertung, KPIs &amp; KVP</h3>
+<p><strong>Ziel:</strong> Steuern + verbessern. <strong>Was unser Stack
+hier macht:</strong> <strong>BI</strong> (Metabase + Grafana) liefert
+OEE, Liefertreue, Ausschuss, Deckungsbeitrag,
+<strong>Process-Drift</strong>, <strong>Mass-Balance</strong>,
+GF-Cockpit. <strong>Historian</strong> ist die Datenbasis.
+<strong>KI-Suche</strong> beantwortet „Frag die Zahlen".
+<strong>Personas:</strong> Dr. Weber (GF), Frank, Petra.</p>
+<hr />
+<h2 id="2--anlagen-leittechnik--digital-twin-vertieft">2 · Anlagen,
+Leittechnik &amp; Digital Twin (vertieft)</h2>
+<p>Der Teil, der Nordwerk vom reinen ERP unterscheidet — die
+<strong>Brücke vom Auftrag zur realen Maschine</strong>.</p>
+<h3 id="anlagen-twin--3d--beherrschen--entstören-anlage">Anlagen-Twin /
+3D — beherrschen &amp; entstören (<code>/anlage/</code>)</h3>
+<p>Klickbarer Drilldown, read-only, generisch (kein
+Maschinenbauer-Geheimnis):</p>
+<pre><code>Werk → Linie (Nord/Süd/West) → Maschine (8) → Schaltschrank → Komponente → Stromlaufplan</code></pre>
+<p>Pro Maschine ein 3D-Modell mit Hotspots (Steuerung/HMI, Spindel,
+Schaltschrank); im Schaltschrank <strong>SPS,
+Antriebe/Frequenzumrichter, Klemmen, Sicherungen</strong> → je
+Komponente ein <strong>Mermaid-Stromlaufplan</strong>. Nutzen: Rüsten
+verstehen, im Störfall schnell von der Maschine zum Plan (Persona
+<strong>Jens</strong>).</p>
+<h3 id="leitstand--scada--echtzeit-zustand-leitstand">Leitstand / SCADA
+— Echtzeit-Zustand (<code>/leitstand/</code>)</h3>
+<p>HMI-Kacheln aller Maschinen mit <strong>läuft / Wartung fällig /
+Leerlauf / Störung</strong> + aktueller Temperatur/Vibration. Dieselben
+Maschinen wie im ERP-Workcenter und im Historian — <strong>eine
+Wahrheit</strong>.</p>
+<h3
+id="digital-twin--what-if--optimierung-twin-demoindystryworks">Digital
+Twin — What-if &amp; Optimierung
+(<code>twin-demo.indystry.works</code>)</h3>
+<ul>
+<li><strong>vor dem Auftrag (P2):</strong> Durchsatz/Ausschuss/Kosten
+simulieren → realistisches Angebot.</li>
+<li><strong>im Betrieb (P6/P12):</strong> Parameter und Engpässe
+durchspielen, ohne die echte Linie anzuhalten.</li>
+</ul>
+<h3
+id="produktionsoptimierung--der-geschlossene-regelkreis">Produktionsoptimierung
+— der geschlossene Regelkreis</h3>
+<pre class="mermaid"><code>flowchart LR
+    M[&quot;Maschinen\n(Fertigung P6)&quot;] --&gt;|Telemetrie| H[(&quot;Historian\nTemp/Vibration&quot;)]
+    H --&gt; BI[&quot;BI: Process-Drift,\nMass-Balance, OEE&quot;]
+    H --&gt; PW[&quot;Vorausschauende\nWartung → maintenance.request&quot;]
+    BI --&gt; TW[&quot;Digital Twin:\nParameter optimieren&quot;]
+    TW --&gt; M
+    PW --&gt; M</code></pre>
+<ul>
+<li><strong>Drift-Erkennung:</strong> BI erkennt schleichende Abweichung
+(Process-Drift) früher als die Endprüfung.</li>
+<li><strong>Massenbilanz:</strong> Mass-Balance-Dashboard deckt
+Material-/Ausbeuteverluste auf.</li>
+<li><strong>Vorausschauende Wartung:</strong> steigende
+Vibration/Temperatur im Historian → <strong>Wartungsanfrage</strong>
+(P10), bevor die Maschine ausfällt (sichtbar als „Wartung fällig" im
+Leitstand).</li>
+<li><strong>Twin-Rückkopplung:</strong> optimierte Parameter aus der
+Simulation zurück in die Fertigung.</li>
+</ul>
+<hr />
+<h2 id="3--querschnitts-prozesse-über-den-ganzen-fluss">3 ·
+Querschnitts-Prozesse (über den ganzen Fluss)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Prozess</th>
+<th>Was es leistet</th>
+<th>Demo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Zusammenarbeit</strong></td>
+<td>Dateiraum (Angebote, Zeichnungen, Prüfprotokolle, Wartung),
+versioniert, kommentierbar — fall- und auftragsbezogen</td>
+<td><code>/zusammenarbeit/</code></td>
+</tr>
+<tr class="even">
+<td><strong>Wissen / Compliance / Kiosk</strong></td>
+<td>Handbuch, Risikoregister (ISO 9001 / IEC 62443), App-Launcher</td>
+<td><code>/wissen/</code></td>
+</tr>
+<tr class="odd">
+<td><strong>KI-Suche</strong></td>
+<td>„Frag die Firma" über
+Produkte/Maschinen/Aufträge/Handbuch/Kennzahlen</td>
+<td><code>/suche/</code></td>
+</tr>
+<tr class="even">
+<td><strong>Betrieb / Status</strong></td>
+<td>Dienste, Backups, Uptime — selbst gehostet, kein Cloud-Lock-in</td>
+<td><code>/status/</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Historian / Data-Lake</strong></td>
+<td>jeder Mess-/Betriebswert sicher + abrufbar; Basis für BI, Twin,
+Wartung</td>
+<td><code>/historian/</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4--master-zustandstabelle-nachschlagen">4 ·
+Master-Zustandstabelle (Nachschlagen)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Entität (<code>Odoo-Modell</code>)</th>
+<th>Zustandskette (Geschäftssprache → <code>technisch</code>)</th>
+<th>Demo-Stand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lead/Chance <code>crm.lead</code></td>
+<td>Neu→Qualifiziert→Angebot→Gewonnen/Verloren
+(<code>New/Qualified/Proposition/Won</code>)</td>
+<td>2/1/1/2</td>
+</tr>
+<tr class="even">
+<td>Angebot/Auftrag <code>sale.order</code></td>
+<td>Angebot <code>draft</code>→gesendet
+<code>sent</code>→<strong>Auftrag <code>sale</code></strong>→gesperrt
+<code>done</code></td>
+<td>6 draft · 22 sale</td>
+</tr>
+<tr class="odd">
+<td>Faktura-Status <code>sale.order</code></td>
+<td>nichts <code>no</code>→zu fakturieren
+<code>to invoice</code>→fakturiert <code>invoiced</code></td>
+<td>6 · 10 · 12</td>
+</tr>
+<tr class="even">
+<td>Einkauf <code>purchase.order</code></td>
+<td>RFQ <code>draft</code>→bestellt <code>purchase</code>→erledigt
+<code>done</code></td>
+<td>4 · 4</td>
+</tr>
+<tr class="odd">
+<td>Lieferung/WE <code>stock.picking</code></td>
+<td><code>draft</code>→wartet <code>confirmed/waiting</code>→bereit
+<code>assigned</code>→<strong>erledigt <code>done</code></strong></td>
+<td>8 · 6 · 12</td>
+</tr>
+<tr class="even">
+<td>Fertigung <code>mrp.production</code></td>
+<td><code>draft</code>→<code>confirmed</code>→<code>progress</code>→<code>to_close</code>→<code>done</code></td>
+<td>18 confirmed · 22 to_close</td>
+</tr>
+<tr class="odd">
+<td>Qualität <code>factory.quality_check</code></td>
+<td>i.O. <code>passed=true</code> / n.i.O.
+<code>passed=false</code></td>
+<td>je Auftrag, 3 Merkmale</td>
+</tr>
+<tr class="even">
+<td>Rechnung <code>account.move</code></td>
+<td>Entwurf <code>draft</code>→gebucht <code>posted</code>;
+offen→bezahlt (<code>payment_state</code>)</td>
+<td>12 posted/offen</td>
+</tr>
+<tr class="odd">
+<td>Wartung <code>maintenance.request</code></td>
+<td>Neue Anfrage→In Bearbeitung→Repariert→Ausschuss</td>
+<td>6 Anfragen</td>
+</tr>
+<tr class="even">
+<td>Reklamation <code>repair.order</code></td>
+<td><code>draft</code>→<code>confirmed</code>→<code>under_repair</code>→<code>done</code></td>
+<td>4 draft</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5--phase--live-demo-matrix">5 · Phase → Live-Demo-Matrix</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Primäre Demo(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P0–P1 Lead/CRM</td>
+<td>ERP <code>erp-demo.indystry.works/odoo</code> (demo/demo) · KI-Suche
+<code>/suche/</code></td>
+</tr>
+<tr class="even">
+<td>P2 Angebot/Kalkulation</td>
+<td>ERP · <strong>Digital Twin</strong>
+<code>twin-demo.indystry.works</code> · Zusammenarbeit
+<code>/zusammenarbeit/</code></td>
+</tr>
+<tr class="odd">
+<td>P3 Auftrag/Bestelleingang</td>
+<td>ERP</td>
+</tr>
+<tr class="even">
+<td>P4 Arbeitsvorbereitung</td>
+<td>ERP · BI <code>bi-demo.indystry.works</code> · Leitstand
+<code>/leitstand/</code></td>
+</tr>
+<tr class="odd">
+<td>P5 Beschaffung</td>
+<td>ERP · Wissen <code>/wissen/</code></td>
+</tr>
+<tr class="even">
+<td>P6 Fertigung/Leittechnik</td>
+<td><strong>Leitstand</strong> <code>/leitstand/</code> ·
+<strong>Anlage</strong> <code>/anlage/</code> · <strong>Twin</strong>
+<code>twin-demo</code> · Historian <code>/historian/</code> · Grafana
+<code>grafana-demo</code></td>
+</tr>
+<tr class="odd">
+<td>P7 QS</td>
+<td>BI <code>bi-demo</code> · Historian <code>/historian/</code></td>
+</tr>
+<tr class="even">
+<td>P8 Lager/Versand</td>
+<td>ERP · App <code>app-demo.indystry.works</code></td>
+</tr>
+<tr class="odd">
+<td>P9 Lieferung/Rechnung</td>
+<td>ERP · Status <code>/status/</code></td>
+</tr>
+<tr class="even">
+<td>P10 Service/Wartung</td>
+<td>ERP (Maintenance) · Historian <code>/historian/</code> · Anlage
+<code>/anlage/</code></td>
+</tr>
+<tr class="odd">
+<td>P11 Reklamation</td>
+<td>ERP (Repair) · Wissen <code>/wissen/</code> · KI-Suche
+<code>/suche/</code></td>
+</tr>
+<tr class="even">
+<td>P12 Auswertung/KVP</td>
+<td>Metabase <code>bi-demo</code> · Grafana <code>grafana-demo</code> ·
+Lab <code>lab-demo.indystry.works</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Einstieg für Besucher:</strong> der Demo-Firma-Hub
+<strong><code>/demos/</code></strong> bündelt alles als „eine Firma zum
+Durchklicken".</p>
+</blockquote>

@@ -1,0 +1,59 @@
+---
+import { search, searchEnabled } from "../lib/search.ts";
+import { t, type Lang } from "../lib/i18n";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const placeholder = lang === "de" ? "z.B. Audit, Maschine, Backup …" : "e.g. audit, machine, backup …";
+const empty = lang === "de" ? "Keine Treffer." : "No results.";
+---
+{searchEnabled && (
+  <>
+    <button id="search-open" class="pill" aria-label={ui.nav_search} style="cursor:pointer;">
+      🔍 {ui.nav_search}
+    </button>
+
+    <div id="search-overlay" role="dialog" aria-modal="true" hidden
+      data-host={search.host} data-index={search.index} data-key={search.key} data-lang={lang} data-semantic={search.semantic ? "1" : ""}
+      data-empty={empty}
+      style="position:fixed;inset:0;background:rgba(24,24,27,.40);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:8vh 1rem;">
+      <div style="background:var(--bg);border-radius:var(--radius-card);max-width:40rem;width:100%;box-shadow:0 30px 80px -20px rgba(0,0,0,.4);overflow:hidden;" onclick="event.stopPropagation()">
+        <input id="search-input" type="search" autocomplete="off" placeholder={placeholder}
+          style="width:100%;border:0;border-bottom:1px solid var(--line);padding:1.1rem 1.25rem;font-size:1.1rem;outline:none;" />
+        <ul id="search-results" style="list-style:none;margin:0;padding:.5rem;max-height:55vh;overflow:auto;"></ul>
+      </div>
+    </div>
+
+    <script>
+      const ov = document.getElementById("search-overlay");
+      const inp = document.getElementById("search-input");
+      const out = document.getElementById("search-results");
+      const open = () => { ov.hidden = false; inp.value = ""; out.innerHTML = ""; inp.focus(); };
+      const close = () => { ov.hidden = true; };
+      document.getElementById("search-open").addEventListener("click", open);
+      ov.addEventListener("click", close);
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !ov.hidden) close(); });
+
+      let timer;
+      const run = async (q) => {
+        if (!q.trim()) { out.innerHTML = ""; return; }
+        try {
+          const res = await fetch(`${ov.dataset.host}/indexes/${ov.dataset.index}/search`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${ov.dataset.key}`, "Content-Type": "application/json" },
+            body: JSON.stringify(Object.assign({ q, filter: `lang = ${ov.dataset.lang}`, limit: 6 }, ov.dataset.semantic === "1" ? { hybrid: { embedder: "mistral", semanticRatio: 0.5 } } : {})),
+          });
+          const data = await res.json();
+          const hits = data.hits || [];
+          if (!hits.length) { out.innerHTML = `<li style="padding:1rem;color:var(--muted)">${ov.dataset.empty}</li>`; return; }
+          out.innerHTML = hits.map((h) => `
+            <li><a href="${h.url}" style="display:block;padding:.85rem 1rem;border-radius:.6rem;text-decoration:none;">
+              <strong style="display:block">${h.title}</strong>
+              <span style="color:var(--muted);font-size:.9rem">${h.subline || ""}</span>
+            </a></li>`).join("");
+        } catch (e) { out.innerHTML = `<li style="padding:1rem;color:var(--muted)">…</li>`; }
+      };
+      inp.addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => run(e.target.value), 180); });
+    </script>
+  </>
+)}

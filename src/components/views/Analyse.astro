@@ -1,0 +1,109 @@
+---
+// /analyse/ — Werkstoff-/Mikroskopie-Galerie je Charge (lang-aware, un-branded).
+// Bilder prozedural erzeugt (dependency-frei, seeded SVG) — Oberfläche, Schliff, Mikroskopie.
+// Messwerte seeded + stabil. Verknüpft mit /graph/ (Charge) + /historian/. Klassen-Filter + Lightbox.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const charges = [
+  { id:"CH-2401", prod:"NW-1001 · Lagerbock Typ A" }, { id:"CH-2402", prod:"NW-1002 · Lagerbock Typ B" },
+  { id:"CH-2403", prod:"NW-2010 · Flanschplatte 120" }, { id:"CH-2404", prod:"NW-2011 · Flanschplatte 160" },
+  { id:"CH-2405", prod:"NW-3005 · Wellenadapter S" }, { id:"CH-2406", prod:"NW-3006 · Wellenadapter M" },
+  { id:"CH-2407", prod:"NW-4002 · Gehäusedeckel" }, { id:"CH-2408", prod:"NW-4003 · Gehäuseunterteil" },
+  { id:"CH-2409", prod:"NW-2010 · Flanschplatte 120" },
+];
+const classes = [
+  ["all", L("Alle","All")], ["surface", L("Oberfläche","Surface")], ["section", L("Schliff","Cross-section")], ["micro", L("Mikroskopie","Microscopy")],
+];
+---
+<section style="background:#0E2522; color:#F4F6F5;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Werkstoff-Analyse · read-only","Material analysis · read-only")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,66px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:16ch;">{L("Bis ins Gefüge.","Down to the grain.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Zu jeder Charge: Oberfläche, Schliffbild und Mikroskopie plus die Messwerte — rückverfolgbar bis zum Auftrag. Klick ein Bild für die Großansicht.","For every batch: surface, cross-section and microscopy plus the measurements — traceable to the order. Click an image to enlarge.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div class="an-chips" id="an-clf">
+      {classes.map(([k, lbl], i) => <button class="an-chip" data-cls={k} aria-pressed={i===0?"true":"false"}>{lbl}</button>)}
+    </div>
+    <div class="an-grid" id="an-grid"></div>
+  </div>
+</section>
+
+<div id="an-box" hidden style="position:fixed; inset:0; z-index:1300; background:rgba(11,28,25,.82); display:flex; align-items:center; justify-content:center; padding:24px;">
+  <div style="max-width:560px; width:100%;">
+    <div id="an-box-img" style="background:#0E2522; border-radius:12px; overflow:hidden;"></div>
+    <p id="an-box-cap" style="font-family:var(--font-mono); font-size:12px; color:#CADAD5; text-align:center; margin:12px 0 0;"></p>
+  </div>
+</div>
+
+<script type="application/json" id="an-data" is:inline set:html={JSON.stringify(charges)}></script>
+<script>
+  const DE = document.documentElement.lang !== "en";
+  const CH = JSON.parse(document.getElementById("an-data").textContent);
+  const CLS = { surface: DE?"Oberfläche":"Surface", section: DE?"Schliff":"Cross-section", micro: DE?"Mikroskopie":"Microscopy" };
+  function rng(seed){ let h=1779033703^seed.length; for(let i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19;} return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return ((h^=h>>>16)>>>0)/4294967296; }; }
+  function svg(inner,bg){ return `<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;background:${bg};">${inner}</svg>`; }
+  function imgSurface(r){ let s=""; for(let i=0;i<46;i++){ const y=r()*150, w=20+r()*180, x=r()*40, o=(0.05+r()*0.22).toFixed(2); s+=`<line x1="${x}" y1="${y}" x2="${x+w}" y2="${y+(r()-0.5)*3}" stroke="#cfd6d3" stroke-width="${(0.4+r()*0.8).toFixed(1)}" opacity="${o}"/>`; } for(let i=0;i<70;i++){ s+=`<circle cx="${r()*200}" cy="${r()*150}" r="${(0.3+r()*0.9).toFixed(1)}" fill="#aeb8b4" opacity="${(0.1+r()*0.3).toFixed(2)}"/>`; } return svg(s,"#6b7672"); }
+  function imgSection(r){ let s=""; for(let i=0;i<70;i++){ const cx=r()*200, cy=r()*150, rad=6+r()*16, g=130+Math.floor(r()*90); s+=`<circle cx="${cx}" cy="${cy}" r="${rad}" fill="rgb(${g},${g},${g-8})" stroke="#3a3f3d" stroke-width="0.7" opacity="0.92"/>`; } return svg(s,"#9aa19e"); }
+  function imgMicro(r){ let s=`<rect width="200" height="150" fill="#0c1a16"/>`; for(let i=0;i<160;i++){ const b=120+Math.floor(r()*130); s+=`<circle cx="${r()*200}" cy="${r()*150}" r="${(0.5+r()*2.4).toFixed(1)}" fill="rgb(${b},${b+10},${b})" opacity="${(0.3+r()*0.6).toFixed(2)}"/>`; } return svg(s,"#0c1a16"); }
+  const GEN = { surface:imgSurface, section:imgSection, micro:imgMicro };
+  const COLR = { surface:"#6b7672", section:"#9aa19e", micro:"#0c1a16" };
+
+  function meas(id){ const r=rng(id+"m"); const masz=(50+(r()-0.5)*0.5), ra=(1.4+(r()-0.3)*0.9), hv=Math.round(200+(r()-0.4)*60), g=Math.round(420+(r()-0.5)*18); const ok = masz>49.7&&masz<50.3&&ra<2.4; return {masz,ra,hv,g,ok}; }
+
+  const grid = document.getElementById("an-grid");
+  const box = document.getElementById("an-box");
+  function thumb(id, cls){ const r=rng(id+cls); return `<button class="an-th" data-id="${id}" data-cls="${cls}" title="${CLS[cls]}" style="aspect-ratio:4/3;">${GEN[cls](r)}<span class="an-th-lbl">${CLS[cls]}</span></button>`; }
+  function card(c){ const m=meas(c.id); const okC=m.ok?"#16794a":"#b4232a"; const okT=m.ok?(DE?"i.O.":"pass"):(DE?"n.i.O.":"fail");
+    return `<article class="an-card" id="${c.id}" data-id="${c.id}">
+      <div class="an-card-h"><div><p class="an-id">${c.id}</p><p class="an-prod">${c.prod}</p></div><span class="an-badge" style="color:${okC};border-color:${okC}55;">● ${okT}</span></div>
+      <div class="an-thumbs">${["surface","section","micro"].map((k)=>thumb(c.id,k)).join("")}</div>
+      <div class="an-meas">
+        <span>${DE?"Maßhalt.":"Dimension"} <b>${m.masz.toFixed(2)} mm</b></span>
+        <span>Ra <b>${m.ra.toFixed(2)} µm</b></span>
+        <span>${DE?"Härte":"Hardness"} <b>${m.hv} HV</b></span>
+        <span>${DE?"Gewicht":"Weight"} <b>${m.g} g</b></span>
+      </div>
+      <div class="an-links"><a href="${(DE?"":"/en")+"/historian/"}">Historian →</a><a href="${(DE?"":"/en")+"/graph/"}">${DE?"im Graph":"in graph"} →</a></div>
+    </article>`; }
+  grid.innerHTML = CH.map(card).join("");
+
+  let activeCls = "all";
+  function applyCls(){ document.querySelectorAll(".an-th").forEach((t)=>{ t.style.display = (activeCls==="all"||t.dataset.cls===activeCls)?"":"none"; }); document.querySelectorAll(".an-thumbs").forEach((g)=>g.classList.toggle("single", activeCls!=="all")); }
+  document.querySelectorAll(".an-chip").forEach((ch)=>ch.addEventListener("click", ()=>{ activeCls=ch.dataset.cls; document.querySelectorAll(".an-chip").forEach((x)=>x.setAttribute("aria-pressed",String(x===ch))); applyCls(); }));
+
+  function openBox(id, cls){ const r=rng(id+cls); document.getElementById("an-box-img").innerHTML = `<div style="aspect-ratio:4/3;">${GEN[cls](r)}</div>`; document.getElementById("an-box-cap").textContent = `${id} · ${CLS[cls]}`; box.hidden=false; }
+  grid.addEventListener("click", (e)=>{ const t=e.target.closest(".an-th"); if(t) openBox(t.dataset.id, t.dataset.cls); });
+  box.addEventListener("click", ()=>{ box.hidden=true; });
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") box.hidden=true; });
+  // Deep-Link zur Charge
+  const h=decodeURIComponent((location.hash||"").replace("#","")); if(h){ const el=document.getElementById(h); if(el){ setTimeout(()=>{el.scrollIntoView({behavior:"smooth",block:"center"}); el.classList.add("flash"); setTimeout(()=>el.classList.remove("flash"),1600);},300); } }
+</script>
+
+<style>
+  .an-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:24px; }
+  .an-chip { font-family:var(--font-mono); font-size:12px; padding:6px 13px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#5C5E63; }
+  .an-chip[aria-pressed="true"] { background:#123A33; color:#fff; border-color:#123A33; }
+  .an-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+  .an-card { border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:16px; scroll-margin-top:90px; transition:box-shadow .15s; }
+  .an-card.flash { box-shadow:0 0 0 3px #E6B23A; }
+  .an-card-h { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .an-id { font-family:var(--font-mono); font-size:13px; color:#16463E; margin:0; font-weight:600; }
+  .an-prod { font-size:13px; color:#5C5E63; margin:2px 0 0; }
+  .an-badge { font-family:var(--font-mono); font-size:11px; border:1px solid; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .an-thumbs { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:12px; }
+  .an-thumbs.single { grid-template-columns:1fr; }
+  .an-th { position:relative; padding:0; border:1px solid #E2E8F0; border-radius:8px; overflow:hidden; cursor:zoom-in; background:none; }
+  .an-th:hover { border-color:#123A33; }
+  .an-th-lbl { position:absolute; left:5px; bottom:4px; font-family:var(--font-mono); font-size:9px; color:#fff; background:rgba(11,28,25,.55); border-radius:4px; padding:1px 5px; }
+  .an-meas { display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; font-size:12.5px; color:#5C5E63; margin-bottom:12px; }
+  .an-meas b { color:#1B1C1E; font-family:var(--font-mono); }
+  .an-links { display:flex; gap:14px; }
+  .an-links a { font-family:var(--font-mono); font-size:12px; color:#16463E; text-decoration:none; }
+  .an-links a:hover { text-decoration:underline; }
+</style>

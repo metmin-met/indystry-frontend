@@ -1,0 +1,115 @@
+---
+// Zusammenarbeit & Dateiraum (read-only, lang-aware): geteilter Dateiraum (Ordner → Dateien →
+// Vorschau) + Aktivitätsfeed. Kohärenter Facetten-Inhalt zur Demo-Firma Nordwerk.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const folders = [
+  { key: "angebote", name: L("Angebote","Quotes"), files: [
+    { n: "Angebot NW-1001 — Helvetia Pumpen.pdf", t: "PDF", s: "182 KB", who: "Jonas K.", when: L("vor 5 h","5 h ago") },
+    { n: "Angebot NW-2010 — Alpentech.pdf", t: "PDF", s: "204 KB", who: "Jonas K.", when: L("gestern","yesterday") },
+  ]},
+  { key: "auftraege", name: L("Aufträge","Orders"), files: [
+    { n: "Auftrag SO-0042 — Donau Maschinenbau.pdf", t: "PDF", s: "96 KB", who: "Lena S.", when: L("vor 3 h","3 h ago") },
+    { n: "Lieferschein NW-4002.pdf", t: "PDF", s: "78 KB", who: "Lena S.", when: L("gestern","yesterday") },
+  ]},
+  { key: "zeichnungen", name: L("Zeichnungen","Drawings"), files: [
+    { n: "Lagerbock Typ A.dxf", t: "DXF", s: "1,2 MB", who: "Tom B.", when: L("vorgestern","2 days ago") },
+    { n: "Flanschplatte 120.step", t: "STEP", s: "3,4 MB", who: "Tom B.", when: L("gestern","yesterday") },
+    { n: "Gehäusedeckel.pdf", t: "PDF", s: "512 KB", who: "Tom B.", when: L("letzte Woche","last week") },
+  ]},
+  { key: "pruefung", name: L("Prüfprotokolle","Inspection records"), files: [
+    { n: "Prüfprotokoll NW-2010 — Charge 23.pdf", t: "PDF", s: "144 KB", who: "Mara R.", when: L("vor 2 h","2 h ago") },
+    { n: "Maßprotokoll NW-1001.xlsx", t: "XLSX", s: "38 KB", who: "Mara R.", when: L("gestern","yesterday") },
+  ]},
+  { key: "wartung", name: L("Wartung","Maintenance"), files: [
+    { n: "Wartungsplan Linie Nord.xlsx", t: "XLSX", s: "52 KB", who: "Lena S.", when: L("gestern","yesterday") },
+    { n: "Hydraulik K1 — Bericht.pdf", t: "PDF", s: "210 KB", who: "Tom B.", when: L("letzte Woche","last week") },
+  ]},
+  { key: "handbuch", name: L("Handbuch","Handbook"), files: [
+    { n: "Rüsten CNC.pdf", t: "PDF", s: "320 KB", who: "Jonas K.", when: L("letzte Woche","last week") },
+    { n: "Qualitätsrichtlinie.pdf", t: "PDF", s: "188 KB", who: "Mara R.", when: L("vor 2 Wochen","2 weeks ago") },
+  ]},
+];
+const activity = [
+  { who: "Mara R.", act: L("hat Prüfprotokoll NW-2010 hochgeladen","uploaded inspection record NW-2010"), when: L("vor 2 h","2 h ago") },
+  { who: "Jonas K.", act: L("hat Angebot NW-1001 kommentiert","commented on quote NW-1001"), when: L("vor 5 h","5 h ago") },
+  { who: "Lena S.", act: L("hat den Wartungsplan Linie Nord aktualisiert","updated the maintenance plan line North"), when: L("gestern","yesterday") },
+  { who: "Tom B.", act: L("hat die Zeichnung Flanschplatte 120 freigegeben","released the drawing Flange plate 120"), when: L("gestern","yesterday") },
+];
+---
+<section style="background:#F8F9FA;" data-de={String(de)}>
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Zusammenarbeit · Dateiraum · read-only","Collaboration · file room · read-only")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Ein Raum für alle Dokumente.","One room for every document.")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(32px,4vw,44px);">{L("Angebote, Zeichnungen, Prüfprotokolle, Wartung — geteilt, versioniert, kommentierbar. Selbst gehostet, kein fremder Cloud-Speicher.","Quotes, drawings, inspection records, maintenance — shared, versioned, commentable. Self-hosted, no third-party cloud.")}</p>
+
+    <div id="folderbar" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+      {folders.map((f, i) => (
+        <button class="fbtn" data-key={f.key} aria-pressed={i === 0 ? "true" : "false"}
+          style="font-family:var(--font-mono); font-size:12px; padding:7px 13px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#3C3E42;">
+          {f.name} <span style="color:#92938F;">· {f.files.length}</span>
+        </button>
+      ))}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start;">
+      <div>
+        {folders.map((f, i) => (
+          <div class="flist" data-key={f.key} style={`border:1px solid #E2E8F0; border-radius:12px; background:#fff; overflow:hidden; ${i === 0 ? "" : "display:none;"}`}>
+            {f.files.map((file, j) => (
+              <button class="frow" data-n={file.n} data-t={file.t} data-s={file.s} data-who={file.who} data-when={file.when}
+                style={`display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; width:100%; text-align:left; padding:13px 16px; background:none; border:none; cursor:pointer; font-family:inherit; ${j ? "border-top:1px solid #F1F3F2;" : ""}`}>
+                <span style="font-family:var(--font-mono); font-size:10px; font-weight:600; color:#16463E; border:1px solid #C0C8C5; border-radius:5px; padding:3px 6px; min-width:34px; text-align:center;">{file.t}</span>
+                <span style="font-size:15px; color:#1B1C1E;">{file.n}</span>
+                <span style="font-family:var(--font-mono); font-size:11px; color:#92938F;">{file.s}</span>
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div id="preview" style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px; min-height:150px;">
+          <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Vorschau","Preview")}</p>
+          <p id="pv" style="color:#92938F; font-size:14px; margin:0;">{L("Datei links anklicken.","Click a file on the left.")}</p>
+        </div>
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px;">
+          <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 12px;">{L("Aktivität","Activity")}</p>
+          {activity.map((a) => (
+            <div style="display:flex; gap:10px; padding:8px 0; border-top:1px solid #F1F3F2; font-size:14px; color:#1B1C1E;">
+              <span style="width:26px;height:26px;border-radius:50%;background:#EFEAE0;display:inline-flex;align-items:center;justify-content:center;font:600 11px var(--font-head,sans-serif);color:#16463E;flex:none;">{a.who.slice(0,1)}</span>
+              <span style="line-height:1.45;"><strong style="font-weight:600;">{a.who}</strong> {a.act} <span style="color:#92938F; font-family:var(--font-mono); font-size:11px;">· {a.when}</span></span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
+  document.querySelectorAll(".fbtn").forEach((b) => {
+    b.addEventListener("click", () => {
+      const key = b.getAttribute("data-key");
+      document.querySelectorAll(".fbtn").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      document.querySelectorAll(".fbtn").forEach((x) => x.setAttribute("style", x.getAttribute("style").replace(/background:#EFEAE0;?/,"") + (x === b ? "background:#EFEAE0;" : "")));
+      document.querySelectorAll(".flist").forEach((l) => { l.style.display = l.getAttribute("data-key") === key ? "" : "none"; });
+    });
+  });
+  const pv = document.getElementById("pv");
+  function bind() {
+    document.querySelectorAll(".frow").forEach((r) => {
+      r.onclick = () => {
+        const n = r.dataset.n, t = r.dataset.t, s = r.dataset.s, who = r.dataset.who, when = r.dataset.when;
+        pv.innerHTML = `<span style="display:inline-block;font-family:monospace;font-size:11px;font-weight:600;color:#16463E;border:1px solid #C0C8C5;border-radius:6px;padding:4px 8px;margin-bottom:10px;">${t} · ${s}</span>
+          <div style="font:600 17px var(--font-head,sans-serif);color:#1B1C1E;margin-bottom:6px;">${n}</div>
+          <div style="font-size:13px;color:#5C5E63;line-height:1.5;">${DE?"Zuletzt geändert von":"Last changed by"} <strong>${who}</strong> · ${when}</div>
+          <div style="margin-top:12px;font-size:13px;color:#92938F;">${DE?"Öffnet read-only im Office-Viewer (Collabora) — Bearbeiten ist in der Demo aus.":"Opens read-only in the office viewer (Collabora) — editing is off in the demo."}</div>`;
+      };
+    });
+  }
+  bind();
+</script>

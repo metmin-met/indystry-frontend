@@ -1,0 +1,87 @@
+---
+// Floating-CTA + Feedback (kombiniert, ein Element — kein Eck-Chaos).
+// Erscheint nach etwas Scroll, versteckt sich nahe dem Footer.
+// Links: Teal-CTA „Pain-List" → /kontakt. Rechts: „Feedback" öffnet das Panel
+// (POST /_lead/submit { kind:"feedback" } → lead-api → Directus `leads` + Matrix/ntfy).
+import type { Lang } from "../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const contactHref = lang === "de" ? "/kontakt/" : "/en/kontakt/";
+const tx = lang === "de"
+  ? { cta: "Pain-List", open: "Feedback", title: "Sag's uns — direkt hier.", sub: "Was fehlt, stört oder gefällt? Wir kümmern uns dort, wo's passiert.", ph: "Dein Feedback zu dieser Seite …", email: "E-Mail (optional, für Rückfragen)", send: "Senden", ok: "Danke! Ist angekommen.", err: "Hat nicht geklappt — später nochmal?", close: "Schließen" }
+  : { cta: "Pain list", open: "Feedback", title: "Tell us — right here.", sub: "What's missing, off or good? We take care where it happens.", ph: "Your feedback on this page …", email: "Email (optional, for follow-up)", send: "Send", ok: "Thanks! Got it.", err: "Didn't work — try again later?", close: "Close" };
+---
+<div class="fcta" data-fcta hidden>
+  <a class="fcta-cta" href={contactHref}>{tx.cta}</a>
+  <button id="fb-open" class="fcta-fb" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fb-panel">{tx.open}</button>
+</div>
+<div id="fb-panel" class="fb-panel" role="dialog" aria-modal="false" aria-label={tx.title} hidden>
+  <button id="fb-close" class="fb-x" type="button" aria-label={tx.close}>×</button>
+  <strong style="display:block;font-size:1rem;">{tx.title}</strong>
+  <p class="fb-sub">{tx.sub}</p>
+  <textarea id="fb-msg" rows="4" placeholder={tx.ph} maxlength="5000"></textarea>
+  <input id="fb-email" type="email" placeholder={tx.email} maxlength="254" autocomplete="email" />
+  <button id="fb-send" class="fb-send" type="button">{tx.send}</button>
+  <p id="fb-status" class="fb-status" role="status" aria-live="polite"></p>
+</div>
+
+<style>
+  .fcta { position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 50; display: inline-flex; align-items: stretch;
+    border: 1px solid var(--ink); border-radius: 2px; overflow: hidden; box-shadow: 0 8px 30px rgba(24,24,27,.14);
+    opacity: 0; transform: translateY(.8rem); pointer-events: none;
+    transition: opacity .3s var(--ease-quint), transform .3s var(--ease-quint); }
+  .fcta.show { opacity: 1; transform: none; pointer-events: auto; }
+  .fcta-cta { background: var(--accent); color: #fff; text-decoration: none; font-weight: 650; font-size: .85rem;
+    padding: .58rem 1.05rem; white-space: nowrap; transition: background .15s; }
+  .fcta-cta:hover { background: var(--accent-ink); color: #fff; }
+  .fcta-fb { background: var(--bg); color: var(--ink); border: 0; border-left: 1px solid var(--ink);
+    font: inherit; font-weight: 650; font-size: .85rem; padding: .58rem 1.05rem; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+  .fcta-fb:hover { background: var(--ink); color: var(--bg); }
+
+  .fb-panel { position: fixed; right: 1.1rem; bottom: 3.7rem; z-index: 51; width: min(22rem, calc(100vw - 2.2rem)); background: var(--bg); border: 1px solid var(--line); border-radius: 2px; padding: 1.1rem 1.2rem 1.2rem; box-shadow: 0 8px 30px rgba(24,24,27,.12); }
+  .fb-x { position: absolute; top: .5rem; right: .6rem; border: 0; background: none; font-size: 1.3rem; line-height: 1; color: var(--muted); cursor: pointer; }
+  .fb-sub { color: var(--muted); font-size: .85rem; margin: .3rem 0 .8rem; line-height: 1.45; }
+  .fb-panel textarea, .fb-panel input { width: 100%; font: inherit; font-size: .9rem; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 2px; background: var(--bg); color: var(--ink); margin-bottom: .6rem; resize: vertical; }
+  .fb-panel textarea:focus, .fb-panel input:focus { outline: none; border-color: var(--accent); }
+  .fb-send { font: inherit; font-weight: 650; font-size: .88rem; padding: .55rem 1.2rem; border: 0; border-radius: 2px; background: var(--accent); color: #fff; cursor: pointer; }
+  .fb-send:hover { background: var(--accent-ink); }
+  .fb-send:disabled { opacity: .55; cursor: default; }
+  .fb-status { font-size: .82rem; font-weight: 600; min-height: 1em; margin: .5rem 0 0; }
+  @media (max-width: 560px) { .fcta { right: .75rem; bottom: .75rem; } }
+  @media (prefers-reduced-motion: reduce) { .fcta { transition: opacity .2s; transform: none; } }
+</style>
+
+<script is:inline define:vars={{ msgs: { ok: tx.ok, err: tx.err } }}>
+  (function () {
+    var open = document.getElementById("fb-open"), panel = document.getElementById("fb-panel"),
+        closeb = document.getElementById("fb-close"), send = document.getElementById("fb-send"),
+        msg = document.getElementById("fb-msg"), email = document.getElementById("fb-email"),
+        status = document.getElementById("fb-status"), fcta = document.querySelector("[data-fcta]");
+
+    if (fcta) {
+      fcta.hidden = false;
+      var footer = document.querySelector("footer"), nearFooter = false;
+      var upd = function () { fcta.classList.toggle("show", window.scrollY > 480 && !nearFooter); };
+      if (footer && "IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) { nearFooter = es[0].isIntersecting; upd(); }, { rootMargin: "0px 0px 80px 0px" }).observe(footer);
+      }
+      window.addEventListener("scroll", upd, { passive: true }); upd();
+    }
+
+    if (!open || !panel) return;
+    function show(v) { panel.hidden = !v; open.setAttribute("aria-expanded", v ? "true" : "false"); if (v) { setTimeout(function () { msg.focus(); }, 30); } }
+    open.addEventListener("click", function () { show(panel.hidden); });
+    closeb.addEventListener("click", function () { show(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) show(false); });
+    send.addEventListener("click", function () {
+      var m = (msg.value || "").trim();
+      if (!m) { msg.focus(); return; }
+      send.disabled = true; status.textContent = "…";
+      fetch("/_lead/submit", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "feedback", message: m, email: (email.value || "").trim(), page: location.pathname }) })
+        .then(function (r) { if (!r.ok) throw 0; status.textContent = msgs.ok; msg.value = ""; email.value = "";
+          setTimeout(function () { show(false); status.textContent = ""; send.disabled = false; }, 1700); })
+        .catch(function () { status.textContent = msgs.err; send.disabled = false; });
+    });
+  })();
+</script>

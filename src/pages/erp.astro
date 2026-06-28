@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import ErpPage from "../components/views/ErpPage.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Self-Hosted ERP" description="Quelloffenes, self-hosted ERP auf Odoo-Fundament — eure Daten, euer Server, OPC-UA/MQTT-ready. Verfeinert für die Industrie." path="/erp/" altPath="/en/erp/">
+  <ErpPage lang={lang} />
+</Base>

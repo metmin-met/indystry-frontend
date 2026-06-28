@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Schnittstellen from "../components/views/Schnittstellen.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Schnittstellen · indystry" description="Womit reden wir? OT (SPS/Beckhoff/PROFINET/OPC-UA), Daten (API/MCP/ETL) und Business (PEPPOL/DATEV/BMD/UVA) — offene Standards, keine Inseln." path="/schnittstellen/" altPath="/en/schnittstellen/">
+  <Schnittstellen lang={lang} />
+</Base>

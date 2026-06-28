@@ -1,0 +1,148 @@
+---
+// /lernen/ — Onboarding & E-Learning (lang-aware): Lernpfad mit Lektion + Mini-Quiz je Modul,
+// Fortschritt in localStorage, Abschluss-Badge. Deckt Onboarding/Schulung generisch. Demo-Links.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const b = de ? "" : "/en";
+const mods = [
+  { k:"safe", t:L("Sicherheit & erste Schritte","Safety & first steps"), min:5,
+    lesson:L("Willkommen bei Nordwerk. Bevor es an die Maschine geht: Not-Aus kennen, PSA tragen, Meldewege verstehen. Im Notfall zuerst Not-Aus, dann Meldung.","Welcome to Nordwerk. Before going to the machine: know the e-stop, wear PPE, understand reporting paths. In an emergency: e-stop first, then report."),
+    q:L("Was tust du im Notfall zuerst?","What do you do first in an emergency?"),
+    opts:[L("Vorgesetzten suchen","Find your supervisor"),L("Not-Aus drücken","Hit the e-stop"),L("Foto machen","Take a photo")], correct:1,
+    why:L("Erst Not-Aus, dann melden — Sicherheit vor allem.","E-stop first, then report — safety first."),
+    demo:{l:L("Handbuch","Handbook"),h:`${b}/wissen/`} },
+  { k:"setup", t:L("Maschine rüsten","Set up a machine"), min:8,
+    lesson:L("Rüsten heißt: Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen. Erst wenn das Erststück passt, läuft die Serie.","Setup means: change tooling, set the zero point, load the program, check the first part. Only when the first part is good does the series run."),
+    q:L("Wann startet die Serie?","When does the series start?"),
+    opts:[L("Sofort nach dem Programmladen","Right after loading the program"),L("Wenn das Erststück passt","When the first part is good"),L("Nach der Pause","After the break")], correct:1,
+    why:L("Das geprüfte Erststück ist die Freigabe für die Serie.","The checked first part is the go-ahead for the series."),
+    demo:{l:L("Anlage","Plant"),h:`${b}/anlage/`} },
+  { k:"erp", t:L("Auftrag im ERP","Order in the ERP"), min:7,
+    lesson:L("Aus einer Anfrage wird ein Angebot, aus dem bestätigten Angebot ein Auftrag. Mit dem Auftrag entstehen automatisch Fertigung und Lieferung — ohne Doppelerfassung.","An inquiry becomes a quote, a confirmed quote becomes an order. The order automatically creates production and delivery — no double entry."),
+    q:L("Was entsteht mit dem bestätigten Auftrag automatisch?","What does the confirmed order create automatically?"),
+    opts:[L("Nur eine Rechnung","Just an invoice"),L("Fertigung & Lieferung","Production & delivery"),L("Gar nichts","Nothing")], correct:1,
+    why:L("Der Auftrag löst Fertigungsauftrag (MRP) und Lieferung aus.","The order triggers the production order (MRP) and the delivery."),
+    demo:{l:"ERP",h:"https://erp-demo.indystry.works/odoo",x:true} },
+  { k:"leit", t:L("Leitstand & Anlage","Control room & plant"), min:6,
+    lesson:L("Der Leitstand zeigt jede Maschine: läuft, Leerlauf, Wartung fällig oder Störung. Bei Wartungsbedarf gehst du von der Maschine in den Schaltschrank bis zum Stromlaufplan.","The control room shows every machine: running, idle, maintenance due or fault. For maintenance you go from the machine into the cabinet down to the wiring plan."),
+    q:L("Was bedeutet eine gelbe Maschine im Leitstand?","What does an amber machine mean in the control room?"),
+    opts:[L("Sie ist aus","It's off"),L("Wartung fällig","Maintenance due"),L("Sie produziert schneller","It runs faster")], correct:1,
+    why:L("Gelb = Wartung fällig — handeln, bevor sie steht.","Amber = maintenance due — act before it stops."),
+    demo:{l:L("Leitstand","Control room"),h:`${b}/leitstand/`} },
+  { k:"qs", t:L("Qualität & Prüfung","Quality & inspection"), min:7,
+    lesson:L("Geprüft wird gegen Grenzwerte: Maßhaltigkeit, Oberfläche, Gewicht. Außerhalb der Grenze heißt n.i.O. — sperren und melden. Jede Charge bekommt ein Protokoll.","Inspection is against limits: dimensions, surface, weight. Outside the limit means fail — block and report. Every batch gets a record."),
+    q:L("Ein Maß liegt außerhalb der Grenze. Was nun?","A dimension is out of limits. What now?"),
+    opts:[L("Trotzdem liefern","Ship anyway"),L("Sperren und melden","Block and report"),L("Grenze ändern","Change the limit")], correct:1,
+    why:L("n.i.O. wird gesperrt und gemeldet — nie einfach durchwinken.","A fail is blocked and reported — never wave it through."),
+    demo:{l:L("Analyse","Analysis"),h:`${b}/analyse/`} },
+  { k:"rek", t:L("Reklamation & Service","Complaints & service"), min:6,
+    lesson:L("Eine Reklamation wird als Fall erfasst, die Ursache strukturiert gesucht (8D), die Korrektur bis zur Wirksamkeit verfolgt. Die KI-Suche findet ähnliche Altfälle.","A complaint is logged as a case, the root cause found structurally (8D), the correction tracked to effect. The AI search finds similar past cases."),
+    q:L("Wozu dient die 8D-Methode?","What is the 8D method for?"),
+    opts:[L("Schneller liefern","Ship faster"),L("Ursache finden & Wiederholung verhindern","Find the cause & prevent recurrence"),L("Rabatt geben","Give a discount")], correct:1,
+    why:L("8D strukturiert die Ursachenanalyse und sichert die Wirksamkeit.","8D structures root-cause analysis and secures effectiveness."),
+    demo:{l:L("Frag die Firma","Ask the company"),h:`${b}/suche/`} },
+];
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:900px; margin:0 auto; padding:clamp(48px,7vw,88px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Onboarding & Lernen","Onboarding & learning")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("In einer Woche drin.","Up to speed in a week.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Der Lernpfad für neue Mitarbeiter: kurze Lektion, kurzes Quiz, Häkchen. Dein Fortschritt bleibt gespeichert — und am Ende gibt's das Abschluss-Abzeichen.","The learning path for new staff: short lesson, short quiz, checkmark. Your progress is saved — and at the end you get the completion badge.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:900px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div class="ln-top">
+      <div class="ln-bar"><div id="ln-fill" class="ln-fill"></div></div>
+      <span id="ln-prog" class="ln-prog"></span>
+      <button id="ln-reset" class="ln-reset">{L("Zurücksetzen","Reset")}</button>
+    </div>
+    <div id="ln-done" hidden class="ln-badge">🏅 {L("Geschafft! Alle Module abgeschlossen.","Done! All modules complete.")}</div>
+    <div id="ln-list" class="ln-list"></div>
+  </div>
+</section>
+
+<script type="application/json" id="ln-data" is:inline set:html={JSON.stringify(mods)}></script>
+<script>
+  const DE = document.documentElement.lang !== "en";
+  const M = JSON.parse(document.getElementById("ln-data").textContent);
+  const KEY = "indystry-lernen-v1";
+  let done = {}; try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) { done = {}; }
+  const list = document.getElementById("ln-list");
+  const fill = document.getElementById("ln-fill"), prog = document.getElementById("ln-prog"), badge = document.getElementById("ln-done");
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e){} }
+  function refresh(){
+    const n = M.filter(m => done[m.k]).length;
+    fill.style.width = (n/M.length*100)+"%";
+    prog.textContent = `${n} / ${M.length} ${DE?"Module":"modules"} · ${Math.round(n/M.length*100)}%`;
+    badge.hidden = n < M.length;
+    M.forEach((m) => { const c = document.getElementById("ln-"+m.k); if(c) c.classList.toggle("done", !!done[m.k]); const ck = c && c.querySelector(".ln-check"); if(ck) ck.textContent = done[m.k] ? "✓" : (M.indexOf(m)+1); });
+  }
+  list.innerHTML = M.map((m, i) => `
+    <div class="ln-card" id="ln-${m.k}">
+      <button class="ln-head" data-k="${m.k}">
+        <span class="ln-check">${i+1}</span>
+        <span class="ln-title">${m.t}</span>
+        <span class="ln-min">${m.min} min</span>
+        <span class="ln-chev">▾</span>
+      </button>
+      <div class="ln-body" hidden>
+        <p class="ln-lesson">${m.lesson}</p>
+        <a class="ln-demo" href="${m.demo.h}" ${m.demo.x?'target="_blank" rel="noopener"':''}>${DE?"Dazu live":"See it live"} · ${m.demo.l} ${m.demo.x?"↗":"→"}</a>
+        <p class="ln-q">${m.q}</p>
+        <div class="ln-opts">${m.opts.map((o,oi)=>`<button class="ln-opt" data-k="${m.k}" data-oi="${oi}">${o}</button>`).join("")}</div>
+        <p class="ln-fb" hidden></p>
+      </div>
+    </div>`).join("");
+
+  list.querySelectorAll(".ln-head").forEach((h) => h.addEventListener("click", () => {
+    const body = h.nextElementSibling; const open = body.hidden;
+    list.querySelectorAll(".ln-body").forEach(b => b.hidden = true);
+    list.querySelectorAll(".ln-head").forEach(x => x.classList.remove("open"));
+    if (open) { body.hidden = false; h.classList.add("open"); }
+  }));
+  list.querySelectorAll(".ln-opt").forEach((o) => o.addEventListener("click", () => {
+    const m = M.find(x => x.k === o.dataset.k); const oi = +o.dataset.oi;
+    const body = o.closest(".ln-body"); const fb = body.querySelector(".ln-fb");
+    body.querySelectorAll(".ln-opt").forEach(x => x.classList.remove("ok","no"));
+    fb.hidden = false;
+    if (oi === m.correct) { o.classList.add("ok"); fb.className = "ln-fb ok"; fb.textContent = "✓ " + m.why; if(!done[m.k]){ done[m.k]=true; save(); refresh(); } }
+    else { o.classList.add("no"); fb.className = "ln-fb no"; fb.textContent = (DE?"Nicht ganz — nochmal.":"Not quite — try again."); }
+  }));
+  document.getElementById("ln-reset").addEventListener("click", () => { done = {}; save(); list.querySelectorAll(".ln-fb").forEach(f=>f.hidden=true); list.querySelectorAll(".ln-opt").forEach(x=>x.classList.remove("ok","no")); refresh(); });
+  refresh();
+</script>
+
+<style>
+  .ln-top { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .ln-bar { flex:1; height:7px; background:#E2E8F0; border-radius:999px; overflow:hidden; }
+  .ln-fill { height:100%; background:#16794a; border-radius:999px; transition:width .4s ease; }
+  .ln-prog { font-family:var(--font-mono); font-size:12px; color:#5C5E63; white-space:nowrap; }
+  .ln-reset { font-family:var(--font-mono); font-size:11px; color:#92938F; background:none; border:1px solid #C0C8C5; border-radius:999px; padding:5px 11px; cursor:pointer; }
+  .ln-badge { background:#EFEAE0; border:1px solid #E6B23A; border-radius:12px; padding:14px 18px; font-weight:600; color:#7a5500; margin-bottom:18px; }
+  .ln-list { display:flex; flex-direction:column; gap:12px; }
+  .ln-card { border:1px solid #E2E8F0; border-radius:14px; background:#fff; overflow:hidden; }
+  .ln-card.done { border-color:#16794a55; }
+  .ln-head { display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:none; border:none; padding:16px 18px; cursor:pointer; font-family:inherit; }
+  .ln-check { flex:none; width:28px; height:28px; border-radius:50%; background:#EFEAE0; color:#16463E; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:13px; }
+  .ln-card.done .ln-check { background:#16794a; color:#fff; }
+  .ln-title { flex:1; font-family:var(--font-head,sans-serif); font-weight:600; font-size:16px; color:#1B1C1E; }
+  .ln-min { font-family:var(--font-mono); font-size:11px; color:#92938F; }
+  .ln-chev { color:#92938F; transition:transform .2s; }
+  .ln-head.open .ln-chev { transform:rotate(180deg); }
+  .ln-body { padding:0 18px 18px; }
+  .ln-lesson { font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 12px; }
+  .ln-demo { display:inline-block; font-family:var(--font-mono); font-size:12px; color:#16463E; text-decoration:none; border-bottom:1.5px solid #C0C8C5; margin-bottom:16px; }
+  .ln-q { font-weight:600; font-size:15px; color:#1B1C1E; margin:6px 0 10px; }
+  .ln-opts { display:flex; flex-direction:column; gap:8px; }
+  .ln-opt { text-align:left; font-family:inherit; font-size:14px; padding:10px 14px; border:1px solid #C0C8C5; border-radius:10px; background:#fff; cursor:pointer; color:#1B1C1E; }
+  .ln-opt:hover { border-color:#123A33; }
+  .ln-opt.ok { background:#e7f4ec; border-color:#16794a; }
+  .ln-opt.no { background:#fbe9e9; border-color:#b4232a; }
+  .ln-fb { font-size:13.5px; line-height:1.5; margin:10px 0 0; }
+  .ln-fb.ok { color:#16794a; }
+  .ln-fb.no { color:#b4232a; }
+</style>

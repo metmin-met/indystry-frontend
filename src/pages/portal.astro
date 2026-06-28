@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Portal from "../components/views/Portal.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Kundenportal · Nordwerk" description="Self-Service: Aufträge, Rechnungen, Service, Reklamation — read-only." path="/portal/" altPath="/en/portal/">
+  <Portal lang={lang} />
+</Base>

@@ -1,0 +1,36 @@
+[
+  {"type":"produkt","title":"NW-1001 · Lagerbock Typ A","text":"Halterung aus Stahl S235, Standard-Lagerbock, ERP-Artikel, Stückliste mit Stahl-Block und Normschrauben.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-1002 · Lagerbock Typ B","text":"Halterung, größere Variante, Stahl S235, ERP-Artikel.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-2010 · Flanschplatte 120","text":"Platte aus Aluminium AW-6082, 120 mm, Zuschnitt auf Laserschneider L1.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-2011 · Flanschplatte 160","text":"Platte aus Aluminium AW-6082, 160 mm.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-3005 · Wellenadapter S","text":"Adapter aus Wellen-Rohling, kleine Baugröße, Zerspanung auf Drehzentrum B1.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-3006 · Wellenadapter M","text":"Adapter mittlere Baugröße.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-4002 · Gehäusedeckel","text":"Gehäuseteil aus Stahl, Montage auf Montagezelle M1/M2.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"produkt","title":"NW-4003 · Gehäuseunterteil","text":"Gehäuseteil, passend zu NW-4002.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+
+  {"type":"maschine","title":"CNC-Fräse A1","text":"Linie Nord, Zerspanung. Spindel, Schaltschrank A1, Sensoren für Temperatur und Vibration. Live im Leitstand und im Anlagen-Twin.","href":"/leitstand/","ext":false},
+  {"type":"maschine","title":"CNC-Fräse A2","text":"Linie Nord, Zerspanung.","href":"/leitstand/","ext":false},
+  {"type":"maschine","title":"Drehzentrum B1","text":"Linie Nord, Zerspanung. Aktuell: Wartung fällig.","href":"/leitstand/","ext":false},
+  {"type":"maschine","title":"Montagezelle M1","text":"Linie Süd, Montage. Keine Sensor-Messreihe.","href":"/anlage/","ext":false},
+  {"type":"maschine","title":"Prüfstand P1","text":"Linie Süd, Prüfung. Endkontrolle und Maßhaltigkeit.","href":"/anlage/","ext":false},
+  {"type":"maschine","title":"Laserschneider L1","text":"Linie West, Zuschnitt von Platten und Blechen.","href":"/leitstand/","ext":false},
+  {"type":"maschine","title":"Abkantpresse K1","text":"Linie West, Umformung, Biegen von Blechteilen.","href":"/leitstand/","ext":false},
+
+  {"type":"handbuch","title":"Maschine rüsten","text":"Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen. Schritt-für-Schritt für die Zerspanungslinie.","href":"/wissen/","ext":false},
+  {"type":"handbuch","title":"Qualitätsprüfung","text":"Maßhaltigkeit, Oberflächenrauheit, Gewicht. Grenzwerte und Prüfprotokoll. Bei Abweichung: sperren und melden.","href":"/wissen/","ext":false},
+  {"type":"handbuch","title":"Reklamation bearbeiten","text":"Schaden aufnehmen, Reparaturauftrag anlegen, Ursache (8D) dokumentieren, Kunde informieren.","href":"/wissen/","ext":false},
+  {"type":"handbuch","title":"Wartungsplan","text":"Präventive Wartung je Maschine, Intervalle, Checklisten. Korrektive Einsätze bei Störung.","href":"/wissen/","ext":false},
+  {"type":"handbuch","title":"Onboarding neue Mitarbeiter","text":"Erste Woche, Sicherheitsunterweisung, Zugänge, Ansprechpartner, Rundgang durch die Linien.","href":"/wissen/","ext":false},
+  {"type":"handbuch","title":"Notfall & Sicherheit","text":"Not-Aus, Brandschutz, Erste Hilfe, Meldewege. Standorte der Sicherheitseinrichtungen.","href":"/wissen/","ext":false},
+
+  {"type":"kpi","title":"OEE — Gesamtanlageneffektivität","text":"Verfügbarkeit × Leistung × Qualität je Maschine und Linie. Im BI-Cockpit und in Grafana.","href":"https://grafana-demo.indystry.works","ext":true},
+  {"type":"kpi","title":"Ausschussquote","text":"Anteil Ausschuss je Auftrag und Produkt. Trend über die Zeit in der BI.","href":"https://bi-demo.indystry.works","ext":true},
+  {"type":"kpi","title":"Durchlaufzeit","text":"Zeit vom Auftragsstart bis Fertigstellung. Engpass-Analyse.","href":"https://bi-demo.indystry.works","ext":true},
+  {"type":"kpi","title":"Liefertreue","text":"Anteil termingerecht gelieferter Aufträge.","href":"/status/","ext":false},
+
+  {"type":"glossar","title":"SPS / CPU","text":"Speicherprogrammierbare Steuerung im Schaltschrank — verarbeitet Eingänge zu Ausgängen, steuert die Maschine. Siehe Stromlaufplan.","href":"/anlage/","ext":false},
+  {"type":"glossar","title":"Schaltschrank","text":"Gehäuse mit SPS, Antrieben/Frequenzumrichtern, Klemmen und Sicherungen. 3D-Drilldown bis zum Plan.","href":"/anlage/","ext":false},
+  {"type":"glossar","title":"Frequenzumrichter (FU)","text":"Stellt Drehzahl der Servo- und Spindelmotoren. Hängt am Feldbus der SPS.","href":"/anlage/","ext":false},
+  {"type":"glossar","title":"Stückliste (BOM)","text":"Welche Rohmaterialien in ein Produkt gehen. Basis für Fertigung und Einkauf im ERP.","href":"https://erp-demo.indystry.works/odoo","ext":true},
+  {"type":"glossar","title":"Charge / Los","text":"Eine Fertigungsmenge eines Produkts, rückverfolgbar über Auftrag, Prüfung und Auslieferung.","href":"/historian/","ext":false}
+]

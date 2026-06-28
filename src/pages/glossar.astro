@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Glossar from "../components/views/Glossar.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Glossar · indystry" description="Die Begriffe der Demo — jeder mit Link zum Thema, wo er live vorkommt." path="/glossar/" altPath="/en/glossar/">
+  <Glossar lang={lang} />
+</Base>

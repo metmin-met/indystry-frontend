@@ -1,0 +1,131 @@
+---
+// /datenhoheit/ — Datenschutz von A bis Z + KI-Souveränitäts-Skala (Cloud-API → Hybrid →
+// Self-hosted offene Gewichte → On-Prem + eigenes Mistral-Modell). Interaktiv.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+
+const levels = [
+  { k: 1, n: L("Cloud-KI (API)", "Cloud AI (API)"), data: L("verlässt das Haus", "leaves the house"),
+    s: L("Schnell starten — aber Daten gehen zum Anbieter.", "Quick to start — but data goes to the provider."),
+    d: L("Fertige KI per API, wie die bekannten Chatbots. Schnell und stark, aber jeder Prompt und jede angehängte Datei landet bei einem externen Anbieter. Für Unkritisches in Ordnung — für Firmengeheimnisse heikel.", "Ready-made AI via API, like the well-known chatbots. Fast and strong, but every prompt and attached file ends up with an external provider. Fine for non-critical work — risky for trade secrets."),
+    privacy: 1, control: 1, effort: 1 },
+  { k: 2, n: L("Hybrid / Mixture", "Hybrid / mixture"), data: L("gemischt, steuerbar", "mixed, steerable"),
+    s: L("Sensibles bleibt lokal, nur Unkritisches geht raus.", "Sensitive stays local, only non-critical goes out."),
+    d: L("Das Beste aus beiden Welten: Suche und sensible Daten bleiben im Haus (lokales RAG), nur anonymisierte oder unkritische Teile gehen an ein starkes externes Modell. Pro Datenklasse entscheidbar.", "The best of both worlds: search and sensitive data stay in-house (local RAG), only anonymised or non-critical parts go to a strong external model. Decidable per data class."),
+    privacy: 2, control: 2, effort: 2 },
+  { k: 3, n: L("Self-hosted (offene Gewichte)", "Self-hosted (open weights)"), data: L("bleibt im Haus", "stays in-house"),
+    s: L("Modell läuft auf eurer Hardware — kein Prompt geht raus.", "Model runs on your hardware — no prompt leaves."),
+    d: L("Ein offenes Modell (z.B. Mistral) läuft auf eurer eigenen Hardware. Kein Prompt, keine Datei verlässt das Haus. DSGVO-freundlich, volle Kontrolle — ihr betreibt die KI selbst.", "An open model (e.g. Mistral) runs on your own hardware. No prompt, no file leaves the house. GDPR-friendly, full control — you run the AI yourself."),
+    privacy: 4, control: 3, effort: 3 },
+  { k: 4, n: L("On-Prem + eigenes Modell", "On-prem + your own model"), data: L("im Haus + maßgeschneidert", "in-house + tailored"),
+    s: L("Auf euren Daten trainiert — kennt eure Produkte & Sprache.", "Trained on your data — knows your products & language."),
+    d: L("Die Königsklasse: ein offenes Modell (Mistral) wird auf euren eigenen Daten feingetunt — es kennt eure Produkte, Prozesse und Sprache. Läuft komplett on-prem und gehört euch. Maximale Datenhoheit.", "The top tier: an open model (Mistral) is fine-tuned on your own data — it knows your products, processes and language. Runs fully on-prem and belongs to you. Maximum data sovereignty."),
+    privacy: 4, control: 4, effort: 4 },
+];
+const checklist = [
+  { t: L("Datenhoheit", "Data ownership"), d: L("Deine Daten liegen bei dir — kein Konzern dazwischen.", "Your data lives with you — no corporation in between.") },
+  { t: L("DSGVO & Privacy by Design", "GDPR & privacy by design"), d: L("Sparsam, zweckgebunden, dokumentiert — von Anfang an mitgedacht.", "Minimal, purpose-bound, documented — built in from the start.") },
+  { t: L("Verschlüsselung", "Encryption"), d: L("Verschlüsselt unterwegs und im Speicher.", "Encrypted in transit and at rest.") },
+  { t: L("SSO & Rechte", "SSO & permissions"), d: L("Ein Login, feine Rollen — jeder sieht nur, was er darf.", "One login, fine-grained roles — everyone sees only what they may.") },
+  { t: L("Audit & Protokoll", "Audit & logging"), d: L("Nachvollziehbar, wer wann was — revisionssicher.", "Traceable who did what when — audit-proof.") },
+  { t: L("Löschkonzept", "Deletion concept"), d: L("Was weg soll, geht auch wirklich weg.", "What should be gone is actually gone.") },
+  { t: L("Offsite-Backup", "Offsite backup"), d: L("Verschlüsselte Kopie außer Haus — Restore getestet.", "Encrypted copy off-site — restore tested.") },
+  { t: L("Kein Lock-in", "No lock-in"), d: L("Offene Formate, offene Standards — du kannst jederzeit gehen.", "Open formats, open standards — you can leave any time.") },
+];
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Datenschutz & KI-Souveränität", "Privacy & AI sovereignty")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Deine Daten. Deine KI. Deine Regeln.", "Your data. Your AI. Your rules.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Datenschutz ist keine Checkbox, sondern eine Bandbreite — von der schnellen Cloud-KI bis zum eigenen, auf euren Daten trainierten Modell. Such dir den Punkt aus, der zu eurem Risiko passt.", "Privacy isn't a checkbox, it's a spectrum — from quick cloud AI to your own model trained on your data. Pick the point that fits your risk.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(40px,5vw,64px);">
+    <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Die KI-Souveränitäts-Skala", "The AI sovereignty scale")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <p style="font-size:14px; color:#5C5E63; margin:0 0 18px; max-width:70ch;">{L("Von „verlässt das Haus“ bis „gehört ganz dir“ — vier Stufen. Klick dich durch.", "From „leaves the house“ to „fully yours“ — four levels. Click through.")}</p>
+
+    <div class="dh" data-dh>
+      <div class="dh-scale">
+        {levels.map((lv) => (
+          <button class="dh-step" data-k={lv.k} aria-pressed={lv.k === 3 ? "true" : "false"}>
+            <span class="dh-num">{lv.k}</span>
+            <span class="dh-name">{lv.n}</span>
+            <span class="dh-data">{lv.data}</span>
+          </button>
+        ))}
+      </div>
+      <div class="dh-detail">
+        {levels.map((lv) => (
+          <div class="dh-panel" data-k={lv.k} hidden={lv.k !== 3}>
+            <p class="dh-pd">{lv.d}</p>
+            <div class="dh-bars">
+              <div class="dh-bar"><span>{L("Datenschutz", "Privacy")}</span><div class="dh-track"><i style={`width:${lv.privacy*25}%;background:#16794a`}></i></div></div>
+              <div class="dh-bar"><span>{L("Kontrolle", "Control")}</span><div class="dh-track"><i style={`width:${lv.control*25}%;background:#3d4fc0`}></i></div></div>
+              <div class="dh-bar"><span>{L("Aufwand", "Effort")}</span><div class="dh-track"><i style={`width:${lv.effort*25}%;background:#E6B23A`}></i></div></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <p style="font-size:13px; color:#92938F; margin:16px 0 0;">{L("Empfehlung für die meisten Industriebetriebe: Stufe 3 (self-hosted) als Basis, Stufe 4 für die Kronjuwelen. Mit Mistral als offenem Modell ist beides möglich — bei euch im Haus.", "Recommendation for most industrial operations: level 3 (self-hosted) as the base, level 4 for the crown jewels. With Mistral as an open model both are possible — in your own house.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:0 clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:16px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Datenschutz von A bis Z", "Privacy from A to Z")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;">
+      {checklist.map((c) => (
+        <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:15px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">✓ {c.t}</p>
+          <p style="font-size:13.5px; line-height:1.5; color:#5C5E63; margin:0;">{c.d}</p>
+        </div>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:clamp(24px,3vw,36px); padding-top:18px;">{L("Souveränität heißt: selbst entscheiden, wo die Grenze verläuft — nicht ein Anbieter. ", "Sovereignty means: you decide where the line runs — not a provider. ")}<a href={b + "/stack/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("So ist der Stack gebaut", "How the stack is built")} →</a></p>
+  </div>
+</section>
+
+<style>
+  .dh-scale { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  @media (max-width:720px){ .dh-scale{ grid-template-columns:1fr 1fr; } }
+  .dh-step { text-align:left; border:1px solid #E2E8F0; border-radius:13px; background:#fff; padding:14px; cursor:pointer; display:flex; flex-direction:column; gap:6px; transition:border-color .15s, box-shadow .15s, transform .15s; position:relative; }
+  .dh-step:hover { border-color:#C0C8C5; transform:translateY(-2px); }
+  .dh-step[aria-pressed="true"] { border-color:#123A33; box-shadow:0 8px 22px rgba(11,28,25,.10); }
+  .dh-num { width:26px; height:26px; border-radius:50%; background:#EFEAE0; color:#123A33; font-family:var(--font-mono); font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; }
+  .dh-step[aria-pressed="true"] .dh-num { background:#123A33; color:#fff; }
+  .dh-name { font-family:var(--font-head); font-weight:600; font-size:14.5px; color:#1B1C1E; line-height:1.2; }
+  .dh-data { font-family:var(--font-mono); font-size:10.5px; color:#92938F; }
+  .dh-detail { margin-top:16px; }
+  .dh-panel { border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2.5vw,24px); }
+  .dh-pd { font-size:15.5px; line-height:1.6; color:#3C3E42; margin:0 0 16px; max-width:72ch; }
+  .dh-bars { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:560px){ .dh-bars{ grid-template-columns:1fr; } }
+  .dh-bar span { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:#5C5E63; display:block; margin-bottom:5px; }
+  .dh-track { height:8px; background:#EEF2F0; border-radius:999px; overflow:hidden; }
+  .dh-track i { display:block; height:100%; border-radius:999px; transition:width .35s var(--ease-quint,ease); }
+</style>
+
+<script>
+  document.querySelectorAll("[data-dh]").forEach((root) => {
+    const steps = root.querySelectorAll(".dh-step");
+    const panels = root.querySelectorAll(".dh-panel");
+    steps.forEach((s) => s.addEventListener("click", () => {
+      const k = s.getAttribute("data-k");
+      steps.forEach((x) => x.setAttribute("aria-pressed", x === s ? "true" : "false"));
+      panels.forEach((p) => { p.hidden = p.getAttribute("data-k") !== k; });
+    }));
+  });
+</script>

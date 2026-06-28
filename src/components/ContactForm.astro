@@ -1,0 +1,93 @@
+---
+import { t } from "../lib/i18n";
+import type { Lang } from "../lib/content";
+interface Props { lang: Lang; bare?: boolean }
+const { lang, bare = false } = Astro.props;
+const ui = t(lang);
+---
+<section class={bare ? "contact contact--bare" : "wrap contact"} data-reveal>
+  <p class="eyebrow">{ui.contact_kicker}</p>
+  <h1 class="hl-1">{ui.contact_title}</h1>
+  <p class="lead">{ui.contact_intro}</p>
+  <p style="font-size:.95rem;margin:-.8rem 0 1.75rem;">{ui.contact_direct} <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a></p>
+
+  <form id="lead-form" novalidate>
+    <div class="row">
+      <label>{ui.contact_name}
+        <input name="name" type="text" autocomplete="name" required maxlength="200" />
+      </label>
+      <label>{ui.contact_email}
+        <input name="email" type="email" autocomplete="email" required maxlength="254" />
+      </label>
+    </div>
+    <label>{ui.contact_company}
+      <input name="company" type="text" autocomplete="organization" maxlength="200" />
+    </label>
+    <label>{ui.contact_message}
+      <textarea name="message" rows="6" required maxlength="5000" placeholder={ui.contact_ph}></textarea>
+    </label>
+    <!-- Honeypot: für Menschen unsichtbar, Bots füllen es aus -->
+    <div class="hp" aria-hidden="true">
+      <label>Website<input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
+    </div>
+    <button type="submit" class="btn">{ui.contact_send}</button>
+    <p id="lead-status" class="status" role="status" aria-live="polite"></p>
+    <p id="lead-next" hidden style="margin:.2rem 0 0;font-weight:600;"><a class="link-accent" href={lang === "de" ? "/demos/" : "/en/demos/"}>{ui.nav_demos} →</a></p>
+    <p class="privacy">{ui.contact_privacy}</p>
+  </form>
+</section>
+
+<style>
+  .contact { max-width: 44rem; padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .lead { color: var(--muted); font-size: 1.1rem; margin: .6rem 0 2rem; max-width: 36rem; }
+  form { display: flex; flex-direction: column; gap: 1.1rem; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  @media (max-width: 540px) { .row { grid-template-columns: 1fr; } }
+  label { display: flex; flex-direction: column; gap: .4rem; font-weight: 600; font-size: .92rem; }
+  input, textarea {
+    font: inherit; padding: .7rem .85rem; border: 1px solid var(--line); border-radius: 2px;
+    background: var(--surface, #fff); color: inherit; width: 100%; transition: border-color .15s ease;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent, #4f46e5); }
+  textarea { resize: vertical; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .status { margin: 0; font-weight: 600; min-height: 1.2em; }
+  .status.ok { color: #16794a; }
+  .status.err { color: #b4232a; }
+  .privacy { color: var(--muted); font-size: .85rem; margin: .2rem 0 0; }
+</style>
+
+<script is:inline define:vars={{ msgs: { sending: ui.contact_sending, ok: ui.contact_ok, err: ui.contact_err, required: ui.contact_required, send: ui.contact_send } }}>
+  (function () {
+    var form = document.getElementById("lead-form");
+    if (!form) return;
+    var status = document.getElementById("lead-status");
+    var btn = form.querySelector(".btn");
+    var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      status.className = "status";
+      var fd = new FormData(form);
+      var payload = {
+        name: (fd.get("name") || "").trim(),
+        email: (fd.get("email") || "").trim(),
+        company: (fd.get("company") || "").trim(),
+        message: (fd.get("message") || "").trim(),
+        website: fd.get("website") || "",
+        page: location.pathname,
+      };
+      if (!payload.name || !payload.message || !emailRe.test(payload.email)) {
+        status.textContent = msgs.required; status.classList.add("err"); return;
+      }
+      btn.disabled = true; status.textContent = msgs.sending;
+      fetch("/_lead/submit", {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
+      }).then(function (r) {
+        if (!r.ok) throw new Error("http " + r.status);
+        form.reset(); status.textContent = msgs.ok; status.classList.add("ok"); btn.style.display = "none"; var nx = document.getElementById("lead-next"); if (nx) nx.hidden = false;
+      }).catch(function () {
+        status.textContent = msgs.err; status.classList.add("err"); btn.disabled = false;
+      });
+    });
+  })();
+</script>

@@ -1,0 +1,9 @@
+---
+import Base from "../../layouts/Base.astro";
+import Overview from "../../components/views/Overview.astro";
+import { brand } from "../../lib/content";
+const lang = "en" as const;
+---
+<Base lang={lang} title={brand.tagline.en} description={brand.claim.en} path="/en/" altPath="/">
+  <Overview lang={lang} />
+</Base>

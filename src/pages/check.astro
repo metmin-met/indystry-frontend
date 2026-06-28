@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import WerksCheck from "../components/views/WerksCheck.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Werks-Check" description="7 Fragen, zwei Minuten: Welcher Typ Werk seid ihr? Finde heraus, welche Bausteine zuerst etwas bringen." path="/check/" altPath="/en/check/" noindex={false}>
+  <WerksCheck lang={lang} />
+</Base>

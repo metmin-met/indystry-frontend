@@ -1,0 +1,47 @@
+---
+import Base from "../layouts/Base.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Impressum" description="Impressum und Offenlegung gemäß §5 ECG / §25 MedienG." path="/impressum/" altPath="/en/impressum/">
+  <section class="wrap legal" style="max-width:48rem;padding-block:clamp(2.5rem,6vw,5rem);">
+    <p class="eyebrow" style="margin-bottom:.75rem;">Impressum</p>
+    <h1 class="hl-1" data-reveal>Impressum</h1>
+    <p class="lead" data-reveal style="margin-top:.6rem;">Offenlegung gemäß §5 ECG, §14 UGB und §25 MedienG.</p>
+
+    <h2>Medieninhaber &amp; Diensteanbieter</h2>
+    <p>
+      DATENDRANG Software GmbH &amp; Co KG<br>
+      Neubaugasse 24, 8020 Graz, Österreich
+    </p>
+    <p>
+      E-Mail: <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a><br>
+      Telefon: +43 (0) 316 813521-0<br>
+      Fax: +43 (0) 316 813521-99
+    </p>
+
+    <h2>Unternehmensdaten</h2>
+    <p>
+      UID-Nr.: ATU49195106<br>
+      Firmenbuchnummer: FN 188738g<br>
+      Firmenbuchgericht: Landesgericht für ZRS Graz<br>
+      GLN: 9110016138848<br>
+      GISA-Zahlen: 18964431 (IT-Dienstleistung), 19184654 (Multimedia-Agentur)
+    </p>
+
+    <h2>Geschäftsführung</h2>
+    <p>David Elmar Fuchs</p>
+
+    <h2>Gewerberecht</h2>
+    <p>
+      Unternehmensgegenstand: Dienstleistungen in der automatischen Datenverarbeitung und Informationstechnik; Multimedia-Agentur.<br>
+      Gewerbebehörde: Magistrat der Stadt Graz<br>
+      Mitglied der Wirtschaftskammer Steiermark.<br>
+      Anwendbare Rechtsvorschrift: Gewerbeordnung (GewO), abrufbar unter <a class="link-accent" href="https://www.ris.bka.gv.at" rel="noopener" target="_blank">ris.bka.gv.at</a>.
+    </p>
+
+    <h2>Haftung für Inhalte</h2>
+    <p style="color:var(--muted);">Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen. Für die Inhalte verlinkter externer Seiten sind ausschließlich deren Betreiber verantwortlich.</p>
+
+    <p style="margin-top:2.5rem;"><a class="link-accent" href="/datenschutz/">Datenschutzerklärung →</a></p>
+  </section>
+</Base>

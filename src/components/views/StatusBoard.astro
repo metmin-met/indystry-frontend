@@ -1,0 +1,79 @@
+---
+// Status-Board (read-only, lang-aware): Betriebssicht der Demo-Firma — Dienste, Backups, Uptime.
+// Gespiegelt nach dem Infra-Cockpit-Vorbild, Demo-Stand (statisch).
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const services = [
+  { name: "ERP (Odoo)",        layer: L("Betrieb","Operations"),   up: true,  uptime: "99,98 %", ms: 142 },
+  { name: "BI (Metabase)",     layer: L("Auswertung","Analytics"), up: true,  uptime: "99,95 %", ms: 188 },
+  { name: "Monitoring (Grafana)", layer: L("Betrieb","Operations"),up: true,  uptime: "99,99 %", ms:  96 },
+  { name: L("Historian (Warehouse)","Historian (warehouse)"), layer: L("Daten","Data"), up: true, uptime: "99,97 %", ms: 61 },
+  { name: L("Leitstand / SCADA","Control room / SCADA"), layer: L("Fertigung","Production"), up: true, uptime: "99,90 %", ms: 110 },
+  { name: L("Anlagen-Twin","Plant twin"), layer: L("Fertigung","Production"), up: true, uptime: "100 %", ms: 44 },
+  { name: "Data-Science (JupyterLite)", layer: L("Daten","Data"), up: true, uptime: "99,80 %", ms: 73 },
+  { name: L("Objektspeicher (S3)","Object storage (S3)"), layer: L("Daten","Data"), up: true, uptime: "99,99 %", ms: 38 },
+  { name: L("Identitäts-Login (SSO)","Identity login (SSO)"), layer: L("Betrieb","Operations"), up: true, uptime: "99,99 %", ms: 52 },
+  { name: L("Kollaboration","Collaboration"), layer: L("Zusammenarbeit","Collaboration"), up: false, uptime: "—", ms: 0 },
+];
+const backups = [
+  { what: L("ERP-Datenbank","ERP database"),     when: L("heute 03:14","today 03:14"), size: "2,2 GB" },
+  { what: L("Warehouse / Historian","Warehouse / historian"), when: L("heute 03:02","today 03:02"), size: "0,9 GB" },
+  { what: L("Objektspeicher","Object storage"),  when: L("heute 02:40","today 02:40"), size: "11,4 GB" },
+  { what: L("Konfiguration / IaC","Config / IaC"), when: L("heute 02:30","today 02:30"), size: "48 MB" },
+  { what: L("Offsite-Spiegel","Offsite mirror"), when: L("gestern 23:50","yesterday 23:50"), size: "14,6 GB" },
+];
+const up = services.filter(s => s.up).length;
+---
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Betrieb · Status · read-only","Operations · status · read-only")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Läuft alles?","Is everything up?")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 8px;">{L("Eine Firma ist auch ein Betrieb. Welche Dienste laufen, wann das letzte Backup lief, wie stabil alles ist — auf einer Seite, so wie es das Infra-Cockpit für die echten Systeme zeigt.","A company is also an operation. Which services are up, when the last backup ran, how stable everything is — on one page, just like the infra cockpit shows for the real systems.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,44px);">{L("Demo-Stand","demo state")} · {up}/{services.length} {L("Dienste online","services online")}</p>
+
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 12px;">{L("Dienste","Services")}</p>
+    <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; overflow:hidden; margin-bottom:clamp(32px,4vw,48px);">
+      {services.map((s, i) => (
+        <div style={`display:grid; grid-template-columns:1fr auto auto auto; gap:14px; align-items:center; padding:13px 18px; ${i ? "border-top:1px solid #F1F3F2;" : ""}`}>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style={`width:9px;height:9px;border-radius:50%;background:${s.up ? "#16794a" : "#b4232a"};`}></span>
+            <span style="font-size:15px; color:#1B1C1E;">{s.name}</span>
+            <span style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#92938F;">{s.layer}</span>
+          </span>
+          <span style={`font-family:var(--font-mono); font-size:12px; color:${s.up ? "#16794a" : "#b4232a"};`}>{s.up ? L("online","online") : L("in Vorbereitung","coming soon")}</span>
+          <span style="font-family:var(--font-mono); font-size:12px; color:#5C5E63; min-width:70px; text-align:right;">{s.uptime}</span>
+          <span style="font-family:var(--font-mono); font-size:12px; color:#92938F; min-width:64px; text-align:right;">{s.up ? s.ms + " ms" : "—"}</span>
+        </div>
+      ))}
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;">
+      <div>
+        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 12px;">{L("Letzte Backups","Latest backups")}</p>
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; overflow:hidden;">
+          {backups.map((b, i) => (
+            <div style={`display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; ${i ? "border-top:1px solid #F1F3F2;" : ""}`}>
+              <span style="display:flex; align-items:center; gap:9px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#16794a;"></span>
+                <span style="font-size:14px; color:#1B1C1E;">{b.what}</span>
+              </span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:#92938F; text-align:right;">{b.when} · {b.size}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 12px;">{L("30-Tage-Bilanz","30-day summary")}</p>
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+          <div><div style="font:600 30px var(--font-head,sans-serif); color:#123A33;">99,96 %</div><div style="font:11px monospace; color:#92938F;">{L("Verfügbarkeit gesamt","overall availability")}</div></div>
+          <div><div style="font:600 30px var(--font-head,sans-serif); color:#123A33;">0</div><div style="font:11px monospace; color:#92938F;">{L("offene Störungen","open incidents")}</div></div>
+          <div><div style="font:600 30px var(--font-head,sans-serif); color:#123A33;">{backups.length}</div><div style="font:11px monospace; color:#92938F;">{L("Backups / Nacht","backups / night")}</div></div>
+          <div><div style="font:600 30px var(--font-head,sans-serif); color:#123A33;">2</div><div style="font:11px monospace; color:#92938F;">{L("Standorte (on- + offsite)","sites (on- + offsite)")}</div></div>
+        </div>
+        <p style="font-size:13px; line-height:1.55; color:#5C5E63; margin:14px 0 0;">{L("Alles selbst gehostet, alles gesichert — kein Cloud-Abo, das im Hintergrund mitliest. Genau diese Betriebssicht gibt's auch für die echten Systeme.","All self-hosted, all backed up — no cloud subscription reading along in the background. This exact operations view exists for the real systems too.")}</p>
+      </div>
+    </div>
+  </div>
+</section>

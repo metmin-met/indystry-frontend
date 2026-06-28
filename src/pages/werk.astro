@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Werk from "../components/views/Werk.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Nordwerk Manufacturing" description="Firmen-Website der Demo-Firma Nordwerk — selbst gehostet." path="/werk/" altPath="/en/werk/">
+  <Werk lang={lang} />
+</Base>

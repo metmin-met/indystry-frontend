@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Anlage from "../../components/views/Anlage.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Plant · Digital Twin" description="Clickable plant drilldown down to control cabinet and wiring plan — Nordwerk demo, read-only." path="/en/anlage/" altPath="/anlage/" noindex={true}>
+  <Anlage lang={lang} />
+</Base>

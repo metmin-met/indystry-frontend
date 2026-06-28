@@ -1,0 +1,272 @@
+---
+// „Ich bin …" (lang-aware): alle 33 Odoo-Personas als Rollen-Karten (Beschreibung + „Mein Tag"
+// + Tags + Demos), gleichzeitig sichtbar. Gefiltert über Pills (Cluster) + Suche + Tag-Klick.
+// Branchenspezifisches generalisiert (un-branded, leak-sicher).
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const b = de ? "" : "/en";
+const ERP = "https://erp-demo.indystry.works/odoo", BI = "https://bi-demo.indystry.works", TWIN = "https://twin-demo.indystry.works";
+const D: Record<string, {l:string;h:string;x?:boolean}> = {
+  erp:{l:"ERP",h:ERP,x:true}, bi:{l:"BI",h:BI,x:true}, twin:{l:"Twin",h:TWIN,x:true},
+  leit:{l:L("Leitstand","Control"),h:`${b}/leitstand/`}, anlage:{l:L("Anlage","Plant"),h:`${b}/anlage/`},
+  hist:{l:"Historian",h:`${b}/historian/`}, suche:{l:L("Suche","Search"),h:`${b}/suche/`},
+  portal:{l:"Portal",h:`${b}/portal/`}, werk:{l:L("Website","Website"),h:`${b}/werk/`},
+  wissen:{l:L("Wissen","Knowledge"),h:`${b}/wissen/`}, status:{l:"Status",h:`${b}/status/`},
+  stack:{l:"Stack",h:`${b}/stack/`}, ki:{l:L("KI & Mensch","AI & humans"),h:`${b}/ki-mensch/`},
+};
+type R = { n:string; tags:string[]; desc:string; day:string; demos:{l:string;h:string;x?:boolean}[] };
+const clusters: { name:string; c:string; roles:R[] }[] = [
+  { name:L("A · Produktion","A · Production"), c:"#2e7d57", roles:[
+    { n:"Produktionsleitung", tags:["Produktions-KPIs","Produktionsreporting","Schichtplanung","Eskalationsmanagement"],
+      desc:L("Führt die Produktion, verantwortet Termin & Auslastung.","Runs production, owns deadlines & utilisation."),
+      day:L("Morgens der Blick auf den Leitstand: läuft alles? Tagsüber Engpässe glätten, Schichten koordinieren, Kennzahlen im Auge.","Morning glance at the control room: is everything running? During the day smoothing bottlenecks, coordinating shifts, watching the numbers."),
+      demos:[D.leit,D.bi,D.anlage] },
+    { n:"Schichtleitung", tags:["Schichtführung","Personaleinteilung","Schichtübergabe-Doku"],
+      desc:L("Führt eine Schicht, teilt Leute ein, übergibt sauber.","Leads a shift, assigns people, hands over cleanly."),
+      day:L("Übergabe lesen, Aufträge verteilen, bei Störungen sofort umsteuern — und am Ende sauber weitergeben.","Read the handover, assign jobs, re-route on faults — and hand over cleanly at the end."),
+      demos:[D.leit,D.anlage] },
+    { n:"Produktionsplanung / Disposition", tags:["Fertigungsplanung","Materialdisposition","Auftragssteuerung"],
+      desc:L("Macht Aufträge fertigungsreif und plant sie ein.","Makes orders production-ready and schedules them."),
+      day:L("Aufträge in Reihenfolge bringen, Material sichern, Maschinen belegen — damit nichts steht.","Sequence orders, secure material, load machines — so nothing stalls."),
+      demos:[D.erp,D.bi] },
+    { n:"Operator / Werker", tags:["Zerspanung","Wärmebehandlung","Entgraten/Sortieren","Messtechnik","Verpackung"],
+      desc:L("Bedient die Maschine, fertigt die Teile.","Operates the machine, makes the parts."),
+      day:L("Rüsten, Programm starten, Erststück prüfen, Mengen an der Maschine zurückmelden — kein Zettel mehr.","Set up, start the program, check the first part, report quantities at the machine — no more paper."),
+      demos:[D.anlage,D.leit] },
+    { n:"Verfahrenstechnik / R&D", tags:["Prozessentwicklung","Versuchsplanung","Werkstoffanalytik","Messauswertung","Mikroskopie/Analytik"],
+      desc:L("Entwickelt und sichert Prozesse ab.","Develops and de-risks processes."),
+      day:L("Versuche planen, Messwerte auswerten, am Twin durchspielen — bis der Prozess stabil läuft.","Plan trials, evaluate readings, run them on the twin — until the process is stable."),
+      demos:[D.hist,D.bi,D.twin] },
+    { n:"Anlagenbau / Anlagentechnik", tags:["Anlagenmontage","Automatisierung","Leittechnik/SCADA","Instandsetzung"],
+      desc:L("Baut, automatisiert und repariert Anlagen.","Builds, automates and repairs plants."),
+      day:L("Neue Zelle aufbauen, Leittechnik anbinden, bei Stillstand schnell instand setzen.","Build a new cell, connect controls, repair fast on downtime."),
+      demos:[D.anlage,D.twin] },
+  ]},
+  { name:L("B · Qualität","B · Quality"), c:"#2563eb", roles:[
+    { n:"QM-Manager", tags:["QM-System","Audits","Dokumentenlenkung","Reklamationsbearbeitung","Projektsteuerung"],
+      desc:L("Verantwortet Qualität, Audits, Nachweise.","Owns quality, audits, records."),
+      day:L("Reklamationen nachhalten, Audit vorbereiten, Drift in der BI früh erkennen — Nachweise lückenlos.","Track complaints, prep the audit, catch drift in BI early — gap-free records."),
+      demos:[D.bi,D.hist,D.suche] },
+    { n:"Qualitätsprüfer", tags:["Messtechnik","Laboranalytik","Werkstoffprüfung","Prüfmittelverwaltung"],
+      desc:L("Prüft Teile, erfasst Messwerte.","Inspects parts, captures readings."),
+      day:L("Maße, Oberfläche, Gewicht prüfen, Grenzwerte automatisch bewerten, Protokoll erzeugen.","Check dimensions, surface, weight, auto-grade against limits, generate the record."),
+      demos:[D.bi,D.hist] },
+    { n:"Interner Auditor / ISMS", tags:["ISMS","Interne Audits","Compliance"],
+      desc:L("Prüft Konformität und Informationssicherheit.","Audits compliance and information security."),
+      day:L("Prozesse gegen Norm prüfen, Lücken dokumentieren, Maßnahmen bis zur Wirksamkeit verfolgen.","Check processes against the standard, document gaps, track actions to effect."),
+      demos:[D.wissen,D.status] },
+  ]},
+  { name:L("C · Lager / Logistik","C · Warehouse / logistics"), c:"#b45309", roles:[
+    { n:"Lager-Mitarbeiter", tags:["Wareneingang","Kommissionierung","Versand","Staplerfahrer"],
+      desc:L("Nimmt an, kommissioniert, versendet.","Receives, picks, ships."),
+      day:L("Wareneingang buchen, Aufträge mobil kommissionieren, mit Echtzeit-Bestand verladen.","Book goods in, pick orders mobile, ship with real-time stock."),
+      demos:[D.erp] },
+    { n:"Lager- / Logistik-Verantwortlicher", tags:["Lagerplanung","Inventur","Versandsteuerung","Lager-Berichtswesen"],
+      desc:L("Steuert Bestände, Inventur, Versand.","Manages stock, inventory, shipping."),
+      day:L("Bestände planen, Inventur fahren, Versand takten — keine bösen Überraschungen.","Plan stock, run inventory, time shipping — no nasty surprises."),
+      demos:[D.erp,D.bi] },
+  ]},
+  { name:L("D · Vertrieb / Einkauf","D · Sales / purchasing"), c:"#7c3aed", roles:[
+    { n:"Vertriebs-Innendienst", tags:["Angebotswesen","Auftragsabwicklung","Kundenbetreuung"],
+      desc:L("Macht Angebote, betreut Kunden, wickelt Aufträge ab.","Quotes, serves customers, handles orders."),
+      day:L("Anfrage zum Angebot, am Twin absichern, per Klick zum Auftrag — und den Kunden auf dem Laufenden halten.","Inquiry to quote, de-risk on the twin, one click to the order — and keep the customer posted."),
+      demos:[D.erp,D.twin,D.portal] },
+    { n:"Einkauf", tags:["Bestellwesen","Lieferantenmanagement","Wareneingangsprüfung"],
+      desc:L("Beschafft Material termingerecht.","Procures material on time."),
+      day:L("Bestellvorschläge aus dem Bedarf prüfen, Lieferanten wählen, Wareneingang absichern.","Review purchase suggestions from demand, pick suppliers, secure goods-in."),
+      demos:[D.erp] },
+  ]},
+  { name:L("E · Finanzen / Geschäftsleitung","E · Finance / management"), c:"#0e7490", roles:[
+    { n:"Buchhaltung", tags:["Debitoren","Kreditoren","Jahresabschluss","Kontenabstimmung"],
+      desc:L("Bucht, fakturiert, schließt ab.","Posts, invoices, closes the books."),
+      day:L("Aus der Lieferung die E-Rechnung, Zahlungen abgleichen, Monat sauber abschließen — ohne Abtippen.","E-invoice from the delivery, reconcile payments, close the month cleanly — no retyping."),
+      demos:[D.erp,D.bi] },
+    { n:"Controller", tags:["Budgetplanung","Kostenrechnung","Management-Reporting"],
+      desc:L("Steuert Budget, Kosten, Marge.","Steers budget, cost, margin."),
+      day:L("Soll/Ist vergleichen, Nachkalkulation, Reporting — wo läuft Geld weg?","Compare plan vs actual, post-calc, reporting — where's money leaking?"),
+      demos:[D.bi,D.erp] },
+    { n:"Geschäftsleitung (GF)", tags:["Strategie","Finanzverantwortung","Personalführung","Konzern-Reporting","Treasury"],
+      desc:L("Führt die Firma, entscheidet, verantwortet.","Runs the company, decides, is accountable."),
+      day:L("Ein Blick aufs Cockpit: Auftrag → Liefertreue → Marge. Entscheiden auf Zahlen, die alle teilen.","A glance at the cockpit: order → on-time → margin. Decide on numbers everyone shares."),
+      demos:[D.bi,D.status] },
+  ]},
+  { name:L("F · Querschnitt","F · Cross-functional"), c:"#475569", roles:[
+    { n:"IT-Administrator", tags:["IT-Infrastruktur","AD/SSO","Monitoring","ERP-Administration"],
+      desc:L("Hält Systeme verfügbar und sicher.","Keeps systems available and secure."),
+      day:L("Backups prüfen, Zugänge verwalten, Monitoring im Blick — alles selbst gehostet, kein Lock-in.","Check backups, manage access, watch monitoring — all self-hosted, no lock-in."),
+      demos:[D.stack,D.status,D.ki] },
+    { n:"Personal (HR)", tags:["Personalverwaltung","Recruiting","Schulungsorganisation","Zeitwirtschaft"],
+      desc:L("Verwaltet, stellt ein, schult.","Administers, hires, trains."),
+      day:L("Bewerbungen sichten, Onboarding starten, Schulungen organisieren, Zeiten pflegen.","Screen applications, start onboarding, organise training, maintain time records."),
+      demos:[D.wissen] },
+    { n:"Helpdesk-Agent", tags:["Ticket-Bearbeitung","User-Support","IT-Onboarding"],
+      desc:L("Löst Anfragen, unterstützt Nutzer.","Resolves requests, supports users."),
+      day:L("Tickets abarbeiten, Nutzer unterstützen, neue Geräte einrichten.","Work tickets, support users, set up new devices."),
+      demos:[D.suche,D.wissen] },
+    { n:"Maintenance / Instandhaltung", tags:["Instandhaltung","Wartungsplanung","Ersatzteilmanagement"],
+      desc:L("Hält Maschinen am Laufen.","Keeps machines running."),
+      day:L("Wartungsplan abarbeiten, bei Störung von der Maschine zum Plan, Lager dank Prognose schon bereit.","Work the maintenance plan, jump machine→plan on a fault, spare already reserved thanks to prediction."),
+      demos:[D.anlage,D.hist,D.twin] },
+    { n:"Mitarbeiter (allgemein)", tags:["Allgemeine Tätigkeiten"],
+      desc:L("Macht den Tagesjob, nutzt Handbuch & Kiosk.","Does the daily job, uses handbook & kiosk."),
+      day:L("Arbeit erledigen, im Handbuch nachsehen, Software selbst aus dem Kiosk holen.","Get work done, look it up in the handbook, install software from the kiosk."),
+      demos:[D.wissen] },
+    { n:"SPS-Programmierer", tags:["SPS-Programmierung","Antriebstechnik","PROFINET"],
+      desc:L("Programmiert Steuerungen.","Programs controllers."),
+      day:L("Steuerung programmieren, Antriebe parametrieren, in Betrieb nehmen.","Program the controller, set up drives, commission."),
+      demos:[D.anlage] },
+    { n:"Leittechnik-Programmierer", tags:["Leittechnik/SCADA","OPC-UA","SPS-Programmierung"],
+      desc:L("Baut Leittechnik/SCADA, bindet an.","Builds control systems / SCADA, connects them."),
+      day:L("Visualisierung bauen, OPC-UA anbinden, Signale auf den Leitstand bringen.","Build the HMI, connect OPC-UA, get signals onto the control room."),
+      demos:[D.anlage,D.twin] },
+    { n:"Ferialpraktikant", tags:["Hilfstätigkeiten"],
+      desc:L("Unterstützt, lernt die Abläufe.","Helps out, learns the ropes."),
+      day:L("Mit anpacken, zuschauen, Schritt für Schritt die Fertigung verstehen.","Pitch in, watch, learn the shop floor step by step."),
+      demos:[D.wissen] },
+    { n:"Werkstudent", tags:["Datenpflege","Unterstützung Analytik"],
+      desc:L("Pflegt Daten, unterstützt Analytik.","Maintains data, supports analytics."),
+      day:L("Daten aufbereiten, Auswertungen vorbereiten, im Historian stöbern.","Prep data, set up analyses, dig around in the historian."),
+      demos:[D.bi,D.hist] },
+  ]},
+  { name:L("G · Externe Stakeholder","G · External stakeholders"), c:"#be185d", roles:[
+    { n:"Kunde", tags:["Auftragsvergabe","Prüfzeugnisse/Konformität","Reklamation"],
+      desc:L("Bestellt, erwartet Transparenz.","Orders, expects transparency."),
+      day:L("Im Portal nachsehen: wo ist mein Auftrag, meine Rechnung, mein Service — ohne Rückfrage.","Check the portal: where's my order, invoice, service — without asking."),
+      demos:[D.portal,D.werk] },
+    { n:"Potentieller Kunde / Lead", tags:["Muster-Anfragen","Datenblätter/NDA","Werks-Audit"],
+      desc:L("Prüft Eignung, fragt Muster an.","Checks fit, requests samples."),
+      day:L("Website ansehen, Muster und Datenblätter anfragen, Werk auditieren.","Look at the website, request samples and datasheets, audit the plant."),
+      demos:[D.werk,D.suche] },
+    { n:"Lieferant", tags:["Rohmaterial-Lieferung","Rechnungsstellung","Kalibrierung/Wartung"],
+      desc:L("Liefert Material, stellt Rechnungen.","Supplies material, invoices."),
+      day:L("Bestellungen annehmen, liefern, Rechnung stellen, Service leisten.","Accept orders, deliver, invoice, service."),
+      demos:[D.erp] },
+    { n:"Externer Auditor", tags:["Zertifizierungsaudits","Pre-Audit","Main Audit"],
+      desc:L("Bestätigt Konformität extern.","Confirms compliance externally."),
+      day:L("Unterlagen prüfen, Werk begehen, Zertifikat ausstellen.","Review documents, walk the plant, issue the certificate."),
+      demos:[D.wissen,D.status] },
+    { n:"Steuerberater (extern)", tags:["Jahresabschluss","Steuerbuchung","Latente Steuern","Abschluss-Anpassungen"],
+      desc:L("Macht Abschluss und Steuern.","Handles closing and taxes."),
+      day:L("Sauberen Export ziehen, Abschluss erstellen, Steuern melden.","Pull a clean export, prepare the closing, file taxes."),
+      demos:[D.erp] },
+    { n:"Muttergesellschaft", tags:["Konzern-Reporting","Konzern-Konsolidierung","Konzernverrechnung"],
+      desc:L("Konzernsicht: Reporting, Konsolidierung.","Group view: reporting, consolidation."),
+      day:L("Zahlen konsolidieren, Konzern-Reporting, Verrechnung über Gesellschaften.","Consolidate figures, group reporting, inter-company settlement."),
+      demos:[D.bi,D.status] },
+    { n:"Eigentümer-Familie", tags:["Eigentümer-Reporting","Strategische Entscheidungen"],
+      desc:L("Steuert langfristig, trägt Verantwortung.","Steers long-term, carries responsibility."),
+      day:L("Aufs Große schauen: Strategie, Investitionen, Werte über Generationen.","Look at the big picture: strategy, investment, values across generations."),
+      demos:[D.bi] },
+  ]},
+  { name:L("H · Bedrohungsakteure (ISMS)","H · Threat actors (ISMS)"), c:"#b4232a", roles:[
+    { n:"Mitbewerber", tags:["ISMS"],
+      desc:L("Bedrohungsakteur im ISMS-Modell.","Threat actor in the ISMS model."),
+      day:L("Wir modellieren auch, wer uns schaden könnte — und schützen Daten entsprechend.","We also model who could harm us — and protect data accordingly."),
+      demos:[D.ki,D.stack] },
+    { n:"Industriespion", tags:["ISMS"],
+      desc:L("Will an Know-how — wird abgewehrt.","Wants the know-how — gets countered."),
+      day:L("Gegen Spionage: Souveränität, Zugriffsschutz, alles im eigenen Haus.","Against espionage: sovereignty, access control, all in-house."),
+      demos:[D.stack] },
+    { n:"Opportunistischer Angreifer", tags:["ISMS"],
+      desc:L("Sucht die schnelle Lücke.","Looks for the quick gap."),
+      day:L("Gegen Gelegenheitsangriffe: SSO, Backups, gepatchte, selbstgehostete Systeme.","Against opportunistic attacks: SSO, backups, patched self-hosted systems."),
+      demos:[D.stack,D.status] },
+  ]},
+];
+const TR: Record<string,string> = {"AD/SSO": "AD/SSO", "Abschluss-Anpassungen": "Final adjustments", "Allgemeine Tätigkeiten": "General tasks", "Angebotswesen": "Quotations", "Anlagenbau / Anlagentechnik": "Plant engineering / Construction", "Anlagenmontage": "Plant assembly", "Antriebstechnik": "Drive technology", "Audits": "Audits", "Auftragsabwicklung": "Order processing", "Auftragssteuerung": "Order control", "Auftragsvergabe": "Order placement", "Automatisierung": "Automation", "Bestellwesen": "Purchasing", "Buchhaltung": "Accounting", "Budgetplanung": "Budget planning", "Compliance": "Compliance", "Controller": "Controller", "Datenblätter/NDA": "Datasheets/NDA", "Datenpflege": "Data maintenance", "Debitoren": "Accounts receivable", "Dokumentenlenkung": "Document control", "ERP-Administration": "ERP administration", "Eigentümer-Familie": "Owner family", "Eigentümer-Reporting": "Owner reporting", "Einkauf": "Procurement", "Entgraten/Sortieren": "Deburring/Sorting", "Ersatzteilmanagement": "Spare parts management", "Eskalationsmanagement": "Escalation management", "Externer Auditor": "External auditor", "Ferialpraktikant": "Intern", "Fertigungsplanung": "Production planning", "Finanzverantwortung": "Financial responsibility", "Geschäftsleitung (GF)": "Management", "Helpdesk-Agent": "Helpdesk agent", "Hilfstätigkeiten": "Support tasks", "ISMS": "ISMS", "IT-Administrator": "IT administrator", "IT-Infrastruktur": "IT infrastructure", "IT-Onboarding": "IT onboarding", "Industriespion": "Industrial spy", "Instandhaltung": "Maintenance", "Instandsetzung": "Repairs", "Interne Audits": "Internal audits", "Interner Auditor / ISMS": "Internal auditor / ISMS", "Inventur": "Inventory", "Jahresabschluss": "Year-end closing", "Kalibrierung/Wartung": "Calibration/Maintenance", "Kommissionierung": "Picking", "Kontenabstimmung": "Account reconciliation", "Konzern-Konsolidierung": "Group consolidation", "Konzern-Reporting": "Group reporting", "Konzernverrechnung": "Intercompany billing", "Kostenrechnung": "Cost accounting", "Kreditoren": "Accounts payable", "Kunde": "Customer", "Kundenbetreuung": "Customer support", "Laboranalytik": "Lab analysis", "Lager- / Logistik-Verantwortlicher": "Warehouse/Logistics manager", "Lager-Berichtswesen": "Warehouse reporting", "Lager-Mitarbeiter": "Warehouse staff", "Lagerplanung": "Warehouse planning", "Latente Steuern": "Deferred taxes", "Leittechnik-Programmierer": "Control system programmer", "Leittechnik/SCADA": "Control systems/SCADA", "Lieferant": "Supplier", "Lieferantenmanagement": "Supplier management", "Main Audit": "Main audit", "Maintenance / Instandhaltung": "Maintenance", "Management-Reporting": "Management reporting", "Materialdisposition": "Material planning", "Messauswertung": "Measurement evaluation", "Messtechnik": "Measurement technology", "Mikroskopie/Analytik": "Microscopy/Analysis", "Mitarbeiter (allgemein)": "Employee (general)", "Mitbewerber": "Competitor", "Monitoring": "Monitoring", "Muster-Anfragen": "Sample requests", "Muttergesellschaft": "Parent company", "OPC-UA": "OPC-UA", "Operator / Werker": "Operator", "Opportunistischer Angreifer": "Opportunistic attacker", "PROFINET": "PROFINET", "Personal (HR)": "HR", "Personaleinteilung": "Staff scheduling", "Personalführung": "Personnel management", "Personalverwaltung": "HR administration", "Potentieller Kunde / Lead": "Potential customer / Lead", "Pre-Audit": "Pre-audit", "Produktions-KPIs": "Production KPIs", "Produktionsleitung": "Production management", "Produktionsplanung / Disposition": "Production planning", "Produktionsreporting": "Production reporting", "Projektsteuerung": "Project control", "Prozessentwicklung": "Process development", "Prüfmittelverwaltung": "Test equipment management", "Prüfzeugnisse/Konformität": "Test certificates/Conformity", "QM-Manager": "QM manager", "QM-System": "QM system", "Qualitätsprüfer": "Quality inspector", "Rechnungsstellung": "Invoicing", "Recruiting": "Recruiting", "Reklamation": "Complaint", "Reklamationsbearbeitung": "Complaint handling", "Rohmaterial-Lieferung": "Raw material delivery", "SPS-Programmierer": "PLC programmer", "SPS-Programmierung": "PLC programming", "Schichtführung": "Shift supervision", "Schichtleitung": "Shift management", "Schichtplanung": "Shift planning", "Schichtübergabe-Doku": "Shift handover docs", "Schulungsorganisation": "Training organization", "Staplerfahrer": "Forklift operator", "Steuerberater (extern)": "Tax advisor (external)", "Steuerbuchung": "Tax accounting", "Strategie": "Strategy", "Strategische Entscheidungen": "Strategic decisions", "Ticket-Bearbeitung": "Ticket handling", "Treasury": "Treasury", "Unterstützung Analytik": "Analytics support", "User-Support": "User support", "Verfahrenstechnik / R&D": "Process engineering / R&D", "Verpackung": "Packaging", "Versand": "Shipping", "Versandsteuerung": "Shipping control", "Versuchsplanung": "Test planning", "Vertriebs-Innendienst": "Sales back office", "Wareneingang": "Goods receipt", "Wareneingangsprüfung": "Goods receipt inspection", "Wartungsplanung": "Maintenance planning", "Werks-Audit": "Plant audit", "Werkstoffanalytik": "Material analysis", "Werkstoffprüfung": "Material testing", "Werkstudent": "Working student", "Wärmebehandlung": "Heat treatment", "Zeitwirtschaft": "Time management", "Zerspanung": "Machining", "Zertifizierungsaudits": "Certification audits"};
+const tr = (x: string) => de ? x : (TR[x] || x);
+const slug = (s: string) => s.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+const total = clusters.reduce((a,c)=>a+c.roles.length,0);
+const mono = (s: string) => s.replace(/[^A-Za-zÄÖÜ]/g,"").slice(0,2).toUpperCase();
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ich bin …", "I am …")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Das ganze Team. Auf Karten.", "The whole team. On cards.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L(`${total} Rollen einer Fertigung — jede mit ihrem Alltag und ihren Aufgaben. Filter über die Pills oder die Suche, klick eine Demo und sieh, was indystry für sie tut.`, `${total} roles of a manufacturer — each with their day and their tasks. Filter via the pills or search, click a demo and see what indystry does for them.`)}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div class="ib-controls">
+      <input id="ib-search" type="search" autocomplete="off" placeholder={L("Suchen … Rolle, Aufgabe (z. B. Wartung, Rechnung)","Search … role, task (e.g. maintenance, invoice)")} />
+    </div>
+    <div class="ib-chips" id="ib-clf">
+      <button class="ib-chip" data-cl="" aria-pressed="true">{L("Alle","All")} · {total}</button>
+      {clusters.map((c) => <button class="ib-chip" data-cl={c.name} style={`--cc:${c.c}`}>{c.name} · {c.roles.length}</button>)}
+    </div>
+    <p id="ib-empty" hidden style="font-family:var(--font-mono); font-size:14px; color:#92938F;">{L("Keine Rolle passt — anderes Stichwort?","No role matches — try another keyword?")}</p>
+
+    <div class="ib-grid">
+      {clusters.map((c) => c.roles.map((r) => (
+        <article id={slug(r.n)} class="pcard" data-cl={c.name} data-q={(tr(r.n)+" "+r.tags.map(tr).join(" ")+" "+tr(r.desc)+" "+tr(r.day)).toLowerCase()} style={`--cc:${c.c}`}>
+          <div class="pcard-head">
+            <span class="pcard-mono">{mono(tr(r.n))}</span>
+            <div style="min-width:0;">
+              <p class="pcard-cl">{c.name}</p>
+              <p class="pcard-name">{tr(r.n)}</p>
+            </div>
+          </div>
+          <p class="pcard-desc">{tr(r.desc)}</p>
+          <div class="pcard-day"><span class="pcard-day-lbl">{L("Mein Tag","My day")}</span> {tr(r.day)}</div>
+          <div class="pcard-tags">{r.tags.map((t) => <button class="ptag" data-tag={tr(t).toLowerCase()}>{tr(t)}</button>)}</div>
+          <div class="pcard-demos">{r.demos.map((d) => <a class="pdemo" href={d.h} target={d.x?"_blank":undefined} rel={d.x?"noopener":undefined}>{d.l} {d.x?"↗":"→"}</a>)}</div>
+        </article>
+      )))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ib-controls { margin-bottom:14px; }
+  #ib-search { width:100%; box-sizing:border-box; font-size:16px; padding:13px 16px; border:1px solid #C0C8C5; border-radius:12px; background:#fff; outline:none; font-family:inherit; }
+  #ib-search:focus { border-color:#123A33; box-shadow:0 0 0 3px rgba(18,58,51,.08); }
+  .ib-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:26px; }
+  .ib-chip { font-family:var(--font-mono); font-size:11.5px; padding:6px 12px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#5C5E63; transition:all .15s; }
+  .ib-chip:hover { color:#1B1C1E; border-color:var(--cc,#123A33); }
+  .ib-chip[aria-pressed="true"] { background:var(--cc,#123A33); color:#fff; border-color:var(--cc,#123A33); }
+  .ib-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:16px; }
+  .pcard { border:1px solid #E2E8F0; border-top:3px solid var(--cc); border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:10px; scroll-margin-top:90px; transition:box-shadow .15s, transform .15s; }
+  .pcard:hover { box-shadow:0 8px 24px rgba(11,28,25,.08); transform:translateY(-2px); }
+  .pcard.flash { box-shadow:0 0 0 3px var(--cc); }
+  .pcard[hidden] { display:none; }
+  .pcard-head { display:flex; align-items:center; gap:11px; }
+  .pcard-mono { flex:none; width:40px; height:40px; border-radius:10px; background:var(--cc); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-head,sans-serif); font-weight:600; font-size:15px; }
+  .pcard-cl { font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:#92938F; margin:0; }
+  .pcard-name { font-family:var(--font-head,sans-serif); font-weight:600; font-size:17px; color:#1B1C1E; margin:1px 0 0; line-height:1.15; }
+  .pcard-desc { font-size:14px; line-height:1.5; color:#3C3E42; margin:0; }
+  .pcard-day { font-size:13.5px; line-height:1.55; color:#5C5E63; background:#F8F9FA; border-left:3px solid var(--cc); border-radius:0 8px 8px 0; padding:9px 12px; }
+  .pcard-day-lbl { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--cc); margin-bottom:2px; }
+  .pcard-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; }
+  .ptag { font-family:var(--font-mono); font-size:10.5px; color:#16463E; background:#EFEAE0; border:none; border-radius:999px; padding:3px 9px; cursor:pointer; }
+  .ptag:hover { background:#E6D9C4; }
+  .pcard-demos { display:flex; flex-wrap:wrap; gap:7px; }
+  .pdemo { text-decoration:none; font-family:var(--font-mono); font-size:11.5px; font-weight:600; color:#fff; background:#123A33; border-radius:8px; padding:6px 11px; }
+  .pdemo:hover { background:#0E2E29; }
+</style>
+
+<script>
+  const search = document.getElementById("ib-search");
+  const chips = Array.from(document.querySelectorAll(".ib-chip"));
+  const cards = Array.from(document.querySelectorAll(".pcard"));
+  const empty = document.getElementById("ib-empty");
+  let activeCl = "";
+  function apply() {
+    const q = search.value.trim().toLowerCase();
+    let any = false;
+    cards.forEach((c) => {
+      const m = (!q || c.dataset.q.includes(q)) && (!activeCl || c.dataset.cl === activeCl);
+      c.hidden = !m; if (m) any = true;
+    });
+    empty.hidden = any;
+  }
+  search.addEventListener("input", apply);
+  chips.forEach((ch) => ch.addEventListener("click", () => { activeCl = ch.dataset.cl; chips.forEach((x) => x.setAttribute("aria-pressed", String(x === ch))); apply(); window.scrollTo({ top: document.querySelector(".ib-controls").getBoundingClientRect().top + window.scrollY - 80, behavior:"smooth" }); }));
+  document.querySelectorAll(".ptag").forEach((t) => t.addEventListener("click", () => { search.value = t.dataset.tag; activeCl=""; chips.forEach((x)=>x.setAttribute("aria-pressed",String(x.dataset.cl===""))); apply(); }));
+  // Deep-Link: zur Karte scrollen + kurz hervorheben
+  const h = decodeURIComponent((location.hash||"").replace("#",""));
+  if (h) { const card = document.getElementById(h); if (card) { setTimeout(()=>{ card.scrollIntoView({behavior:"smooth",block:"center"}); card.classList.add("flash"); setTimeout(()=>card.classList.remove("flash"),1600); }, 300); } }
+</script>

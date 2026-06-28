@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Daily from "../../components/views/Daily.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Daily Industry 4.0 · indystry" description="A daily, self-hosted news digest on Industry 4.0, IIoT, OPC-UA, digital twin, MES & AI in production — curated by an AI." path="/en/daily/" altPath="/daily/">
+  <Daily lang={lang} />
+</Base>

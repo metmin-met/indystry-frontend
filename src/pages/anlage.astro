@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Anlage from "../components/views/Anlage.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Anlage · Digitaler Zwilling" description="Klickbarer Anlagen-Drilldown bis auf Schaltschrank- und Plan-Ebene — Nordwerk Demo, read-only." path="/anlage/" altPath="/en/anlage/" noindex={true}>
+  <Anlage lang={lang} />
+</Base>

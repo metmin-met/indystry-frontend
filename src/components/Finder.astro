@@ -1,0 +1,55 @@
+---
+// Lösungs-Finder: geführte „Sag wo's klemmt → passender Baustein"-Suche auf dem
+// vorhandenen Meilisearch-Pillar-Index. Rendert nur, wenn ein Such-Key da ist.
+import { search, searchEnabled } from "../lib/search.ts";
+import { PILLAR_COLOR } from "../lib/pillarColors";
+import type { Lang } from "../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = lang === "de"
+  ? { kicker: "Lösungs-Finder", title: "Sag, wo's klemmt — wir zeigen den passenden Baustein.",
+      ph: "z. B. Wareneingang, Schichtplan, Auswertung, Wartung …",
+      empty: "Nichts Passendes gefunden — schick uns einfach deine Pain-List.", view: "ansehen" }
+  : { kicker: "Solution finder", title: "Tell us where it pinches — we'll point to the right block.",
+      ph: "e.g. goods-in, shift plan, analytics, maintenance …",
+      empty: "Nothing matched — just send us your pain list.", view: "view" };
+---
+{searchEnabled && (
+  <section id="finder" class="wrap" style="padding-block:clamp(2.5rem,6vw,4rem);">
+    <p class="eyebrow" style="margin-bottom:.75rem;">{tx.kicker}</p>
+    <h2 class="hl-2" data-reveal style="max-width:24ch;">{tx.title}</h2>
+    <input id="finder-input" type="search" autocomplete="off" aria-label={tx.kicker} placeholder={tx.ph}
+      data-host={search.host} data-index={search.index} data-key={search.key} data-lang={lang} data-empty={tx.empty} data-view={tx.view} data-semantic={search.semantic ? "1" : ""}
+      style="width:100%;max-width:42rem;margin-top:1.25rem;border:1px solid var(--line);border-radius:4px;padding:.85rem 1rem;font:inherit;font-size:1.05rem;background:var(--bg);color:var(--ink);" />
+    <div id="finder-results" aria-live="polite" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:.75rem;margin-top:1rem;"></div>
+  </section>
+  <script is:inline define:vars={{ colors: PILLAR_COLOR }}>
+    (function () {
+      var inp = document.getElementById("finder-input"), out = document.getElementById("finder-results");
+      if (!inp || !out) return;
+      var timer;
+      var esc = function (s) { return String(s || "").replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+      var run = async function (q) {
+        if (!q.trim()) { out.innerHTML = ""; return; }
+        try {
+          var reqBody = { q: q, filter: "lang = " + inp.dataset.lang, limit: 4 };
+          if (inp.dataset.semantic === "1") { reqBody.hybrid = { embedder: "mistral", semanticRatio: 0.5 }; }
+          var res = await fetch(inp.dataset.host + "/indexes/" + inp.dataset.index + "/search", {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + inp.dataset.key, "Content-Type": "application/json" },
+            body: JSON.stringify(reqBody)
+          });
+          var data = await res.json(); var hits = data.hits || [];
+          if (!hits.length) { out.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;margin:.4rem 0;">' + esc(inp.dataset.empty) + '</p>'; return; }
+          out.innerHTML = hits.map(function (h) {
+            return '<a class="card" href="' + esc(h.url) + '" style="display:block;text-decoration:none;padding:1.1rem 1.25rem;">' +
+              '<strong style="display:block;font-size:.98rem;"><span class="sig-dot" style="--sig:' + (colors[h.slug] || '#586374') + '"></span>' + esc(h.title) + '</strong>' +
+              '<span style="color:var(--muted);font-size:.88rem;line-height:1.4;display:block;margin-top:.2rem;">' + esc(h.subline) + '</span>' +
+              '<span class="link-accent" style="color:var(--accent);display:block;margin-top:.6rem;font-size:.9rem;">' + esc(inp.dataset.view) + ' →</span></a>';
+          }).join("");
+        } catch (e) { out.innerHTML = ""; }
+      };
+      inp.addEventListener("input", function (e) { clearTimeout(timer); timer = setTimeout(function () { run(e.target.value); }, 180); });
+    })();
+  </script>
+)}

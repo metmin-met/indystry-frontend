@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Tag from "../components/views/Tag.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Ein Tag bei Nordwerk" description="Eine Schicht von früh bis spät — elf Momente, jeder klickt direkt ins echte System." path="/tag/" altPath="/en/tag/">
+  <Tag lang={lang} />
+</Base>

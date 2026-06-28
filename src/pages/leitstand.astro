@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Leitstand from "../components/views/Leitstand.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Leitstand · Nordwerk" description="SCADA-Leitstand: Live-Sicht aller Maschinen mit Temperatur und Vibration — Nordwerk Demo, read-only." path="/leitstand/" altPath="/en/leitstand/" noindex={true}>
+  <Leitstand lang={lang} />
+</Base>

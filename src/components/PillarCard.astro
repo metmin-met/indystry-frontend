@@ -1,0 +1,14 @@
+---
+import { accent, type Lang, type Pillar } from "../lib/content";
+import { pillarColor } from "../lib/pillarColors";
+interface Props { pillar: Pillar; lang: Lang; index: number }
+const { pillar, lang, index } = Astro.props;
+const c = pillar[lang];
+const href = lang === "de" ? `/saeule/${pillar.slug}/` : `/en/pillar/${pillar.slug}/`;
+const sig = pillarColor(pillar.slug);
+---
+<a href={href} class="card" data-reveal style={`display:flex;flex-direction:column;gap:.85rem;text-decoration:none;border-top:3px solid ${sig};`}>
+  <span class="badge" style="background:var(--ink);">{index}</span>
+  <h3 class="hl-3"><span class="sig-dot" style={`--sig:${sig}`}></span>{c.hook.headline}</h3>
+  <p style="color:var(--muted);line-height:1.45;margin:0;">{c.hook.subline}</p>
+</a>

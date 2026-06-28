@@ -1,0 +1,268 @@
+---
+// Interner Live-Styleguide: Komponenten-Galerie + Token-Panel (Farben/Schrift live
+// konfigurierbar → setzt :root-Variablen, exportiert CSS). noindex.
+import Base from "../layouts/Base.astro";
+const CORE = [
+  ["--bg", "#f6f4f0", "Papier-Hintergrund"], ["--bg-soft", "#edeae4", "Beige (Bänder)"],
+  ["--ink", "#18181b", "Ink (Headlines)"], ["--ink-soft", "#2b2a28", "Ink soft"],
+  ["--muted-strong", "#45433e", "Fließtext"], ["--muted", "#5f5b53", "Captions"],
+  ["--line", "#ddd8cf", "Hairline"], ["--accent", "#1a7a6d", "Teal-Akzent"],
+  ["--accent-ink", "#15665b", "Teal Link-Text"],
+];
+const PILLARS = [
+  ["--p-ops", "#4a6fa5", "Betrieb"], ["--p-automation", "#2a86a8", "Automatisierung"],
+  ["--p-twin", "#7b5cc4", "Digital Twin"], ["--p-historian", "#3d4fc0", "Historian"],
+  ["--p-bi", "#c08a2e", "BI"], ["--p-erp", "#c4673f", "ERP"],
+  ["--p-ai", "#b03f93", "KI-Suche"], ["--p-collab", "#3f9a52", "Zusammenarbeit"],
+  ["--p-knowledge", "#5a8a98", "Wissen/Kiosk"], ["--p-web", "#c2506f", "Web"],
+];
+const FONTS = [
+  ['Geist', '"Geist Variable", ui-sans-serif, system-ui, sans-serif'],
+  ['System', 'system-ui, -apple-system, sans-serif'],
+  ['Serif (Georgia)', 'Georgia, "Times New Roman", serif'],
+  ['Mono', 'ui-monospace, "Cascadia Code", monospace'],
+];
+---
+<Base lang="de" title="Styleguide" description="Internes Design-System & Token-Playground." noindex path="/styleguide/" altPath="/styleguide/">
+  <div class="sg">
+    <aside class="sg-panel">
+      <p class="eyebrow" style="margin-bottom:.5rem;">Tokens</p>
+      <h2 class="hl-3" style="margin:0 0 1rem;">Live konfigurieren</h2>
+
+      <p class="sg-grouptitle">Schrift</p>
+      <select data-var="--font-sans" class="sg-select">
+        {FONTS.map(([name, stack]) => <option value={stack}>{name}</option>)}
+      </select>
+
+      <p class="sg-grouptitle">Maße &amp; Typo</p>
+      <label class="sg-range"><span><code>--radius-card</code> <span class="sg-cap">Radius</span></span><input type="range" data-var="--radius-card" data-unit="px" min="0" max="16" step="1" value="2" /><output class="sg-val">2px</output></label>
+      <label class="sg-range"><span><code>--hl-hero-max</code> <span class="sg-cap">Hero-Größe</span></span><input type="range" data-var="--hl-hero-max" data-unit="rem" min="2.5" max="6" step="0.1" value="5" /><output class="sg-val">5rem</output></label>
+      <label class="sg-range"><span><code>--body-leading</code> <span class="sg-cap">Zeilenhöhe</span></span><input type="range" data-var="--body-leading" min="1.4" max="1.9" step="0.05" value="1.6" /><output class="sg-val">1.6</output></label>
+      <label class="sg-range"><span><code>--display-tracking</code> <span class="sg-cap">Tracking</span></span><input type="range" data-var="--display-tracking" data-unit="em" min="-0.05" max="0" step="0.005" value="-0.03" /><output class="sg-val">-0.03em</output></label>
+
+      <p class="sg-grouptitle">Grundfarben</p>
+      {CORE.map(([v, hex, label]) => (
+        <label class="sg-row"><input type="color" data-var={v} value={hex} /><span><code>{v}</code><br /><span class="sg-cap">{label}</span></span></label>
+      ))}
+
+      <p class="sg-grouptitle">Farbleitsystem (Säulen)</p>
+      {PILLARS.map(([v, hex, label]) => (
+        <label class="sg-row"><input type="color" data-var={v} value={hex} /><span><code>{v}</code><br /><span class="sg-cap">{label}</span></span></label>
+      ))}
+
+      <div class="sg-actions">
+        <button type="button" class="btn btn-sm" id="sg-export">Export</button>
+        <button type="button" class="btn btn-sm" id="sg-import">Import</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="sg-share">Link</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="sg-reset">Reset</button>
+      </div>
+      <textarea id="sg-io" class="sg-out" placeholder=":root { … }  — Export füllt das Feld; eigenes CSS hier einfügen und Import drücken."></textarea>
+      <p id="sg-msg" class="sg-cap" style="margin:.4rem 0 0;min-height:1em;"></p>
+    </aside>
+
+    <div class="sg-stage">
+      <div class="sg-vp">
+        <span class="sg-cap">Vorschau:</span>
+        <button type="button" class="btn btn-ghost btn-sm" data-w="390">Mobil</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-w="768">Tablet</button>
+        <button type="button" class="btn btn-ghost btn-sm is-active" data-w="0">Voll</button>
+      </div>
+      <section class="sg-block">
+        <p class="eyebrow">Kontrast (WCAG AA)</p>
+        <ul id="sg-contrast" class="sg-contrast"></ul>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Typografie</p>
+        <p class="hl-hero" style="margin:.3rem 0;">Hero — Raus aus dem Chaos.</p>
+        <p class="hl-1" style="margin:.3rem 0;">Headline 1 — der dritte Weg</p>
+        <p class="hl-2" style="margin:.3rem 0;">Headline 2 — Bausteine</p>
+        <p class="hl-3" style="margin:.3rem 0;">Headline 3 — Detail</p>
+        <p class="lead" style="max-width:48ch;">Lead — fertige Software fürs Werk, ab Tag eins angelernt, an euch angepasst.</p>
+        <p style="color:var(--muted-strong);max-width:60ch;">Fließtext — klar lesbar auf warmem Papier. Hierarchie über Typo, Weißraum und Hairlines, nicht über Schatten.</p>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Eyebrows &amp; Pills</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+          <span class="eyebrow">DER DRITTE WEG</span>
+          <span class="pill">Pill</span>
+          <span class="pill">Open Source</span>
+        </div>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Buttons</p>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+          <a class="btn" href="#">Primär (Teal)</a>
+          <a class="btn btn-ghost" href="#">Ghost</a>
+          <a class="btn btn-sm" href="#">Klein</a>
+        </div>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Karten</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;">
+          <div class="card" style="padding:1.25rem;"><strong>Hairline-Karte</strong><p style="color:var(--muted-strong);margin:.4rem 0 0;font-size:.92rem;">Standard, flach.</p></div>
+          <a class="card" href="#" style="padding:1.25rem;border-top:3px solid var(--p-erp);text-decoration:none;"><span class="sig-dot" style="--sig:var(--p-erp)"></span><strong>Signatur-Karte</strong><p style="color:var(--muted-strong);margin:.4rem 0 0;font-size:.92rem;">Farb-Oberkante + Punkt, klickbar.</p></a>
+          <div class="card" style="padding:1.25rem;background:var(--bg-soft);border-color:transparent;"><strong>Soft-Karte</strong><p style="color:var(--muted-strong);margin:.4rem 0 0;font-size:.92rem;">Auf Beige-Band.</p></div>
+        </div>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Farbleitsystem</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.5rem .9rem;">
+          {PILLARS.map(([v, , label]) => (
+            <div style="display:flex;align-items:center;border-top:1px solid var(--line);padding:.5rem 0;color:var(--muted-strong);">
+              <span class="sig-dot" style={`--sig:var(${v})`}></span><span>{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Formular</p>
+        <input type="text" placeholder="Eingabe (Focus = Teal)" style="width:min(28rem,100%);font:inherit;padding:.7rem .85rem;border:1px solid var(--line);border-radius:4px;background:#fff;" />
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Links &amp; Fokus</p>
+        <p style="margin:.3rem 0;"><a class="link-accent" href="#">Akzent-Link</a> &nbsp;·&nbsp; <a class="link-underline" href="#">Body-Link</a></p>
+        <span style="display:inline-block;margin-top:.6rem;padding:.4rem .8rem;border:1px solid var(--line);border-radius:var(--radius-card);outline:2px solid var(--accent);outline-offset:2px;font-size:.9rem;">Fokus-Ring (Teal)</span>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Vergleich</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem;">
+          <div class="card" style="padding:1.1rem;background:var(--bg-soft);border-color:transparent;"><strong style="color:var(--muted);">Sackgasse A</strong><p style="color:var(--muted);margin:.3rem 0 0;font-size:.9rem;">gedämpft …</p></div>
+          <div class="card" style="padding:1.1rem;border-color:var(--ink);border-top:3px solid var(--ink);"><span class="pill">Der dritte Weg</span><strong style="display:block;margin-top:.5rem;font-size:1.15rem;">indystry</strong></div>
+          <div class="card" style="padding:1.1rem;background:var(--bg-soft);border-color:transparent;"><strong style="color:var(--muted);">Sackgasse B</strong><p style="color:var(--muted);margin:.3rem 0 0;font-size:.9rem;">gedämpft …</p></div>
+        </div>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Ablauf</p>
+        <ol style="list-style:none;margin:.5rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:1rem;">
+          <li style="border-top:2px solid var(--ink);padding-top:.6rem;"><span class="hl-2" style="font-size:1.3rem;color:var(--muted);">01</span><strong style="display:block;">Pain-List</strong></li>
+          <li style="border-top:2px solid var(--ink);padding-top:.6rem;"><span class="hl-2" style="font-size:1.3rem;color:var(--muted);">02</span><strong style="display:block;">Gespräch</strong></li>
+          <li style="border-top:2px solid var(--ink);padding-top:.6rem;"><span class="hl-2" style="font-size:1.3rem;color:var(--muted);">03</span><strong style="display:block;">Pilot</strong></li>
+        </ol>
+      </section>
+
+      <section class="sg-block">
+        <p class="eyebrow">Footer</p>
+        <div style="border-top:1px solid var(--line);background:var(--bg-soft);padding:1.25rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;color:var(--muted);font-size:.9rem;">
+          <span>Open Source als Fundament. Der Mehrwert ist das Wissen.</span>
+          <span style="display:flex;gap:1rem;"><a class="link-accent" href="#">FAQ</a><a class="link-accent" href="#">Kontakt</a><a class="link-accent" href="#">Impressum</a></span>
+          <span>© 2026 indystry</span>
+        </div>
+      </section>
+
+      <section class="sg-block" style="border-top:3px solid var(--accent);padding-top:1.25rem;">
+        <p class="eyebrow eyebrow--accent">CTA-Banner</p>
+        <p class="hl-2" style="margin:.2rem 0 .6rem;">Schick uns deine Pain-List.</p>
+        <a class="btn" href="#">Pain-List schicken</a>
+      </section>
+    </div>
+  </div>
+
+  <style>
+    .sg { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; max-width: 84rem; margin-inline: auto; padding: 1rem 1.25rem 4rem; align-items: start; }
+    .sg-panel { position: sticky; top: 5rem; border: 1px solid var(--line); border-radius: 2px; padding: 1.1rem; background: #fff; max-height: calc(100vh - 6rem); overflow: auto; }
+    .sg-grouptitle { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 650; color: var(--muted); margin: 1.25rem 0 .5rem; }
+    .sg-row { display: flex; align-items: center; gap: .6rem; padding: .2rem 0; font-size: .8rem; }
+    .sg-row input[type=color] { width: 2rem; height: 2rem; border: 1px solid var(--line); border-radius: 2px; background: none; cursor: pointer; flex: none; padding: 0; }
+    .sg-row code { font-size: .72rem; color: var(--ink); }
+    .sg-cap { color: var(--muted); font-size: .72rem; }
+    .sg-select { width: 100%; font: inherit; font-size: .85rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: 2px; background: #fff; }
+    .sg-range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .35rem .5rem; padding: .35rem 0; font-size: .78rem; }
+    .sg-range input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+    .sg-range output { font: .72rem ui-monospace, monospace; color: var(--muted); }
+    .sg-actions { display: flex; gap: .5rem; margin-top: 1.25rem; }
+    .sg-out { width: 100%; margin-top: .75rem; min-height: 12rem; font: .75rem ui-monospace, monospace; border: 1px solid var(--line); border-radius: 2px; padding: .6rem; }
+    .sg-block { padding-block: 1.25rem; border-top: 1px solid var(--line); }
+    .sg-block:first-child { border-top: 0; }
+    .sg-vp { display: flex; align-items: center; gap: .4rem; padding-bottom: 1rem; flex-wrap: wrap; }
+    .sg-vp .btn.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .sg-frame { max-width: var(--vp, none); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 0 1rem; transition: max-width .3s var(--ease-quint); }
+    .sg-contrast { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .4rem .9rem; }
+    .sg-contrast li { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--muted-strong); }
+    .sg-contrast .sg-badge { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    @media (max-width: 820px) { .sg { grid-template-columns: 1fr; } .sg-panel { position: static; max-height: none; } }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var root = document.documentElement;
+      var inputs = Array.prototype.slice.call(document.querySelectorAll("[data-var]"));
+      var byVar = {}; inputs.forEach(function (el) { byVar[el.dataset.var] = el; });
+      var KEY = "idy-sg-theme";
+      var io = document.getElementById("sg-io"), msg = document.getElementById("sg-msg");
+      function setMsg(t) { msg.textContent = t; setTimeout(function () { if (msg.textContent === t) msg.textContent = ""; }, 2500); }
+      function valOf(el) { return el.value + (el.dataset.unit || ""); }
+      function out(el) { var o = el.parentElement && el.parentElement.querySelector("output"); if (o) o.textContent = valOf(el); }
+      function snapshot() { var o = {}; inputs.forEach(function (el) { o[el.dataset.var] = valOf(el); }); return o; }
+      function applyObj(o) { Object.keys(o).forEach(function (v) { root.style.setProperty(v, o[v]); var el = byVar[v]; if (el) { el.value = el.dataset.unit ? parseFloat(o[v]) : o[v]; out(el); } }); updateContrast(); }
+      function persist() { try { localStorage.setItem(KEY, JSON.stringify(snapshot())); } catch (e) {} }
+      var PAIRS = [
+        ["Headline (ink/bg)", "--ink", "--bg"], ["Body (ink-soft/bg)", "--ink-soft", "--bg"],
+        ["Fließtext (muted-strong/bg)", "--muted-strong", "--bg"], ["Caption (muted/bg)", "--muted", "--bg"],
+        ["Caption auf Band (muted/bg-soft)", "--muted", "--bg-soft"], ["Teal-Link (accent-ink/bg)", "--accent-ink", "--bg"],
+        ["Button-Text (#fff/accent)", "#ffffff", "--accent"]
+      ];
+      function lum(hex) { var c = hex.replace("#", "").trim(); if (c.length === 3) c = c.replace(/./g, "$&$&"); var r = parseInt(c.substr(0,2),16)/255, g = parseInt(c.substr(2,2),16)/255, b = parseInt(c.substr(4,2),16)/255; function f(x){ return x <= .03928 ? x/12.92 : Math.pow((x+.055)/1.055, 2.4); } return .2126*f(r) + .7152*f(g) + .0722*f(b); }
+      function resolve(t) { return t.charAt(0) === "#" ? t : (getComputedStyle(root).getPropertyValue(t).trim() || "#000000"); }
+      function ratio(a, b) { var L1 = lum(a), L2 = lum(b); return (Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05); }
+      function updateContrast() {
+        var el = document.getElementById("sg-contrast"); if (!el) return;
+        el.innerHTML = PAIRS.map(function (p) {
+          var r; try { r = ratio(resolve(p[1]), resolve(p[2])); } catch (e) { return ""; }
+          var pass = r >= 4.5, mid = r >= 3, col = pass ? "#16794a" : (mid ? "#9a7d1f" : "#b4232a");
+          var tag = pass ? "AA \u2713" : (mid ? "AA groß" : "\u2717");
+          return "<li><span class=\"sg-badge\" style=\"color:" + col + "\">" + r.toFixed(2) + ":1 " + tag + "</span><span>" + p[0] + "</span></li>";
+        }).join("");
+      }
+      inputs.forEach(function (el) { el.addEventListener("input", function () { root.style.setProperty(el.dataset.var, valOf(el)); out(el); persist(); updateContrast(); }); });
+      document.getElementById("sg-export").addEventListener("click", function () {
+        var css = ":root {\n"; inputs.forEach(function (el) { css += "  " + el.dataset.var + ": " + valOf(el) + ";\n"; }); css += "}";
+        io.value = css;
+        if (navigator.clipboard) { navigator.clipboard.writeText(css).then(function () { setMsg("In Zwischenablage kopiert."); }, function () { io.focus(); io.select(); setMsg("Exportiert (manuell kopieren)."); }); }
+        else { io.focus(); io.select(); setMsg("Exportiert."); }
+      });
+      document.getElementById("sg-import").addEventListener("click", function () {
+        var o = {}, re = /(--[\w-]+)\s*:\s*([^;]+);/g, m, n = 0;
+        while ((m = re.exec(io.value))) { o[m[1].trim()] = m[2].trim(); n++; }
+        if (n) { applyObj(o); persist(); setMsg(n + " Tokens importiert."); } else setMsg("Keine Tokens gefunden.");
+      });
+      document.getElementById("sg-share").addEventListener("click", function () {
+        var h = "#t=" + encodeURIComponent(JSON.stringify(snapshot()));
+        var url = location.origin + location.pathname + h;
+        if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function () { setMsg("Link kopiert."); }, function () { setMsg("Link in der Adresszeile."); }); }
+        else setMsg("Link in der Adresszeile.");
+        location.hash = h;
+      });
+      document.getElementById("sg-reset").addEventListener("click", function () {
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        if (location.hash) history.replaceState(null, "", location.pathname);
+        inputs.forEach(function (el) { root.style.removeProperty(el.dataset.var); });
+        applyObj(DEFAULTS); setMsg("Auf Defaults zurückgesetzt.");
+      });
+      var stage = document.querySelector(".sg-stage");
+      document.querySelectorAll("[data-w]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var w = +b.dataset.w;
+          if (w) { stage.classList.add("sg-frame"); stage.style.setProperty("--vp", w + "px"); }
+          else { stage.classList.remove("sg-frame"); stage.style.removeProperty("--vp"); }
+          document.querySelectorAll("[data-w]").forEach(function (x) { x.classList.toggle("is-active", x === b); });
+        });
+      });
+      var DEFAULTS = snapshot();
+      try {
+        var fromHash = location.hash.indexOf("#t=") === 0 ? JSON.parse(decodeURIComponent(location.hash.slice(3))) : null;
+        var saved = fromHash || (localStorage.getItem(KEY) ? JSON.parse(localStorage.getItem(KEY)) : null);
+        if (saved) applyObj(saved);
+      } catch (e) {}
+      updateContrast();
+    })();
+  </script>
+</Base>

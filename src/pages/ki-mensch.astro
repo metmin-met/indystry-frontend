@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import KiMensch from "../components/views/KiMensch.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="KI & Mensch · indystry" description="Was die KI übernimmt — und wofür es trotzdem Menschen braucht." path="/ki-mensch/" altPath="/en/ki-mensch/">
+  <KiMensch lang={lang} />
+</Base>

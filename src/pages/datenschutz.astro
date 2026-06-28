@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Datenschutzerklärung" description="Wie diese Website mit personenbezogenen Daten umgeht (DSGVO)." path="/datenschutz/" altPath="/en/datenschutz/">
+  <section class="wrap legal" style="max-width:48rem;padding-block:clamp(2.5rem,6vw,5rem);">
+    <p class="eyebrow" style="margin-bottom:.75rem;">Datenschutz</p>
+    <h1 class="hl-1" data-reveal>Datenschutzerklärung</h1>
+    <p class="lead" data-reveal style="margin-top:.6rem;">Wir verarbeiten so wenig Daten wie möglich — und nur dafür, wofür du sie uns gibst.</p>
+
+    <h2>Verantwortlicher</h2>
+    <p>
+      DATENDRANG Software GmbH &amp; Co KG<br>
+      Neubaugasse 24, 8020 Graz, Österreich<br>
+      E-Mail: <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a>
+    </p>
+
+    <h2>Server-Logfiles</h2>
+    <p>Beim Aufruf dieser Website werden vom Server automatisch technische Daten verarbeitet (IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browsertyp). Das ist für den sicheren und stabilen Betrieb der Website technisch erforderlich (Art. 6 Abs. 1 lit. f DSGVO — berechtigtes Interesse). Diese Daten werden nicht mit anderen Quellen zusammengeführt und nach kurzer Zeit gelöscht.</p>
+
+    <h2>Kontakt- und Anfrageformular</h2>
+    <p>Wenn du uns über das Formular schreibst, verarbeiten wir die von dir angegebenen Daten — Name, E-Mail-Adresse, optional dein Unternehmen sowie deine Nachricht — ausschließlich, um deine Anfrage zu bearbeiten und zu beantworten (Art. 6 Abs. 1 lit. b und lit. f DSGVO). Wir geben diese Daten nicht an Dritte weiter und nutzen sie nicht für Werbung oder einen Newsletter. Wir speichern sie, solange es für die Bearbeitung nötig ist bzw. bis du um Löschung bittest, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
+
+    <h2>Cookies</h2>
+    <p>Diese Website setzt keine Cookies zu Marketing- oder Wiedererkennungszwecken.</p>
+
+    <h2>Reichweitenmessung</h2>
+    <p>Zur anonymen Reichweitenmessung nutzen wir eine selbst gehostete, cookielose Web-Analyse (Umami). Es werden keine personenbezogenen Profile gebildet und keine Daten an Dritte übermittelt; die „Do Not Track“-Einstellung deines Browsers wird respektiert. Rechtsgrundlage ist unser berechtigtes Interesse an einer datensparsamen Statistik (Art. 6 Abs. 1 lit. f DSGVO).</p>
+
+    <h2>Hosting</h2>
+    <p>Die Website wird auf eigener bzw. angemieteter Server-Infrastruktur innerhalb der EU betrieben. Eine Übermittlung personenbezogener Daten an Dritte findet dabei nicht statt, abgesehen von der technisch notwendigen Verarbeitung durch den Infrastruktur-Dienstleister als Auftragsverarbeiter.</p>
+
+    <h2>Deine Rechte</h2>
+    <p>Dir stehen die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch zu. Wende dich dafür an <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a>. Außerdem hast du das Recht auf Beschwerde bei der Aufsichtsbehörde:</p>
+    <p style="color:var(--muted);">Österreichische Datenschutzbehörde, Barichgasse 40–42, 1030 Wien, <a class="link-accent" href="mailto:dsb@dsb.gv.at">dsb@dsb.gv.at</a>, <a class="link-accent" href="https://www.dsb.gv.at" rel="noopener" target="_blank">dsb.gv.at</a>.</p>
+
+    <p style="margin-top:2.5rem;"><a class="link-accent" href="/impressum/">Impressum →</a></p>
+  </section>
+</Base>

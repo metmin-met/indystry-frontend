@@ -1,0 +1,123 @@
+---
+// Interaktives Phase→Tool→Demo-Herzstück. variant="embed" (in /ablauf/) | "full" (in /landkarte/ mit Filtern).
+import type { Lang } from "../../lib/content";
+import { PHASES, TOOLS, AKTE, CATS } from "../../data/phases";
+interface Props { lang: Lang; variant?: "embed" | "full" }
+const { lang, variant = "embed" } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const hrefOf = (t: any) => (t.ext ? t.href : b + t.href);
+const akte = ["I", "II", "III"] as const;
+const cats = Array.from(new Set(PHASES.flatMap((p) => p.tools.map((k) => TOOLS[k].cat))));
+const liveCount = PHASES.flatMap((p) => p.tools).filter((k) => TOOLS[k].ext).length;
+---
+<div class={`pm pm-${variant}`} data-variant={variant}>
+  {variant === "full" && (
+    <div class="pm-filters">
+      <div class="pm-fgroup">
+        <span class="pm-flabel">{L("Akt", "Act")}</span>
+        <button class="pm-pill on" data-akt="">{L("Alle", "All")}</button>
+        {akte.map((a) => <button class="pm-pill" data-akt={a}>{AKTE[a][lang].split("·")[0].trim()}</button>)}
+      </div>
+      <div class="pm-fgroup">
+        <span class="pm-flabel">{L("Bereich", "Area")}</span>
+        <button class="pm-pill pm-cat on" data-cat="">{L("Alle", "All")}</button>
+        {cats.map((c) => <button class="pm-pill pm-cat" data-cat={c}>{CATS[c][lang]}</button>)}
+      </div>
+      <button class="pm-pill pm-live" data-live="0">{L("nur Live-Demos", "live demos only")} ↗ · {liveCount}</button>
+    </div>
+  )}
+
+  {akte.map((a) => (
+    <section class="pm-akt" data-akt={a}>
+      <div class="pm-akt-h"><span class="pm-akt-t">{AKTE[a][lang]}</span><span class="pm-akt-line"></span></div>
+      <div class="pm-grid">
+        {PHASES.filter((p) => p.akt === a).map((p) => (
+          <article class="pm-card" data-akt={p.akt} data-cats={p.tools.map((k) => TOOLS[k].cat).join(" ")} data-live={p.tools.some((k) => TOOLS[k].ext) ? "1" : "0"}>
+            <div class="pm-card-h">
+              <span class="pm-badge">{p.id}</span>
+              {p.star && <span class="pm-star" title="Meilenstein">★</span>}
+              <h3 class="pm-title">{p.titel[lang]}</h3>
+            </div>
+            <p class="pm-kurz">{p.kurz[lang]}</p>
+            <div class="pm-chips">
+              {p.tools.map((k) => { const t = TOOLS[k]; return (
+                <a class="pm-chip" data-cat={t.cat} data-live={t.ext ? "1" : "0"} style={`--cc:${t.color}`} href={hrefOf(t)} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}>
+                  <span class="pm-cdot"></span>{t.name[lang]}<span class="pm-arr">{t.ext ? " ↗" : " →"}</span>
+                </a>
+              ); })}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+  {variant === "full" && <p class="pm-empty" hidden>{L("Keine Phase passt zum Filter.", "No phase matches the filter.")}</p>}
+</div>
+
+<style>
+  .pm { margin: 0; }
+  .pm-akt { margin: 26px 0 8px; }
+  .pm-akt-h { display: flex; align-items: center; gap: 14px; margin: 0 0 16px; }
+  .pm-akt-t { font-family: var(--font-mono, monospace); font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #16463E; white-space: nowrap; }
+  .pm-akt-line { flex: 1; height: 1px; background: #E2E8F0; }
+  .pm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .pm-card { border: 1px solid #E2E8F0; border-radius: 14px; background: #fff; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .15s, transform .15s, border-color .15s; }
+  .pm-card:hover { box-shadow: 0 10px 26px rgba(11,28,25,.08); transform: translateY(-2px); border-color: #C0C8C5; }
+  .pm-card-h { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .pm-badge { font-family: var(--font-mono, monospace); font-size: 11.5px; font-weight: 600; color: #fff; background: #123A33; border-radius: 7px; padding: 3px 8px; letter-spacing: 0.02em; }
+  .pm-star { color: #E6B23A; font-size: 14px; }
+  .pm-title { font-family: var(--font-head, sans-serif); font-weight: 600; font-size: 16px; color: #1B1C1E; margin: 0; line-height: 1.2; }
+  .pm-kurz { font-size: 13.5px; line-height: 1.5; color: #5C5E63; margin: 0; }
+  .pm-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
+  .pm-chip { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-family: var(--font-mono, monospace); font-size: 11.5px; font-weight: 600; color: #15433b; background: color-mix(in srgb, var(--cc) 9%, #fff); border: 1px solid color-mix(in srgb, var(--cc) 35%, #fff); border-radius: 999px; padding: 5px 10px; transition: background .14s, border-color .14s, transform .14s, opacity .14s; }
+  .pm-chip:hover { background: color-mix(in srgb, var(--cc) 18%, #fff); border-color: var(--cc); transform: translateY(-1px); }
+  .pm-cdot { width: 7px; height: 7px; border-radius: 50%; background: var(--cc); flex: none; }
+  .pm-arr { color: var(--cc); }
+  .pm-chip.dim { opacity: .25; filter: grayscale(0.6); }
+  .pm-card.hide { display: none; }
+
+  .pm-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin: 0 0 8px; }
+  .pm-fgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+  .pm-flabel { font-family: var(--font-mono, monospace); font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #92938F; margin-right: 2px; }
+  .pm-pill { font-family: var(--font-mono, monospace); font-size: 11.5px; padding: 6px 12px; border: 1px solid #C0C8C5; border-radius: 999px; background: #fff; cursor: pointer; color: #5C5E63; transition: all .15s; }
+  .pm-pill:hover { border-color: #123A33; color: #123A33; }
+  .pm-pill.on { background: #123A33; color: #fff; border-color: #123A33; }
+  .pm-pill.pm-live.on { background: #16794a; border-color: #16794a; }
+  .pm-empty { font-size: 14px; color: #92938F; padding: 20px 0; }
+</style>
+
+<script>
+  document.querySelectorAll(".pm-full").forEach((root) => {
+    const cards = Array.from(root.querySelectorAll(".pm-card"));
+    const akts = Array.from(root.querySelectorAll(".pm-akt"));
+    const empty = root.querySelector(".pm-empty");
+    let fAkt = "", fCat = "", fLive = false;
+
+    const setOn = (sel, attr, val) => root.querySelectorAll(sel).forEach((b) => b.classList.toggle("on", b.getAttribute(attr) === val));
+
+    function apply() {
+      cards.forEach((c) => {
+        const okAkt = !fAkt || c.getAttribute("data-akt") === fAkt;
+        const cats = (c.getAttribute("data-cats") || "").split(" ");
+        const okCat = !fCat || cats.includes(fCat);
+        const okLive = !fLive || c.getAttribute("data-live") === "1";
+        c.classList.toggle("hide", !(okAkt && okCat && okLive));
+        c.querySelectorAll(".pm-chip").forEach((ch) => {
+          const dimCat = fCat && ch.getAttribute("data-cat") !== fCat;
+          const dimLive = fLive && ch.getAttribute("data-live") !== "1";
+          ch.classList.toggle("dim", !!(dimCat || dimLive));
+        });
+      });
+      akts.forEach((a) => { const vis = a.querySelectorAll(".pm-card:not(.hide)").length; a.style.display = vis ? "" : "none"; });
+      const total = cards.filter((c) => !c.classList.contains("hide")).length;
+      if (empty) empty.hidden = total > 0;
+    }
+
+    root.querySelectorAll("[data-akt].pm-pill").forEach((btn) => btn.addEventListener("click", () => { fAkt = btn.getAttribute("data-akt"); setOn(".pm-pill[data-akt]", "data-akt", fAkt); apply(); }));
+    root.querySelectorAll(".pm-cat").forEach((btn) => btn.addEventListener("click", () => { fCat = btn.getAttribute("data-cat"); setOn(".pm-cat", "data-cat", fCat); apply(); }));
+    const liveBtn = root.querySelector(".pm-live");
+    if (liveBtn) liveBtn.addEventListener("click", () => { fLive = !fLive; liveBtn.classList.toggle("on", fLive); apply(); });
+  });
+</script>

@@ -1,0 +1,78 @@
+---
+// Glossar (lang-aware): die Begriffe der Demo-Firma, jeder mit Link zum Thema/zur Demo, wo er
+// vorkommt. Macht den Stack + Prozess nachschlagbar.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const P = (path: string) => (de ? "" : "/en") + path;
+const ERP = "https://erp-demo.indystry.works/odoo";
+const TWIN = "https://twin-demo.indystry.works";
+const BI = "https://bi-demo.indystry.works";
+type T = { k: string; d: string; href: string; ext?: boolean };
+const groups: { name: string; terms: T[] }[] = [
+  { name: L("Fertigung & Anlage", "Production & plant"), terms: [
+    { k: L("Leitstand / SCADA", "Control room / SCADA"), d: L("Live-Sicht aller Maschinen mit Zustand und Messwerten.", "Live view of all machines with state and readings."), href: P("/leitstand/") },
+    { k: L("Anlagen-Twin", "Plant twin"), d: L("Klickbarer 3D-Drilldown Werk → Maschine → Schaltschrank → Plan.", "Clickable 3D drilldown plant → machine → cabinet → plan."), href: P("/anlage/") },
+    { k: L("Schaltschrank", "Control cabinet"), d: L("Gehäuse mit SPS, Antrieben, Klemmen und Sicherungen.", "Enclosure with PLC, drives, terminals and fuses."), href: P("/anlage/") },
+    { k: "SPS / CPU", d: L("Speicherprogrammierbare Steuerung — verarbeitet Eingänge zu Ausgängen.", "Programmable logic controller — turns inputs into outputs."), href: P("/anlage/") },
+    { k: L("Frequenzumrichter (FU)", "Variable-frequency drive (VFD)"), d: L("Stellt die Drehzahl der Servo- und Spindelmotoren.", "Sets the speed of servo and spindle motors."), href: P("/anlage/") },
+    { k: L("Stromlaufplan", "Wiring plan"), d: L("Schaltplan einer Komponente — bis hierhin geht der Drilldown.", "Schematic of a component — the drilldown goes this far."), href: P("/anlage/") },
+    { k: L("Digital Twin", "Digital twin"), d: L("Simulation der Linie: Durchsatz, Ausschuss, Kosten als What-if.", "Line simulation: throughput, scrap, cost as what-if."), href: TWIN, ext: true },
+    { k: L("Vorausschauende Wartung", "Predictive maintenance"), d: L("Aus Vibration/Temperatur die Wartung ableiten, bevor es kracht.", "Derive maintenance from vibration/temperature before failure."), href: P("/historian/") },
+  ]},
+  { name: L("Daten, BI & Historian", "Data, BI & historian"), terms: [
+    { k: "Historian", d: L("Zeitreihen-Speicher jeder Maschine — Temperatur, Vibration.", "Time-series store per machine — temperature, vibration."), href: P("/historian/") },
+    { k: L("Zeitreihe", "Time series"), d: L("Messwert über die Zeit, Grundlage für Trend und Alarm.", "A measurement over time, the basis for trend and alert."), href: P("/historian/") },
+    { k: "OEE", d: L("Gesamtanlageneffektivität = Verfügbarkeit × Leistung × Qualität.", "Overall equipment effectiveness = availability × performance × quality."), href: BI, ext: true },
+    { k: "Process-Drift", d: L("Schleichende Abweichung — die BI sieht sie vor der Endprüfung.", "Slow deviation — BI sees it before final inspection."), href: BI, ext: true },
+    { k: L("Massenbilanz", "Mass balance"), d: L("Wo Material und Ausbeute verloren gehen.", "Where material and yield are lost."), href: BI, ext: true },
+  ]},
+  { name: L("ERP & Prozess", "ERP & process"), terms: [
+    { k: L("Make-to-order", "Make-to-order"), d: L("Auf Bestellung fertigen statt auf Lager — Nordwerks Modell.", "Build to order rather than to stock — Nordwerk's model."), href: P("/werk/") },
+    { k: "MRP", d: L("Materialbedarfsplanung: errechnet Bedarfe + Fertigungsaufträge.", "Material requirements planning: computes demand + production orders."), href: ERP, ext: true },
+    { k: L("Stückliste (BOM)", "Bill of materials (BOM)"), d: L("Welche Rohstoffe in ein Produkt gehen.", "Which raw materials go into a product."), href: ERP, ext: true },
+    { k: L("Charge / Los", "Batch / lot"), d: L("Eine rückverfolgbare Fertigungsmenge.", "A traceable production quantity."), href: P("/historian/") },
+    { k: L("Kommissionierung (Picking)", "Picking"), d: L("Fertigware für den Versand zusammenstellen.", "Assembling finished goods for shipment."), href: ERP, ext: true },
+    { k: L("Lead / Opportunity", "Lead / opportunity"), d: L("Eine Anfrage auf dem Weg zum Auftrag (CRM).", "An inquiry on its way to becoming an order (CRM)."), href: ERP, ext: true },
+    { k: L("Servicevertrag / SLA", "Service contract / SLA"), d: L("Zugesicherte Wartung + Reaktionszeit für den Kunden.", "Committed maintenance + response time for the customer."), href: P("/portal/") },
+    { k: L("Reklamation / 8D", "Complaint / 8D"), d: L("Schadensfall strukturiert lösen + Wiederholung verhindern.", "Resolve a damage case structurally + prevent recurrence."), href: P("/suche/") },
+  ]},
+  { name: L("KI, Betrieb & Souveränität", "AI, operations & sovereignty"), terms: [
+    { k: L("KI-Antwort (RAG)", "AI answer (RAG)"), d: L("Sprachmodell antwortet nur auf Basis der eigenen Firmendaten, mit Quellen.", "A language model answers only from the company's own data, with sources."), href: P("/suche/") },
+    { k: L("KI & Mensch", "AI & humans"), d: L("Was die KI übernimmt — und wofür es Menschen braucht.", "What the AI takes on — and what still needs humans."), href: P("/ki-mensch/") },
+    { k: "Read-only", d: L("Ansehen, nichts kann kaputtgehen — alle Demos sind nur lesend.", "Look around, nothing can break — all demos are read-only."), href: P("/demos/") },
+    { k: "Lock-in", d: L("Abhängigkeit von einem Anbieter — genau das vermeidet der Stack.", "Dependence on one vendor — exactly what the stack avoids."), href: P("/stack/") },
+    { k: L("Souveränität", "Sovereignty"), d: L("Alles selbst gehostet, Daten bleiben im Haus.", "All self-hosted, data stays in-house."), href: P("/stack/") },
+  ]},
+];
+const total = groups.reduce((a, g) => a + g.terms.length, 0);
+---
+<section style="background:#F8F9FA;">
+  <div style="max-width:1000px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Glossar", "Glossary")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Die Begriffe, kurz erklärt.", "The terms, briefly explained.")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(32px,4vw,48px);">{L(`Von SPS bis Souveränität — ${total} Begriffe aus dieser Demo. Jeder verlinkt direkt dorthin, wo er live vorkommt.`, `From PLC to sovereignty — ${total} terms from this demo. Each links straight to where it shows up live.`)}</p>
+
+    {groups.map((g) => (
+      <div style="margin-bottom:clamp(28px,3.5vw,40px);">
+        <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:12px;">
+          <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{g.name}</span>
+          <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px;">
+          {g.terms.map((t) => (
+            <a href={t.href} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}
+              style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 16px; display:block;">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <span style="font-weight:600; font-size:15px;">{t.k}</span>
+                <span style="margin-left:auto; color:#92938F; font-size:13px;">{t.ext ? "↗" : "→"}</span>
+              </span>
+              <span style="display:block; font-size:14px; line-height:1.5; color:#5C5E63; margin-top:4px;">{t.d}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

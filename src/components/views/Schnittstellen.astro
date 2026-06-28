@@ -1,0 +1,86 @@
+---
+// /schnittstellen/ — „Womit reden wir?“: OT-Maschinenebene, Daten/Integration, Business/Finanz.
+// Pro Schnittstelle Richtung (↘ rein / ↗ raus / ↔ bidi), Status, Deep-Link. Leak-sicher (nur Standards).
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const LOGOS = new Set(["datev"]);
+type Dir = "in" | "out" | "bi";
+type If = { n: string; d: string; dir: Dir; href: string; ext?: boolean; live?: boolean; key?: string };
+const DIR: Record<Dir, { s: string; de: string; en: string; c: string }> = {
+  in:  { s: "↘", de: "rein", en: "inbound", c: "#3d4fc0" },
+  out: { s: "↗", de: "raus", en: "outbound", c: "#c4673f" },
+  bi:  { s: "↔", de: "bidirektional", en: "bidirectional", c: "#16794a" },
+};
+const bands: { name: string; sub: string; cc: string; items: If[] }[] = [
+  { name: L("OT · Maschinenebene", "OT · machine level"), cc: "var(--p-automation)",
+    sub: L("So kommen Maschinen- & Sensordaten herein — herstellerneutral bis auf die Steuerung.", "How machine & sensor data comes in — vendor-neutral, down to the controller."),
+    items: [
+      { n: "OPC-UA", d: L("Die gemeinsame Sprache der Maschinen: Werte herstellerneutral in den Historian.", "The shared language of machines: values vendor-neutrally into the historian."), dir: "bi", href: "/historian/" },
+      { n: "SPS / Steuerungen", d: L("Takt, Zustände, Störungen direkt von der Anlagensteuerung.", "Cycle, states, faults straight from the plant controller."), dir: "in", href: "/anlage/" },
+      { n: "Beckhoff / TwinCAT", d: L("PC-basierte Steuerung: Variablen & Achsdaten direkt abgegriffen.", "PC-based control: variables & axis data tapped directly."), dir: "in", href: "/leitstand/" },
+      { n: "PROFINET", d: L("Feldbus: Antriebe, I/O und Sensoren am Maschinennetz.", "Fieldbus: drives, I/O and sensors on the machine network."), dir: "in", href: "/anlage/" },
+    ]},
+  { name: L("Daten · Integration", "Data · integration"), cc: "var(--p-ai)",
+    sub: L("Andere Systeme, Altdaten und die KI andocken — sauber und rechtegeprüft.", "Connect other systems, legacy data and the AI — cleanly and permission-checked."),
+    items: [
+      { n: L("REST-API", "REST API"), d: L("Offene Schnittstelle: Fremdsysteme lesen & schreiben Aufträge, Status, Daten.", "Open interface: external systems read & write orders, status, data."), dir: "bi", href: "/portal/" },
+      { n: "MCP (Model-Context-Protocol)", d: L("Die KI-Brücke: die KI greift rechtegeprüft auf Suche & Firmendaten zu — Antworten mit echten Zahlen.", "The AI bridge: the AI accesses search & company data permission-checked — answers with real numbers."), dir: "bi", href: "/suche/" },
+      { n: L("ETL aus Excel & Files", "ETL from Excel & files"), d: L("Die „Krake“: Altdaten, Tabellen und Dateien werden eingesaugt, bereinigt und verknüpft.", "The catch-all: legacy data, spreadsheets and files get pulled in, cleaned and linked."), dir: "in", href: "/suche/" },
+    ]},
+  { name: L("Business · Finanz", "Business · finance"), cc: "var(--p-erp)",
+    sub: L("Rechnungen, Buchhaltung und Meldungen — strukturiert rein und raus.", "Invoices, accounting and filings — structured, in and out."),
+    items: [
+      { n: L("PEPPOL (E-Rechnung)", "PEPPOL (e-invoice)"), d: L("Strukturierte E-Rechnung rein & raus (UBL / BIS Billing 3.0) — im Kundenportal demonstriert.", "Structured e-invoicing in & out (UBL / BIS Billing 3.0) — demonstrated in the customer portal."), dir: "bi", href: "/portal/", live: true },
+      { n: "DATEV", d: L("Buchhaltungs-Export an den Steuerberater — auf Knopfdruck.", "Accounting export to the tax advisor — at the push of a button."), dir: "out", href: "/koennen/", key: "datev" },
+      { n: "BMD", d: L("Export ins BMD-Finanzpaket (AT/DACH).", "Export into the BMD finance suite (AT/DACH)."), dir: "out", href: "/koennen/" },
+      { n: L("UVA / Steuer", "VAT / tax"), d: L("Umsatzsteuer-Voranmeldung & gesetzliche Meldungen.", "Advance VAT returns & statutory filings."), dir: "out", href: "/koennen/" },
+    ]},
+];
+const mono = (s: string) => s.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Schnittstellen", "Interfaces")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Womit reden wir?", "What do we talk to?")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Von der Maschinensteuerung bis zum Steuerberater: offene, gängige Standards — keine proprietären Inseln. Daten kommen rein, fließen durch, gehen strukturiert raus.", "From the machine controller to the tax advisor: open, common standards — no proprietary islands. Data comes in, flows through, goes out structured.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    {bands.map((band) => (
+      <div style="margin-bottom:clamp(32px,4vw,48px);">
+        <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:6px;">
+          <span style={`font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; border-left:3px solid ${band.cc}; padding-left:10px;`}>{band.name}</span>
+          <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+        </div>
+        <p style="font-size:14px; color:#5C5E63; margin:0 0 16px; max-width:70ch;">{band.sub}</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;">
+          {band.items.map((it) => { const dd = DIR[it.dir]; return (
+            <a href={it.ext ? it.href : b + it.href} target={it.ext ? "_blank" : undefined} rel={it.ext ? "noopener" : undefined}
+               style={`text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-top:3px solid ${band.cc}; border-radius:13px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:9px;`}>
+              <span style="display:flex; align-items:center; gap:11px;">
+                {it.key && LOGOS.has(it.key)
+                  ? <img src={`/logos/${it.key}.svg`} alt="" width="24" height="24" loading="lazy" style="flex:none; width:24px; height:24px; object-fit:contain;" />
+                  : <span style={`flex:none; width:32px; height:32px; border-radius:8px; background:${band.cc}; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-head); font-weight:600; font-size:12px;`}>{mono(it.n)}</span>}
+                <span style="font-weight:600; font-size:15px; line-height:1.2;">{it.n}</span>
+              </span>
+              <span style="font-size:13.5px; line-height:1.5; color:#5C5E63; flex:1;">{it.d}</span>
+              <span style="display:flex; flex-wrap:wrap; gap:7px; align-items:center;">
+                <span style={`font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:${dd.c}; border:1px solid ${dd.c}55; border-radius:999px; padding:2px 8px;`}>{dd.s} {L(dd.de, dd.en)}</span>
+                {it.live
+                  ? <span style="font-family:var(--font-mono); font-size:10px; font-weight:600; color:#16794a;">● {L("live demonstriert","live demo")}</span>
+                  : <span style="font-family:var(--font-mono); font-size:10px; color:#92938F;">{L("Standard","standard")}</span>}
+              </span>
+            </a>
+          ); })}
+        </div>
+      </div>
+    ))}
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:18px;">{L("Standards statt Insellösungen: was eine offene Schnittstelle hat, lässt sich anbinden — und was reinkommt, gehört dir.", "Standards instead of islands: anything with an open interface can be connected — and whatever comes in is yours.")}</p>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+---
+import Base from "../../layouts/Base.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Privacy Policy" description="How this website handles personal data (GDPR)." path="/en/datenschutz/" altPath="/datenschutz/">
+  <section class="wrap legal" style="max-width:48rem;padding-block:clamp(2.5rem,6vw,5rem);">
+    <p class="eyebrow" style="margin-bottom:.75rem;">Privacy</p>
+    <h1 class="hl-1" data-reveal>Privacy Policy</h1>
+    <p class="lead" data-reveal style="margin-top:.6rem;">We process as little data as possible — and only for what you give it to us.</p>
+
+    <h2>Controller</h2>
+    <p>
+      DATENDRANG Software GmbH &amp; Co KG<br>
+      Neubaugasse 24, 8020 Graz, Austria<br>
+      Email: <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a>
+    </p>
+
+    <h2>Server log files</h2>
+    <p>When you visit this website, the server automatically processes technical data (IP address, date and time, page requested, browser type). This is technically necessary for the secure, stable operation of the site (Art. 6(1)(f) GDPR — legitimate interest). This data is not combined with other sources and is deleted after a short period.</p>
+
+    <h2>Contact and enquiry form</h2>
+    <p>If you write to us via the form, we process the data you provide — your name, email address, optionally your company and your message — solely to handle and answer your enquiry (Art. 6(1)(b) and (f) GDPR). We do not pass this data to third parties and do not use it for advertising or a newsletter. We store it for as long as needed to handle your enquiry or until you ask us to delete it, unless statutory retention obligations apply.</p>
+
+    <h2>Cookies</h2>
+    <p>This website sets no cookies for marketing or re-identification purposes.</p>
+
+    <h2>Analytics</h2>
+    <p>For anonymous reach measurement we use self-hosted, cookieless web analytics (Umami). No personal profiles are built and no data is shared with third parties; your browser&rsquo;s &ldquo;Do Not Track&rdquo; setting is respected. The legal basis is our legitimate interest in privacy-friendly statistics (Art. 6(1)(f) GDPR).</p>
+
+    <h2>Hosting</h2>
+    <p>The website runs on our own or rented server infrastructure within the EU. No personal data is transferred to third parties beyond the technically necessary processing by the infrastructure provider acting as a processor.</p>
+
+    <h2>Your rights</h2>
+    <p>You have the right to access, rectification, erasure, restriction of processing, data portability and objection. To exercise them, contact <a class="link-accent" href="mailto:hallo@datendrang.com">hallo@datendrang.com</a>. You also have the right to lodge a complaint with the supervisory authority:</p>
+    <p style="color:var(--muted);">Austrian Data Protection Authority (Österreichische Datenschutzbehörde), Barichgasse 40–42, 1030 Vienna, <a class="link-accent" href="mailto:dsb@dsb.gv.at">dsb@dsb.gv.at</a>, <a class="link-accent" href="https://www.dsb.gv.at" rel="noopener" target="_blank">dsb.gv.at</a>.</p>
+
+    <p style="margin-top:2.5rem;"><a class="link-accent" href="/en/impressum/">Imprint →</a></p>
+  </section>
+</Base>

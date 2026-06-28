@@ -1,0 +1,34 @@
+---
+// KI-Fassung = Maschinen-Kontext (AI-to-AI). Terminal-Ansicht des llms.txt-Dokuments.
+// Bewusst NICHT für Menschen geschrieben — Menschen nutzen DE/EN.
+import { machineDoc, kiData } from "../../lib/ki";
+const doc = machineDoc();
+const data = kiData();
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "indystry.works — Bausteine",
+  itemListElement: data.pillars.map((p) => ({ "@type": "ListItem", position: p.nr, url: p.url, name: p.title.de })),
+};
+---
+<section class="blueprint" style="color:#F8F9FA; min-height:84vh;">
+  <div style="max-width:980px; margin:0 auto; padding:clamp(56px,8vw,104px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(20px,3vw,28px);">Machine context · AI-to-AI · llms.txt</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 16px;">Maschinen-Fassung.</h1>
+    <p style="font-size:clamp(16px,1.5vw,18px); line-height:1.6; color:#9FB8B0; margin:0 0 6px; max-width:60ch;">Diese Fassung ist für KI-Agenten — dicht, strukturiert, sofort parsebar.</p>
+    <p style="font-size:14px; line-height:1.6; color:#7C9A92; margin:0 0 clamp(32px,4vw,44px);">Du bist ein Mensch? Nimm <a href="/" style="color:#A6CFC5; text-decoration:none; border-bottom:1px solid #2E5A52;">DE</a> oder <a href="/en/" style="color:#A6CFC5; text-decoration:none; border-bottom:1px solid #2E5A52;">EN</a>.</p>
+
+    <!-- Terminal -->
+    <div style="background:#0E2E29; border:1px solid #2E5A52; border-radius:12px; overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,0.30);">
+      <div style="display:flex; align-items:center; gap:14px; padding:12px 16px; background:#123A33; border-bottom:1px solid #2E5A52;">
+        <span style="display:flex; gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#2E5A52;"></span><span style="width:10px;height:10px;border-radius:50%;background:#2E5A52;"></span><span style="width:10px;height:10px;border-radius:50%;background:#2E5A52;"></span></span>
+        <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; color:#7C9A92;">indystry.works · /llms.txt</span>
+        <span style="margin-left:auto; display:flex; gap:8px;"><a href="/llms.txt" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; text-decoration:none; border:1px solid #2E5A52; border-radius:6px; padding:4px 10px;">.txt ↗</a><a href="/ki.json" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; text-decoration:none; border:1px solid #2E5A52; border-radius:6px; padding:4px 10px;">.json ↗</a><a href="/llms-full.txt" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; text-decoration:none; border:1px solid #2E5A52; border-radius:6px; padding:4px 10px;">.full ↗</a></span>
+      </div>
+      <pre style="margin:0; padding:clamp(18px,2.5vw,28px); overflow-x:auto; font-family:var(--font-mono); font-size:13px; line-height:1.7; color:#C7E0D8; white-space:pre-wrap; word-break:break-word;">{doc}</pre>
+    </div>
+
+    <p style="margin-top:clamp(28px,4vw,40px); font-family:var(--font-mono); font-size:12px; color:#7C9A92; line-height:1.7;">// fetchbar: <a href="/llms.txt" style="color:#A6CFC5; text-decoration:none;">/llms.txt</a> (index) · <a href="/llms-full.txt" style="color:#A6CFC5; text-decoration:none;">/llms-full.txt</a> (voller Inhalt) · <a href="/ki.json" style="color:#A6CFC5; text-decoration:none;">/ki.json</a> · schema.org eingebettet</p>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+</section>

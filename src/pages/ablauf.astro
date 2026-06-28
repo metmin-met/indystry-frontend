@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Ablauf from "../components/views/Ablauf.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Auftragsfluss & Zustände · Nordwerk" description="Der komplette Ablauf vom Bestelleingang bis zur Lieferung — mit allen Status und was der Stack je Phase tut." path="/ablauf/" altPath="/en/ablauf/">
+  <Ablauf lang={lang} />
+</Base>

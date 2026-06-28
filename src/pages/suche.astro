@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Suche from "../components/views/Suche.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Frag die Firma · Nordwerk" description="Volltextsuche über Produkte, Maschinen, Aufträge, Handbuch und Kennzahlen — Nordwerk Demo, read-only." path="/suche/" altPath="/en/suche/" noindex={true}>
+  <Suche lang={lang} />
+</Base>

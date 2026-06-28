@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import WerksCheck from "../../components/views/WerksCheck.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Factory check" description="7 questions, two minutes: what kind of plant are you? Find out which building blocks help first." path="/en/check/" altPath="/check/" noindex={false}>
+  <WerksCheck lang={lang} />
+</Base>

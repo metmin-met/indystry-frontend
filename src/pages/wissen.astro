@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Wissen from "../components/views/Wissen.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Wissen & Kiosk · Nordwerk" description="Handbuch, Compliance und App-Launcher der Demo-Firma — read-only." path="/wissen/" altPath="/en/wissen/" noindex={true}>
+  <Wissen lang={lang} />
+</Base>

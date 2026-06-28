@@ -1,0 +1,226 @@
+---
+// /rechner/ — „So skaliert das System“ (lang-aware): der Core bleibt gleich, gewachsen
+// wird über Hardware; erst bei hohem Event-Durchsatz lohnt ein Streaming-Layer (Kafka).
+// Illustrative Sizing-Heuristik, keine Angebote.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:1040px; margin:0 auto; padding:clamp(48px,7vw,90px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Der dritte Weg · Skalierung","The third way · scaling")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("So skaliert das System","How the system scales")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Core bleibt gleich — dieselbe Software vom ersten Tag an. Du wächst über Hardware, nicht über Lizenzen pro Kopf. Und erst wenn richtig viele Maschinen gleichzeitig Daten liefern, lohnt sich ein Streaming-Puffer (Kafka). Schieb die Regler.","The core stays the same — the same software from day one. You grow through hardware, not per-seat licences. And only once a lot of machines stream data at once does a streaming buffer (Kafka) pay off. Move the sliders.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1040px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+
+    <div class="rc-card">
+      <p class="rc-h">{L("Dein Betrieb","Your operation")}</p>
+      <div id="rc-sliders"></div>
+      <p style="font-family:var(--font-mono); font-size:10.5px; color:#92938F; margin:14px 0 0;">{L("Illustrative Sizing-Heuristik, keine Angebote. Der Software-Core ist konstant — was wächst, ist die Hardware darunter.","Illustrative sizing heuristic, not a quote. The software core is constant — what grows is the hardware beneath it.")}</p>
+    </div>
+
+    <div class="rc-grid">
+      <div class="rc-card rc-core">
+        <p class="rc-h">{L("Core · unverändert","Core · unchanged")}</p>
+        <p class="rc-sub">{L("Dieselben Bausteine — egal ob 5 oder 500 Maschinen.","The same building blocks — whether 5 or 500 machines.")}</p>
+        <div class="rc-chips" id="rc-core-chips"></div>
+        <div class="rc-flat">{L("0 € pro zusätzlichem Nutzer","€0 per additional user")}</div>
+      </div>
+
+      <div class="rc-card rc-hw">
+        <p class="rc-h">{L("Hardware · wächst","Hardware · grows")}</p>
+        <div id="rc-tier" class="rc-tier"></div>
+        <div class="rc-metrics" id="rc-hw"></div>
+      </div>
+
+      <div class="rc-card rc-stream">
+        <p class="rc-h">{L("Datenstrom · Kafka?","Data stream · Kafka?")}</p>
+        <div id="rc-stream-val" class="rc-streamval"></div>
+        <div class="rc-gauge"><div class="rc-gauge-fill" id="rc-gauge"></div><div class="rc-gauge-mark"></div></div>
+        <p class="rc-gauge-lbl"><span>0</span><span>{L("Break-even","break-even")}</span></p>
+        <div id="rc-verdict" class="rc-verdict"></div>
+      </div>
+    </div>
+
+    <div class="rc-card" style="margin-top:20px;">
+      <p class="rc-h">{L("Wachstumskurve","Growth curve")}</p>
+      <p class="rc-sub">{L("Mehr Maschinen → mehr Hardware (Stufen). Der Core bleibt flach. Ab dem Kafka-Break-even kommt ein Streaming-Layer dazu.","More machines → more hardware (steps). The core stays flat. Beyond the Kafka break-even a streaming layer is added.")}</p>
+      <div id="rc-chart" class="rc-chart"></div>
+      <div class="rc-legend">
+        <span><span class="rc-sw" style="background:#16794a"></span>{L("Hardware (vCPU)","Hardware (vCPU)")}</span>
+        <span><span class="rc-sw" style="background:#9AA7A2"></span>{L("Core (Software) — gleich","Core (software) — same")}</span>
+        <span><span class="rc-sw" style="background:#E6B23A"></span>{L("Kafka-Break-even","Kafka break-even")}</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .rc-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(20px,3vw,28px);}
+  .rc-h{font-family:var(--font-head);font-weight:600;font-size:18px;color:var(--ink);margin:0 0 6px;}
+  .rc-sub{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0 0 16px;max-width:54ch;}
+  .rc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px;}
+  @media(max-width:860px){.rc-grid{grid-template-columns:1fr;}}
+  .rc-row{margin:0 0 18px;}
+  .rc-row label{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:var(--ink);font-weight:600;margin-bottom:7px;}
+  .rc-row label b{font-family:var(--font-mono);font-weight:600;color:var(--accent);font-size:15px;}
+  .rc-row input[type=range]{width:100%;accent-color:var(--accent);height:4px;}
+  .rc-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 16px;}
+  .rc-chip{font-family:var(--font-mono);font-size:11px;background:#EAF1EE;color:#1c4a40;border:1px solid #CFE0DA;border-radius:999px;padding:4px 9px;}
+  .rc-flat{font-family:var(--font-mono);font-size:13px;font-weight:600;color:#16794a;background:#EAF6F0;border:1px dashed #9ccdb9;border-radius:10px;padding:9px 12px;text-align:center;}
+  .rc-tier{font-family:var(--font-mono);font-size:13px;font-weight:600;color:#fff;background:var(--accent);border-radius:10px;padding:9px 12px;text-align:center;margin-bottom:14px;}
+  .rc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .rc-metric .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .rc-metric .v{font-family:var(--font-mono);font-weight:600;font-size:22px;color:var(--ink);}
+  .rc-metric .v small{font-size:12px;color:var(--muted);font-weight:400;}
+  .rc-streamval{font-family:var(--font-mono);font-weight:600;font-size:26px;color:var(--ink);margin-bottom:4px;}
+  .rc-streamval small{font-size:13px;color:var(--muted);font-weight:400;}
+  .rc-gauge{position:relative;height:12px;background:#EEF2F0;border-radius:999px;overflow:hidden;margin:14px 0 4px;}
+  .rc-gauge-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#16794a,#3FBF7F);transition:width .35s ease,background .35s;}
+  .rc-gauge-mark{position:absolute;left:75%;top:-3px;bottom:-3px;width:2px;background:#E6B23A;}
+  .rc-gauge-lbl{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin:2px 0 14px;}
+  .rc-gauge-lbl span:last-child{color:#b5851a;}
+  .rc-verdict{font-size:13px;line-height:1.5;border-radius:10px;padding:11px 13px;font-weight:500;}
+  .rc-verdict.ok{background:#EAF6F0;color:#155c3f;border:1px solid #b9ddca;}
+  .rc-verdict.kafka{background:#FBF3E0;color:#7a5a12;border:1px solid #ecd49a;}
+  .rc-chart{width:100%;}
+  .rc-legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:12.5px;color:var(--ink);}
+  .rc-legend span{display:inline-flex;align-items:center;gap:7px;}
+  .rc-sw{width:14px;height:4px;border-radius:2px;display:inline-block;}
+</style>
+
+<script>
+  const DE = document.documentElement.lang !== "en";
+  const T = (d, e) => DE ? d : e;
+  const $ = (s) => document.querySelector(s);
+  const nf = (n, d=0) => Number(n).toLocaleString(DE?"de-DE":"en-GB", {minimumFractionDigits:d, maximumFractionDigits:d});
+
+  const SIG = 8;            // Sensor-Signale je Maschine @1 Hz
+  const KAFKA_EPS = 2400;   // Break-even Events/s (~300 Maschinen)
+  const state = { M:60, U:50, S:1, Y:5 };
+
+  const sliders = [
+    { k:"M", min:5,  max:500, label:T("Maschinen / Sensorquellen","Machines / sensor sources"), unit:"" },
+    { k:"U", min:5,  max:500, label:T("Nutzer","Users"), unit:"" },
+    { k:"S", min:1,  max:8,   label:T("Standorte","Sites"), unit:"" },
+    { k:"Y", min:1,  max:10,  label:T("Datenhaltung (Jahre)","Data retention (years)"), unit:"" },
+  ];
+
+  function vcpuAt(M, U, S){ return Math.ceil(8 + M*0.09 + U*0.05 + (S-1)*4); }
+  function calc(M,U,S,Y){
+    const eps = M*SIG;
+    const kafka = eps >= KAFKA_EPS || S >= 3;
+    const vcpu = vcpuAt(M,U,S);
+    const ram  = Math.ceil(32 + M*0.45 + U*0.30 + (S-1)*16);
+    const stor = Math.max(0.3, +(0.3 + M*Y*0.0016 + U*Y*0.003).toFixed(1));
+    let nodes = 1;
+    if (M>40 || U>50 || S>1) nodes++;
+    if (M>150 || U>150 || S>2) nodes++;
+    if (kafka) nodes++;
+    let tier;
+    if (nodes<=1) tier = T("1 Node · All-in-One","1 node · all-in-one");
+    else if (nodes===2) tier = T("2 Nodes · App + DB","2 nodes · app + DB");
+    else if (!kafka) tier = T("Cluster · 3 Nodes","cluster · 3 nodes");
+    else tier = T("Cluster + Streaming","cluster + streaming");
+    return { eps, kafka, vcpu, ram, stor, nodes, tier };
+  }
+
+  const CORE = T(
+    ["ERP / Auftragskern","PostgreSQL","Historian (Zeitreihen)","BI & Dashboards","Mess-/Maschinen-Gateway","Such- & Wissens-Index","KI-Assistent"],
+    ["ERP / order core","PostgreSQL","Historian (time-series)","BI & dashboards","measurement gateway","search & knowledge index","AI assistant"]
+  );
+
+  function renderSliders(){
+    $("#rc-sliders").innerHTML = sliders.map(s=>{
+      const v = state[s.k];
+      const disp = s.k==="S" ? (v + " " + T(v===1?"Standort":"Standorte", v===1?"site":"sites"))
+                 : s.k==="Y" ? (v + " " + T(v===1?"Jahr":"Jahre", v===1?"year":"years"))
+                 : nf(v);
+      return `<div class="rc-row"><label for="sl-${s.k}">${s.label} <b id="vl-${s.k}">${disp}</b></label>
+        <input type="range" id="sl-${s.k}" min="${s.min}" max="${s.max}" value="${v}" step="1"></div>`;
+    }).join("");
+    sliders.forEach(s=>{
+      $("#sl-"+s.k).addEventListener("input", e=>{ state[s.k]=+e.target.value; render(); });
+    });
+  }
+
+  function chart(){
+    const W=920, H=300, P={l:46,r:18,t:18,b:42};
+    const x0=P.l, x1=W-P.r, y0=H-P.b, y1=P.t;
+    const Mmax=500, vMax = vcpuAt(Mmax, state.U, state.S);
+    const X = m => x0 + (m/Mmax)*(x1-x0);
+    const Y = v => y0 - (v/vMax)*(y0-y1);
+    // Tier-Bänder (Maschinen-Schwellen 40/150/300)
+    const bands=[[0,40,"#F1F5F3"],[40,150,"#E9F0ED"],[150,300,"#E1EBE7"],[300,Mmax,"#FBF3E0"]];
+    let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="var(--font-mono),monospace">`;
+    bands.forEach(([a,b,c])=>{ svg+=`<rect x="${X(a).toFixed(1)}" y="${y1}" width="${(X(b)-X(a)).toFixed(1)}" height="${y0-y1}" fill="${c}"/>`; });
+    // y-Gitter
+    for(let i=0;i<=4;i++){ const v=vMax*i/4, y=Y(v); svg+=`<line x1="${x0}" y1="${y.toFixed(1)}" x2="${x1}" y2="${y.toFixed(1)}" stroke="#E2E8F0" stroke-width="1"/><text x="${x0-8}" y="${(y+3).toFixed(1)}" font-size="10" fill="#92938F" text-anchor="end">${Math.round(v)}</text>`; }
+    // x-Achse
+    [0,100,200,300,400,500].forEach(m=>{ svg+=`<text x="${X(m).toFixed(1)}" y="${y0+18}" font-size="10" fill="#92938F" text-anchor="middle">${m}</text>`; });
+    svg+=`<text x="${((x0+x1)/2).toFixed(1)}" y="${H-6}" font-size="10.5" fill="#5C5E63" text-anchor="middle">${T("Maschinen / Sensorquellen","machines / sensor sources")}</text>`;
+    // Core flat (gleich)
+    const yc=Y(8);
+    svg+=`<line x1="${x0}" y1="${yc.toFixed(1)}" x2="${x1}" y2="${yc.toFixed(1)}" stroke="#9AA7A2" stroke-width="2" stroke-dasharray="6 5"/>`;
+    // Hardware rising
+    let dd="";
+    for(let m=0;m<=Mmax;m+=10){ dd+=(m?"L":"M")+X(m).toFixed(1)+" "+Y(vcpuAt(m,state.U,state.S)).toFixed(1)+" "; }
+    svg+=`<path d="${dd}" fill="none" stroke="#16794a" stroke-width="2.6"/>`;
+    // Kafka break-even (Maschinen = KAFKA_EPS/SIG = 300) — oder Standorte>=3 erzwingt es links
+    const mKafka = KAFKA_EPS/SIG;
+    svg+=`<line x1="${X(mKafka).toFixed(1)}" y1="${y1}" x2="${X(mKafka).toFixed(1)}" y2="${y0}" stroke="#E6B23A" stroke-width="2" stroke-dasharray="4 4"/>`;
+    svg+=`<text x="${(X(mKafka)+6).toFixed(1)}" y="${y1+12}" font-size="10" fill="#b5851a">Kafka</text>`;
+    // aktueller Punkt
+    const cx=X(state.M), cy=Y(vcpuAt(state.M,state.U,state.S));
+    svg+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="6" fill="#16794a" stroke="#fff" stroke-width="2"><animate attributeName="r" values="6;8;6" dur="1.6s" repeatCount="indefinite"/></circle>`;
+    svg+=`<text x="${cx.toFixed(1)}" y="${(cy-12).toFixed(1)}" font-size="11" font-weight="700" fill="#0f5538" text-anchor="middle">${vcpuAt(state.M,state.U,state.S)} vCPU</text>`;
+    svg+=`</svg>`;
+    return svg;
+  }
+
+  function render(){
+    const r = calc(state.M, state.U, state.S, state.Y);
+    // Slider-Labels
+    sliders.forEach(s=>{ const el=$("#vl-"+s.k); if(!el) return;
+      const v=state[s.k];
+      el.textContent = s.k==="S" ? (v+" "+T(v===1?"Standort":"Standorte", v===1?"site":"sites"))
+                     : s.k==="Y" ? (v+" "+T(v===1?"Jahr":"Jahre", v===1?"year":"years"))
+                     : nf(v);
+    });
+    // Core chips
+    $("#rc-core-chips").innerHTML = CORE.map(c=>`<span class="rc-chip">${c}</span>`).join("");
+    // Hardware
+    $("#rc-tier").textContent = r.tier + " · " + r.nodes + " " + T(r.nodes===1?"Node":"Nodes","node"+(r.nodes>1?"s":""));
+    $("#rc-hw").innerHTML = `
+      <div class="rc-metric"><div class="k">vCPU</div><div class="v">${r.vcpu}</div></div>
+      <div class="rc-metric"><div class="k">RAM</div><div class="v">${r.ram}<small> GB</small></div></div>
+      <div class="rc-metric"><div class="k">${T("Speicher","Storage")}</div><div class="v">${nf(r.stor,1)}<small> TB</small></div></div>
+      <div class="rc-metric"><div class="k">Nodes</div><div class="v">${r.nodes}</div></div>`;
+    // Datenstrom
+    $("#rc-stream-val").innerHTML = `${nf(r.eps)} <small>${T("Events/s","events/s")}</small>`;
+    const pct = Math.min(100, (r.eps/KAFKA_EPS)*75);  // 75% = Break-even-Marke
+    const g=$("#rc-gauge"); g.style.width = pct.toFixed(0)+"%";
+    g.style.background = r.kafka ? "linear-gradient(90deg,#E6B23A,#d99a1f)" : "linear-gradient(90deg,#16794a,#3FBF7F)";
+    const v=$("#rc-verdict");
+    if(r.kafka){
+      v.className="rc-verdict kafka";
+      v.innerHTML = (state.S>=3 && r.eps<KAFKA_EPS)
+        ? T("Mehrere Standorte → ein Streaming-Puffer (Kafka/Redpanda) entkoppelt die Standort-Ingests und glättet Lastspitzen.","Multiple sites → a streaming buffer (Kafka/Redpanda) decouples per-site ingest and smooths spikes.")
+        : T("Hoher Durchsatz → ein Streaming-Puffer (Kafka/Redpanda) lohnt sich jetzt: Ingest-Spitzen werden gepuffert, die DB bleibt ruhig.","High throughput → a streaming buffer (Kafka/Redpanda) pays off now: ingest spikes are buffered, the DB stays calm.");
+    } else {
+      v.className="rc-verdict ok";
+      v.innerHTML = T("Direkt-Ingest reicht: die Zeitreihen-DB nimmt den Strom locker auf — kein Kafka nötig. Du sparst dir eine ganze Komponente.","Direct ingest is enough: the time-series DB swallows the stream easily — no Kafka needed. You save an entire component.");
+    }
+    // Chart
+    $("#rc-chart").innerHTML = chart();
+  }
+
+  renderSliders();
+  render();
+</script>

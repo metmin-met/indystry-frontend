@@ -1,0 +1,83 @@
+---
+// /koennen/ — Kompetenz-/Erfahrungsseite (lang-aware, un-branded): was schon gebaut & im Einsatz
+// ist, generisch dargestellt. Verbindet zu den Live-Demos, wo vorhanden.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const P = (path: string) => (de ? "" : "/en") + path;
+type Cap = { t: string; d: string; href?: string; ext?: boolean; tag?: string };
+const groups: { name: string; items: Cap[] }[] = [
+  { name: L("Daten & Digitaler Zwilling", "Data & digital twin"), items: [
+    { t: L("Edge-Konnektor", "Edge connector"), d: L("Signale direkt an Maschine/SPS abgreifen — passiv, ohne Eingriff in die Steuerung.", "Tap signals right at the machine/PLC — passively, without touching the controller."), tag: L("im Einsatz","in use") },
+    { t: L("Digital Twin aufsetzen", "Set up a digital twin"), d: L("Live-Abbild der Anlage: zusehen, übersteuern, Ausfälle vorhersagen.", "Live image of the plant: watch, override, predict failures."), href: P("/twin/") },
+    { t: L("Historian / Data-Lake", "Historian / data lake"), d: L("Jeder Mess- und Betriebswert sicher gespeichert und abrufbar.", "Every measurement and operating value stored safely and queryable."), href: P("/historian/") },
+    { t: L("ETL & Daten-Integration", "ETL & data integration"), d: L("Verteilte Quellen sauber zusammenführen — eine Wahrheit statt Insel-Tabellen.", "Bring scattered sources together cleanly — one truth instead of silo spreadsheets."), tag: L("im Einsatz","in use") },
+    { t: L("Unternehmenssuche", "Company-wide search"), d: L("Volltext + KI-Antwort über alle Daten, Dokumente und Historie.", "Full text + AI answer across all data, documents and history."), href: P("/suche/") },
+  ]},
+  { name: L("Finanzen & Buchhaltung", "Finance & accounting"), items: [
+    { t: L("Buchhaltung & Bilanz", "Accounting & balance sheet"), d: L("Von der Buchung bis zum Abschluss — durchgängig, ohne Medienbruch.", "From posting to closing — end to end, no media breaks.") },
+    { t: L("Forecast & Controlling", "Forecast & controlling"), d: L("Liquidität, Marge, Nachkalkulation — auf einer Datenbasis.", "Liquidity, margin, post-calculation — on one data base.") },
+    { t: L("E-Rechnung (PEPPOL)", "E-invoicing (PEPPOL)"), d: L("Rechnungen normkonform elektronisch senden und empfangen.", "Send and receive invoices electronically, standard-compliant.") },
+    { t: L("Steuer / UVA", "Tax / VAT return"), d: L("Umsatzsteuer-Voranmeldung und Meldungen direkt aus dem System.", "VAT advance returns and filings straight from the system.") },
+    { t: L("Schnittstellen: BMD · DATEV", "Interfaces: BMD · DATEV"), d: L("Sauberer Export zum Steuerberater — gängige Buchhaltungsformate.", "Clean export to the tax advisor — common accounting formats.") },
+  ]},
+  { name: L("Betrieb & Instandhaltung", "Operations & maintenance"), items: [
+    { t: L("Maintenance & Anlagendoku (BIM)", "Maintenance & plant docs (BIM)"), d: L("Holistische Sicht: Anlage, Komponenten, Wartung und Pläne an einem Objekt.", "Holistic view: plant, components, maintenance and plans on one object."), href: P("/anlage/") },
+    { t: L("Tages-Digests & Reports", "Daily digests & reports"), d: L("Automatische Tageszusammenfassung — was lief, was offen ist, was auffällt.", "Automatic daily summary — what ran, what's open, what stands out.") },
+    { t: L("Monitoring & Status", "Monitoring & status"), d: L("Dienste, Backups, Uptime — der Betrieb auf einen Blick.", "Services, backups, uptime — operations at a glance."), href: P("/status/") },
+  ]},
+  { name: L("Menschen & Wissen", "People & knowledge"), items: [
+    { t: L("Onboarding", "Onboarding"), d: L("Neue Mitarbeiter strukturiert einarbeiten — Zugänge, Schritte, Ansprechpartner.", "Bring new staff on board in a structured way — access, steps, contacts.") },
+    { t: L("Schulungsunterlagen", "Training materials"), d: L("Wissen aufbauen und aktuell halten, an einem Ort für alle.", "Build and maintain knowledge, one place for everyone.") },
+    { t: L("Umfragen / Surveys", "Surveys"), d: L("Feedback strukturiert einholen und auswerten.", "Collect and evaluate feedback in a structured way.") },
+    { t: L("Handbuch & Wissens-Kiosk", "Handbook & knowledge kiosk"), d: L("Handbuch, Compliance und App-Launcher für alle.", "Handbook, compliance and app launcher for everyone."), href: P("/wissen/") },
+  ]},
+  { name: L("IT, Geräte & Software", "IT, devices & software"), items: [
+    { t: L("Automatisiertes Software-Rollout", "Automated software rollout"), d: L("Software auf die Flotte ausrollen — serverseitig, ohne Vor-Ort, ohne Admin-Prompt.", "Roll out software to the fleet — server-side, no on-site visit, no admin prompt."), tag: L("im Einsatz","in use") },
+    { t: L("App-Kiosk (Self-Service)", "App kiosk (self-service)"), d: L("Mitarbeiter installieren freigegebene Software selbst — sicher.", "Staff install approved software themselves — safely."), href: P("/wissen/") },
+    { t: L("Geräteverwaltung (MDM)", "Device management (MDM)"), d: L("Mobile Geräte und Apps zentral verwalten und absichern.", "Manage and secure mobile devices and apps centrally."), tag: L("im Einsatz","in use") },
+    { t: L("Eigene App-Entwicklung", "Custom app development"), d: L("Wo Standard nicht passt: eigene Web-/Mobile-Apps auf demselben Stack.", "Where standard doesn't fit: custom web/mobile apps on the same stack.") },
+    { t: L("SSO & Souveränität", "SSO & sovereignty"), d: L("Ein Login, alles selbst gehostet, Daten im Haus — kein Lock-in.", "One login, all self-hosted, data in-house — no lock-in."), href: P("/stack/") },
+  ]},
+];
+const total = groups.reduce((a, g) => a + g.items.length, 0);
+---
+<section style="background:#123A33; color:#F4F6F5;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(44px,6vw,68px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Was wir können", "What we can do")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Aus Erfahrung gebaut. Nicht aus Slides.", "Built from experience. Not from slides.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L(`Vieles davon läuft schon — in echten Werken, im Tagesbetrieb. Hier ${total} Bausteine generisch, ohne Kundennamen. Wo es eine Demo gibt, kannst du direkt reinklicken.`, `A lot of this is already running — in real plants, in daily operation. Here are ${total} building blocks, generic, no customer names. Where there's a demo, click straight in.`)}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(36px,5vw,64px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    {groups.map((g) => (
+      <div style="margin-bottom:clamp(28px,3.5vw,44px);">
+        <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:14px;">
+          <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{g.name}</span>
+          <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;">
+          {g.items.map((it) => {
+            const inner = (
+              <>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+                  <span style="font-family:var(--font-head); font-weight:600; font-size:16px; color:#1B1C1E;">{it.t}</span>
+                  {it.tag && <span style="font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; color:#16794a; border:1px solid #16794a44; border-radius:999px; padding:2px 7px;">{it.tag}</span>}
+                  {it.href && <span style="margin-left:auto; color:#92938F; font-size:13px;">{it.ext ? "↗" : "→"}</span>}
+                </div>
+                <span style="display:block; font-size:14px; line-height:1.5; color:#5C5E63;">{it.d}</span>
+              </>
+            );
+            return it.href
+              ? <a href={it.href} target={it.ext ? "_blank" : undefined} rel={it.ext ? "noopener" : undefined} style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:15px 17px; display:block;">{inner}</a>
+              : <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:15px 17px;">{inner}</div>;
+          })}
+        </div>
+      </div>
+    ))}
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:18px; margin-top:8px;">{L("Nicht alles braucht jeder. Der Punkt ist: es greift ineinander, läuft im eigenen Haus und wächst mit — Schritt für Schritt statt Big-Bang.", "Not everyone needs all of it. The point: it interlocks, runs in your own house and grows with you — step by step, not big bang.")}</p>
+  </div>
+</section>

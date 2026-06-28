@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Graph from "../../components/views/Graph.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Knowledge graph · 3D · Nordwerk" description="The whole company as a 3D network: lines, machines, products, orders, customers, batches — clickable." path="/en/graph/" altPath="/graph/" noindex={true}>
+  <Graph lang={lang} />
+</Base>

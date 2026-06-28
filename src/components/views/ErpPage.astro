@@ -1,0 +1,97 @@
+---
+// ERP-Produktseite (aus dem Stitch-„Self-Hosted ERP"-Entwurf abgeleitet).
+import Bento from "./Bento.astro";
+import { type Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const kontakt = de ? "/kontakt/" : "/en/kontakt/";
+const demo = "https://erp-demo.indystry.works/web/login";
+const saeule = de ? "/saeule/erp-betrieb/" : "/en/pillar/erp-betrieb/";
+const feats = de ? [
+  { t: "Datenhoheit & Sicherheit", d: "Eure sensiblen Produktionsdaten bleiben in eurem Netzwerk — geschützt durch eure eigenen Sicherheitsprotokolle.", l: "Mehr erfahren →", h: "/#souv" },
+  { t: "Maßgeschneiderte Add-ons", d: "Von Lagerlogistik bis komplexe Fertigung — das System passt sich eurem Prozess an, nicht umgekehrt. Voller Zugriff auf den Quellcode.", l: "Bausteine ansehen →", h: saeule },
+  { t: "Industrie 4.0 ready", d: "Gängige Protokolle wie OPC-UA und MQTT für Echtzeit-Monitoring eurer Fertigungslinien — anschlussfähig statt Insellösung.", l: "Integration ansehen →", h: de ? "/saeule/automatisierung-leittechnik/" : "/en/pillar/automatisierung-leittechnik/" },
+] : [
+  { t: "Data sovereignty & security", d: "Your sensitive production data stays in your network — protected by your own security policies.", l: "Learn more →", h: "/en/#souv" },
+  { t: "Tailored add-ons", d: "From warehouse logistics to complex manufacturing — the system adapts to your process, not the other way round. Full source-code access.", l: "See building blocks →", h: saeule },
+  { t: "Industry 4.0 ready", d: "Common protocols like OPC-UA and MQTT for real-time monitoring of your production lines — connectable, not an island.", l: "See integration →", h: "/en/pillar/automatisierung-leittechnik/" },
+];
+---
+<!-- HERO (hell · Mockup) -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1280px; margin:0 auto; padding:clamp(56px,8vw,112px) clamp(24px,5vw,56px) clamp(64px,8vw,96px);">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(40px,5vw,72px); align-items:center;">
+      <div>
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 clamp(20px,3vw,28px);">{de ? "Open-Source ERP-Suite" : "Open-source ERP suite"}</p>
+        <h1 style="font-weight:600; font-size:clamp(36px,5.6vw,72px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px); max-width:15ch;">{de ? "Die Freiheit eurer Daten. Das ERP der nächsten Generation." : "The freedom of your data. The ERP of the next generation."}</h1>
+        <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(28px,4vw,36px); max-width:48ch;">{de ? "Vollständig quelloffen, self-hosted und unter eurer Kontrolle. Auf Odoo-Fundament — verfeinert für die Präzision deutscher Ingenieurskunst." : "Fully open-source, self-hosted and under your control. On an Odoo foundation — refined for engineering precision."}</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 clamp(28px,4vw,36px);">
+          {[de ? "Quelloffen" : "Open source", "Self-hosted", "DSGVO", "OPC-UA · MQTT"].map((b) => (
+            <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#16463E; border:1px solid #C0C8C5; border-radius:9999px; padding:5px 12px;">{b}</span>
+          ))}
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
+          <a href={kontakt} style="text-decoration:none; background:#1B1C1E; color:#F8F9FA; font-weight:600; font-size:15px; padding:16px 28px; border-radius:4px;">{de ? "Self-hosted starten →" : "Start self-hosted →"}</a>
+          <a href={demo} style="text-decoration:none; color:#1B1C1E; font-weight:500; font-size:15px; padding:16px 4px; border-bottom:1.5px solid #1B1C1E;">{de ? "Demo öffnen ↗" : "Open demo ↗"}</a>
+        </div>
+      </div>
+      <div style="justify-self:end; width:100%; max-width:520px;">
+        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 24px 70px rgba(15,23,42,0.10); overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:14px; padding:12px 16px; background:#F4F4EF; border-bottom:1px solid #E2E8F0;">
+            <span style="display:flex; gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span><span style="width:10px;height:10px;border-radius:50%;background:#E2E8F0;"></span></span>
+            <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#92938F;">ERP_BETRIEB</span>
+          </div>
+          <div style="padding:22px; color:#1B1C1E;">
+            <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 8px;">{de ? "Offene Aufträge" : "Open orders"}</p>
+            <div style="display:flex; align-items:baseline; gap:12px; margin:0 0 18px;">
+              <span style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,4vw,44px); letter-spacing:-0.02em;">124</span>
+              <span style="font-size:13px; color:#16794a; font-weight:600;">▲ 12</span>
+            </div>
+            <div style="display:grid; gap:9px; margin:0 0 16px;">
+              {[de ? "Aufträge" : "Orders", de ? "Lager & Logistik" : "Stock & logistics", de ? "Wartung" : "Maintenance"].map((x) => (
+                <div style="display:flex; align-items:center; gap:10px; font-size:14px;"><span style="color:#16463E; font-weight:700;">✓</span><span>{x}</span></div>
+              ))}
+            </div>
+            <div style="background:#123A33; border-radius:8px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; color:#A6CFC5;">
+              <span>SERVER STATUS</span><span style="color:#E6B23A;">SELF-HOSTED · ON-PREM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3-up Feature-Cards -->
+<section style="background:#F8F9FA; border-top:1px solid #E2E8F0;">
+  <div style="max-width:1280px; margin:0 auto; padding:clamp(72px,9vw,128px) clamp(24px,5vw,56px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(40px,5vw,56px);">{de ? "Warum self-hosted" : "Why self-hosted"}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(20px,2.5vw,28px);">
+      {feats.map((f) => (
+        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:clamp(24px,3vw,32px); display:flex; flex-direction:column;">
+          <h3 style="font-weight:600; font-size:clamp(19px,2vw,22px); letter-spacing:-0.015em; margin:0 0 12px;">{f.t}</h3>
+          <p style="font-size:15px; line-height:1.6; color:#5C5E63; margin:0 0 22px; flex:1;">{f.d}</p>
+          <a href={f.h} class="erp-feat" style="text-decoration:none; font-size:14px; font-weight:600; color:#16463E;">{f.l}</a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<Bento lang={lang} />
+
+<!-- CTA -->
+<section class="blueprint" style="color:#F8F9FA;">
+  <div style="max-width:880px; margin:0 auto; padding:clamp(72px,10vw,128px) clamp(24px,5vw,56px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Souveränität" : "Sovereignty"}</p>
+    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px);">{de ? "Bereit für die Souveränität?" : "Ready for sovereignty?"}</h2>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#9FB8B0; margin:0 0 clamp(32px,4vw,44px); max-width:50ch;">{de ? "Startet auf eurer eigenen Infrastruktur — oder lasst euch vorab eine konkrete Lösungsskizze geben." : "Start on your own infrastructure — or get a concrete solution sketch first."}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
+      <a href={kontakt} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px; border-radius:4px;">{de ? "Pain-List schicken →" : "Send pain list →"}</a>
+      <a href={demo} style="text-decoration:none; color:#F8F9FA; font-weight:500; font-size:15px; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗"}</a>
+    </div>
+  </div>
+</section>
+
+<style>.erp-feat:hover { color: #1B1C1E; }</style>

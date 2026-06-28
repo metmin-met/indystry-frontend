@@ -1,0 +1,123 @@
+---
+// /graph/ — 3D-Wissensgraph (lang-aware, un-branded): Linien ↔ Maschinen ↔ Produkte ↔ Rohmaterial
+// ↔ Aufträge ↔ Kunden ↔ Chargen. Interaktiv (3d-force-graph). Klick auf Knoten → Info + Demo-Link.
+interface Props { lang: "de" | "en" }
+const { lang } = Astro.props;
+const de = lang === "de";
+const L = (d: string, e: string) => (de ? d : e);
+const lines = ["Linie Nord", "Linie Süd", "Linie West"];
+const machines: [string, string][] = [
+  ["CNC-Fräse A1","Linie Nord"],["CNC-Fräse A2","Linie Nord"],["Drehzentrum B1","Linie Nord"],
+  ["Montagezelle M1","Linie Süd"],["Montagezelle M2","Linie Süd"],["Prüfstand P1","Linie Süd"],
+  ["Laserschneider L1","Linie West"],["Abkantpresse K1","Linie West"],
+];
+const products: [string,string,string[],string[]][] = [
+  ["NW-1001","Lagerbock Typ A",["CNC-Fräse A1","CNC-Fräse A2"],["RM-STB","RM-SCH"]],
+  ["NW-1002","Lagerbock Typ B",["CNC-Fräse A2"],["RM-STB","RM-SCH"]],
+  ["NW-2010","Flanschplatte 120",["Laserschneider L1"],["RM-ALP"]],
+  ["NW-2011","Flanschplatte 160",["Laserschneider L1","Abkantpresse K1"],["RM-ALP"]],
+  ["NW-3005","Wellenadapter S",["Drehzentrum B1"],["RM-WLR"]],
+  ["NW-3006","Wellenadapter M",["Drehzentrum B1"],["RM-WLR"]],
+  ["NW-4002","Gehäusedeckel",["Montagezelle M1"],["RM-STB","RM-SCH"]],
+  ["NW-4003","Gehäuseunterteil",["Montagezelle M2"],["RM-STB","RM-SCH"]],
+];
+const raw: [string,string][] = [["RM-STB","Stahl-Block S235"],["RM-ALP","Aluplatte AW-6082"],["RM-WLR","Wellen-Rohling"],["RM-SCH","Normschraube M8"]];
+const customers = ["Helvetia Pumpen","Alpentech","Donau Maschinenbau","Rheinland Apparatebau","Brenner Antriebstechnik"];
+const orders: [string,string,string][] = [
+  ["SO-0042","NW-1001","Helvetia Pumpen"],["SO-0051","NW-2010","Alpentech"],["SO-0058","NW-3006","Donau Maschinenbau"],
+  ["SO-0063","NW-4002","Rheinland Apparatebau"],["SO-0067","NW-1002","Brenner Antriebstechnik"],["SO-0071","NW-2011","Alpentech"],
+];
+const charges: [string,string,string][] = [["CH-23","NW-2010","SO-0051"],["CH-24","NW-1001","SO-0042"],["CH-25","NW-3006","SO-0058"]];
+
+const nodes: any[] = [];
+const links: any[] = [];
+const add = (id: string, name: string, type: string, val = 3) => nodes.push({ id, name, type, val });
+lines.forEach((l) => add("line:"+l, l, "line", 8));
+machines.forEach(([m, l]) => { add("mach:"+m, m, "machine", 6); links.push({ source:"mach:"+m, target:"line:"+l }); });
+raw.forEach(([id, n]) => add("raw:"+id, n, "raw", 3));
+customers.forEach((c) => add("cust:"+c, c, "customer", 5));
+products.forEach(([code, name, ms, rs]) => {
+  add("prod:"+code, code+" · "+name, "product", 6);
+  ms.forEach((m) => links.push({ source:"prod:"+code, target:"mach:"+m }));
+  rs.forEach((r) => links.push({ source:"prod:"+code, target:"raw:"+r }));
+});
+orders.forEach(([id, code, cust]) => { add("ord:"+id, id, "order", 4); links.push({ source:"ord:"+id, target:"prod:"+code }); links.push({ source:"ord:"+id, target:"cust:"+cust }); });
+charges.forEach(([id, code, ord]) => { add("chg:"+id, id, "charge", 3); links.push({ source:"chg:"+id, target:"prod:"+code }); links.push({ source:"chg:"+id, target:"ord:"+ord }); });
+const graph = { nodes, links };
+const legend = [
+  ["line", L("Linie","Line"), "#E6B23A"], ["machine", L("Maschine","Machine"), "#5FD08A"],
+  ["product", L("Produkt","Product"), "#7FB3FF"], ["raw", L("Rohmaterial","Raw material"), "#9aa0a6"],
+  ["order", L("Auftrag","Order"), "#F0A35E"], ["customer", L("Kunde","Customer"), "#E08BCB"],
+  ["charge", L("Charge","Batch"), "#C9A0FF"],
+];
+---
+<section style="background:#0E2522; color:#F4F6F5;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,90px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Wissensgraph · 3D", "Knowledge graph · 3D")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:18ch;">{L("Die ganze Firma als ein Netz.", "The whole company as one network.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Linie, Maschine, Produkt, Rohmaterial, Auftrag, Kunde, Charge — alles hängt zusammen. Dreh den Graphen, klick einen Knoten und folge der Spur ins echte System.", "Line, machine, product, raw material, order, customer, batch — everything is connected. Spin the graph, click a node and follow the trail into the real system.")}</p>
+  </div>
+</section>
+
+<section style="background:#0E2522;">
+  <div id="graph3d" style="width:100%; height:72vh; min-height:460px; position:relative; cursor:grab;"></div>
+  <div style="max-width:1100px; margin:0 auto; padding:18px clamp(24px,5vw,56px) clamp(56px,7vw,90px);">
+    <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
+      {legend.map(([k, lbl, c]) => (
+        <span style="display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:12px; color:#A6CFC5;"><span style={`width:11px;height:11px;border-radius:50%;background:${c};`}></span>{lbl}</span>
+      ))}
+    </div>
+    <div id="g-info" style="border:1px solid #214740; border-radius:12px; background:#13322D; color:#E8EFEC; padding:16px 18px; min-height:70px;">
+      <span style="font-family:var(--font-mono); font-size:12px; color:#7C9A92;">{L("Knoten anklicken für Details.", "Click a node for details.")}</span>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="graph-data" is:inline set:html={JSON.stringify(graph)}></script>
+<script>
+  import ForceGraph3D from "3d-force-graph";
+  const DE = document.documentElement.lang !== "en";
+  const data = JSON.parse(document.getElementById("graph-data").textContent);
+  const COL = { line:"#E6B23A", machine:"#5FD08A", product:"#7FB3FF", raw:"#9aa0a6", order:"#F0A35E", customer:"#E08BCB", charge:"#C9A0FF" };
+  const TL = DE
+    ? { line:"Linie", machine:"Maschine", product:"Produkt", raw:"Rohmaterial", order:"Auftrag", customer:"Kunde", charge:"Charge" }
+    : { line:"Line", machine:"Machine", product:"Product", raw:"Raw material", order:"Order", customer:"Customer", charge:"Batch" };
+  const HREF = (t) => ({ machine:(DE?"":"/en")+"/leitstand/", line:(DE?"":"/en")+"/leitstand/", charge:(DE?"":"/en")+"/analyse/", customer:(DE?"":"/en")+"/portal/", product:"https://erp-demo.indystry.works/odoo", order:"https://erp-demo.indystry.works/odoo", raw:"https://erp-demo.indystry.works/odoo" }[t]);
+  const EXT = (t) => t==="product"||t==="order"||t==="raw";
+  const el = document.getElementById("graph3d");
+  const info = document.getElementById("g-info");
+
+  const G = ForceGraph3D()(el)
+    .backgroundColor("#0E2522")
+    .graphData(data)
+    .nodeId("id")
+    .nodeLabel((n) => `${n.name} · ${TL[n.type]}`)
+    .nodeColor((n) => COL[n.type] || "#fff")
+    .nodeOpacity(0.95)
+    .nodeVal((n) => n.val || 3)
+    .linkColor(() => "rgba(166,207,197,0.22)")
+    .linkWidth(0.6)
+    .onNodeClick((n) => {
+      const P=(x)=>(DE?"":"/en")+x, ERPU="https://erp-demo.indystry.works/odoo", BIU="https://bi-demo.indystry.works", TWU="https://twin-demo.indystry.works";
+      const INFO = {
+        line:    { d: DE?"Eine Fertigungslinie und ihre Maschinen.":"A production line and its machines.", links:[[DE?"Leitstand":"Control room",P("/leitstand/")],[DE?"Anlage":"Plant",P("/anlage/")]] },
+        machine: { d: DE?"Eine von 8 Maschinen — Status, Schaltschrank, Live-Werte.":"One of 8 machines — status, cabinet, live readings.", links:[[DE?"Leitstand":"Control room",P("/leitstand/")],[DE?"Anlage":"Plant",P("/anlage/")],["Twin",TWU,1],["Historian",P("/historian/")]] },
+        product: { d: DE?"Ein Fertigprodukt (NW-XXXX) mit Stückliste.":"A finished product (NW-XXXX) with a BOM.", links:[["ERP",ERPU,1],[DE?"Analyse":"Analysis",P("/analyse/")]] },
+        raw:     { d: DE?"Rohmaterial — geht per Stückliste in Produkte.":"Raw material — feeds products via the BOM.", links:[["ERP",ERPU,1]] },
+        order:   { d: DE?"Ein Kundenauftrag — löst Fertigung + Lieferung aus.":"A customer order — triggers production + delivery.", links:[["ERP",ERPU,1],[DE?"Tour":"Tour",P("/tour/")]] },
+        customer:{ d: DE?"Ein Kunde — sieht Status im Self-Service-Portal.":"A customer — sees status in the self-service portal.", links:[["Portal",P("/portal/")],[DE?"Website":"Website",P("/werk/")]] },
+        charge:  { d: DE?"Eine rückverfolgbare Charge — mit Analyse & Zeitreihen.":"A traceable batch — with analysis & time series.", links:[[DE?"Analyse":"Analysis",P("/analyse/")],["Historian",P("/historian/")]] },
+      };
+      const I = INFO[n.type] || { d:"", links:[] };
+      const linksHtml = I.links.map((l)=>`<a href="${l[1]}" ${l[2]?'target="_blank" rel="noopener"':''} style="text-decoration:none;background:#13322D;color:#fff;font-weight:600;font-size:12px;padding:7px 12px;border-radius:8px;">${l[0]} ${l[2]?"↗":"→"}</a>`).join("");
+      info.innerHTML = `<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:${COL[n.type]};margin-bottom:4px;">${TL[n.type]}</div>
+        <div style="font-family:var(--font-head,sans-serif);font-weight:600;font-size:18px;margin-bottom:6px;">${n.name}</div>
+        <div style="font-size:13px;line-height:1.5;color:#A6CFC5;margin-bottom:12px;">${I.d}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">${linksHtml}</div>`;
+      const dist = 90; const r = 1 + dist / Math.hypot(n.x||1, n.y||1, n.z||1);
+      G.cameraPosition({ x:(n.x||0)*r, y:(n.y||0)*r, z:(n.z||0)*r }, n, 800);
+    });
+  function size(){ G.width(el.clientWidth); G.height(el.clientHeight); }
+  size(); window.addEventListener("resize", size);
+  setTimeout(() => { try { G.zoomToFit(600, 40); } catch(e){} }, 600);
+</script>
