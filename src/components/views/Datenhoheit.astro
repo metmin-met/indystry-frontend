@@ -1,6 +1,7 @@
 ---
-// /datenhoheit/ — Datenschutz von A bis Z + KI-Souveränitäts-Skala (Cloud-API → Hybrid →
-// Self-hosted offene Gewichte → On-Prem + eigenes Mistral-Modell). Interaktiv.
+// /datenhoheit/ — Datenschutz & KI-Souveränität. Redesign: interaktive Souveränitäts-Skala
+// mit Daten-Fluss-Diagramm (wohin gehen die Daten je Stufe?) + klickbare Vergleichs-Heatmap
+// (synct die Stufe) + Datenschutz A–Z. Daten = Single Source, bilingual via L().
 import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -10,122 +11,287 @@ const L = (d: string, e: string) => (de ? d : e);
 
 const levels = [
   { k: 1, n: L("Cloud-KI (API)", "Cloud AI (API)"), data: L("verlässt das Haus", "leaves the house"),
-    s: L("Schnell starten — aber Daten gehen zum Anbieter.", "Quick to start — but data goes to the provider."),
-    d: L("Fertige KI per API, wie die bekannten Chatbots. Schnell und stark, aber jeder Prompt und jede angehängte Datei landet bei einem externen Anbieter. Für Unkritisches in Ordnung — für Firmengeheimnisse heikel.", "Ready-made AI via API, like the well-known chatbots. Fast and strong, but every prompt and attached file ends up with an external provider. Fine for non-critical work — risky for trade secrets."),
-    privacy: 1, control: 1, effort: 1 },
+    cap: L("Jeder Prompt verlässt das Haus.", "Every prompt leaves the house."),
+    d: L("Fertige KI per API, wie die bekannten Chatbots. Schnell und stark — aber jeder Prompt und jede angehängte Datei landet bei einem externen Anbieter. Für Unkritisches in Ordnung, für Firmengeheimnisse heikel.", "Ready-made AI via API, like the well-known chatbots. Fast and strong — but every prompt and attached file ends up with an external provider. Fine for non-critical work, risky for trade secrets."),
+    privacy: 1, control: 1, effort: 1, out: L("Ja · alles", "Yes · all"), outColor: "#c4673f", payload: L("Prompt + Dateien", "Prompt + files") },
   { k: 2, n: L("Hybrid / Mixture", "Hybrid / mixture"), data: L("gemischt, steuerbar", "mixed, steerable"),
-    s: L("Sensibles bleibt lokal, nur Unkritisches geht raus.", "Sensitive stays local, only non-critical goes out."),
+    cap: L("Sensibles bleibt — nur Anonymisiertes geht raus.", "Sensitive stays — only anonymised leaves."),
     d: L("Das Beste aus beiden Welten: Suche und sensible Daten bleiben im Haus (lokales RAG), nur anonymisierte oder unkritische Teile gehen an ein starkes externes Modell. Pro Datenklasse entscheidbar.", "The best of both worlds: search and sensitive data stay in-house (local RAG), only anonymised or non-critical parts go to a strong external model. Decidable per data class."),
-    privacy: 2, control: 2, effort: 2 },
+    privacy: 2, control: 2, effort: 2, out: L("Teilweise", "Partial"), outColor: "#c08a2e", payload: L("nur anonymisiert", "anonymised only") },
   { k: 3, n: L("Self-hosted (offene Gewichte)", "Self-hosted (open weights)"), data: L("bleibt im Haus", "stays in-house"),
-    s: L("Modell läuft auf eurer Hardware — kein Prompt geht raus.", "Model runs on your hardware — no prompt leaves."),
-    d: L("Ein offenes Modell (z.B. Mistral) läuft auf eurer eigenen Hardware. Kein Prompt, keine Datei verlässt das Haus. DSGVO-freundlich, volle Kontrolle — ihr betreibt die KI selbst.", "An open model (e.g. Mistral) runs on your own hardware. No prompt, no file leaves the house. GDPR-friendly, full control — you run the AI yourself."),
-    privacy: 4, control: 3, effort: 3 },
+    cap: L("Kein Prompt verlässt das Haus.", "No prompt leaves the house."),
+    d: L("Ein offenes Modell (z. B. Mistral) läuft auf eurer eigenen Hardware. Kein Prompt, keine Datei verlässt das Haus. DSGVO-freundlich, volle Kontrolle — ihr betreibt die KI selbst.", "An open model (e.g. Mistral) runs on your own hardware. No prompt, no file leaves the house. GDPR-friendly, full control — you run the AI yourself."),
+    privacy: 4, control: 3, effort: 3, out: L("Nein", "No"), outColor: "#16794a", payload: "" },
   { k: 4, n: L("On-Prem + eigenes Modell", "On-prem + your own model"), data: L("im Haus + maßgeschneidert", "in-house + tailored"),
-    s: L("Auf euren Daten trainiert — kennt eure Produkte & Sprache.", "Trained on your data — knows your products & language."),
+    cap: L("Trainiert auf euren Daten — alles bleibt im Haus.", "Trained on your data — everything stays in-house."),
     d: L("Die Königsklasse: ein offenes Modell (Mistral) wird auf euren eigenen Daten feingetunt — es kennt eure Produkte, Prozesse und Sprache. Läuft komplett on-prem und gehört euch. Maximale Datenhoheit.", "The top tier: an open model (Mistral) is fine-tuned on your own data — it knows your products, processes and language. Runs fully on-prem and belongs to you. Maximum data sovereignty."),
-    privacy: 4, control: 4, effort: 4 },
+    privacy: 4, control: 4, effort: 4, out: L("Nein", "No"), outColor: "#16794a", payload: "" },
 ];
 const checklist = [
   { t: L("Datenhoheit", "Data ownership"), d: L("Deine Daten liegen bei dir — kein Konzern dazwischen.", "Your data lives with you — no corporation in between.") },
   { t: L("DSGVO & Privacy by Design", "GDPR & privacy by design"), d: L("Sparsam, zweckgebunden, dokumentiert — von Anfang an mitgedacht.", "Minimal, purpose-bound, documented — built in from the start.") },
   { t: L("Verschlüsselung", "Encryption"), d: L("Verschlüsselt unterwegs und im Speicher.", "Encrypted in transit and at rest.") },
   { t: L("SSO & Rechte", "SSO & permissions"), d: L("Ein Login, feine Rollen — jeder sieht nur, was er darf.", "One login, fine-grained roles — everyone sees only what they may.") },
-  { t: L("Audit & Protokoll", "Audit & logging"), d: L("Nachvollziehbar, wer wann was — revisionssicher.", "Traceable who did what when — audit-proof.") },
+  { t: L("Audit & Protokoll", "Audit & logging"), d: L("Nachvollziehbar, wer wann was — revisionssicher (Wazuh · Zabbix · Graylog).", "Traceable who did what when — audit-proof (Wazuh · Zabbix · Graylog).") },
   { t: L("Löschkonzept", "Deletion concept"), d: L("Was weg soll, geht auch wirklich weg.", "What should be gone is actually gone.") },
   { t: L("Offsite-Backup", "Offsite backup"), d: L("Verschlüsselte Kopie außer Haus — Restore getestet.", "Encrypted copy off-site — restore tested.") },
   { t: L("Kein Lock-in", "No lock-in"), d: L("Offene Formate, offene Standards — du kannst jederzeit gehen.", "Open formats, open standards — you can leave any time.") },
 ];
+const T = {
+  privacy: L("Datenschutz", "Privacy"), control: L("Kontrolle", "Control"), effort: L("Aufwand", "Effort"),
+  flow: L("Daten-Fluss · Stufe", "Data flow · level"), dout: L("Daten raus:", "Data out:"),
+  werk: L("⌂ Euer Werk · On-Prem", "⌂ Your plant · on-prem"), sens: L("Sensible Daten", "Sensitive data"),
+  rag: L("Lokales RAG", "Local RAG"), tuned: L("↳ feingetunt auf euren Daten", "↳ fine-tuned on your data"),
+  zero: L("✕ 0 raus", "✕ 0 out"), cloud: L("☁ Anbieter-Cloud", "☁ Provider cloud"), notused: L("nicht genutzt", "not used"),
+};
+const lvlJSON = JSON.stringify(levels);
 ---
-<section style="background:#123A33; color:#F4F6F5;">
-  <div style="max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:60%; width:55%; height:90%; background:radial-gradient(circle,rgba(230,178,58,.12),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
     <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Datenschutz & KI-Souveränität", "Privacy & AI sovereignty")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Deine Daten. Deine KI. Deine Regeln.", "Your data. Your AI. Your rules.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Datenschutz ist keine Checkbox, sondern eine Bandbreite — von der schnellen Cloud-KI bis zum eigenen, auf euren Daten trainierten Modell. Such dir den Punkt aus, der zu eurem Risiko passt.", "Privacy isn't a checkbox, it's a spectrum — from quick cloud AI to your own model trained on your data. Pick the point that fits your risk.")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Deine Daten. Deine KI.", "Your data. Your AI.")} <span style="color:#E6B23A;">{L("Deine Regeln.", "Your rules.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0 0 28px;">{L("Datenschutz ist keine Checkbox, sondern eine Bandbreite — von der schnellen Cloud-KI bis zum eigenen, auf euren Daten trainierten Modell. Such dir den Punkt aus, der zu eurem Risiko passt.", "Privacy isn't a checkbox, it's a spectrum — from quick cloud AI to your own model trained on your data. Pick the point that fits your risk.")}</p>
+    <!-- Spektrum-Teaser -->
+    <div style="max-width:560px;">
+      <div style="height:8px; border-radius:999px; background:linear-gradient(90deg,#E6B23A,#c08a2e 33%,#5e9b7e 66%,#16794a);"></div>
+      <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:8px;">
+        <span>{L("verlässt das Haus", "leaves the house")}</span>
+        <span>{L("gehört ganz dir", "fully yours")}</span>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- §01 SKALA + DATEN-FLUSS -->
 <section style="background:#F8F9FA;">
-  <div style="max-width:1080px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(40px,5vw,64px);">
-    <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:8px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Die KI-Souveränitäts-Skala", "The AI sovereignty scale")}</span>
-      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+  <div class="dh" data-dh data-t={JSON.stringify(T)} style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(36px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Die KI-Souveränitäts-Skala", "The AI sovereignty scale")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span><span style="width:7px; height:7px; border:1.5px solid #C0C8C5;"></span>
     </div>
-    <p style="font-size:14px; color:#5C5E63; margin:0 0 18px; max-width:70ch;">{L("Von „verlässt das Haus“ bis „gehört ganz dir“ — vier Stufen. Klick dich durch.", "From „leaves the house“ to „fully yours“ — four levels. Click through.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(28px,4.4vw,52px); line-height:1.04; letter-spacing:-0.03em; margin:0 0 8px; max-width:20ch;">{L("Wohin gehen eure Daten? Ihr entscheidet.", "Where does your data go? You decide.")}</h2>
+    <p style="font-family:var(--font-mono); font-size:13px; color:#5C5E63; margin:0 0 24px;">{L("Von „verlässt das Haus“ bis „gehört ganz dir“ — vier Stufen. Wähl eine.", "From „leaves the house“ to „fully yours“ — four levels. Pick one.")}</p>
 
-    <div class="dh" data-dh>
-      <div class="dh-scale">
-        {levels.map((lv) => (
-          <button class="dh-step" data-k={lv.k} aria-pressed={lv.k === 3 ? "true" : "false"}>
-            <span class="dh-num">{lv.k}</span>
-            <span class="dh-name">{lv.n}</span>
-            <span class="dh-data">{lv.data}</span>
-          </button>
-        ))}
+    <div class="dh-scale">
+      {levels.map((lv) => (
+        <button class="dh-step" data-k={lv.k} aria-pressed={lv.k === 3 ? "true" : "false"}>
+          <span class="dh-num">{lv.k}</span>
+          <span class="dh-name">{lv.n}</span>
+          <span class="dh-data">{lv.data}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- DATA-FLOW DIAGRAM -->
+    <div class="dh-card">
+      <div class="dh-cardtop">
+        <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#16463E;">{T.flow} <b id="dh-lvlnum">3</b></span>
+        <span id="dh-status" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px;"></span>
       </div>
-      <div class="dh-detail">
-        {levels.map((lv) => (
-          <div class="dh-panel" data-k={lv.k} hidden={lv.k !== 3}>
-            <p class="dh-pd">{lv.d}</p>
-            <div class="dh-bars">
-              <div class="dh-bar"><span>{L("Datenschutz", "Privacy")}</span><div class="dh-track"><i style={`width:${lv.privacy*25}%;background:#16794a`}></i></div></div>
-              <div class="dh-bar"><span>{L("Kontrolle", "Control")}</span><div class="dh-track"><i style={`width:${lv.control*25}%;background:#3d4fc0`}></i></div></div>
-              <div class="dh-bar"><span>{L("Aufwand", "Effort")}</span><div class="dh-track"><i style={`width:${lv.effort*25}%;background:#E6B23A`}></i></div></div>
-            </div>
+      <div class="dh-flow">
+        <!-- WERK -->
+        <div class="dh-werk">
+          <div style="font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin-bottom:14px;">{T.werk}</div>
+          <div style="display:flex; flex-wrap:wrap; gap:7px;">
+            <span class="dh-chip">{T.sens}</span><span class="dh-chip">{T.rag}</span>
           </div>
-        ))}
+          <div id="dh-model" style="position:relative; margin-top:18px; display:none; align-items:center; gap:8px; background:#123A33; color:#EAF1EE; border-radius:9px; padding:10px 14px;">
+            <span class="dh-orbit"></span>
+            <span style="width:9px; height:9px; border-radius:50%; background:#3FB57E; display:inline-block; margin-left:14px;"></span>
+            <span style="font-family:var(--font-mono); font-size:12px;">KI-Modell · Mistral</span>
+          </div>
+          <div id="dh-tuned" style="margin-top:10px; display:none; font-family:var(--font-mono); font-size:10.5px; color:#16794a;">{T.tuned}</div>
+        </div>
+        <!-- CONNECTOR -->
+        <div class="dh-conn">
+          <div id="dh-conn-out" style="display:none;">
+            <div id="dh-line" style="position:absolute; top:50%; left:0; right:0; height:2px; transform:translateY(-50%);"></div>
+            <span id="dh-packet" class="dh-packet"></span>
+            <span id="dh-arrow" style="position:absolute; right:-2px; top:50%; transform:translateY(-50%); font-size:15px;">▶</span>
+          </div>
+          <div id="dh-conn-int" style="display:none;">
+            <div style="position:absolute; top:50%; left:0; right:0; height:0; border-top:2px dashed #C0C8C5; transform:translateY(-50%);"></div>
+            <span style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; color:#16794a; font-family:var(--font-mono); font-size:9.5px; padding:3px 6px; border:1px solid #16794a; border-radius:5px; white-space:nowrap;">{T.zero}</span>
+          </div>
+        </div>
+        <!-- CLOUD -->
+        <div id="dh-cloud" class="dh-cloud">
+          <div id="dh-cloud-ink" style="font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:14px;">{T.cloud}</div>
+          <span id="dh-cloud-payload" class="dh-chip" style="display:none;"></span>
+          <span id="dh-cloud-notused" style="font-family:var(--font-mono); font-size:12px; color:#92938F; display:none;">{T.notused}</span>
+        </div>
+      </div>
+      <p id="dh-caption" style="font-family:var(--font-head); font-weight:600; font-size:clamp(17px,1.7vw,21px); color:#123A33; margin:22px 0 0; border-left:3px solid #16794a; padding-left:14px;"></p>
+      <p id="dh-desc" style="font-size:15.5px; line-height:1.6; color:#3C3E42; margin:14px 0 22px; max-width:74ch;"></p>
+      <div class="dh-bars">
+        <div class="dh-bar"><div class="dh-barlab"><span>{T.privacy}</span><span id="dh-v-privacy" style="color:#1B1C1E;"></span></div><div class="dh-track"><i id="dh-i-privacy" style="background:#16794a;"></i></div></div>
+        <div class="dh-bar"><div class="dh-barlab"><span>{T.control}</span><span id="dh-v-control" style="color:#1B1C1E;"></span></div><div class="dh-track"><i id="dh-i-control" style="background:#3d4fc0;"></i></div></div>
+        <div class="dh-bar"><div class="dh-barlab"><span>{T.effort}</span><span id="dh-v-effort" style="color:#1B1C1E;"></span></div><div class="dh-track"><i id="dh-i-effort" style="background:#E6B23A;"></i></div></div>
       </div>
     </div>
-    <p style="font-size:13px; color:#92938F; margin:16px 0 0;">{L("Empfehlung für die meisten Industriebetriebe: Stufe 3 (self-hosted) als Basis, Stufe 4 für die Kronjuwelen. Mit Mistral als offenem Modell ist beides möglich — bei euch im Haus.", "Recommendation for most industrial operations: level 3 (self-hosted) as the base, level 4 for the crown jewels. With Mistral as an open model both are possible — in your own house.")}</p>
+
+    <div style="margin-top:20px; background:#EFEAE0; border-radius:13px; padding:18px 22px; display:flex; gap:14px; align-items:flex-start;">
+      <span style="font-family:var(--font-mono); font-size:15px; color:#16463E; flex:none; margin-top:1px;">★</span>
+      <p style="margin:0; font-size:15px; line-height:1.6; color:#3C3E42;"><b style="color:#1B1C1E;">{L("Empfehlung für die meisten Industriebetriebe:", "Recommendation for most industrial operations:")}</b> {L("Stufe 3 (self-hosted) als Basis, Stufe 4 für die Kronjuwelen. Mit Mistral als offenem Modell ist beides möglich — bei euch im Haus.", "level 3 (self-hosted) as the base, level 4 for the crown jewels. With Mistral as an open model both are possible — in your own house.")}</p>
+    </div>
   </div>
 </section>
 
+<!-- §02 HEATMAP -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Vergleich auf einen Blick", "Comparison at a glance")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span><span style="width:7px; height:7px; border:1.5px solid #C0C8C5;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(28px,4.4vw,52px); line-height:1.04; letter-spacing:-0.03em; margin:0 0 24px;">{L("Vier Stufen, drei Hebel.", "Four levels, three levers.")}</h2>
+    <div class="dh-heat">
+      <div class="dh-hrow dh-hhead">
+        <span>{L("Stufe", "Level")}</span><span>{T.privacy}</span><span>{T.control}</span><span>{T.effort}</span><span>{L("Daten raus?", "Data out?")}</span>
+      </div>
+      {levels.map((lv) => (
+        <button class="dh-hrow dh-mrow" data-row={lv.k} aria-pressed={lv.k === 3 ? "true" : "false"}>
+          <span style="display:flex; align-items:center; gap:10px;"><span class="dh-badge">{lv.k}</span><b style="font-family:var(--font-head); font-weight:600; font-size:14px; color:#1B1C1E; text-align:left;">{lv.n}</b></span>
+          <span><span class="dh-mtrack"><i style={`width:${lv.privacy*25}%; background:#16794a;`}></i></span></span>
+          <span><span class="dh-mtrack"><i style={`width:${lv.control*25}%; background:#3d4fc0;`}></i></span></span>
+          <span><span class="dh-mtrack"><i style={`width:${lv.effort*25}%; background:#E6B23A;`}></i></span></span>
+          <span style={`font-family:var(--font-mono); font-size:12px; font-weight:600; color:${lv.outColor};`}>{lv.out}</span>
+        </button>
+      ))}
+    </div>
+    <p style="font-family:var(--font-mono); font-size:12px; color:#5C5E63; margin:14px 0 0;">{L("Tipp: Zeile anklicken — die Skala oben springt auf die Stufe.", "Tip: click a row — the scale above jumps to that level.")}</p>
+  </div>
+</section>
+
+<!-- §03 A–Z -->
 <section style="background:#F8F9FA;">
-  <div style="max-width:1080px; margin:0 auto; padding:0 clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:16px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Datenschutz von A bis Z", "Privacy from A to Z")}</span>
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(56px,7vw,88px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Datenschutz von A bis Z", "Privacy from A to Z")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;">
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(28px,4.4vw,52px); line-height:1.04; letter-spacing:-0.03em; margin:0 0 24px;">{L("Acht Dinge, die von Anfang an stimmen.", "Eight things that are right from the start.")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:14px;">
       {checklist.map((c) => (
-        <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:15px;">
-          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">✓ {c.t}</p>
+        <div class="dh-az">
+          <p style="display:flex; align-items:center; gap:8px; font-family:var(--font-head); font-weight:600; font-size:16px; color:#1B1C1E; margin:0 0 6px;"><span style="color:#16794a;">✓</span>{c.t}</p>
           <p style="font-size:13.5px; line-height:1.5; color:#5C5E63; margin:0;">{c.d}</p>
         </div>
       ))}
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:clamp(24px,3vw,36px); padding-top:18px;">{L("Souveränität heißt: selbst entscheiden, wo die Grenze verläuft — nicht ein Anbieter. ", "Sovereignty means: you decide where the line runs — not a provider. ")}<a href={b + "/stack/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("So ist der Stack gebaut", "How the stack is built")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,56px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Souveränität heißt:", "Sovereignty means:")} <span style="color:#E6B23A;">{L("ihr", "you")}</span> {L("entscheidet, wo die Grenze verläuft.", "decide where the line runs.")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Nicht ein Anbieter. So ist der Stack gebaut, der das möglich macht.", "Not a provider. This is how the stack that makes it possible is built.")}</p>
+    <a href={b + "/stack/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px; display:inline-block;">{L("So ist der Stack gebaut", "How the stack is built")} →</a>
   </div>
 </section>
 
 <style>
-  .dh-scale { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .dh-scale { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px; }
   @media (max-width:720px){ .dh-scale{ grid-template-columns:1fr 1fr; } }
-  .dh-step { text-align:left; border:1px solid #E2E8F0; border-radius:13px; background:#fff; padding:14px; cursor:pointer; display:flex; flex-direction:column; gap:6px; transition:border-color .15s, box-shadow .15s, transform .15s; position:relative; }
+  .dh-step { text-align:left; border:1px solid #E2E8F0; border-radius:13px; background:#fff; padding:16px; cursor:pointer; display:flex; flex-direction:column; gap:6px; transition:border-color .15s, box-shadow .15s, transform .15s; }
   .dh-step:hover { border-color:#C0C8C5; transform:translateY(-2px); }
-  .dh-step[aria-pressed="true"] { border-color:#123A33; box-shadow:0 8px 22px rgba(11,28,25,.10); }
-  .dh-num { width:26px; height:26px; border-radius:50%; background:#EFEAE0; color:#123A33; font-family:var(--font-mono); font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; }
+  .dh-step[aria-pressed="true"] { border-color:#123A33; box-shadow:0 10px 24px rgba(11,28,25,.10); }
+  .dh-num { width:27px; height:27px; border-radius:50%; background:#EFEAE0; color:#123A33; font-family:var(--font-mono); font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; }
   .dh-step[aria-pressed="true"] .dh-num { background:#123A33; color:#fff; }
-  .dh-name { font-family:var(--font-head); font-weight:600; font-size:14.5px; color:#1B1C1E; line-height:1.2; }
+  .dh-name { font-family:var(--font-head); font-weight:600; font-size:15px; color:#1B1C1E; line-height:1.18; }
   .dh-data { font-family:var(--font-mono); font-size:10.5px; color:#92938F; }
-  .dh-detail { margin-top:16px; }
-  .dh-panel { border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2.5vw,24px); }
-  .dh-pd { font-size:15.5px; line-height:1.6; color:#3C3E42; margin:0 0 16px; max-width:72ch; }
-  .dh-bars { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+
+  .dh-card { background:#fff; border:1px solid #E2E8F0; border-radius:16px; padding:clamp(18px,3vw,32px); }
+  .dh-cardtop { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+  .dh-flow { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; }
+  @media (max-width:640px){ .dh-flow{ grid-template-columns:1fr; } .dh-conn{ height:48px !important; width:100% !important; transform:rotate(90deg); } }
+  .dh-werk { position:relative; border:1.5px solid #16463E; border-radius:13px; background:#F3F7F5; padding:18px; min-height:160px; }
+  .dh-chip { font-family:var(--font-mono); font-size:11.5px; color:#3C3E42; background:#fff; border:1px solid #C0C8C5; border-radius:7px; padding:5px 9px; display:inline-block; }
+  .dh-conn { position:relative; width:clamp(70px,12vw,150px); height:2px; }
+  .dh-packet { position:absolute; top:50%; transform:translate(-50%,-50%); width:10px; height:10px; border-radius:50%; }
+  .dh-cloud { border:1.5px dashed #c08a2e; border-radius:13px; background:#FCF6EA; padding:18px; min-height:160px; }
+  .dh-orbit { position:absolute; left:14px; top:50%; width:9px; height:9px; border-radius:50%; background:#3FB57E; animation:dh-orbit 2.6s linear infinite; }
+  .dh-bars { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:4px; }
   @media (max-width:560px){ .dh-bars{ grid-template-columns:1fr; } }
-  .dh-bar span { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:#5C5E63; display:block; margin-bottom:5px; }
+  .dh-barlab { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:#5C5E63; margin-bottom:6px; }
   .dh-track { height:8px; background:#EEF2F0; border-radius:999px; overflow:hidden; }
-  .dh-track i { display:block; height:100%; border-radius:999px; transition:width .35s var(--ease-quint,ease); }
+  .dh-track i { display:block; height:100%; border-radius:999px; transition:width .4s cubic-bezier(.22,1,.36,1); }
+
+  .dh-heat { background:#fff; border:1px solid #E2E8F0; border-radius:14px; overflow:hidden; }
+  .dh-hrow { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr; gap:0; align-items:center; }
+  .dh-hhead { font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#92938F; background:#F8F9FA; border-bottom:1px solid #E2E8F0; }
+  .dh-hhead span { padding:13px 16px; }
+  .dh-mrow { width:100%; border:0; border-bottom:1px solid #EEF2F0; background:#fff; cursor:pointer; text-align:left; transition:background .15s; }
+  .dh-mrow > span { padding:15px 16px; }
+  .dh-mrow:hover { background:#FBF6EC; }
+  .dh-mrow[aria-pressed="true"] { background:#FBF6EC; box-shadow:inset 3px 0 0 #123A33; }
+  .dh-badge { width:22px; height:22px; border-radius:50%; background:#EFEAE0; color:#123A33; font-family:var(--font-mono); font-weight:600; font-size:11px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .dh-mrow[aria-pressed="true"] .dh-badge { background:#123A33; color:#fff; }
+  .dh-mtrack { display:block; height:7px; background:#EEF2F0; border-radius:999px; overflow:hidden; }
+  .dh-mtrack i { display:block; height:100%; }
+  @media (max-width:640px){ .dh-hrow{ grid-template-columns:1.4fr 1fr 1fr; } .dh-hhead span:nth-child(4),.dh-hhead span:nth-child(5),.dh-mrow > span:nth-child(4),.dh-mrow > span:nth-child(5){ display:none; } }
+
+  .dh-az { border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px; transition:transform .15s, box-shadow .15s; }
+  .dh-az:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(11,28,25,.06); }
+
+  @keyframes dh-orbit { from{ transform:rotate(0) translateX(0); } }
+  @keyframes dh-pkout { 0%{ left:0; opacity:0; } 12%{ opacity:1; } 88%{ opacity:1; } 100%{ left:100%; opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .dh-orbit, .dh-packet{ animation:none !important; } }
 </style>
 
-<script>
-  document.querySelectorAll("[data-dh]").forEach((root) => {
-    const steps = root.querySelectorAll(".dh-step");
-    const panels = root.querySelectorAll(".dh-panel");
-    steps.forEach((s) => s.addEventListener("click", () => {
-      const k = s.getAttribute("data-k");
-      steps.forEach((x) => x.setAttribute("aria-pressed", x === s ? "true" : "false"));
-      panels.forEach((p) => { p.hidden = p.getAttribute("data-k") !== k; });
-    }));
-  });
+<script is:inline define:vars={{ lvlJSON }}>
+  (function(){
+    var root = document.querySelector("[data-dh]"); if(!root) return;
+    var L = JSON.parse(lvlJSON);
+    var $ = function(id){ return document.getElementById(id); };
+    function apply(lv){
+      var cur = L[lv-1]; if(!cur) return;
+      var internal = lv >= 3;
+      var flow = internal ? "#16794a" : (lv===2 ? "#c08a2e" : "#E6B23A");
+      // steps + rows
+      root.querySelectorAll(".dh-step").forEach(function(s){ s.setAttribute("aria-pressed", s.getAttribute("data-k")==String(lv) ? "true":"false"); });
+      document.querySelectorAll(".dh-mrow").forEach(function(r){ r.setAttribute("aria-pressed", r.getAttribute("data-row")==String(lv) ? "true":"false"); });
+      // header
+      $("dh-lvlnum").textContent = lv;
+      $("dh-status").style.color = cur.outColor;
+      $("dh-status").innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:'+cur.outColor+';display:inline-block;"></span>'+root.dataset.dout+' '+cur.out;
+      // werk model
+      $("dh-model").style.display = internal ? "inline-flex" : "none";
+      $("dh-tuned").style.display = lv===4 ? "block" : "none";
+      // connector
+      $("dh-conn-out").style.display = internal ? "none" : "block";
+      $("dh-conn-int").style.display = internal ? "block" : "none";
+      if(!internal){
+        var line = $("dh-line"), pk = $("dh-packet"), ar = $("dh-arrow");
+        if(lv===2){ line.style.background="transparent"; line.style.borderTop="2px dashed "+flow; line.style.height="0"; }
+        else { line.style.background=flow; line.style.borderTop="0"; line.style.height="2px"; }
+        pk.style.background=flow; pk.style.boxShadow="0 0 8px "+flow; pk.style.animation="dh-pkout 2s linear infinite";
+        ar.style.color=flow;
+      }
+      // cloud
+      var cloud = $("dh-cloud");
+      cloud.style.opacity = internal ? ".4" : "1";
+      cloud.style.borderColor = internal ? "#C0C8C5" : "#c08a2e";
+      cloud.style.background = internal ? "#F8F9FA" : "#FCF6EA";
+      $("dh-cloud-ink").style.color = internal ? "#92938F" : "#9a6a1e";
+      $("dh-cloud-payload").style.display = (!internal && cur.payload) ? "inline-block" : "none";
+      $("dh-cloud-payload").textContent = cur.payload || "";
+      $("dh-cloud-notused").style.display = internal ? "inline" : "none";
+      // caption + desc + bars
+      $("dh-caption").textContent = cur.cap; $("dh-caption").style.borderLeftColor = flow;
+      $("dh-desc").textContent = cur.d;
+      [["privacy","#16794a"],["control","#3d4fc0"],["effort","#E6B23A"]].forEach(function(p){
+        $("dh-i-"+p[0]).style.width = (cur[p[0]]*25)+"%";
+        $("dh-v-"+p[0]).textContent = cur[p[0]]+"/4";
+      });
+    }
+    root.dataset.dout = (JSON.parse(root.getAttribute("data-t")||"{}").dout) || "Daten raus:";
+    root.querySelectorAll(".dh-step").forEach(function(s){ s.addEventListener("click", function(){ apply(+s.getAttribute("data-k")); }); });
+    document.querySelectorAll(".dh-mrow").forEach(function(r){ r.addEventListener("click", function(){ apply(+r.getAttribute("data-row")); var el=document.querySelector("[data-dh]"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }); });
+    apply(3);
+  })();
 </script>
