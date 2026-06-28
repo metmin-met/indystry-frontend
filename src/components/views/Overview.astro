@@ -745,3 +745,21 @@ const kick = (n:string) => n; // helper noop
   .ov-cta-sec .ov-cta-row { justify-content:center; align-items:center; }
   .ov-cta-mail { font-family:var(--font-mono); font-size:.85rem; color:#A6CFC5; }
 </style>
+
+<style>
+  /* Mobile: kein horizontaler Überlauf ("Wackeln/Drift") */
+  .ov-sec, .ov-hero, .ov-dark, .ov-beige, .ov-sysline, .ov-stats-sec, .ov-cta-sec { overflow-x: clip; }
+  .ov-h1, .ov-sys-h, .ov-cta-h, .ov-h2, .ov-h3b, .ov-team-h, .ov-cmp-t, .ov-halt-h { overflow-wrap: break-word; }
+  .ov-3col > *, .ov-4col > *, .ov-5col > *, .ov-2col > *, .ov-cmp > *, .ov-diag > *, .ov-stat { min-width: 0; }
+  @media (max-width: 680px) {
+    .ov-h1 { font-size: clamp(2.05rem, 9vw, 3rem); letter-spacing: -.03em; }
+    .ov-sys-h { font-size: clamp(2.1rem, 9vw, 3.2rem); }
+    .ov-cta-h { font-size: clamp(2rem, 8.5vw, 3rem); }
+    .ov-h1, .ov-sys-h, .ov-cta-h { hyphens: auto; }
+    .ov-hsplit { padding-left: 1.25rem; padding-right: 1.25rem; }
+  }
+  @media (max-width: 520px) {
+    .ov-stat-col { grid-template-columns: 1fr; }
+    .ov-diag { grid-template-columns: 1fr; }
+  }
+</style>
