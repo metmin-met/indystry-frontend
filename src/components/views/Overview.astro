@@ -100,7 +100,15 @@ const diag = [
   { tag:"OPT 03", label:"11–25", v:L("Tiefes Chaos. Keiner kennt mehr die eine Wahrheit.","Deep chaos. Nobody knows the single truth anymore.") },
   { tag:"OPT 04", label:"25+",   v:L("Tabellen-Hölle. Höchste Zeit für ein System.","Spreadsheet hell. High time for a system.") },
 ];
-const interfaces = ["PEPPOL", L("Buchhaltung","Accounting"), L("Versand-API","Shipping API"), L("Lieferanten","Suppliers"), "OPC-UA", "SPS", "MCP"];
+const interfaces = [
+  { l:"PEPPOL", d:L("Standard für strukturierte E-Rechnungen — rein und raus, ohne PDF-Abtippen.","Standard for structured e-invoices — in and out, no PDF re-typing.") },
+  { l:L("Buchhaltung","Accounting"), d:L("Export zu DATEV, BMD & Co. — Belege landen direkt beim Steuerberater.","Export to DATEV, BMD & co. — records land straight with the tax advisor.") },
+  { l:L("Versand-API","Shipping API"), d:L("Anbindung an Versanddienstleister: Etiketten und Tracking automatisch.","Connects to carriers: labels and tracking automatically.") },
+  { l:L("Lieferanten","Suppliers"), d:L("Bestellungen, Preise und Wareneingänge digital mit Lieferanten austauschen.","Exchange orders, prices and receipts with suppliers digitally.") },
+  { l:"OPC-UA", d:L("Herstellerneutrale Maschinensprache — Sensor- und Maschinendaten standardisiert herein.","Vendor-neutral machine language — sensor and machine data in, standardised.") },
+  { l:"SPS", d:L("Speicherprogrammierbare Steuerung — direkt an die Maschinensteuerung angebunden.","PLC — connected straight to the machine controller.") },
+  { l:"MCP", d:L("Model-Context-Protocol — gibt der KI rechtegeprüften Zugriff auf Daten und Tools.","Model Context Protocol — gives the AI permission-checked access to data and tools.") },
+];
 const fxExamples = de
   ? ["Niemand sieht, was die Maschinen machen","Wir verlieren ständig Messdaten","Auswertungen kosten jeden Monat Tage","Audit steht an, nichts ist auffindbar"]
   : ["Nobody sees what the machines do","We keep losing measurement data","Reports cost days every month","An audit is due, nothing is findable"];
@@ -215,7 +223,7 @@ const kick = (n:string) => n; // helper noop
   <div class="rv1">
     <div class="ov-head"><span class="ov-mono ov-kick">{L("Schnittstellen","Interfaces")}</span><span class="ov-hair"></span></div>
     <h2 class="ov-h3b">{L("Spricht mit allem, was zählt.","Talks to everything that matters.")}</h2>
-    <div class="ov-ifs">{interfaces.map((x) => <span class="ov-if">{x}</span>)}</div>
+    <div class="ov-ifs">{interfaces.map((x) => <a class="ov-if" href={`${b}/schnittstellen/`} title={x.d}>{x.l}</a>)}</div>
   </div>
 </div></section>
 
@@ -634,7 +642,8 @@ const kick = (n:string) => n; // helper noop
 
   /* Migration/Schnittstellen */
   .ov-ifs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.4rem; }
-  .ov-if { font-family:var(--font-mono); font-size:.78rem; color:#16463E; background:#fff; border:1px solid #C0C8C5; border-radius:8px; padding:.45rem .8rem; }
+  .ov-if { font-family:var(--font-mono); font-size:.78rem; color:#16463E; background:#fff; border:1px solid #C0C8C5; border-radius:8px; padding:.45rem .8rem; text-decoration:none; cursor:help; transition:border-color .2s,background .2s; }
+  .ov-if:hover { border-color:#16463E; background:#EFEAE0; }
 
   /* Stats */
   .ov-stats-sec { position:relative; overflow:hidden; }
