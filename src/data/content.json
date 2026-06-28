@@ -297,7 +297,7 @@
       "demo": {
         "url": "https://erp-demo.indystry.works",
         "login": "demo / demo",
-        "status": "planned"
+        "status": "live"
       },
       "de": {
         "hook": {

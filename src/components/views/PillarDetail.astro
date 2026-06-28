@@ -19,6 +19,23 @@ const CAT: Record<string, string> = {
 };
 const cat = CAT[pillar.slug] || "";
 const detailUrl = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s + "/");
+const L = (d: string, e: string) => (de ? d : e);
+const isErp = pillar.slug === "erp-betrieb";
+const erpFlow = de
+  ? ["Auftrag", "Planung", "Fertigung", "Qualität", "Lager", "Rechnung"]
+  : ["Order", "Planning", "Production", "Quality", "Stock", "Invoice"];
+const erpModules = [
+  { t: L("Aufträge & Verkauf", "Orders & sales"), d: L("Angebot, Auftrag, Lieferung, Rechnung in einem Fluss.", "Quote, order, delivery, invoice in one flow.") },
+  { t: L("Einkauf & Lieferanten", "Purchasing & suppliers"), d: L("Bestellungen, Wareneingang, Lieferantenpreise.", "POs, goods receipt, supplier pricing.") },
+  { t: L("Fertigung (MRP)", "Manufacturing (MRP)"), d: L("Stücklisten, Arbeitspläne, Fertigungsaufträge.", "BOMs, routings, work orders.") },
+  { t: L("Planung mit Gantt", "Planning with Gantt"), d: L("Kapazitäten und Termine sichtbar steuern.", "Steer capacity and dates visually.") },
+  { t: L("Lager & Chargen", "Stock & lots"), d: L("Bestände, Buchungen, lückenlose Rückverfolgung.", "Stock, moves, seamless lot traceability.") },
+  { t: L("Qualitätsprüfung", "Quality control"), d: L("Prüfpläne, Grenzwerte, Prüfprotokolle am Auftrag.", "Control plans, limits, inspection records on the order.") },
+  { t: L("Wartung", "Maintenance"), d: L("Geplante und Ad-hoc-Instandhaltung der Anlagen.", "Planned and ad-hoc equipment maintenance.") },
+  { t: L("Kostenrechnung & Fakturierung", "Costing & invoicing"), d: L("Von der Kalkulation bis zur Rechnung.", "From calculation to invoice.") },
+  { t: L("Zeit & Anwesenheit", "Time & attendance"), d: L("Arbeitszeit, Schicht, Projektzeiten.", "Working hours, shifts, project time.") },
+  { t: L("Mobile-App + NFC", "Mobile app + NFC"), d: L("Anwesenheit und Behälter-Tracking direkt an der Maschine.", "Attendance and container tracking right at the machine.") },
+];
 ---
 <article style="background:#F8F9FA;">
   <div style="max-width:880px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
@@ -62,8 +79,34 @@ const detailUrl = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s 
       </div>
     )}
 
-    {pillar.slug === "erp-betrieb" && (
-      <a href={de ? "/erp/" : "/en/erp/"} class="pd-rel" style="text-decoration:none; color:#1B1C1E; display:inline-flex; align-items:center; gap:8px; margin-top:clamp(28px,4vw,40px); font-weight:600; font-size:15px; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{de ? "Zur ERP-Produktseite" : "To the ERP product page"} →</a>
+    {isErp && (
+      <section style="margin-top:clamp(40px,5vw,60px); border-top:1px solid #E2E8F0; padding-top:clamp(32px,4vw,44px);">
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Auftrag → Rechnung: ein Datenmodell", "Order → invoice: one data model")}</p>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 8px;">
+          {erpFlow.map((step, i) => (
+            <>
+              {i > 0 && <span style="color:#E6B23A; font-weight:700;">→</span>}
+              <span style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#123A33; background:#fff; border:1px solid #C0C8C5; border-radius:9999px; padding:7px 14px;">{step}</span>
+            </>
+          ))}
+        </div>
+        <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(28px,4vw,40px); max-width:60ch;">{L("Einmal eingegeben, überall sichtbar — kein Zuruf-Telefonat, kein doppeltes Tippen.", "Entered once, visible everywhere — no shouted phone calls, no double typing.")}</p>
+
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Was alles drinsteckt", "What's inside")}</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:12px;">
+          {erpModules.map((m) => (
+            <div style="border:1px solid #E2E8F0; border-left:3px solid #c4673f; border-radius:12px; background:#fff; padding:15px 16px;">
+              <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{m.t}</p>
+              <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{m.d}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:clamp(28px,4vw,40px);">
+          <a href={pillar.demo.url} target="_blank" rel="noopener" style="text-decoration:none; background:#123A33; color:#F8F9FA; font-weight:600; font-size:15px; padding:14px 24px; border-radius:10px;">{L("ERP live ausprobieren", "Try the ERP live")} ↗</a>
+          <a href={de ? "/erp/" : "/en/erp/"} class="pd-rel" style="text-decoration:none; color:#1B1C1E; display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:15px; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{L("Zur ERP-Produktseite", "To the ERP product page")} →</a>
+        </div>
+      </section>
     )}
 
     <!-- Story -->
