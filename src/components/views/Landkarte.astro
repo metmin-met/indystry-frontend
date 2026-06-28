@@ -1,52 +1,306 @@
 ---
-// /landkarte/ — die große klickbare Werks-Landkarte: alle Phasen, alle Tools, alle Live-Demos,
-// gefiltert nach Akt/Bereich/Live. Reuse PhaseMatrix (variant=full) + Tool-Legende.
+// /landkarte/ — Werks-Landkarte als vertikale Prozess-Linie (Timeline). Server-gerendert aus
+// phases.ts; Filter (Akt/Bereich/nur-Live) client-seitig per Klassen-Toggle. Design-Handoff
+// „Werks-Landkarte (Prozess-Linie)". Eingebettet in Base.astro (Header/Footer/Related).
 import type { Lang } from "../../lib/content";
-import { TOOLS, CATS } from "../../data/phases";
-import PhaseMatrix from "./PhaseMatrix.astro";
+import { PHASES, TOOLS, CATS } from "../../data/phases";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
 const b = de ? "" : "/en";
 const L = (d: string, e: string) => (de ? d : e);
 const hrefOf = (t: any) => (t.ext ? t.href : b + t.href);
-const toolList = Object.values(TOOLS);
+const glyph = (t: any) => (t.ext ? "↗" : "→");
+
+const AKT = [
+  { id: "I",   roman: "I",   name: L("Anbahnung", "Initiation"),          range: "P0–P3" },
+  { id: "II",  roman: "II",  name: L("Auftrag → Lieferung", "Order → delivery"), range: "P4–P9" },
+  { id: "III", roman: "III", name: L("Nach der Lieferung", "After delivery"),    range: "P10–P12" },
+] as const;
+
+const liveCount = PHASES.flatMap((p) => p.tools).filter((k) => TOOLS[k].ext).length;
+const toolCount = Object.keys(TOOLS).length;
+const catCount = new Set(Object.values(TOOLS).map((t) => t.cat)).size;
+const catOrder = ["erp", "ai", "twin", "knowledge", "bi", "ops", "data", "web"];
+
+// Flache Item-Liste (Akt-Reihe + Phasen-Reihen), für Linien-Caps
+type Item = { kind: "act" | "phase"; akt: string } & Record<string, any>;
+const items: Item[] = [];
+for (const a of AKT) {
+  items.push({ kind: "act", akt: a.id, roman: a.roman, name: a.name, range: a.range,
+    count: PHASES.filter((p) => p.akt === a.id).length });
+  for (const p of PHASES.filter((p) => p.akt === a.id)) {
+    items.push({ kind: "phase", akt: a.id, id: p.id, star: !!p.star,
+      title: p.titel[lang], desc: p.kurz[lang],
+      tools: p.tools.map((k) => ({ ...TOOLS[k], key: k })),
+      cats: Array.from(new Set(p.tools.map((k) => TOOLS[k].cat))).join(" "),
+      live: p.tools.some((k) => TOOLS[k].ext) ? "1" : "0" });
+  }
+}
+const lineCap = (i: number) => `top:${i === 0 ? "2rem" : "0"};bottom:${i === items.length - 1 ? "calc(100% - 2rem)" : "0"};`;
 ---
-<section style="background:#123A33; color:#F4F6F5;">
-  <div style="max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Werks-Landkarte", "Factory map")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Die ganze Firma — als klickbare Landkarte.", "The whole company — as a clickable map.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Jede Phase vom Erstkontakt bis zur Wartung, jedes Tool, jede Live-Demo — alles anklickbar. Filtere nach Akt, Bereich oder nur Live-Demos und spring direkt rein.", "Every phase from first contact to maintenance, every tool, every live demo — all clickable. Filter by act, area or live demos only and jump straight in.")}</p>
+<section class="lk-hero">
+  <div class="lk-eyrow">
+    <span class="lk-eyebrow">{L("Werks-Landkarte", "Factory map")}</span>
+    <span class="lk-livepill"><span class="lk-livedot"></span>{liveCount} {L("Live-Demos", "live demos")}</span>
+  </div>
+  <h1 class="lk-h1">{L("Die ganze Firma — als klickbare Landkarte.", "The whole company — as a clickable map.")}</h1>
+  <p class="lk-lead">{L("Jede Phase vom Erstkontakt bis zur Wartung, jedes Tool, jede Live-Demo — alles anklickbar. Filtere nach Akt, Bereich oder nur Live-Demos und spring direkt rein.", "Every phase from first contact to maintenance, every tool, every live demo — all clickable. Filter by act, area or live demos only and jump straight in.")}</p>
+  <div class="lk-glyphs">
+    <span><span class="g-live">↗</span> {L("Live-Demo öffnen", "Open live demo")}</span>
+    <span><span class="g-page">→</span> {L("Seite ansehen", "View page")}</span>
+    <span><span class="g-star">★</span> {L("Meilenstein", "Milestone")}</span>
   </div>
 </section>
 
-<section style="background:#F8F9FA;">
-  <div style="max-width:1180px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <PhaseMatrix lang={lang} variant="full" />
-
-    <div class="lk-legend">
-      <p class="lk-legend-h">{L("Alle Tools im Überblick", "All tools at a glance")}</p>
-      <div class="lk-tools">
-        {toolList.map((t) => (
-          <a class="lk-tool" style={`--cc:${t.color}`} href={hrefOf(t)} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}>
-            <span class="lk-tdot"></span><span class="lk-tname">{t.name[lang]}</span>
-            <span class="lk-tcat">{CATS[t.cat][lang]}</span>
-            <span class="lk-tarr">{t.ext ? "↗" : "→"}</span>
-          </a>
-        ))}
+<div class="lk-bar">
+  <div class="lk-bar-inner">
+    <div class="lk-grp">
+      <span class="lk-lab">{L("Akt", "Act")}</span>
+      <div class="lk-seg-wrap">
+        <button type="button" class="lk-seg on" data-akt="all">{L("Alle", "All")}</button>
+        {AKT.map((a) => <button type="button" class="lk-seg" data-akt={a.id}>{a.roman}</button>)}
       </div>
     </div>
+    <div class="lk-grp">
+      <span class="lk-lab">{L("Bereich", "Area")}</span>
+      <select class="lk-sel" id="lk-bereich">
+        <option value="all">{L("Alle", "All")}</option>
+        {catOrder.map((c) => <option value={c}>{CATS[c][lang]}</option>)}
+      </select>
+    </div>
+    <button type="button" class="lk-live" id="lk-live"><span class="lk-live-dot"></span>{L("nur Live-Demos", "live demos only")} ↗</button>
+    <div class="lk-bar-right">
+      <span class="lk-count" id="lk-count"></span>
+      <button type="button" class="lk-reset" id="lk-reset" hidden>{L("Zurücksetzen", "Reset")} ✕</button>
+    </div>
   </div>
+</div>
+
+<section class="lk-wrap">
+  <div class="lk-tl" id="lk-tl">
+    {items.map((it, i) => (
+      <div class={`lk-row ${it.kind}`} data-kind={it.kind} data-akt={it.akt} data-cats={it.kind === "phase" ? it.cats : undefined} data-live={it.kind === "phase" ? it.live : undefined}>
+        <div class="lk-rail">
+          <span class="lk-line" style={lineCap(i)}></span>
+          {it.kind === "act"
+            ? <span class="lk-node lk-node-act">{it.roman}</span>
+            : <><span class="lk-tick"></span><span class={`lk-node lk-node-phase${it.star ? " star" : ""}`}></span></>}
+        </div>
+        <div class="lk-content">
+          {it.kind === "act" ? (
+            <div class="lk-act">
+              <span class="lk-act-eyebrow">{L("Akt", "Act")} {it.roman}</span>
+              <div class="lk-act-row">
+                <span class="lk-act-h">{it.name}</span>
+                <span class="lk-act-cap" data-range={it.range} data-count={it.count}>{it.range} · {it.count} {L("Phasen", "phases")}</span>
+              </div>
+            </div>
+          ) : (
+            <article class="lk-card">
+              <div class="lk-card-top">
+                <span class={`lk-code${it.star ? " star" : ""}`}>{it.id}</span>
+                {it.star && <span class="lk-star"><span class="lk-star-sym">★</span> {L("Meilenstein", "Milestone")}</span>}
+              </div>
+              <h3 class="lk-title">{it.title}</h3>
+              <p class="lk-desc">{it.desc}</p>
+              <div class="lk-chips">
+                {it.tools.map((t: any) => (
+                  <a class="lk-chip" href={hrefOf(t)} title={t.desc[lang]} data-cat={t.cat} data-ext={t.ext ? "1" : "0"} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}>
+                    <span class="lk-dot" style={`background:${t.color}`}></span><span>{t.name[lang]}</span><span class="lk-glyph">{glyph(t)}</span>
+                  </a>
+                ))}
+              </div>
+            </article>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="lk-empty" id="lk-empty" hidden>
+    <div class="lk-empty-mark">∅</div>
+    <p>{L("Keine Phase passt zu diesem Filter.", "No phase matches this filter.")}</p>
+    <button type="button" class="lk-reset2" id="lk-reset2">{L("Filter zurücksetzen", "Reset filters")}</button>
+  </div>
+
+  <section class="lk-legend">
+    <div class="lk-legend-head">
+      <h2>{L("Alle Tools im Überblick", "All tools at a glance")}</h2>
+      <span class="lk-legend-sub">{toolCount} {L("Werkzeuge", "tools")} · {catCount} {L("Bereiche", "areas")}</span>
+    </div>
+    <div class="lk-legend-grid">
+      {Object.values(TOOLS).map((t: any) => (
+        <a class="lk-lg" href={hrefOf(t)} title={t.desc[lang]} data-cat={t.cat} data-ext={t.ext ? "1" : "0"} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}>
+          <span class="lk-lg-head"><span class="lk-dot" style={`background:${t.color}`}></span><span class="lk-lg-name">{t.name[lang]}</span><span class="lk-lg-glyph">{glyph(t)}</span></span>
+          <span class="lk-lg-desc">{t.desc[lang]}</span>
+          <span class="lk-lg-cat">{CATS[t.cat][lang]}</span>
+        </a>
+      ))}
+    </div>
+  </section>
 </section>
 
 <style>
-  .lk-legend { margin-top: clamp(40px,5vw,64px); border-top: 1px solid #E2E8F0; padding-top: 28px; }
-  .lk-legend-h { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #16463E; margin: 0 0 16px; }
-  .lk-tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
-  .lk-tool { display: flex; align-items: center; gap: 10px; text-decoration: none; border: 1px solid #E2E8F0; border-left: 3px solid var(--cc); border-radius: 10px; background: #fff; padding: 11px 14px; transition: box-shadow .14s, transform .14s, border-color .14s; }
-  .lk-tool:hover { box-shadow: 0 8px 20px rgba(11,28,25,.08); transform: translateY(-2px); }
-  .lk-tdot { width: 9px; height: 9px; border-radius: 50%; background: var(--cc); flex: none; }
-  .lk-tname { font-weight: 600; font-size: 14px; color: #1B1C1E; }
-  .lk-tcat { font-family: var(--font-mono); font-size: 10.5px; color: #92938F; margin-left: auto; }
-  .lk-tarr { color: var(--cc); font-weight: 600; }
+  .lk-hero { max-width:72rem; margin:0 auto; padding:clamp(3rem,6vw,5rem) 1.25rem clamp(1.4rem,3vw,2rem); }
+  .lk-eyrow { display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .lk-eyebrow { font-family:var(--font-mono); font-size:.78rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+  .lk-livepill { display:inline-flex; align-items:center; gap:.45rem; font-family:var(--font-mono); font-size:.72rem; font-weight:600; letter-spacing:.04em; color:#16463E; border:1px solid var(--line-strong); border-radius:9999px; padding:.22rem .6rem; }
+  .lk-livedot { width:.4rem; height:.4rem; border-radius:50%; background:var(--accent); }
+  .lk-h1 { margin:0 0 1.1rem; font-family:var(--font-head); font-weight:760; font-size:clamp(2rem,4.6vw,3.4rem); line-height:1.06; letter-spacing:-.035em; color:var(--ink); max-width:18ch; }
+  .lk-lead { margin:0 0 1.5rem; max-width:62ch; font-size:clamp(1.05rem,1.6vw,1.3rem); line-height:1.5; color:var(--ink-soft); }
+  .lk-glyphs { display:flex; flex-wrap:wrap; gap:1.25rem; font-family:var(--font-mono); font-size:.8rem; color:var(--muted); }
+  .lk-glyphs span { display:inline-flex; align-items:center; gap:.45rem; }
+  .lk-glyphs .g-live { color:#16463E; font-size:1rem; } .lk-glyphs .g-page { color:var(--ink-soft); font-size:1rem; } .lk-glyphs .g-star { color:var(--accent); }
+
+  .lk-bar { border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#F8F9FA; }
+  .lk-bar-inner { max-width:72rem; margin:0 auto; padding:.8rem 1.25rem; display:flex; align-items:center; gap:1rem 1.5rem; flex-wrap:wrap; }
+  .lk-grp { display:flex; align-items:center; gap:.6rem; }
+  .lk-lab { font-family:var(--font-mono); font-size:.7rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-faint); }
+  .lk-seg-wrap { display:flex; gap:.3rem; }
+  .lk-seg { padding:.4rem .8rem; border-radius:8px; font-family:var(--font-sans); font-weight:600; font-size:.82rem; cursor:pointer; background:#fff; color:var(--ink-soft); border:1px solid var(--line-strong); transition:all .15s var(--ease-quint); }
+  .lk-seg:hover { border-color:var(--ink); }
+  .lk-seg.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .lk-sel { appearance:none; -webkit-appearance:none; padding:.5rem 2rem .5rem .8rem; border-radius:8px; border:1px solid var(--line-strong); background-color:#fff; color:var(--ink-soft); font-family:var(--font-sans); font-weight:500; font-size:.85rem; cursor:pointer; min-width:11rem; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235C5E63' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+  .lk-live { display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .8rem; border-radius:8px; font-family:var(--font-sans); font-weight:600; font-size:.82rem; cursor:pointer; background:#fff; color:var(--ink-soft); border:1px solid var(--line-strong); transition:all .15s var(--ease-quint); }
+  .lk-live:hover { border-color:var(--ink); }
+  .lk-live-dot { width:.5rem; height:.5rem; border-radius:50%; background:var(--accent); }
+  .lk-live.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .lk-live.on .lk-live-dot { background:#fff; }
+  .lk-bar-right { margin-left:auto; display:flex; align-items:center; gap:.9rem; }
+  .lk-count { font-family:var(--font-mono); font-size:.78rem; color:var(--muted); }
+  .lk-reset { padding:.4rem .75rem; border-radius:8px; border:1px solid var(--line-strong); background:#fff; color:var(--ink-soft); font-family:var(--font-sans); font-weight:600; font-size:.78rem; cursor:pointer; }
+  .lk-reset:hover { border-color:var(--ink); }
+
+  .lk-wrap { max-width:72rem; margin:0 auto; padding:clamp(2rem,4vw,3rem) 1.25rem 2.5rem; }
+  .lk-tl { position:relative; }
+  .lk-row { display:grid; grid-template-columns:3rem minmax(0,1fr); align-items:start; }
+  .lk-row.hide { display:none; }
+  .lk-rail { position:relative; align-self:stretch; }
+  .lk-line { position:absolute; left:1.5rem; transform:translateX(-50%); width:2px; background:#C7CEC9; }
+  .lk-tick { position:absolute; left:1.5rem; top:2rem; width:1.5rem; height:2px; background:#C7CEC9; z-index:1; }
+  .lk-node { position:absolute; left:1.5rem; top:2rem; transform:translate(-50%,-50%); border-radius:50%; z-index:2; box-shadow:0 0 0 4px #F8F9FA; }
+  .lk-node-act { width:2.2rem; height:2.2rem; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:.82rem; }
+  .lk-node-phase { width:.95rem; height:.95rem; background:#fff; border:2px solid var(--accent); }
+  .lk-node-phase.star { width:1.15rem; height:1.15rem; background:var(--accent); }
+  .lk-content { max-width:46rem; min-width:0; padding-bottom:1.5rem; }
+
+  .lk-act { padding:.35rem 0 1.1rem; }
+  .lk-act-eyebrow { font-family:var(--font-mono); font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .lk-act-row { display:flex; align-items:baseline; gap:.9rem; flex-wrap:wrap; margin-top:.3rem; }
+  .lk-act-h { font-family:var(--font-head); font-weight:700; font-size:clamp(1.35rem,2.6vw,1.9rem); line-height:1.1; letter-spacing:-.025em; color:var(--ink); }
+  .lk-act-cap { font-family:var(--font-mono); font-size:.72rem; color:var(--muted); }
+
+  .lk-card { background:#fff; border:1px solid #CBD2CC; border-radius:8px; padding:1.4rem; display:flex; flex-direction:column; gap:.55rem; transition:border-color .25s var(--ease-quint); }
+  .lk-card:hover { border-color:var(--ink); }
+  .lk-card-top { display:flex; align-items:center; justify-content:space-between; gap:.6rem; }
+  .lk-code { display:inline-flex; align-items:center; padding:.28rem .6rem; border-radius:9999px; font-family:var(--font-mono); font-weight:600; font-size:.78rem; letter-spacing:.02em; background:#fff; color:var(--ink); border:1px solid var(--line-strong); }
+  .lk-code.star { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .lk-star { display:inline-flex; align-items:center; gap:.3rem; font-family:var(--font-mono); font-size:.66rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); }
+  .lk-star-sym { font-size:.8rem; }
+  .lk-title { margin:.15rem 0 0; font-family:var(--font-head); font-weight:640; font-size:1.18rem; line-height:1.22; letter-spacing:-.01em; color:var(--ink); }
+  .lk-desc { margin:0; font-size:.92rem; line-height:1.5; color:var(--muted); }
+  .lk-chips { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.2rem; }
+  .lk-chip { display:inline-flex; align-items:center; gap:.45rem; padding:.32rem .65rem; border-radius:9999px; border:1px solid var(--line-strong); background:#fff; text-decoration:none; font-family:var(--font-mono); font-size:.74rem; font-weight:500; color:var(--ink-soft); white-space:nowrap; transition:border-color .15s,background .15s,opacity .15s; }
+  .lk-chip:hover { border-color:var(--ink); }
+  .lk-chip.match { border-color:var(--accent); background:var(--bg-soft); }
+  .lk-chip.dim { opacity:.32; }
+  .lk-dot { width:.5rem; height:.5rem; border-radius:50%; flex:none; }
+  .lk-glyph { opacity:.55; }
+
+  .lk-empty { text-align:center; padding:4.5rem 1.25rem; color:var(--muted); }
+  .lk-empty-mark { font-family:var(--font-mono); font-size:2rem; color:var(--line-strong); margin-bottom:.75rem; }
+  .lk-empty p { margin:0 0 1.1rem; font-size:1.05rem; }
+  .lk-reset2 { padding:.6rem 1.1rem; border-radius:8px; border:1px solid var(--line-strong); background:#fff; color:var(--ink); font-family:var(--font-sans); font-weight:600; font-size:.9rem; cursor:pointer; }
+
+  .lk-legend { margin-top:3rem; padding-top:2rem; border-top:1px solid var(--line); }
+  .lk-legend-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+  .lk-legend-head h2 { margin:0; font-family:var(--font-head); font-weight:680; font-size:clamp(1.4rem,3vw,2rem); letter-spacing:-.02em; color:var(--ink); }
+  .lk-legend-sub { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; color:var(--muted-faint); }
+  .lk-legend-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(18rem,1fr)); gap:.7rem; }
+  .lk-lg { display:flex; flex-direction:column; gap:.35rem; padding:.85rem .95rem; border-radius:8px; border:1px solid var(--line); background:#fff; text-decoration:none; transition:border-color .15s,opacity .15s; }
+  .lk-lg:hover { border-color:var(--ink); }
+  .lk-lg.match { border-color:var(--accent); background:var(--bg-soft); }
+  .lk-lg.dim { opacity:.32; }
+  .lk-lg-head { display:flex; align-items:center; gap:.5rem; }
+  .lk-lg-name { font-family:var(--font-head); font-weight:600; font-size:.95rem; color:var(--ink); }
+  .lk-lg-glyph { margin-left:auto; opacity:.5; }
+  .lk-lg-desc { font-size:.82rem; line-height:1.5; color:var(--muted); }
+  .lk-lg-cat { font-family:var(--font-mono); font-size:.64rem; letter-spacing:.04em; text-transform:uppercase; color:var(--muted-faint); }
+  @media (prefers-reduced-motion: reduce) { .lk-seg,.lk-live,.lk-card,.lk-chip,.lk-lg { transition:none; } }
 </style>
+
+<script>
+  const root = document.getElementById("lk-tl");
+  if (root) {
+    const rows = Array.from(root.querySelectorAll(".lk-row"));
+    const phaseRows = rows.filter((r) => r.dataset.kind === "phase");
+    const actRows = rows.filter((r) => r.dataset.kind === "act");
+    const segs = Array.from(document.querySelectorAll(".lk-seg"));
+    const sel = document.getElementById("lk-bereich");
+    const liveBtn = document.getElementById("lk-live");
+    const countEl = document.getElementById("lk-count");
+    const resetEl = document.getElementById("lk-reset");
+    const reset2 = document.getElementById("lk-reset2");
+    const emptyEl = document.getElementById("lk-empty");
+    const legendChips = Array.from(document.querySelectorAll(".lk-lg"));
+    const T = (d, e) => (document.documentElement.lang !== "en" ? d : e);
+    let akt = "all", bereich = "all", live = false;
+
+    function apply() {
+      const active = live || bereich !== "all";
+      const matchTool = (c, ext) => (!live || ext === "1") && (bereich === "all" || c === bereich);
+      let vPhases = 0, vLinks = 0;
+
+      phaseRows.forEach((r) => {
+        const byAkt = akt === "all" || r.dataset.akt === akt;
+        const chips = Array.from(r.querySelectorAll(".lk-chip"));
+        const anyMatch = chips.some((ch) => matchTool(ch.dataset.cat, ch.dataset.ext));
+        const visible = active ? (byAkt && anyMatch) : byAkt;
+        r.classList.toggle("hide", !visible);
+        chips.forEach((ch) => {
+          const m = active && matchTool(ch.dataset.cat, ch.dataset.ext);
+          const d = active && !matchTool(ch.dataset.cat, ch.dataset.ext);
+          ch.classList.toggle("match", m); ch.classList.toggle("dim", d);
+        });
+        if (visible) { vPhases++; vLinks += chips.length; }
+      });
+      // Akt-Reihen ein/aus + Caption-Count aktualisieren
+      actRows.forEach((a) => {
+        const id = a.dataset.akt;
+        const vis = phaseRows.filter((r) => r.dataset.akt === id && !r.classList.contains("hide"));
+        a.classList.toggle("hide", vis.length === 0);
+        const cap = a.querySelector(".lk-act-cap");
+        if (cap) cap.textContent = `${cap.dataset.range} · ${vis.length} ${T("Phasen","phases")}`;
+      });
+      // Linien-Caps über sichtbare Reihen neu setzen
+      const vis = rows.filter((r) => !r.classList.contains("hide"));
+      rows.forEach((r) => { const l = r.querySelector(".lk-line"); if (l) l.style.cssText = "position:absolute;left:1.5rem;transform:translateX(-50%);width:2px;background:#C7CEC9;top:0;bottom:0;"; });
+      if (vis.length) {
+        const f = vis[0].querySelector(".lk-line"), la = vis[vis.length - 1].querySelector(".lk-line");
+        if (f) f.style.top = "2rem";
+        if (la) la.style.bottom = "calc(100% - 2rem)";
+        if (vis.length === 1 && f) { f.style.bottom = "calc(100% - 2rem)"; }
+      }
+      // Legende
+      legendChips.forEach((ch) => {
+        const m = bereich !== "all" && ch.dataset.cat === bereich;
+        const d = (bereich !== "all" && ch.dataset.cat !== bereich) || (live && ch.dataset.ext !== "1");
+        ch.classList.toggle("match", m); ch.classList.toggle("dim", d);
+      });
+      // Zähler / Reset / Empty
+      countEl.textContent = `${vPhases} ${T("Phasen","phases")} · ${vLinks} ${T("Tools","tools")}`;
+      const anyFilter = active || akt !== "all";
+      resetEl.hidden = !anyFilter;
+      emptyEl.hidden = vPhases > 0;
+    }
+    function reset() { akt = "all"; bereich = "all"; live = false; segs.forEach((s) => s.classList.toggle("on", s.dataset.akt === "all")); sel.value = "all"; liveBtn.classList.remove("on"); apply(); }
+
+    segs.forEach((s) => s.addEventListener("click", () => { akt = s.dataset.akt; segs.forEach((x) => x.classList.toggle("on", x === s)); apply(); }));
+    sel.addEventListener("change", (e) => { bereich = e.target.value; apply(); });
+    liveBtn.addEventListener("click", () => { live = !live; liveBtn.classList.toggle("on", live); apply(); });
+    resetEl.addEventListener("click", reset);
+    reset2.addEventListener("click", reset);
+    apply();
+  }
+</script>
