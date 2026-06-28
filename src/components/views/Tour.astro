@@ -45,84 +45,88 @@ const steps = [
     x:L("Im Cockpit: Auftrag → Liefertreue → Marge. Eine Wahrheit, die alle teilen.","In the cockpit: order → on-time → margin. One truth everyone shares."),
     l:"BI", h:BI, ext:true, vt:"bars", vd:{items:[{l:"OEE",v:78,max:100,u:"%",c:"#16794a"},{l:L("Liefertreue","On-time"),v:96,max:100,u:"%",c:"#16794a"},{l:L("Ausschuss","Scrap"),v:4,max:20,u:"%",c:"#E6B23A"}]} },
 ];
+const STC: Record<string,string> = { ok:"#16794a", warn:"#E6B23A", idle:"#92938F" };
+function viz(s: any): string {
+  const v = s.vd;
+  if (s.vt === "flow") return `<div class="vz-flow">${v.stages.map((st:string,k:number)=>`<span class="vz-pill ${k===v.active?'on':(k<v.active?'past':'')}">${st}</span>${k<v.stages.length-1?'<span class="vz-arr">→</span>':''}`).join("")}</div>`;
+  if (s.vt === "bars") return `<div class="vz-bars">${v.items.map((it:any)=>`<div class="vz-bar"><div class="vz-bl"><span>${it.l}</span><b>${it.v}${it.u}</b></div><div class="vz-track"><div class="vz-fillb" data-w="${Math.round(it.v/it.max*100)}" style="background:${it.c};width:0%"></div></div></div>`).join("")}</div>`;
+  if (s.vt === "dots") return `<div class="vz-dots">${v.items.map((it:any)=>`<div class="vz-dot"><span style="background:${STC[it[1]]}"></span>${it[0]}</div>`).join("")}</div>`;
+  if (s.vt === "table") return `<table class="vz-tbl"><thead><tr>${v.head.map((h:string)=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${v.rows.map((r:string[])=>`<tr>${r.map((c)=>`<td>${c}</td>`).join("")}</tr>`).join("")}${v.foot?`<tr class="vz-foot">${v.foot.map((c:string)=>`<td>${c}</td>`).join("")}</tr>`:""}</tbody></table>`;
+  return "";
+}
 ---
-<section style="background:#123A33; color:#F4F6F5;">
-  <div style="max-width:1000px; margin:0 auto; padding:clamp(48px,7vw,88px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Der rote Faden","The thread")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:18ch;">{L("Eine Bestellung, der ganze Weg.","One order, the whole way.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Folge dem Lagerbock NW-1001 durch die ganze Firma — jeder Schritt mit Diagramm und Live-Link.","Follow bearing block NW-1001 through the whole company — every step with a diagram and a live link.")}</p>
-  </div>
-</section>
-
-<section style="background:#F8F9FA;">
-  <div style="max-width:1000px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <div class="tr-bar"><div id="tr-fill" class="tr-fill"></div></div>
-    <div id="tr-card" class="tr-card"></div>
-    <div class="tr-nav">
-      <button id="tr-prev" class="tr-btn">← {L("Zurück","Back")}</button>
-      <span id="tr-count" class="tr-count"></span>
-      <button id="tr-next" class="tr-btn primary">{L("Weiter","Next")} →</button>
+<section class="tj-hero">
+  <div class="tj-hero-in">
+    <p class="tj-eyebrow">{L("Der rote Faden","The thread")}</p>
+    <h1 class="tj-h1">{L("Eine Bestellung, der ganze Weg.","One order, the whole way.")}</h1>
+    <p class="tj-lead">{L("Folge dem Lagerbock NW-1001 durch die ganze Firma — jeder Schritt mit Diagramm und Live-Link.","Follow bearing block NW-1001 through the whole company — every step with a diagram and a live link.")}</p>
+    <div class="tj-meta">
+      <span class="tj-pill"><span class="tj-pill-dot"></span>NW-1001</span>
+      <span class="tj-scroll">{L("scrollen, der Faden folgt","scroll, the thread follows")} ↓</span>
     </div>
-    <div id="tr-dots" class="tr-dots"></div>
   </div>
 </section>
 
-<script type="application/json" id="tr-data" is:inline set:html={JSON.stringify(steps)}></script>
-<script>
-  const DE = document.documentElement.lang !== "en";
-  const S = JSON.parse(document.getElementById("tr-data").textContent);
-  const card = document.getElementById("tr-card"), fill = document.getElementById("tr-fill"), count = document.getElementById("tr-count"), dots = document.getElementById("tr-dots");
-  let i = 0;
-  const STC = { ok:"#16794a", warn:"#E6B23A", idle:"#92938F" };
-  function viz(s){
-    const v=s.vd;
-    if(s.vt==="flow"){ return `<div class="vz-flow">${v.stages.map((st,k)=>`<span class="vz-pill ${k===v.active?'on':(k<v.active?'past':'')}">${st}</span>${k<v.stages.length-1?'<span class="vz-arr">→</span>':''}`).join("")}</div>`; }
-    if(s.vt==="bars"){ return `<div class="vz-bars">${v.items.map((it)=>`<div class="vz-bar"><div class="vz-bl"><span>${it.l}</span><b>${it.v}${it.u}</b></div><div class="vz-track"><div class="vz-fillb" data-w="${Math.round(it.v/it.max*100)}" style="background:${it.c};width:0%"></div></div></div>`).join("")}</div>`; }
-    if(s.vt==="dots"){ return `<div class="vz-dots">${v.items.map((it)=>`<div class="vz-dot"><span style="background:${STC[it[1]]}"></span>${it[0]}</div>`).join("")}</div>`; }
-    if(s.vt==="table"){ return `<table class="vz-tbl"><thead><tr>${v.head.map((h)=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${v.rows.map((r)=>`<tr>${r.map((c)=>`<td>${c}</td>`).join("")}</tr>`).join("")}${v.foot?`<tr class="vz-foot">${v.foot.map((c)=>`<td>${c}</td>`).join("")}</tr>`:""}</tbody></table>`; }
-    return "";
-  }
-  function show(n, push) {
-    i = Math.max(0, Math.min(S.length-1, n)); const s = S[i];
-    card.classList.add("swap");
-    setTimeout(() => {
-      card.innerHTML = `<div class="tr-txt">
-          <p class="tr-ph">${s.ph}</p><p class="tr-step">${DE?"Schritt":"Step"} ${i+1} / ${S.length}</p>
-          <h2 class="tr-t">${s.t}</h2><p class="tr-x">${s.x}</p>
-          <a class="tr-live" href="${s.h}" ${s.ext?'target="_blank" rel="noopener"':''}>${DE?"Jetzt live ansehen":"See it live now"} · ${s.l} ${s.ext?"↗":"→"}</a>
-        </div>
-        <div class="tr-viz">${viz(s)}</div>`;
-      card.classList.remove("swap");
-      requestAnimationFrame(()=>card.querySelectorAll(".vz-fillb").forEach(el=>el.style.width=el.dataset.w+"%"));
-    }, 150);
-    fill.style.width = ((i+1)/S.length*100)+"%";
-    count.textContent = `${i+1} / ${S.length}`;
-    dotEls.forEach((d, k) => d.setAttribute("aria-current", String(k===i)));
-    document.getElementById("tr-prev").disabled = i===0;
-    if (push !== false) try { history.replaceState(null,"","#"+(i+1)); } catch(e){}
-  }
-  dots.innerHTML = S.map((_, k) => `<button class="tr-dot" data-k="${k}" aria-label="${k+1}"></button>`).join("");
-  const dotEls = Array.from(dots.querySelectorAll(".tr-dot"));
-  document.getElementById("tr-next").addEventListener("click", () => show(i+1));
-  document.getElementById("tr-prev").addEventListener("click", () => show(i-1));
-  dotEls.forEach((d) => d.addEventListener("click", () => show(+d.dataset.k)));
-  document.addEventListener("keydown", (e) => { if(e.key==="ArrowRight") show(i+1); if(e.key==="ArrowLeft") show(i-1); });
-  const h = parseInt((location.hash||"").replace("#","")); show(h>0?h-1:0, false);
-</script>
+<div class="tj-progress"><div class="tj-progress-fill" id="tj-progress"></div></div>
 
-<style>
-  .tr-bar { height:5px; background:#E2E8F0; border-radius:999px; overflow:hidden; margin-bottom:22px; }
-  .tr-fill { height:100%; background:#E6B23A; border-radius:999px; transition:width .35s ease; }
-  .tr-card { border:1px solid #E2E8F0; border-radius:18px; background:#fff; padding:clamp(22px,3.5vw,40px); box-shadow:0 10px 30px rgba(11,28,25,.07); min-height:260px; transition:opacity .2s ease, transform .2s ease; display:grid; grid-template-columns:1fr; gap:24px; }
-  @media (min-width:760px){ .tr-card{ grid-template-columns:1.05fr 0.95fr; align-items:center; } }
-  .tr-card.swap { opacity:0; transform:translateY(8px); }
-  .tr-ph { display:inline-block; font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#16463E; background:#EFEAE0; border-radius:999px; padding:4px 11px; margin:0 0 12px; }
-  .tr-step { font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 6px; }
-  .tr-t { font-family:var(--font-head,sans-serif); font-weight:600; font-size:clamp(24px,3.6vw,38px); letter-spacing:-0.02em; color:#1B1C1E; margin:0 0 12px; }
-  .tr-x { font-size:clamp(15px,1.6vw,18px); line-height:1.6; color:#3C3E42; margin:0 0 20px; }
-  .tr-live { display:inline-flex; align-items:center; gap:8px; text-decoration:none; background:#123A33; color:#fff; font-weight:600; font-size:15px; padding:11px 18px; border-radius:11px; }
-  .tr-live:hover { background:#0E2E29; }
-  .tr-viz { background:#F8F9FA; border:1px solid #E2E8F0; border-radius:14px; padding:18px; }
+<section class="tj-body">
+  <div class="tj-journey" id="tj-journey">
+    <span class="tj-track" id="tj-track"></span>
+    <span class="tj-fill" id="tj-fill"></span>
+    {steps.map((s, i) => (
+      <div class="tj-step" data-step={i}>
+        <div class="tj-rail">
+          <span class="tj-node" data-node={i}>{i + 1}</span>
+        </div>
+        <article class="tj-card">
+          <div class="tj-text">
+            <span class="tj-ph">{s.ph}</span>
+            <p class="tj-step-n">{L("Schritt","Step")} {i + 1} / {steps.length}</p>
+            <h2 class="tj-t">{s.t}</h2>
+            <p class="tj-x">{s.x}</p>
+            <a class="tj-live" href={s.h} target={s.ext ? "_blank" : undefined} rel={s.ext ? "noopener" : undefined}>{L("Jetzt live ansehen","See it live now")} · {s.l} {s.ext ? "↗" : "→"}</a>
+          </div>
+          <div class="tj-viz" set:html={viz(s)} />
+        </article>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style is:global>
+  .tj-hero { background:#123A33; color:#F4F6F5; }
+  .tj-hero-in { max-width:62rem; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(1.25rem,5vw,3.5rem) clamp(28px,4vw,44px); }
+  .tj-eyebrow { font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px; }
+  .tj-h1 { font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:.99; letter-spacing:-.03em; margin:0 0 16px; max-width:18ch; color:#F4F6F5; }
+  .tj-lead { font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0 0 22px; }
+  .tj-meta { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; }
+  .tj-pill { display:inline-flex; align-items:center; gap:.45rem; font-family:var(--font-mono); font-size:.78rem; font-weight:600; letter-spacing:.04em; color:#E6B23A; border:1px solid #E6B23A55; border-radius:9999px; padding:.28rem .7rem; }
+  .tj-pill-dot { width:.45rem; height:.45rem; border-radius:50%; background:#E6B23A; }
+  .tj-scroll { font-family:var(--font-mono); font-size:.75rem; color:#8FB0A8; }
+
+  .tj-progress { position:sticky; top:0; z-index:40; height:4px; background:#E2E8F0; }
+  .tj-progress-fill { height:100%; width:0; background:#E6B23A; transition:width .1s linear; }
+
+  .tj-body { background:#F8F9FA; }
+  .tj-journey { position:relative; max-width:62rem; margin:0 auto; padding:clamp(2.5rem,5vw,4rem) clamp(1.25rem,5vw,3.5rem) clamp(4rem,8vw,6rem); }
+  .tj-track, .tj-fill { position:absolute; left:calc(clamp(1.25rem,5vw,3.5rem) + 1.75rem); width:2px; transform:translateX(-50%); border-radius:2px; }
+  .tj-track { background:#E2E8F0; }
+  .tj-fill { background:#E6B23A; height:0; }
+  .tj-step { display:grid; grid-template-columns:3.5rem minmax(0,1fr); align-items:start; }
+  .tj-rail { position:relative; align-self:stretch; }
+  .tj-node { position:absolute; left:1.75rem; top:2.2rem; transform:translate(-50%,-50%); width:1.9rem; height:1.9rem; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:.8rem; background:#fff; border:1px solid #C0C8C5; color:#92938F; box-shadow:0 0 0 4px #F8F9FA; z-index:2; transition:background .3s,border-color .3s,color .3s; }
+  .tj-node.active { background:#E6B23A; border-color:#E6B23A; color:#1B1C1E; }
+  .tj-card { max-width:none; min-width:0; margin-bottom:clamp(1.5rem,3vw,2.5rem); background:#fff; border:1px solid #E2E8F0; border-radius:18px; box-shadow:0 10px 30px rgba(11,28,25,.06); padding:clamp(20px,3vw,34px); display:grid; grid-template-columns:1fr; gap:22px; }
+  @media (min-width:780px){ .tj-card { grid-template-columns:1.05fr .95fr; align-items:center; } }
+  .tj-ph { display:inline-block; font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#16463E; background:#EFEAE0; border-radius:9999px; padding:4px 11px; margin:0 0 12px; }
+  .tj-step-n { font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 6px; }
+  .tj-t { font-family:var(--font-head); font-weight:600; font-size:clamp(22px,3vw,34px); letter-spacing:-.02em; color:#1B1C1E; margin:0 0 12px; line-height:1.1; }
+  .tj-x { font-size:clamp(15px,1.6vw,18px); line-height:1.6; color:#3C3E42; margin:0 0 20px; }
+  .tj-live { display:inline-flex; align-items:center; gap:8px; text-decoration:none; background:#123A33; color:#fff; font-weight:600; font-size:15px; padding:11px 18px; border-radius:11px; transition:background .15s; }
+  .tj-live:hover { background:#0E2E29; }
+  .tj-viz { background:#F8F9FA; border:1px solid #E2E8F0; border-radius:14px; padding:18px; }
+
+  /* Diagramme (exakt wie bisher) */
   .vz-flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .vz-pill { font-family:var(--font-mono); font-size:12px; padding:7px 12px; border-radius:999px; border:1px solid #C0C8C5; background:#fff; color:#5C5E63; }
   .vz-pill.on { background:#E6B23A; border-color:#E6B23A; color:#1B1C1E; font-weight:700; }
@@ -132,21 +136,66 @@ const steps = [
   .vz-bl { display:flex; justify-content:space-between; font-size:13px; color:#5C5E63; margin-bottom:5px; }
   .vz-bl b { font-family:var(--font-mono); color:#1B1C1E; }
   .vz-track { height:9px; background:#E2E8F0; border-radius:999px; overflow:hidden; }
-  .vz-fillb { height:100%; border-radius:999px; transition:width .7s cubic-bezier(.4,0,.2,1); }
+  .vz-fillb { height:100%; border-radius:999px; transition:width .8s cubic-bezier(.4,0,.2,1); }
   .vz-dots { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .vz-dot { display:flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:12px; color:#3C3E42; }
   .vz-dot span { width:11px; height:11px; border-radius:50%; }
   .vz-tbl { width:100%; border-collapse:collapse; font-size:13.5px; }
   .vz-tbl th { text-align:left; font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:#92938F; padding:6px 8px; border-bottom:1px solid #E2E8F0; }
   .vz-tbl td { padding:9px 8px; border-bottom:1px solid #F1F3F2; color:#1B1C1E; }
-  .vz-tbl tr:hover td { background:#fff; }
   .vz-tbl .vz-foot td { font-weight:700; color:#123A33; border-top:1px solid #123A33; border-bottom:none; }
-  .tr-nav { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:22px; }
-  .tr-btn { font-family:var(--font-head,sans-serif); font-weight:600; font-size:15px; padding:11px 20px; border:1px solid #C0C8C5; border-radius:11px; background:#fff; cursor:pointer; color:#1B1C1E; }
-  .tr-btn.primary { background:#123A33; color:#fff; border-color:#123A33; }
-  .tr-btn:disabled { opacity:.4; cursor:default; }
-  .tr-count { font-family:var(--font-mono); font-size:13px; color:#92938F; }
-  .tr-dots { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:22px; }
-  .tr-dot { width:10px; height:10px; border-radius:50%; border:none; background:#D7DCDA; cursor:pointer; padding:0; }
-  .tr-dot[aria-current="true"] { background:#123A33; transform:scale(1.25); }
+
+  html.js .tj-step { opacity:0; transform:translateY(16px); transition:opacity .6s var(--ease-quint,ease), transform .6s var(--ease-quint,ease); }
+  html.js .tj-step.in { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .tj-step { opacity:1; transform:none; transition:none; }
+    .tj-node, .tj-live, .vz-fillb, .tj-progress-fill { transition:none; }
+  }
 </style>
+
+<script>
+  const journey = document.getElementById("tj-journey");
+  if (journey) {
+    const steps = Array.from(journey.querySelectorAll(".tj-step"));
+    const nodes = Array.from(journey.querySelectorAll(".tj-node"));
+    const track = document.getElementById("tj-track");
+    const fill = document.getElementById("tj-fill");
+    const prog = document.getElementById("tj-progress");
+    const nodeCenter = (n) => { const r = n.getBoundingClientRect(); return r.top + r.height / 2 + window.scrollY; };
+
+    let ticking = false;
+    function scene() {
+      ticking = false;
+      if (!nodes.length) return;
+      const jTop = journey.getBoundingClientRect().top + window.scrollY;
+      const top = nodeCenter(nodes[0]) - jTop;
+      const bottom = nodeCenter(nodes[nodes.length - 1]) - jTop;
+      const span = Math.max(1, bottom - top);
+      track.style.top = top + "px"; track.style.height = span + "px";
+      fill.style.top = top + "px";
+      const mid = window.scrollY + window.innerHeight / 2;
+      const frac = Math.max(0, Math.min(1, (mid - (top + jTop)) / span));
+      fill.style.height = (frac * span) + "px";
+      prog.style.width = (frac * 100) + "%";
+      nodes.forEach((n) => n.classList.toggle("active", nodeCenter(n) <= mid + 2));
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(scene); } }
+
+    // Reveal + Balken-Animation beim Eintreten
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("in");
+          e.target.querySelectorAll(".vz-fillb").forEach((el) => { el.style.width = el.dataset.w + "%"; });
+          io.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -18% 0px" });
+    steps.forEach((st) => io.observe(st));
+
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    addEventListener("load", scene);
+    scene();
+  }
+</script>
