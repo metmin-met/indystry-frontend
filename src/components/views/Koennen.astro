@@ -1,83 +1,240 @@
 ---
-// /koennen/ — Kompetenz-/Erfahrungsseite (lang-aware, un-branded): was schon gebaut & im Einsatz
-// ist, generisch dargestellt. Verbindet zu den Live-Demos, wo vorhanden.
+// /koennen/ — Kompetenz-/Erfahrungsseite. Redesign (Claude-Design-Handoff ZIP 4):
+// Farbleitsystem pro Domäne, Bento-Hierarchie (im Einsatz = große Feature-Cards), typografische
+// Monogramm-Kacheln, Capability-Marquee, Stats-Zähler, Filter (Domäne + nur im Einsatz).
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
 const L = (d: string, e: string) => (de ? d : e);
 const P = (path: string) => (de ? "" : "/en") + path;
-type Cap = { t: string; d: string; href?: string; ext?: boolean; tag?: string };
-const groups: { name: string; items: Cap[] }[] = [
-  { name: L("Daten & Digitaler Zwilling", "Data & digital twin"), items: [
-    { t: L("Edge-Konnektor", "Edge connector"), d: L("Signale direkt an Maschine/SPS abgreifen — passiv, ohne Eingriff in die Steuerung.", "Tap signals right at the machine/PLC — passively, without touching the controller."), tag: L("im Einsatz","in use") },
-    { t: L("Digital Twin aufsetzen", "Set up a digital twin"), d: L("Live-Abbild der Anlage: zusehen, übersteuern, Ausfälle vorhersagen.", "Live image of the plant: watch, override, predict failures."), href: P("/twin/") },
-    { t: L("Historian / Data-Lake", "Historian / data lake"), d: L("Jeder Mess- und Betriebswert sicher gespeichert und abrufbar.", "Every measurement and operating value stored safely and queryable."), href: P("/historian/") },
-    { t: L("ETL & Daten-Integration", "ETL & data integration"), d: L("Verteilte Quellen sauber zusammenführen — eine Wahrheit statt Insel-Tabellen.", "Bring scattered sources together cleanly — one truth instead of silo spreadsheets."), tag: L("im Einsatz","in use") },
-    { t: L("Unternehmenssuche", "Company-wide search"), d: L("Volltext + KI-Antwort über alle Daten, Dokumente und Historie.", "Full text + AI answer across all data, documents and history."), href: P("/suche/") },
+const b = de ? "" : "/en";
+const inUseLabel = L("im Einsatz", "in use");
+
+type Item = { t: string; d: string; mono: string; href?: string; inUse?: boolean };
+type Group = { key: string; name: string; short: string; color: string; gl: string; items: Item[] };
+const groupsMeta: Group[] = [
+  { key: "daten", name: L("Daten & Digitaler Zwilling", "Data & digital twin"), short: L("Daten & Twin", "Data & twin"), color: "#7b5cc4", gl: "D", items: [
+    { t: L("Edge-Konnektor", "Edge connector"), mono: "EK", inUse: true, d: L("Signale direkt an Maschine/SPS abgreifen — passiv, ohne Eingriff in die Steuerung.", "Tap signals right at the machine/PLC — passively, without touching the controller.") },
+    { t: L("Digital Twin aufsetzen", "Set up a digital twin"), mono: "DT", href: P("/twin/"), d: L("Live-Abbild der Anlage: zusehen, übersteuern, Ausfälle vorhersagen.", "Live image of the plant: watch, override, predict failures.") },
+    { t: L("Historian / Data-Lake", "Historian / data lake"), mono: "HL", href: P("/historian/"), d: L("Jeder Mess- und Betriebswert sicher gespeichert und abrufbar.", "Every measurement and operating value stored safely and queryable.") },
+    { t: L("ETL & Daten-Integration", "ETL & data integration"), mono: "ET", inUse: true, d: L("Verteilte Quellen sauber zusammenführen — eine Wahrheit statt Insel-Tabellen.", "Bring scattered sources together cleanly — one truth instead of silo spreadsheets.") },
+    { t: L("Unternehmenssuche", "Company-wide search"), mono: "US", href: P("/suche/"), d: L("Volltext + KI-Antwort über alle Daten, Dokumente und Historie.", "Full text + AI answer across all data, documents and history.") },
   ]},
-  { name: L("Finanzen & Buchhaltung", "Finance & accounting"), items: [
-    { t: L("Buchhaltung & Bilanz", "Accounting & balance sheet"), d: L("Von der Buchung bis zum Abschluss — durchgängig, ohne Medienbruch.", "From posting to closing — end to end, no media breaks.") },
-    { t: L("Forecast & Controlling", "Forecast & controlling"), d: L("Liquidität, Marge, Nachkalkulation — auf einer Datenbasis.", "Liquidity, margin, post-calculation — on one data base.") },
-    { t: L("E-Rechnung (PEPPOL)", "E-invoicing (PEPPOL)"), d: L("Rechnungen normkonform elektronisch senden und empfangen.", "Send and receive invoices electronically, standard-compliant.") },
-    { t: L("Steuer / UVA", "Tax / VAT return"), d: L("Umsatzsteuer-Voranmeldung und Meldungen direkt aus dem System.", "VAT advance returns and filings straight from the system.") },
-    { t: L("Schnittstellen: BMD · DATEV", "Interfaces: BMD · DATEV"), d: L("Sauberer Export zum Steuerberater — gängige Buchhaltungsformate.", "Clean export to the tax advisor — common accounting formats.") },
+  { key: "finanzen", name: L("Finanzen & Buchhaltung", "Finance & accounting"), short: L("Finanzen", "Finance"), color: "#c4673f", gl: "F", items: [
+    { t: L("Buchhaltung & Bilanz", "Accounting & balance sheet"), mono: "BB", d: L("Von der Buchung bis zum Abschluss — durchgängig, ohne Medienbruch.", "From posting to closing — end to end, no media breaks.") },
+    { t: L("Forecast & Controlling", "Forecast & controlling"), mono: "FC", d: L("Liquidität, Marge, Nachkalkulation — auf einer Datenbasis.", "Liquidity, margin, post-calculation — on one data base.") },
+    { t: L("E-Rechnung (PEPPOL)", "E-invoicing (PEPPOL)"), mono: "ER", d: L("Rechnungen normkonform elektronisch senden und empfangen.", "Send and receive invoices electronically, standard-compliant.") },
+    { t: L("Steuer / UVA", "Tax / VAT return"), mono: "UV", d: L("Umsatzsteuer-Voranmeldung und Meldungen direkt aus dem System.", "VAT advance returns and filings straight from the system.") },
+    { t: L("Schnittstellen: BMD · DATEV", "Interfaces: BMD · DATEV"), mono: "BD", d: L("Sauberer Export zum Steuerberater — gängige Buchhaltungsformate.", "Clean export to the tax advisor — common accounting formats.") },
   ]},
-  { name: L("Betrieb & Instandhaltung", "Operations & maintenance"), items: [
-    { t: L("Maintenance & Anlagendoku (BIM)", "Maintenance & plant docs (BIM)"), d: L("Holistische Sicht: Anlage, Komponenten, Wartung und Pläne an einem Objekt.", "Holistic view: plant, components, maintenance and plans on one object."), href: P("/anlage/") },
-    { t: L("Tages-Digests & Reports", "Daily digests & reports"), d: L("Automatische Tageszusammenfassung — was lief, was offen ist, was auffällt.", "Automatic daily summary — what ran, what's open, what stands out.") },
-    { t: L("Monitoring & Status", "Monitoring & status"), d: L("Dienste, Backups, Uptime — der Betrieb auf einen Blick.", "Services, backups, uptime — operations at a glance."), href: P("/status/") },
+  { key: "betrieb", name: L("Betrieb & Instandhaltung", "Operations & maintenance"), short: L("Betrieb", "Operations"), color: "#2a86a8", gl: "B", items: [
+    { t: L("Maintenance & Anlagendoku (BIM)", "Maintenance & plant docs (BIM)"), mono: "BM", href: P("/anlage/"), d: L("Holistische Sicht: Anlage, Komponenten, Wartung und Pläne an einem Objekt.", "Holistic view: plant, components, maintenance and plans on one object.") },
+    { t: L("Tages-Digests & Reports", "Daily digests & reports"), mono: "TD", d: L("Automatische Tageszusammenfassung — was lief, was offen ist, was auffällt.", "Automatic daily summary — what ran, what's open, what stands out.") },
+    { t: L("Monitoring & Status", "Monitoring & status"), mono: "MO", href: P("/status/"), d: L("Dienste, Backups, Uptime — der Betrieb auf einen Blick.", "Services, backups, uptime — operations at a glance.") },
   ]},
-  { name: L("Menschen & Wissen", "People & knowledge"), items: [
-    { t: L("Onboarding", "Onboarding"), d: L("Neue Mitarbeiter strukturiert einarbeiten — Zugänge, Schritte, Ansprechpartner.", "Bring new staff on board in a structured way — access, steps, contacts.") },
-    { t: L("Schulungsunterlagen", "Training materials"), d: L("Wissen aufbauen und aktuell halten, an einem Ort für alle.", "Build and maintain knowledge, one place for everyone.") },
-    { t: L("Umfragen / Surveys", "Surveys"), d: L("Feedback strukturiert einholen und auswerten.", "Collect and evaluate feedback in a structured way.") },
-    { t: L("Handbuch & Wissens-Kiosk", "Handbook & knowledge kiosk"), d: L("Handbuch, Compliance und App-Launcher für alle.", "Handbook, compliance and app launcher for everyone."), href: P("/wissen/") },
+  { key: "menschen", name: L("Menschen & Wissen", "People & knowledge"), short: L("Menschen & Wissen", "People & knowledge"), color: "#3f9a52", gl: "M", items: [
+    { t: L("Onboarding", "Onboarding"), mono: "OB", d: L("Neue Mitarbeiter strukturiert einarbeiten — Zugänge, Schritte, Ansprechpartner.", "Bring new staff on board in a structured way — access, steps, contacts.") },
+    { t: L("Schulungsunterlagen", "Training materials"), mono: "SU", d: L("Wissen aufbauen und aktuell halten, an einem Ort für alle.", "Build and maintain knowledge, one place for everyone.") },
+    { t: L("Umfragen / Surveys", "Surveys"), mono: "UM", d: L("Feedback strukturiert einholen und auswerten.", "Collect and evaluate feedback in a structured way.") },
+    { t: L("Handbuch & Wissens-Kiosk", "Handbook & knowledge kiosk"), mono: "HK", href: P("/wissen/"), d: L("Handbuch, Compliance und App-Launcher für alle.", "Handbook, compliance and app launcher for everyone.") },
   ]},
-  { name: L("IT, Geräte & Software", "IT, devices & software"), items: [
-    { t: L("Automatisiertes Software-Rollout", "Automated software rollout"), d: L("Software auf die Flotte ausrollen — serverseitig, ohne Vor-Ort, ohne Admin-Prompt.", "Roll out software to the fleet — server-side, no on-site visit, no admin prompt."), tag: L("im Einsatz","in use") },
-    { t: L("App-Kiosk (Self-Service)", "App kiosk (self-service)"), d: L("Mitarbeiter installieren freigegebene Software selbst — sicher.", "Staff install approved software themselves — safely."), href: P("/wissen/") },
-    { t: L("Geräteverwaltung (MDM)", "Device management (MDM)"), d: L("Mobile Geräte und Apps zentral verwalten und absichern.", "Manage and secure mobile devices and apps centrally."), tag: L("im Einsatz","in use") },
-    { t: L("Eigene App-Entwicklung", "Custom app development"), d: L("Wo Standard nicht passt: eigene Web-/Mobile-Apps auf demselben Stack.", "Where standard doesn't fit: custom web/mobile apps on the same stack.") },
-    { t: L("SSO & Souveränität", "SSO & sovereignty"), d: L("Ein Login, alles selbst gehostet, Daten im Haus — kein Lock-in.", "One login, all self-hosted, data in-house — no lock-in."), href: P("/stack/") },
+  { key: "it", name: L("IT, Geräte & Software", "IT, devices & software"), short: L("IT & Geräte", "IT & devices"), color: "#4a6fa5", gl: "I", items: [
+    { t: L("Automatisiertes Software-Rollout", "Automated software rollout"), mono: "SR", inUse: true, d: L("Software auf die Flotte ausrollen — serverseitig, ohne Vor-Ort, ohne Admin-Prompt.", "Roll out software to the fleet — server-side, no on-site visit, no admin prompt.") },
+    { t: L("App-Kiosk (Self-Service)", "App kiosk (self-service)"), mono: "AK", href: P("/wissen/"), d: L("Mitarbeiter installieren freigegebene Software selbst — sicher.", "Staff install approved software themselves — safely.") },
+    { t: L("Geräteverwaltung (MDM)", "Device management (MDM)"), mono: "MD", inUse: true, d: L("Mobile Geräte und Apps zentral verwalten und absichern.", "Manage and secure mobile devices and apps centrally.") },
+    { t: L("Eigene App-Entwicklung", "Custom app development"), mono: "AE", d: L("Wo Standard nicht passt: eigene Web-/Mobile-Apps auf demselben Stack.", "Where standard doesn't fit: custom web/mobile apps on the same stack.") },
+    { t: L("SSO & Souveränität", "SSO & sovereignty"), mono: "SS", href: P("/stack/"), d: L("Ein Login, alles selbst gehostet, Daten im Haus — kein Lock-in.", "One login, all self-hosted, data in-house — no lock-in.") },
   ]},
 ];
-const total = groups.reduce((a, g) => a + g.items.length, 0);
+
+const tint = (c: string) => `color-mix(in srgb, ${c} 7%, #fff)`;
+type Flat = Item & { grp: string; gkey: string; color: string; gl: string; feat: boolean };
+const all: Flat[] = [];
+groupsMeta.forEach((g) => g.items.forEach((it) => all.push({ ...it, grp: g.short, gkey: g.key, color: g.color, gl: g.gl, feat: !!it.inUse })));
+const total = all.length;
+const inUseN = all.filter((x) => x.inUse).length;
+const demoN = all.filter((x) => x.href).length;
+const half = Math.ceil(all.length / 2);
+const rowA = all.slice(0, half), rowB = all.slice(half);
+const filterDefs: [string, string, string][] = [["all", L("Alle", "All"), "#123A33"], ...groupsMeta.map((g) => [g.key, g.short, g.color] as [string, string, string])];
+const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name, color: g.color }]));
 ---
-<section style="background:#123A33; color:#F4F6F5;">
-  <div style="max-width:1100px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(44px,6vw,68px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Was wir können", "What we can do")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Aus Erfahrung gebaut. Nicht aus Slides.", "Built from experience. Not from slides.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L(`Vieles davon läuft schon — in echten Werken, im Tagesbetrieb. Hier ${total} Bausteine generisch, ohne Kundennamen. Wo es eine Demo gibt, kannst du direkt reinklicken.`, `A lot of this is already running — in real plants, in daily operation. Here are ${total} building blocks, generic, no customer names. Where there's a demo, click straight in.`)}</p>
+<!-- HERO -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; top:-12%; right:-6%; width:44%; height:74%; background:radial-gradient(circle at 60% 40%,rgba(230,178,58,.16),transparent 62%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(46px,7vw,92px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+    <div style="display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#A6CFC5; margin-bottom:20px;">
+      <span style="width:7px; height:7px; background:#E6B23A; display:inline-block;"></span>{L("Was wir können · Aus Erfahrung", "What we can do · from experience")}
+    </div>
+    <h1 style="font-family:var(--font-head); font-weight:800; font-size:clamp(38px,6.4vw,80px); line-height:0.98; letter-spacing:-0.04em; margin:0; max-width:16ch;">{L("Aus Erfahrung gebaut.", "Built from experience.")} <span style="color:#E6B23A;">{L("Nicht aus Slides.", "Not from slides.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,22px); line-height:1.6; color:#C7D8D2; max-width:60ch; margin:24px 0 0;">{L("Vieles läuft schon — in echten Werken, im Tagesbetrieb. Generisch, ohne Kundennamen. Wo es eine Demo gibt, klick direkt rein.", "A lot is already running — in real plants, in daily operation. Generic, no customer names. Where there's a demo, click straight in.")}</p>
+  </div>
+  <!-- MARQUEE -->
+  <div style="position:relative; border-top:1px solid rgba(166,207,197,.16); border-bottom:1px solid rgba(166,207,197,.16); padding:16px 0; display:flex; flex-direction:column; gap:9px;">
+    <div class="kn-mqrow"><div class="kn-mq">
+      {[...rowA, ...rowA].map((m) => (
+        <span class="kn-mqpill"><span class="kn-mqmono" style={`border-color:${m.color}; color:${m.color};`}>{m.mono}</span>{m.t}</span>
+      ))}
+    </div></div>
+    <div class="kn-mqrow"><div class="kn-mq kn-mqb">
+      {[...rowB, ...rowB].map((m) => (
+        <span class="kn-mqpill"><span class="kn-mqmono" style={`border-color:${m.color}; color:${m.color};`}>{m.mono}</span>{m.t}</span>
+      ))}
+    </div></div>
+  </div>
+  <!-- STATS -->
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:22px clamp(24px,5vw,56px);">
+    <div class="kn-stats">
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#F4F8F6;"><span class="kn-count" data-to={total}>{total}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("BAUSTEINE", "BUILDING BLOCKS")}</div></div>
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#3FB57E;"><span class="kn-count" data-to={inUseN}>{inUseN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("IM EINSATZ", "IN USE")}</div></div>
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#E6B23A;"><span class="kn-count" data-to={demoN}>{demoN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("MIT DEMO / SEITE", "WITH DEMO / PAGE")}</div></div>
+    </div>
   </div>
 </section>
 
-<section style="background:#F8F9FA;">
-  <div style="max-width:1100px; margin:0 auto; padding:clamp(36px,5vw,64px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    {groups.map((g) => (
-      <div style="margin-bottom:clamp(28px,3.5vw,44px);">
-        <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:14px;">
-          <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{g.name}</span>
-          <span style="flex:1; height:1px; background:#E2E8F0;"></span>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;">
-          {g.items.map((it) => {
-            const inner = (
-              <>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
-                  <span style="font-family:var(--font-head); font-weight:600; font-size:16px; color:#1B1C1E;">{it.t}</span>
-                  {it.tag && <span style="font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; color:#16794a; border:1px solid #16794a44; border-radius:999px; padding:2px 7px;">{it.tag}</span>}
-                  {it.href && <span style="margin-left:auto; color:#92938F; font-size:13px;">{it.ext ? "↗" : "→"}</span>}
-                </div>
-                <span style="display:block; font-size:14px; line-height:1.5; color:#5C5E63;">{it.d}</span>
-              </>
-            );
-            return it.href
-              ? <a href={it.href} target={it.ext ? "_blank" : undefined} rel={it.ext ? "noopener" : undefined} style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:15px 17px; display:block;">{inner}</a>
-              : <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:15px 17px;">{inner}</div>;
-          })}
-        </div>
-      </div>
+<!-- FILTER -->
+<div class="kn-filterbar" data-ghead={JSON.stringify(gheadMap)}>
+  <div style="max-width:1120px; margin:0 auto; padding:13px clamp(24px,5vw,56px); display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    {filterDefs.map(([k, label, color]) => (
+      <button type="button" class="kn-filt" data-group={k} data-color={color} aria-pressed={k === "all" ? "true" : "false"}>
+        <span class="kn-fdot" style={`background:${color};`}></span>{label} <span style="opacity:.6; font-size:11px;">{k === "all" ? total : groupsMeta.find((g) => g.key === k)!.items.length}</span>
+      </button>
     ))}
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:18px; margin-top:8px;">{L("Nicht alles braucht jeder. Der Punkt ist: es greift ineinander, läuft im eigenen Haus und wächst mit — Schritt für Schritt statt Big-Bang.", "Not everyone needs all of it. The point: it interlocks, runs in your own house and grows with you — step by step, not big bang.")}</p>
+    <button type="button" class="kn-filt kn-inuse" data-inuse aria-pressed="false"><span class="kn-led" style="width:7px; height:7px; border-radius:50%; background:#16794a; display:inline-block;"></span> {L("nur im Einsatz", "in use only")}</button>
+    <span style="margin-left:auto; font-family:var(--font-mono); font-size:12px; color:#5C5E63;"><b id="kn-vis">{total}</b> / {total}</span>
+  </div>
+</div>
+
+<!-- BENTO -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1120px; margin:0 auto; padding:clamp(36px,4vw,56px) clamp(24px,5vw,56px) clamp(56px,7vw,88px);">
+    <div id="kn-ghead" style="display:none; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; white-space:nowrap;"><span id="kn-ghead-dot" style="width:8px; height:8px; border-radius:50%;"></span><span id="kn-ghead-name"></span></span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span><span style="width:7px; height:7px; border:1.5px solid #C0C8C5;"></span>
+    </div>
+    <div id="kn-grid" class="kn-grid">
+      {all.map((it) => {
+        const tile = `width:${it.feat ? "2.7rem" : "2.2rem"}; height:${it.feat ? "2.7rem" : "2.2rem"}; border-radius:9px; border:1.5px solid ${it.color}; background:color-mix(in srgb, ${it.color} 12%, #fff); color:${it.color}; font-family:var(--font-mono); font-weight:700; font-size:${it.feat ? "16px" : "13px"}; display:flex; align-items:center; justify-content:center; flex:none; letter-spacing:.02em;`;
+        const card = it.feat ? `border:1px solid color-mix(in srgb, ${it.color} 32%, #E2E8F0); background:${tint(it.color)};` : "border:1px solid #E2E8F0;";
+        const ghost = `position:absolute; right:.5rem; bottom:-.8rem; font-family:var(--font-head); font-weight:800; font-size:5.4rem; line-height:1; color:color-mix(in srgb, ${it.color} 14%, transparent); pointer-events:none; z-index:0;`;
+        const titleSize = it.feat ? "19px" : "16.5px";
+        const inner = (
+          <>
+            {it.feat && <span style={ghost}>{it.gl}</span>}
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:11px;">
+                <span style={tile}>{it.mono}</span>
+                <div style="flex:1; min-width:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span style={`font-family:var(--font-head); font-weight:700; font-size:${titleSize}; letter-spacing:-.01em; color:#1B1C1E; line-height:1.14;`}>{it.t}</span>
+                  {it.inUse && <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; color:#16794a; border:1px solid #16794a55; border-radius:999px; padding:2px 7px;"><span class="kn-led" style="width:5px; height:5px; border-radius:50%; background:#16794a; display:inline-block;"></span>{inUseLabel}</span>}
+                  {it.href && <span class="kn-arrow" style={`margin-left:auto; color:${it.color}; font-size:15px;`}>→</span>}
+                </div>
+              </div>
+              <span style="font-size:14px; line-height:1.5; color:#5C5E63;">{it.d}</span>
+              <span style="display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F;"><span style={`color:${it.color}; font-weight:700;`}>{it.gl}</span>{it.grp}</span>
+            </div>
+          </>
+        );
+        const cls = `kn-card${it.feat ? " kn-feat" : ""}`;
+        return it.href
+          ? <a href={it.href} class={cls} data-group={it.gkey} data-inuse={it.inUse ? "1" : ""} style={card}>{inner}</a>
+          : <div class={cls} data-group={it.gkey} data-inuse={it.inUse ? "1" : ""} style={card}>{inner}</div>;
+      })}
+    </div>
+    <p id="kn-empty" style="display:none; font-size:15px; color:#92938F; padding:32px 0;">{L("Keine Bausteine in dieser Auswahl.", "No building blocks in this selection.")}</p>
+    <p style="font-size:15px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:22px; margin-top:32px; max-width:70ch;">{L("Nicht alles braucht jeder. Der Punkt: es greift ineinander, läuft im eigenen Haus und wächst mit — Schritt für Schritt statt Big-Bang.", "Not everyone needs all of it. The point: it interlocks, runs in your own house and grows with you — step by step, not big bang.")}</p>
   </div>
 </section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,56px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:20ch;">{L("Was davon klemmt bei euch gerade?", "Which of these is pinching you right now?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Schreib's roh in eine Pain-List — wir sagen dir, welche Bausteine greifen.", "Jot it raw into a pain list — we'll tell you which building blocks fit.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={b + "/stack/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("So ist der Stack gebaut", "How the stack is built")} ↗</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .kn-mqrow { overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); }
+  .kn-mq { display:flex; gap:9px; width:max-content; animation:kn-mqA 46s linear infinite; }
+  .kn-mqb { animation:kn-mqB 54s linear infinite; }
+  .kn-mqrow:hover .kn-mq { animation-play-state:paused; }
+  .kn-mqpill { display:inline-flex; align-items:center; gap:8px; flex:none; border:1px solid rgba(166,207,197,.2); border-radius:999px; padding:6px 14px; font-family:var(--font-mono); font-size:11.5px; color:#C7D8D2; }
+  .kn-mqmono { width:22px; height:22px; border-radius:6px; border:1px solid; font-weight:700; font-size:10px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  @keyframes kn-mqA { from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  @keyframes kn-mqB { from{ transform:translateX(-50%); } to{ transform:translateX(0); } }
+
+  .kn-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+
+  .kn-filterbar { position:sticky; top:0; z-index:50; background:rgba(248,249,250,.94); backdrop-filter:saturate(160%) blur(10px); -webkit-backdrop-filter:saturate(160%) blur(10px); border-top:1px solid #E2E8F0; border-bottom:1px solid #DCE0E5; }
+  .kn-filt { cursor:pointer; transition:all .18s; font-family:var(--font-mono); font-size:12px; font-weight:600; border-radius:8px; padding:8px 13px; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:#fff; color:#3C3E42; border:1px solid #C0C8C5; }
+  .kn-fdot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .kn-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(16.5rem,1fr)); gap:14px; grid-auto-flow:row dense; }
+  .kn-feat { grid-column:span 1; }
+  @media (min-width:780px){ .kn-feat{ grid-column:span 2; } }
+  .kn-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:6px; background:#fff; border-radius:13px; padding:18px 20px; text-decoration:none; color:#1B1C1E; transition:transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s, border-color .28s; }
+  a.kn-card:hover { transform:translateY(-4px); box-shadow:0 16px 36px rgba(11,28,25,.12); }
+  .kn-arrow { display:inline-block; transition:transform .25s; }
+  a.kn-card:hover .kn-arrow { transform:translate(3px,-3px); }
+
+  .kn-led { animation:kn-led 1.8s ease-in-out infinite; }
+  @keyframes kn-led { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.35; transform:scale(.6); } }
+  @media (prefers-reduced-motion: reduce){ .kn-mq, .kn-led{ animation:none !important; } }
+</style>
+
+<script is:inline>
+  (function(){
+    var bar = document.querySelector(".kn-filterbar"); if(!bar) return;
+    var grid = document.getElementById("kn-grid");
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".kn-card"));
+    var ghead = JSON.parse(bar.getAttribute("data-ghead") || "{}");
+    var state = { group: "all", inUse: false };
+    var fOff = { bg:"#fff", col:"#3C3E42", bd:"#C0C8C5" };
+
+    function paintFilters(){
+      bar.querySelectorAll(".kn-filt[data-group]").forEach(function(btn){
+        var k = btn.getAttribute("data-group"), c = btn.getAttribute("data-color"), on = state.group===k;
+        btn.setAttribute("aria-pressed", on?"true":"false");
+        btn.style.background = on?c:fOff.bg; btn.style.color = on?"#fff":fOff.col; btn.style.borderColor = on?c:fOff.bd;
+        var dot = btn.querySelector(".kn-fdot"); if(dot) dot.style.background = on?"#fff":c;
+      });
+      var iu = bar.querySelector(".kn-inuse");
+      iu.setAttribute("aria-pressed", state.inUse?"true":"false");
+      iu.style.background = state.inUse?"#E7F3EC":fOff.bg; iu.style.color = state.inUse?"#16794a":fOff.col; iu.style.borderColor = state.inUse?"#16794a":fOff.bd;
+    }
+    function apply(){
+      var n = 0;
+      cards.forEach(function(card){
+        var g = card.getAttribute("data-group"), u = card.getAttribute("data-inuse")==="1";
+        var vis = (state.group==="all"||g===state.group) && (!state.inUse||u);
+        card.style.display = vis?"":"none"; if(vis) n++;
+      });
+      document.getElementById("kn-vis").textContent = n;
+      document.getElementById("kn-empty").style.display = n?"none":"block";
+      var gh = document.getElementById("kn-ghead");
+      if(state.group!=="all" && ghead[state.group]){
+        gh.style.display="flex";
+        document.getElementById("kn-ghead-name").textContent = ghead[state.group].name;
+        document.getElementById("kn-ghead-dot").style.background = ghead[state.group].color;
+      } else gh.style.display="none";
+      paintFilters();
+    }
+    bar.querySelectorAll(".kn-filt[data-group]").forEach(function(btn){
+      btn.addEventListener("click", function(){ state.group = btn.getAttribute("data-group"); apply(); });
+    });
+    bar.querySelector(".kn-inuse").addEventListener("click", function(){ state.inUse = !state.inUse; apply(); });
+    apply();
+
+    // Zähler
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ var el=e.target, to=+el.getAttribute("data-to")||0, t0=performance.now();
+      (function step(t){ var p=Math.min((t-t0)/1100,1); el.textContent=Math.round(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step); })(t0);
+      io.unobserve(el); } }); }, { threshold:0.5 });
+    document.querySelectorAll(".kn-count").forEach(function(el){ io.observe(el); });
+  })();
+</script>
