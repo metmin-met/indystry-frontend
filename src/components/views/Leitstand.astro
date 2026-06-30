@@ -10,8 +10,27 @@ const de = lang === "de";
     <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#A6CFC5; margin:0 0 14px;">{de ? "Leitstand · SCADA · read-only" : "Control room · SCADA · read-only"}</p>
     <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,5.5vw,60px); line-height:1.0; letter-spacing:-0.03em; color:#F4F6F5; margin:0 0 12px;">{de ? "Das Werk auf einen Blick." : "The plant at a glance."}</h1>
     <p style="font-size:clamp(16px,1.5vw,19px); line-height:1.6; color:#A6CFC5; max-width:60ch; margin:0 0 6px;">{de ? "Jede Maschine, ihr Zustand, ihre aktuellen Messwerte — die Operator-Sicht. Dieselben Daten wie im Historian und in der BI." : "Every machine, its state, its current readings — the operator view. The same data as in the historian and BI."}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px;">
+      {["SCADA/HMI","OPC-UA","TimescaleDB","Echtzeit","read-only"].map((x) => (<span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; border:1px solid #2E5A52; border-radius:999px; padding:5px 12px;">{x}</span>))}
+    </div>
     <p id="meta" style="font-family:var(--font-mono); font-size:12px; color:#6E8C84; margin:0 0 clamp(26px,3.5vw,38px);">{de ? "Snapshot wird geladen …" : "Loading snapshot …"}</p>
     <div id="tiles" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px;"></div>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(20px,4vw,48px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{de ? "Was ein echter Leitstand leistet" : "What a real control room does"}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Eine Wahrheit" : "One truth"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Dieselbe Datenquelle wie Historian und BI — kein zweiter Zahlenstand, der widerspricht." : "The same data source as historian and BI — no second set of numbers that contradicts."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Alarmmanagement" : "Alarm management"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Grenzwerte, Eskalation, Quittierung — nicht nur Anzeige, sondern Handlungspfad." : "Limits, escalation, acknowledgement — not just display, but a path to act."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Herstellerneutral (OPC-UA)" : "Vendor-neutral (OPC-UA)"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Koppelt an SPS und Leittechnik verschiedener Hersteller — eine Sicht über alles." : "Couples to PLCs and control systems from different vendors — one view over all."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Rollen & read-only" : "Roles & read-only"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Der Operator sieht alles, greift aber nur ein, wo es erlaubt ist — protokolliert." : "The operator sees everything but only intervenes where allowed — logged."}</p></div>
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{de ? "Die Werte kommen aus dem Historian, der Zwilling rechnet darauf weiter." : "The values come from the historian, the twin computes on top of them."} <a href={(de?"":"/en")+"/historian/"} style="color:#16463E; font-weight:600; text-decoration:none;">{de ? "Zum Historian" : "To the historian"} →</a> &nbsp; <a href={(de?"":"/en")+"/twin/"} style="color:#16463E; font-weight:600; text-decoration:none;">{de ? "Zum digitalen Zwilling" : "To the digital twin"} →</a></p>
   </div>
 </section>
 

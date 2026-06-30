@@ -1,0 +1,68 @@
+---
+// Homepage-Teaser: eine laufende Prozess-Animation (Lichtbogen) + CTA zu /simulationen/.
+// Rein dekorativ (CSS-Loop, keine Interaktion) — die bedienbaren Sims leben auf /simulationen/.
+import type { Lang } from "../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+---
+<section class="ht-wrap">
+  <div class="ht-inner">
+    <div class="ht-txt">
+      <p class="ht-kick">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive")}</p>
+      <h2 class="ht-h">{L("Prozesse, die arbeiten — nicht nur Bilder.", "Processes that work — not just pictures.")}</h2>
+      <p class="ht-lead">{L("Schweißnaht, Laserschnitt, Zerspanung, Umformung, Mischer — als bedienbare Modelle. Dreh an den Reglern, das Modell rechnet mit und warnt vor dem Grenzfall.", "Weld, laser cut, machining, forming, mixer — as operable models. Turn the sliders, the model computes along and warns at the edge.")}</p>
+      <a class="ht-cta" href={b + "/simulationen/"}>{L("Live ausprobieren", "Try it live")} →</a>
+    </div>
+    <div class="ht-art">
+      <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <radialGradient id="ht-arc"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#bfe0ff"/><stop offset=".7" stop-color="#5b8fd6" stop-opacity=".5"/><stop offset="1" stop-color="#5b8fd6" stop-opacity="0"/></radialGradient>
+          <radialGradient id="ht-heat"><stop offset="0" stop-color="#ff8a3c"/><stop offset="1" stop-color="#ff8a3c" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect x="20" y="126" width="150" height="46" fill="#22443d" stroke="#3a554e"/>
+        <rect x="190" y="126" width="150" height="46" fill="#22443d" stroke="#3a554e"/>
+        <g class="ht-bead"><circle cx="180" cy="126" r="5" fill="#E6B23A"/><circle cx="172" cy="126" r="5" fill="#d98f2a"/><circle cx="164" cy="126" r="5" fill="#c47a1f"/><circle cx="156" cy="126" r="5" fill="#a8631a"/><circle cx="148" cy="126" r="5" fill="#8a5117"/></g>
+        <circle class="ht-heat" cx="180" cy="126" r="36" fill="url(#ht-heat)"/>
+        <g class="ht-torch"><rect x="206" y="40" width="20" height="64" rx="4" transform="rotate(24 216 72)" fill="#0E2522" stroke="#3FBF7F"/><rect x="196" y="98" width="6" height="22" transform="rotate(24 199 109)" fill="#A6CFC5"/></g>
+        <circle class="ht-arc" cx="180" cy="124" r="22" fill="url(#ht-arc)"/>
+        <circle class="ht-arccore" cx="180" cy="124" r="4" fill="#fff"/>
+        <g fill="#ffd27a"><circle class="ht-sp ht-s1" cx="180" cy="124" r="1.9"/><circle class="ht-sp ht-s2" cx="180" cy="124" r="1.5"/><circle class="ht-sp ht-s3" cx="180" cy="124" r="2.1"/><circle class="ht-sp ht-s4" cx="180" cy="124" r="1.4"/><circle class="ht-sp ht-s5" cx="180" cy="124" r="1.7"/></g>
+      </svg>
+      <span class="ht-badge">{L("Lichtbogenschweißen · live", "Arc welding · live")}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ht-wrap { position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px; }
+  .ht-inner { max-width:72rem; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(24px,5vw,56px); display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(24px,4vw,48px); align-items:center; }
+  @media (max-width:760px){ .ht-inner{ grid-template-columns:1fr; } }
+  .ht-kick { font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 14px; }
+  .ht-h { font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-.03em; margin:0 0 14px; max-width:18ch; }
+  .ht-lead { font-size:clamp(15px,1.5vw,18px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 24px; }
+  .ht-cta { display:inline-block; background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 24px; border-radius:10px; }
+  .ht-art { position:relative; }
+  .ht-art svg { width:100%; height:auto; display:block; background:#0A1F1B; border:1px solid #1c3a34; border-radius:14px; }
+  .ht-badge { position:absolute; left:14px; bottom:12px; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:#A6CFC5; border:1px solid #2E5A52; background:rgba(10,31,27,.7); border-radius:999px; padding:4px 10px; }
+  .ht-arc { transform-box:fill-box; transform-origin:center; animation:ht-flick .14s steps(2) infinite; }
+  .ht-arccore { animation:ht-flick .1s steps(2) infinite; }
+  @keyframes ht-flick { 0%{opacity:.55; transform:scale(.85);} 50%{opacity:1; transform:scale(1.12);} 100%{opacity:.7; transform:scale(.95);} }
+  .ht-heat { animation:ht-pulse 1.6s ease-in-out infinite; }
+  @keyframes ht-pulse { 0%,100%{opacity:.55;} 50%{opacity:.92;} }
+  .ht-bead { animation:ht-grow 3.2s ease-in-out infinite; transform-box:fill-box; }
+  @keyframes ht-grow { 0%{clip-path:inset(0 100% 0 0);} 60%{clip-path:inset(0 0 0 0);} 100%{clip-path:inset(0 0 0 0); opacity:.9;} }
+  .ht-torch { animation:ht-jit .16s linear infinite; transform-box:fill-box; }
+  @keyframes ht-jit { 0%,100%{transform:translate(0,0);} 50%{transform:translate(.6px,-.4px);} }
+  .ht-sp { opacity:0; }
+  .ht-s1{ animation:ht-f1 .7s linear infinite; } .ht-s2{ animation:ht-f2 .9s linear infinite .1s; }
+  .ht-s3{ animation:ht-f3 .6s linear infinite .2s; } .ht-s4{ animation:ht-f4 .8s linear infinite .15s; } .ht-s5{ animation:ht-f5 .75s linear infinite .05s; }
+  @keyframes ht-f1 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-34px,26px);} }
+  @keyframes ht-f2 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(30px,30px);} }
+  @keyframes ht-f3 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-20px,34px);} }
+  @keyframes ht-f4 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(40px,18px);} }
+  @keyframes ht-f5 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-44px,12px);} }
+  @media (prefers-reduced-motion: reduce){ .ht-arc,.ht-arccore,.ht-heat,.ht-bead,.ht-torch,.ht-sp{ animation:none !important; } .ht-bead{ clip-path:none !important; } .ht-sp{ opacity:.5; } }
+</style>

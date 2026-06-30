@@ -1,11 +1,17 @@
 ---
-// /lernen/ — Onboarding & E-Learning (lang-aware): Lernpfad mit Lektion + Mini-Quiz je Modul,
-// Fortschritt in localStorage, Abschluss-Badge. Deckt Onboarding/Schulung generisch. Demo-Links.
+// /lernen/ — Redesign (Handoff ZIP 8): gamifizierte Onboarding-Reise. Werksausweis (Ring/XP/Name),
+// Lernpfad mit grünem Fortschritts-Faden, Quiz-States, Abschluss-Siegel. mods[] 1:1 behalten.
+// localStorage: done → indystry-lernen-v1 (Produktiv-Key), name → indystry-lernen-name. Keine Emojis.
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
 const L = (d: string, e: string) => (de ? d : e);
 const b = de ? "" : "/en";
+const META: Record<string,{mono:string;hue:string}> = {
+  safe:{mono:"SI",hue:"#c0392b"}, setup:{mono:"RÜ",hue:"#c4673f"}, erp:{mono:"ER",hue:"#16463E"},
+  leit:{mono:"LS",hue:"#3f9a52"}, qs:{mono:"QS",hue:"#4a6fa5"}, rek:{mono:"RK",hue:"#7b5cc4"},
+  sec:{mono:"DS",hue:"#2a86a8"}, kpi:{mono:"KZ",hue:"#b5851a"},
+};
 const mods = [
   { k:"safe", t:L("Sicherheit & erste Schritte","Safety & first steps"), min:5,
     lesson:L("Willkommen bei Nordwerk. Bevor es an die Maschine geht: Not-Aus kennen, PSA tragen, Meldewege verstehen. Im Notfall zuerst Not-Aus, dann Meldung.","Welcome to Nordwerk. Before going to the machine: know the e-stop, wear PPE, understand reporting paths. In an emergency: e-stop first, then report."),
@@ -43,106 +49,222 @@ const mods = [
     opts:[L("Schneller liefern","Ship faster"),L("Ursache finden & Wiederholung verhindern","Find the cause & prevent recurrence"),L("Rabatt geben","Give a discount")], correct:1,
     why:L("8D strukturiert die Ursachenanalyse und sichert die Wirksamkeit.","8D structures root-cause analysis and secures effectiveness."),
     demo:{l:L("Frag die Firma","Ask the company"),h:`${b}/suche/`} },
+  { k:"sec", t:L("Datenschutz & Sicherheit","Privacy & security"), min:6,
+    lesson:L("Ein Login für alles (SSO), zweiter Faktor an, Bildschirm sperren beim Weggehen. Bei Phishing-Mails: nicht klicken, melden. Sicherheit ist Teil der täglichen Arbeit, nicht ein Extra.","One login for everything (SSO), second factor on, lock the screen when you leave. Phishing mails: don't click, report. Security is part of the daily work, not an extra."),
+    q:L("Verdächtige E-Mail mit Link — was tust du?","Suspicious email with a link — what do you do?"),
+    opts:[L("Link öffnen, um zu prüfen","Open the link to check"),L("Nicht klicken, melden","Don't click, report"),L("Weiterleiten an alle","Forward to everyone")], correct:1,
+    why:L("Nie auf verdächtige Links klicken — melden, damit andere gewarnt sind.","Never click suspicious links — report so others are warned."),
+    demo:{l:L("Compliance","Compliance"),h:`${b}/compliance/`} },
+  { k:"kpi", t:L("Kennzahlen lesen","Reading the KPIs"), min:5,
+    lesson:L("Kennzahlen wie OEE, Termintreue und Ausschussquote zeigen, wie der Betrieb läuft. Wichtig ist der Trend, nicht der einzelne Tag. Jeder Stand wird eingefroren, damit man Entwicklungen ehrlich vergleichen kann.","KPIs like OEE, on-time delivery and scrap rate show how the operation runs. What matters is the trend, not a single day. Every state is frozen so you can compare developments honestly."),
+    q:L("Worauf kommt es bei Kennzahlen vor allem an?","What matters most with KPIs?"),
+    opts:[L("Der einzelne Tageswert","The single day's value"),L("Der Trend über die Zeit","The trend over time"),L("Möglichst große Zahlen","The biggest possible numbers")], correct:1,
+    why:L("Der Trend zählt — ein einzelner Tag schwankt immer.","The trend is what counts — a single day always fluctuates."),
+    demo:{l:L("Kennzahlen","KPIs"),h:`${b}/kennzahlen/`} },
 ];
+const modsJ = mods.map((m) => ({ ...m, mono: META[m.k].mono, hue: META[m.k].hue }));
+const TT = {
+  badge: L("Werksausweis · Nordwerk","Worker pass · Nordwerk"), name: L("Dein Name","Your name"),
+  modules: L("Module","Modules"), status0: L("Neu im Werk","New here"), status1: L("In Einarbeitung","Onboarding"),
+  status2: L("Eingearbeitet","Onboarded"), remain: L("noch ~","~"), remainU: L(" min Lernzeit"," min to go"),
+  done: L("abgeschlossen","completed"), reset: L("Zurücksetzen","Reset"),
+  live: L("Dazu live","See it live"), retry: L("Nicht ganz — nochmal.","Not quite — try again."),
+};
 ---
-<section style="background:#123A33; color:#F4F6F5;">
-  <div style="max-width:900px; margin:0 auto; padding:clamp(48px,7vw,88px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+<section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
     <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Onboarding & Lernen","Onboarding & learning")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("In einer Woche drin.","Up to speed in a week.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Der Lernpfad für neue Mitarbeiter: kurze Lektion, kurzes Quiz, Häkchen. Dein Fortschritt bleibt gespeichert — und am Ende gibt's das Abschluss-Abzeichen.","The learning path for new staff: short lesson, short quiz, checkmark. Your progress is saved — and at the end you get the completion badge.")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("In einer Woche drin.","Up to speed in a week.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:62ch; margin:0;">{L("Lektion, Quiz, Häkchen — pro Modul. Du sammelst XP, dein Werksausweis füllt sich, und am Ende stempelt sich das Abschluss-Siegel. Dein Fortschritt bleibt im Browser gespeichert.","Lesson, quiz, checkmark — per module. You collect XP, your worker pass fills up, and at the end the completion seal stamps in. Your progress is saved in the browser.")}</p>
   </div>
 </section>
 
 <section style="background:#F8F9FA;">
-  <div style="max-width:900px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <div class="ln-top">
-      <div class="ln-bar"><div id="ln-fill" class="ln-fill"></div></div>
-      <span id="ln-prog" class="ln-prog"></span>
-      <button id="ln-reset" class="ln-reset">{L("Zurücksetzen","Reset")}</button>
+  <div data-lp data-de={String(de)} data-tt={JSON.stringify(TT)} style="max-width:1080px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
+    <div class="lp-grid">
+      <!-- Werksausweis -->
+      <aside class="lp-rail">
+        <div class="lp-badge">
+          <div class="lp-badge-top">{TT.badge}</div>
+          <div class="lp-badge-body">
+            <div class="lp-ringwrap">
+              <svg viewBox="0 0 120 120" class="lp-ring" width="120" height="120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#22443d" stroke-width="9"/>
+                <circle id="lp-ringfill" cx="60" cy="60" r="52" fill="none" stroke="#16794a" stroke-width="9" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+              </svg>
+              <span id="lp-initials" class="lp-initials">—</span>
+            </div>
+            <input id="lp-name" class="lp-name" type="text" maxlength="24" placeholder={TT.name} autocomplete="off" />
+            <div class="lp-tiles">
+              <div class="lp-tile"><b id="lp-modn">0/—</b><span>{TT.modules}</span></div>
+              <div class="lp-tile"><b id="lp-xp">0</b><span>XP</span></div>
+            </div>
+            <div id="lp-status" class="lp-status"></div>
+            <div id="lp-seal" class="lp-seal" hidden>
+              <svg viewBox="0 0 64 64" width="58" height="58" aria-hidden="true">
+                <circle cx="32" cy="32" r="26" fill="#E6B23A"/><circle cx="32" cy="32" r="26" fill="none" stroke="#b5851a" stroke-width="2"/>
+                <circle cx="32" cy="32" r="20" fill="none" stroke="#fff8e6" stroke-width="1.5" stroke-dasharray="2 3"/>
+                <path d="M22 33 l7 7 14-16" fill="none" stroke="#3a2a06" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span id="lp-sealdate" class="lp-sealdate"></span>
+            </div>
+            <button id="lp-reset" class="lp-reset">{TT.reset}</button>
+          </div>
+        </div>
+      </aside>
+      <!-- Lernpfad -->
+      <div class="lp-track">
+        <div class="lp-thread"><div id="lp-fill" class="lp-thread-fill"></div></div>
+        <div id="lp-list"></div>
+      </div>
     </div>
-    <div id="ln-done" hidden class="ln-badge">🏅 {L("Geschafft! Alle Module abgeschlossen.","Done! All modules complete.")}</div>
-    <div id="ln-list" class="ln-list"></div>
   </div>
 </section>
 
-<script type="application/json" id="ln-data" is:inline set:html={JSON.stringify(mods)}></script>
-<script>
-  const DE = document.documentElement.lang !== "en";
-  const M = JSON.parse(document.getElementById("ln-data").textContent);
-  const KEY = "indystry-lernen-v1";
-  let done = {}; try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) { done = {}; }
-  const list = document.getElementById("ln-list");
-  const fill = document.getElementById("ln-fill"), prog = document.getElementById("ln-prog"), badge = document.getElementById("ln-done");
-  function save(){ try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e){} }
-  function refresh(){
-    const n = M.filter(m => done[m.k]).length;
-    fill.style.width = (n/M.length*100)+"%";
-    prog.textContent = `${n} / ${M.length} ${DE?"Module":"modules"} · ${Math.round(n/M.length*100)}%`;
-    badge.hidden = n < M.length;
-    M.forEach((m) => { const c = document.getElementById("ln-"+m.k); if(c) c.classList.toggle("done", !!done[m.k]); const ck = c && c.querySelector(".ln-check"); if(ck) ck.textContent = done[m.k] ? "✓" : (M.indexOf(m)+1); });
-  }
-  list.innerHTML = M.map((m, i) => `
-    <div class="ln-card" id="ln-${m.k}">
-      <button class="ln-head" data-k="${m.k}">
-        <span class="ln-check">${i+1}</span>
-        <span class="ln-title">${m.t}</span>
-        <span class="ln-min">${m.min} min</span>
-        <span class="ln-chev">▾</span>
-      </button>
-      <div class="ln-body" hidden>
-        <p class="ln-lesson">${m.lesson}</p>
-        <a class="ln-demo" href="${m.demo.h}" ${m.demo.x?'target="_blank" rel="noopener"':''}>${DE?"Dazu live":"See it live"} · ${m.demo.l} ${m.demo.x?"↗":"→"}</a>
-        <p class="ln-q">${m.q}</p>
-        <div class="ln-opts">${m.opts.map((o,oi)=>`<button class="ln-opt" data-k="${m.k}" data-oi="${oi}">${o}</button>`).join("")}</div>
-        <p class="ln-fb" hidden></p>
-      </div>
-    </div>`).join("");
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(26px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 auto; max-width:22ch;">{L("Eingearbeitet — und alles griffbereit.","Onboarded — and everything at hand.")}</h2>
+    <p style="font-size:clamp(15px,1.6vw,19px); color:#C7D8D2; max-width:52ch; margin:18px auto 28px;">{L("Das ganze Wissen der Firma bleibt im Kiosk — durchsuchbar, immer aktuell.","The company's whole knowledge stays in the kiosk — searchable, always current.")}</p>
+    <a href={b + "/wissen/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Zum Wissens-Kiosk","To the knowledge kiosk")} →</a>
+  </div>
+</section>
 
-  list.querySelectorAll(".ln-head").forEach((h) => h.addEventListener("click", () => {
-    const body = h.nextElementSibling; const open = body.hidden;
-    list.querySelectorAll(".ln-body").forEach(b => b.hidden = true);
-    list.querySelectorAll(".ln-head").forEach(x => x.classList.remove("open"));
-    if (open) { body.hidden = false; h.classList.add("open"); }
-  }));
-  list.querySelectorAll(".ln-opt").forEach((o) => o.addEventListener("click", () => {
-    const m = M.find(x => x.k === o.dataset.k); const oi = +o.dataset.oi;
-    const body = o.closest(".ln-body"); const fb = body.querySelector(".ln-fb");
-    body.querySelectorAll(".ln-opt").forEach(x => x.classList.remove("ok","no"));
-    fb.hidden = false;
-    if (oi === m.correct) { o.classList.add("ok"); fb.className = "ln-fb ok"; fb.textContent = "✓ " + m.why; if(!done[m.k]){ done[m.k]=true; save(); refresh(); } }
-    else { o.classList.add("no"); fb.className = "ln-fb no"; fb.textContent = (DE?"Nicht ganz — nochmal.":"Not quite — try again."); }
-  }));
-  document.getElementById("ln-reset").addEventListener("click", () => { done = {}; save(); list.querySelectorAll(".ln-fb").forEach(f=>f.hidden=true); list.querySelectorAll(".ln-opt").forEach(x=>x.classList.remove("ok","no")); refresh(); });
-  refresh();
+<script type="application/json" id="lp-data" is:inline set:html={JSON.stringify(modsJ)}></script>
+<script is:inline>
+  (function(){
+    var root=document.querySelector("[data-lp]"); if(!root) return;
+    var DE=root.dataset.de==="true"; var TT=JSON.parse(root.dataset.tt);
+    var M=JSON.parse(document.getElementById("lp-data").textContent);
+    var KEY="indystry-lernen-v1", NKEY="indystry-lernen-name";
+    var done={}, name=""; try{done=JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){done={};}
+    try{name=localStorage.getItem(NKEY)||"";}catch(e){name="";}
+    var list=document.getElementById("lp-list");
+    var C=326.7; // 2*pi*52
+
+    list.innerHTML = M.map(function(m,i){ return (
+      '<div class="lp-mod" id="lp-'+m.k+'">'+
+        '<div class="lp-node"><span class="lp-noden">'+(i+1)+'</span></div>'+
+        '<div class="lp-card">'+
+          '<button class="lp-head" data-k="'+m.k+'">'+
+            '<span class="lp-mono" style="border-color:'+m.hue+';color:'+m.hue+';">'+m.mono+'</span>'+
+            '<span class="lp-title">'+m.t+'</span><span class="lp-min">'+m.min+' min</span><span class="lp-chev">▾</span>'+
+          '</button>'+
+          '<div class="lp-body" hidden>'+
+            '<p class="lp-lesson">'+m.lesson+'</p>'+
+            '<a class="lp-demo" href="'+m.demo.h+'" '+(m.demo.x?'target="_blank" rel="noopener"':'')+'>'+TT.live+' · '+m.demo.l+' '+(m.demo.x?'↗':'→')+'</a>'+
+            '<p class="lp-q">'+m.q+'</p>'+
+            '<div class="lp-opts">'+m.opts.map(function(o,oi){return '<button class="lp-opt" data-k="'+m.k+'" data-oi="'+oi+'"><span class="lp-ol">'+String.fromCharCode(65+oi)+'</span>'+o+'</button>';}).join("")+'</div>'+
+            '<p class="lp-fb" hidden></p>'+
+          '</div>'+
+        '</div>'+
+      '</div>'); }).join("");
+
+    function initials(s){ s=(s||"").trim(); if(!s) return "—"; var p=s.split(/\s+/); return (p.length>1?(p[0][0]+p[p.length-1][0]):s.slice(0,2)).toUpperCase(); }
+    function save(){ try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){} }
+    function saveName(){ try{localStorage.setItem(NKEY,name);}catch(e){} }
+    function measureThread(){
+      var nodes=[].slice.call(list.querySelectorAll(".lp-mod"));
+      var lastDone=-1; M.forEach(function(m,i){ if(done[m.k]) lastDone=i; });
+      var fill=document.getElementById("lp-fill");
+      if(lastDone<0){ fill.style.height="0px"; return; }
+      var top=list.getBoundingClientRect().top;
+      var nd=nodes[lastDone].querySelector(".lp-node").getBoundingClientRect();
+      fill.style.height=(nd.top - top + nd.height/2)+"px";
+    }
+    function refresh(){
+      var n=M.filter(function(m){return done[m.k];}).length, total=M.length;
+      document.getElementById("lp-ringfill").setAttribute("stroke-dashoffset", (C*(1-n/total)).toFixed(1));
+      document.getElementById("lp-initials").textContent=initials(name);
+      document.getElementById("lp-modn").textContent=n+"/"+total;
+      document.getElementById("lp-xp").textContent=(n*120);
+      var st=document.getElementById("lp-status");
+      var seal=document.getElementById("lp-seal");
+      if(n>=total){ st.textContent=TT.status2; st.style.color="#16794a"; seal.hidden=false;
+        document.getElementById("lp-sealdate").textContent=TT.done+" "+new Date().toLocaleDateString(DE?"de-DE":"en-GB"); }
+      else { seal.hidden=true;
+        var rem=M.filter(function(m){return !done[m.k];}).reduce(function(a,m){return a+m.min;},0);
+        st.innerHTML=(n===0?TT.status0:TT.status1)+' <span style="color:#92938F;">· '+TT.remain+rem+TT.remainU+'</span>';
+        st.style.color="#1B1C1E";
+      }
+      M.forEach(function(m,i){ var mod=document.getElementById("lp-"+m.k); if(!mod) return;
+        mod.classList.toggle("done",!!done[m.k]);
+        mod.querySelector(".lp-noden").innerHTML=done[m.k]?"&#10003;":(i+1);
+      });
+      measureThread();
+    }
+
+    var nameEl=document.getElementById("lp-name"); nameEl.value=name;
+    nameEl.addEventListener("input",function(){ name=nameEl.value; saveName(); document.getElementById("lp-initials").textContent=initials(name); });
+
+    list.querySelectorAll(".lp-head").forEach(function(h){ h.addEventListener("click",function(){
+      var body=h.nextElementSibling, open=body.hidden;
+      list.querySelectorAll(".lp-body").forEach(function(x){x.hidden=true;});
+      list.querySelectorAll(".lp-head").forEach(function(x){x.classList.remove("open");});
+      if(open){ body.hidden=false; h.classList.add("open"); }
+      measureThread();
+    }); });
+    list.querySelectorAll(".lp-opt").forEach(function(o){ o.addEventListener("click",function(){
+      var m=M.find(function(x){return x.k===o.dataset.k;}), oi=+o.dataset.oi;
+      var body=o.closest(".lp-body"), fb=body.querySelector(".lp-fb");
+      body.querySelectorAll(".lp-opt").forEach(function(x){x.classList.remove("ok","no");});
+      fb.hidden=false;
+      if(oi===m.correct){ o.classList.add("ok"); fb.className="lp-fb ok"; fb.innerHTML="&#10003; "+m.why; if(!done[m.k]){done[m.k]=true; save(); refresh();} }
+      else { o.classList.add("no"); fb.className="lp-fb no"; fb.textContent=TT.retry; }
+    }); });
+    document.getElementById("lp-reset").addEventListener("click",function(){ done={}; save();
+      list.querySelectorAll(".lp-fb").forEach(function(f){f.hidden=true;}); list.querySelectorAll(".lp-opt").forEach(function(x){x.classList.remove("ok","no");}); refresh(); });
+    window.addEventListener("resize", measureThread);
+    refresh();
+  })();
 </script>
 
 <style>
-  .ln-top { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
-  .ln-bar { flex:1; height:7px; background:#E2E8F0; border-radius:999px; overflow:hidden; }
-  .ln-fill { height:100%; background:#16794a; border-radius:999px; transition:width .4s ease; }
-  .ln-prog { font-family:var(--font-mono); font-size:12px; color:#5C5E63; white-space:nowrap; }
-  .ln-reset { font-family:var(--font-mono); font-size:11px; color:#92938F; background:none; border:1px solid #C0C8C5; border-radius:999px; padding:5px 11px; cursor:pointer; }
-  .ln-badge { background:#EFEAE0; border:1px solid #E6B23A; border-radius:12px; padding:14px 18px; font-weight:600; color:#7a5500; margin-bottom:18px; }
-  .ln-list { display:flex; flex-direction:column; gap:12px; }
-  .ln-card { border:1px solid #E2E8F0; border-radius:14px; background:#fff; overflow:hidden; }
-  .ln-card.done { border-color:#16794a55; }
-  .ln-head { display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:none; border:none; padding:16px 18px; cursor:pointer; font-family:inherit; }
-  .ln-check { flex:none; width:28px; height:28px; border-radius:50%; background:#EFEAE0; color:#16463E; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:13px; }
-  .ln-card.done .ln-check { background:#16794a; color:#fff; }
-  .ln-title { flex:1; font-family:var(--font-head,sans-serif); font-weight:600; font-size:16px; color:#1B1C1E; }
-  .ln-min { font-family:var(--font-mono); font-size:11px; color:#92938F; }
-  .ln-chev { color:#92938F; transition:transform .2s; }
-  .ln-head.open .ln-chev { transform:rotate(180deg); }
-  .ln-body { padding:0 18px 18px; }
-  .ln-lesson { font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 12px; }
-  .ln-demo { display:inline-block; font-family:var(--font-mono); font-size:12px; color:#16463E; text-decoration:none; border-bottom:1.5px solid #C0C8C5; margin-bottom:16px; }
-  .ln-q { font-weight:600; font-size:15px; color:#1B1C1E; margin:6px 0 10px; }
-  .ln-opts { display:flex; flex-direction:column; gap:8px; }
-  .ln-opt { text-align:left; font-family:inherit; font-size:14px; padding:10px 14px; border:1px solid #C0C8C5; border-radius:10px; background:#fff; cursor:pointer; color:#1B1C1E; }
-  .ln-opt:hover { border-color:#123A33; }
-  .ln-opt.ok { background:#e7f4ec; border-color:#16794a; }
-  .ln-opt.no { background:#fbe9e9; border-color:#b4232a; }
-  .ln-fb { font-size:13.5px; line-height:1.5; margin:10px 0 0; }
-  .ln-fb.ok { color:#16794a; }
-  .ln-fb.no { color:#b4232a; }
+  .lp-grid{display:grid;grid-template-columns:19rem 1fr;gap:clamp(20px,3vw,40px);align-items:start;}
+  @media(max-width:920px){.lp-grid{grid-template-columns:1fr;}}
+  .lp-rail{position:sticky;top:84px;}
+  @media(max-width:920px){.lp-rail{position:static;}}
+  .lp-badge{border:1px solid #E2E8F0;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 12px 30px rgba(11,28,25,.07);}
+  .lp-badge-top{background:#123A33;color:#A6CFC5;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:10px 16px;}
+  .lp-badge-body{padding:20px 18px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .lp-ringwrap{position:relative;width:120px;height:120px;}
+  .lp-ringfill{transition:stroke-dashoffset .5s ease;}
+  .lp-initials{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:34px;color:#123A33;}
+  .lp-name{width:100%;text-align:center;font-family:var(--font-mono);font-size:13px;border:1px solid #C0C8C5;border-radius:9px;padding:8px 10px;color:#1B1C1E;}
+  .lp-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+  .lp-tile{border:1px solid #E2E8F0;border-radius:10px;padding:10px;text-align:center;}
+  .lp-tile b{display:block;font-family:var(--font-head);font-weight:800;font-size:22px;color:#123A33;}
+  .lp-tile span{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#92938F;}
+  .lp-status{font-family:var(--font-mono);font-size:12px;font-weight:600;text-align:center;}
+  .lp-seal{display:flex;flex-direction:column;align-items:center;gap:4px;animation:lp-sealin .5s cubic-bezier(.22,1,.36,1);}
+  .lp-sealdate{font-family:var(--font-mono);font-size:10px;color:#92938F;}
+  @keyframes lp-sealin{from{transform:scale(2) rotate(-12deg);opacity:0;}to{transform:none;opacity:1;}}
+  .lp-reset{font-family:var(--font-mono);font-size:11px;color:#92938F;background:none;border:1px solid #C0C8C5;border-radius:999px;padding:5px 12px;cursor:pointer;}
+  .lp-track{position:relative;padding-left:8px;}
+  .lp-thread{position:absolute;left:20px;top:14px;bottom:14px;width:2px;background:#E2E8F0;}
+  .lp-thread-fill{position:absolute;left:0;top:0;width:2px;background:#16794a;height:0;transition:height .5s ease;}
+  .lp-mod{position:relative;display:grid;grid-template-columns:40px 1fr;gap:10px;margin-bottom:12px;}
+  .lp-node{position:relative;z-index:1;display:flex;justify-content:center;padding-top:14px;}
+  .lp-noden{width:30px;height:30px;border-radius:50%;background:#fff;border:1.5px solid #C0C8C5;color:#92938F;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:600;font-size:13px;box-shadow:0 0 0 4px #F8F9FA;}
+  .lp-mod.done .lp-noden{background:#16794a;border-color:#16794a;color:#fff;}
+  .lp-card{border:1px solid #E2E8F0;border-radius:14px;background:#fff;overflow:hidden;}
+  .lp-mod.done .lp-card{border-color:#16794a55;}
+  .lp-head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;padding:14px 16px;cursor:pointer;font-family:inherit;}
+  .lp-mono{flex:none;width:34px;height:34px;border:1.5px solid;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:13px;background:#fff;}
+  .lp-title{flex:1;font-family:var(--font-head);font-weight:600;font-size:16px;color:#1B1C1E;}
+  .lp-min{font-family:var(--font-mono);font-size:11px;color:#92938F;}
+  .lp-chev{color:#92938F;transition:transform .2s;}
+  .lp-head.open .lp-chev{transform:rotate(180deg);}
+  .lp-body{padding:0 16px 16px;}
+  .lp-lesson{font-size:15px;line-height:1.6;color:#3C3E42;margin:0 0 12px;}
+  .lp-demo{display:inline-block;font-family:var(--font-mono);font-size:12px;color:#16463E;text-decoration:none;border-bottom:1.5px solid #C0C8C5;margin-bottom:16px;}
+  .lp-q{font-weight:600;font-size:15px;color:#1B1C1E;margin:6px 0 10px;}
+  .lp-opts{display:flex;flex-direction:column;gap:8px;}
+  .lp-opt{display:flex;align-items:center;gap:10px;text-align:left;font-family:inherit;font-size:14px;padding:10px 13px;border:1px solid #C0C8C5;border-radius:10px;background:#fff;cursor:pointer;color:#1B1C1E;}
+  .lp-ol{flex:none;width:20px;height:20px;border-radius:6px;background:#EFEAE0;color:#16463E;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:600;}
+  .lp-opt:hover{border-color:#123A33;}
+  .lp-opt.ok{background:#e7f4ec;border-color:#16794a;}.lp-opt.ok .lp-ol{background:#16794a;color:#fff;}
+  .lp-opt.no{background:#fbe9e9;border-color:#b4232a;}
+  .lp-fb{font-size:13.5px;line-height:1.5;margin:10px 0 0;}.lp-fb.ok{color:#16794a;}.lp-fb.no{color:#b4232a;}
+  @media(prefers-reduced-motion:reduce){.lp-seal{animation:none;}}
 </style>

@@ -89,6 +89,18 @@ const activity = [
   </div>
 </section>
 
+<!-- KOLLABORATION-TIEFE -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Mehr als ein Dateiraum","More than a file room")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("Zusammenarbeiten, wo die Arbeit ist.","Collaborate where the work is.")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;"><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Projekte & Meilensteine","Projects & milestones")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Gantt-Roadmap mit Abhängigkeiten, kritischem Pfad und Stakeholder-Abnahme.","Gantt roadmap with dependencies, critical path and stakeholder sign-off.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Whiteboard in Echtzeit","Real-time whiteboard")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Gemeinsam skizzieren — direkt am Datensatz, alle sehen denselben Stand.","Sketch together — right on the record, everyone sees the same state.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Chat-Brücke","Chat bridge")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Jeder Auftrag hat seinen Raum: Notizen aus dem ERP und Chat (Ende-zu-Ende) verbunden.","Every order has its room: ERP notes and chat (end-to-end) connected.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Diagramme aus Text","Diagrams from text")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Abläufe und Pläne als Text schreiben — versioniert, sofort als Diagramm gerendert.","Write flows and plans as text — versioned, instantly rendered as a diagram.")}</p></div></div>
+  </div>
+</section>
+
 <script>
   const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
   document.querySelectorAll(".fbtn").forEach((b) => {

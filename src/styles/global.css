@@ -228,3 +228,7 @@ html.js [data-reveal].is-visible { opacity: 1; transform: none; }
 .lang-switch a { text-decoration:none; color:var(--muted); padding:.28rem .6rem; border-radius:9999px; line-height:1; transition:background .15s, color .15s; }
 .lang-switch a.on { background:var(--accent); color:#fff; }
 .lang-switch a:hover:not(.on) { color:var(--ink); }
+
+/* Tag-Links (Pills → facettierte Suche). Additiv; erbt sonst die Optik der jeweiligen Pill-Klasse. */
+.taglink { cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s, background .15s; }
+a.taglink:hover { border-color: var(--accent, #16463E); color: var(--accent, #16463E); }

@@ -4,6 +4,7 @@
 // Such-/Archiv-/KI-Brücke. Belegt die Souveränitäts-Story (kein Lock-in, alles selbst hostbar).
 import type { Lang } from "../../lib/content";
 import StackFlow from "./StackFlow.astro";
+import { tagHref, tagLabel } from "../../lib/tags";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
@@ -11,6 +12,7 @@ const b = de ? "" : "/en";
 const L = (d: string, e: string) => (de ? d : e);
 // Logos, die wir lokal gebündelt haben (simple-icons, MIT). Sonst Monogramm-Fallback.
 const LOGOS = new Set(["astro","caddy","directus","umami","odoo","postgresql","metabase","grafana","jupyter","meilisearch","mermaid","mistral","nextcloud","collabora","matrix","n8n","docker","proxmox","authentik","timescale","kafka","redis","zabbix","graylog","rustdesk"]);
+const STACKMAP: Record<string,string> = { odoo:"erp", postgresql:"erp", metabase:"bi", grafana:"bi", jupyter:"analyse", timescale:"historian", meilisearch:"suche", mistral:"ki", authentik:"sso", proxmox:"backup", wazuh:"compliance", zabbix:"compliance", graylog:"compliance", rustdesk:"resilienz", netbird:"souveraenitaet", kafka:"historian", nextcloud:"wissen", collabora:"wissen", matrix:"wissen" };
 const ERP = "https://erp-demo.indystry.works", BI = "https://bi-demo.indystry.works", COCKPIT = "https://grafana-demo.indystry.works", LAB = "https://lab-demo.indystry.works";
 type It = { n: string; d: string; lic: string; href: string; key?: string; demo?: string; demoExt?: boolean };
 const groups: { name: string; items: It[] }[] = [
@@ -42,6 +44,7 @@ const groups: { name: string; items: It[] }[] = [
     { n: "Nextcloud", d: L("Dateien & Office", "files & office"), lic: "AGPL-3", href: "https://nextcloud.com", key: "nextcloud", demo: "/zusammenarbeit/" },
     { n: "Collabora", d: L("Office Online", "office online"), lic: "MPL-2.0", href: "https://www.collaboraonline.com", key: "collabora", demo: "/zusammenarbeit/" },
     { n: "Matrix / Element", d: L("Chat & Video (E2EE)", "chat & video (E2EE)"), lic: "Apache-2.0 / AGPL-3", href: "https://matrix.org", key: "matrix", demo: "/zusammenarbeit/" },
+    { n: "XWiki", d: L("Wiki & Wissensbasis", "wiki & knowledge base"), lic: "LGPL-2.1", href: "https://www.xwiki.org", demo: "/wissen/" },
   ]},
   { name: L("Infrastruktur & Souveränität", "Infrastructure & sovereignty"), items: [
     { n: "Docker", d: L("Container", "containers"), lic: "Apache-2.0", href: "https://www.docker.com", key: "docker" },
@@ -113,6 +116,9 @@ const hrefOf = (it: It) => (it.demoExt ? it.demo : b + (it.demo || ""));
                   <span style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.04em; color:#92938F; border:1px solid #C0C8C5; border-radius:999px; padding:2px 7px;">{it.lic}</span>
                   {it.demo && it.demo !== "#" && (
                     <a href={hrefOf(it)} target={it.demoExt ? "_blank" : undefined} rel={it.demoExt ? "noopener" : undefined} style="font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:#16463E; text-decoration:none; border:1px solid #9ccdb9; background:#EAF6F0; border-radius:999px; padding:2px 8px;">{L("live ansehen","see live")} {it.demoExt ? "↗" : "→"}</a>
+                  )}
+                  {it.key && STACKMAP[it.key] && (
+                    <a class="taglink" href={tagHref(STACKMAP[it.key], lang)} title={L("Verwandte Seiten finden","Find related pages")} style="font-family:var(--font-mono); font-size:10.5px; color:#5C5E63; text-decoration:none; border:1px solid #C0C8C5; border-radius:999px; padding:2px 8px;">{tagLabel(STACKMAP[it.key], lang)} ⌕</a>
                   )}
                 </span>
               </span>

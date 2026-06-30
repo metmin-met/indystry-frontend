@@ -38,6 +38,9 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
     <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Bis auf den Stromlaufplan.", "Down to the wiring plan.")}</h1>
     <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{L("Das ganze Werk: drei Linien, acht Maschinen. Wähl eine Maschine, klick in den Schaltschrank — und sieh Schalter und Leitungen in Aktion, inklusive Ausfall-Prognose.", "The whole plant: three lines, eight machines. Pick a machine, click into the cabinet — and see switches and wiring in action, including failure prediction.")}</p>
     <p style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,44px);">{L("Status = aktueller Demo-Stand der Anlage", "Status = current demo state of the plant")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 clamp(20px,3vw,32px);">
+      {["3D im Browser","Stromlaufplan","OPC-UA","Anlagendoku (BIM)","Ausfall-Prognose"].map((x) => (<span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#16463E; border:1px solid #C0C8C5; border-radius:999px; padding:5px 12px;">{x}</span>))}
+    </div>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:clamp(36px,5vw,56px);">
       {lines.map((line) => (
@@ -211,6 +214,22 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
   .sp-group.focus .sp-node, .sp-group.focus .sp-fuse, .sp-group.focus .sp-motor { stroke:#E6B23A; }
   .sp-group.focus text { fill:#fff; }
 </style>
+
+<section style="background:#EFEAE0;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Anlagendoku, die mitlebt", "Plant docs that stay alive")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Drilldown bis zum Plan", "Drilldown to the plan")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Werk → Maschine → Schaltschrank → Stromlaufplan — ohne CAD-Lizenz, direkt im Browser.", "Plant → machine → cabinet → wiring plan — no CAD licence, right in the browser.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Offene Formate", "Open formats")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("3D-Modell, DXF und PDF im Browser — kein proprietärer Vendor-Viewer, kein Lock-in.", "3D model, DXF and PDF in the browser — no proprietary vendor viewer, no lock-in.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Mit der Wartung verbunden", "Linked to maintenance")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Jede Komponente kennt ihre Norm, Prüffrist und Doku — die Anlage ist ein Objekt, kein Ordner.", "Every component knows its standard, interval and docs — the asset is an object, not a folder.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Ausfall-Prognose", "Failure prediction")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Vorhergesagter Lagerschaden, bevor er die Linie stoppt — aus Vibration und Temperatur.", "Predicted bearing failure before it stops the line — from vibration and temperature.")}</p></div>
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Dieselbe Anlage steckt im Instandhaltungs-Modul — mit Hierarchie, Normen und Prüffristen.", "The same asset lives in the maintenance module — with hierarchy, standards and intervals.")} <a href={(de?"":"/en")+"/instandhaltung/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Instandhaltung", "To maintenance")} →</a></p>
+  </div>
+</section>
 
 <script>
   import "@google/model-viewer";

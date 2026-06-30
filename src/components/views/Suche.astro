@@ -1,112 +1,199 @@
 ---
-// KI-Suche „Frag die Firma" (read-only, lang-aware): client-seitige Volltextsuche über einen
-// gebackenen Nordwerk-Korpus (/data/nordwerk-corpus.json). Dependency-frei. Die LLM-Antwortebene
-// (zusammenfassen statt nur finden) kommt mit einem Mistral-Schlüssel dazu.
-interface Props { lang: "de" | "en" }
+// /suche/ — facettierte Suche: Tags (aus Pills) filtern die Ergebnisse. Engine: echtes Meilisearch
+// über /_search (wenn search.json einen Key trägt), sonst statischer Fallback über den eingebetteten
+// Such-Index. LLM-Antwort via /_ask/. Bilingual.
+import type { Lang } from "../../lib/tags";
+import { TAGS, GROUPS } from "../../lib/tags";
+import rawIndex from "../../data/search-index.json";
+import searchCfg from "../../data/search.json";
+interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
+const b = de ? "" : "/en";
 const L = (d: string, e: string) => (de ? d : e);
+const docs = (rawIndex as any[]).map((d) => ({
+  id: d.id, type: d.type, ext: !!d.ext,
+  url: d.ext ? d.url : (b + d.url),
+  tags: d.tags || [], title: d[lang].t, summary: d[lang].s,
+}));
+const tagMeta: Record<string, { group: string; label: string }> = {};
+Object.keys(TAGS).forEach((s) => { tagMeta[s] = { group: TAGS[s].group, label: TAGS[s][lang] }; });
+const groupOrder = ["interface", "tool", "standard", "branche", "thema", "persona"];
+const groupLabels: Record<string, string> = {};
+groupOrder.forEach((g) => { groupLabels[g] = (GROUPS as any)[g][lang]; });
+const typeLabel = { page: L("Seite", "Page"), demo: L("Demo", "Demo"), pillar: L("Säule", "Pillar"), glossar: L("Glossar", "Glossary") };
+const cfg = { host: searchCfg.host || "/_search", index: (searchCfg as any).index || "content", key: (searchCfg as any).key || "" };
 ---
-<section style="background:#F8F9FA; min-height:70vh;" data-de={String(de)}>
-  <div style="max-width:880px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("KI-Suche · Volltext · read-only","AI search · full text · read-only")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Frag die Firma.","Ask the company.")}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 24px;">{L("Eine Suche über alles: Produkte, Maschinen, Aufträge, Handbuch, Kennzahlen. Tipp ein Stichwort — die Treffer verlinken direkt ins passende System.","One search across everything: products, machines, orders, handbook, metrics. Type a keyword — hits link straight into the right system.")}</p>
+<section style="background:#F8F9FA; min-height:70vh;" data-suche data-de={String(de)}
+  data-docs={JSON.stringify(docs)} data-tagmeta={JSON.stringify(tagMeta)}
+  data-groups={JSON.stringify(groupOrder.map((g)=>({g,label:groupLabels[g]})))}
+  data-types={JSON.stringify(typeLabel)} data-cfg={JSON.stringify(cfg)}>
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(24px,5vw,56px) clamp(64px,8vw,110px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Suche · Tags & Facetten","Search · tags & facets")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,60px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 12px;">{L("Frag die Firma.","Ask the company.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:64ch; margin:0 0 22px;">{L("Tipp ein Stichwort — oder klick irgendwo auf der Seite ein Tag an. Die Facetten links grenzen ein: Schnittstellen, Bausteine, Normen, Branchen.","Type a keyword — or click any tag across the site. The facets on the left narrow it down: interfaces, building blocks, standards, industries.")}</p>
 
-    <div style="display:flex; gap:10px; align-items:stretch;">
-      <input id="q" type="search" autocomplete="off" placeholder={L("z. B. Lagerbock, Schaltschrank, Wartung, OEE …","e.g. bearing block, cabinet, maintenance, OEE …")}
-        style="flex:1; min-width:0; box-sizing:border-box; font-size:18px; padding:16px 18px; border:1px solid #C0C8C5; border-radius:12px; background:#fff; outline:none; font-family:inherit;" />
-      <button id="askbtn" style="flex:none; font-family:var(--font-head); font-weight:600; font-size:16px; padding:0 22px; border:none; border-radius:12px; background:#123A33; color:#fff; cursor:pointer;">✦ {L("Fragen","Ask")}</button>
+    <div style="display:flex; gap:10px; align-items:stretch; max-width:680px;">
+      <input id="q" type="search" autocomplete="off" placeholder={L("z. B. OPC-UA, Wartung, ISO 27001 …","e.g. OPC-UA, maintenance, ISO 27001 …")}
+        style="flex:1; min-width:0; box-sizing:border-box; font-size:17px; padding:14px 16px; border:1px solid #C0C8C5; border-radius:12px; background:#fff; outline:none; font-family:inherit;" />
+      <button id="askbtn" style="flex:none; font-family:var(--font-head); font-weight:600; font-size:15px; padding:0 20px; border:none; border-radius:12px; background:#123A33; color:#fff; cursor:pointer;">✦ {L("KI fragen","Ask AI")}</button>
     </div>
-    <div id="chips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
-    <div id="answerbox" hidden style="margin-top:18px; border:1px solid #C0C8C5; border-left:3px solid #123A33; border-radius:12px; padding:18px 20px; background:#fff;">
+    <div id="active" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
+
+    <div id="answerbox" hidden style="margin-top:16px; border:1px solid #C0C8C5; border-left:3px solid #123A33; border-radius:12px; padding:16px 18px; background:#fff; max-width:680px;">
       <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#16463E; margin:0 0 8px;">✦ {L("Antwort","Answer")}</p>
       <div id="answer" style="font-size:15px; line-height:1.6; color:#1B1C1E; white-space:pre-wrap;"></div>
-      <div id="sources" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
     </div>
 
-    <p id="count" style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:22px 0 14px;"></p>
-    <div id="results" style="display:flex; flex-direction:column; gap:12px;"></div>
+    <div class="su-layout" style="display:grid; grid-template-columns:240px 1fr; gap:28px; margin-top:26px; align-items:start;">
+      <aside class="su-facets" id="facets" style="position:sticky; top:84px;"></aside>
+      <div>
+        <p id="count" style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 14px;"></p>
+        <div id="results" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>
+    </div>
 
-    <p style="margin-top:clamp(32px,4vw,48px); font-size:13px; line-height:1.6; color:#92938F;">{L("Antworten von einem Sprachmodell auf Basis der Firmendaten — mit Quellenangabe, read-only. Treffer unten verlinken direkt ins jeweilige System.","Answers from a language model grounded in the company data — with sources, read-only. The hits below link straight into each system.")}</p>
+    <p style="margin-top:clamp(28px,4vw,44px); font-size:13px; line-height:1.6; color:#92938F; max-width:70ch;">{L("Treffer verlinken direkt ins jeweilige System; Demos öffnen in einem neuen Tab. Antworten kommen von einem Sprachmodell auf Basis der Firmendaten, mit Quellen.","Hits link straight into each system; demos open in a new tab. Answers come from a language model grounded in the company data, with sources.")}</p>
   </div>
 </section>
 
-<script>
-  const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
-  const $ = (s) => document.querySelector(s);
-  const TYPE = DE
-    ? { produkt:"Produkt", maschine:"Maschine", handbuch:"Handbuch", kpi:"Kennzahl", glossar:"Glossar" }
-    : { produkt:"Product", maschine:"Machine", handbuch:"Handbook", kpi:"Metric", glossar:"Glossary" };
-  const TCOL = { produkt:"#16794a", maschine:"#123A33", handbuch:"#9a6b00", kpi:"#1d4ed8", glossar:"#7c3aed" };
-  const EXAMPLES = DE ? ["Lagerbock","Schaltschrank","Wartung","OEE","SPS","Reklamation"]
-                      : ["bearing block","cabinet","maintenance","OEE","PLC","complaint"];
-  const norm = (s) => (s||"").toLowerCase();
-  let CORPUS = [];
+<style>
+  @media (max-width:760px){ .su-layout{ grid-template-columns:1fr !important; } .su-facets{ position:static !important; } }
+  .su-fgroup{ margin-bottom:16px; }
+  .su-ftitle{ font-family:var(--font-mono); font-size:10.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#92938F; margin:0 0 8px; }
+  .su-frow{ display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; text-align:left; background:none; border:none; padding:5px 0; cursor:pointer; font-size:13.5px; color:#3C3E42; }
+  .su-frow:hover{ color:#16463E; }
+  .su-frow.on{ color:#123A33; font-weight:600; }
+  .su-fcount{ font-family:var(--font-mono); font-size:11px; color:#92938F; }
+  .su-frow.on .su-fcount{ color:#16794a; }
+  .su-chip{ display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:12px; color:#123A33; background:#EAF6F0; border:1px solid #9ccdb9; border-radius:999px; padding:5px 11px; cursor:pointer; }
+  .su-chip b{ font-weight:700; }
+  .su-res{ text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 18px; display:block; transition:border-color .15s, transform .15s; }
+  .su-res:hover{ border-color:#123A33; transform:translateY(-2px); }
+  .su-rtag{ font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:#16463E; border:1px solid #C0C8C5; border-radius:999px; padding:2px 7px; }
+</style>
 
-  function score(item, terms) {
-    const hay = norm(item.title + " " + item.text + " " + TYPE[item.type]);
-    let sc = 0;
-    for (const t of terms) {
-      if (!t) continue;
-      if (norm(item.title).includes(t)) sc += 5;
-      if (hay.includes(t)) sc += 2; else return -1; // alle Terme müssen vorkommen
-    }
-    return sc;
+<script is:inline>
+(function(){
+  var root=document.querySelector("[data-suche]"); if(!root) return;
+  var DE=root.dataset.de==="true";
+  var DOCS=JSON.parse(root.dataset.docs), TM=JSON.parse(root.dataset.tagmeta);
+  var GROUPS=JSON.parse(root.dataset.groups), TYPES=JSON.parse(root.dataset.types), CFG=JSON.parse(root.dataset.cfg);
+  var $=function(s){return document.querySelector(s);};
+  var T=function(d,e){return DE?d:e;};
+  var norm=function(s){return (s||"").toLowerCase();};
+  var state={ q:"", tags:[] };
+
+  // URL lesen
+  function readURL(){
+    var p=new URLSearchParams(location.search);
+    state.q=p.get("q")||"";
+    state.tags=p.getAll("tag").filter(function(t){return TM[t];});
+    $("#q").value=state.q;
   }
-  function resolve(item) {
-    if (item.ext) return item.href;
-    return (DE ? "" : "/en") + item.href;
+  function writeURL(){
+    var p=new URLSearchParams();
+    if(state.q) p.set("q",state.q);
+    state.tags.forEach(function(t){p.append("tag",t);});
+    var qs=p.toString();
+    history.replaceState(null,"",location.pathname+(qs?"?"+qs:""));
   }
-  function render(q) {
-    const terms = norm(q).split(/\s+/).filter(Boolean);
-    let list;
-    if (!terms.length) list = CORPUS.map(x => ({ x, s: 0 }));
-    else list = CORPUS.map(x => ({ x, s: score(x, terms) })).filter(r => r.s >= 0).sort((a,b)=>b.s-a.s);
-    $("#count").textContent = terms.length
-      ? `${list.length} ${DE ? "Treffer für" : "hits for"} „${q}“`
-      : `${CORPUS.length} ${DE ? "Einträge — tipp ein Stichwort" : "entries — type a keyword"}`;
-    $("#results").innerHTML = list.map(({x}) => {
-      const c = TCOL[x.type] || "#123A33";
-      return `<a href="${resolve(x)}" ${x.ext?'target="_blank" rel="noopener"':''} style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 18px; display:block;">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-          <span style="font-family:monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:${c}; border:1px solid ${c}33; border-radius:999px; padding:2px 8px;">${TYPE[x.type]||x.type}</span>
-          <span style="font-weight:600; font-size:16px;">${x.title}</span>
-          <span style="margin-left:auto; color:#92938F; font-size:13px;">${x.ext?"↗":"→"}</span>
-        </div>
-        <div style="font-size:14px; line-height:1.5; color:#5C5E63;">${x.text}</div></a>`;
-    }).join("") || `<p style="color:#92938F; font:15px monospace;">${DE?"Nichts gefunden — anderes Stichwort?":"Nothing found — try another keyword?"}</p>`;
+  function resolve(d){ return d.url; }
+
+  // STATISCHE Engine (Fallback / Default)
+  function staticSearch(){
+    var terms=norm(state.q).split(/\s+/).filter(Boolean);
+    function matchQ(d){ if(!terms.length) return true; var hay=norm(d.title+" "+d.summary+" "+d.tags.join(" ")); return terms.every(function(t){return hay.indexOf(t)>=0;}); }
+    function matchTags(d){ return state.tags.every(function(t){return d.tags.indexOf(t)>=0;}); }
+    var qSet=DOCS.filter(matchQ);                       // für Facetten-Counts (nur q)
+    var results=qSet.filter(matchTags);                  // Ergebnisse (q + tags)
+    var counts={}; qSet.forEach(function(d){ d.tags.forEach(function(t){ counts[t]=(counts[t]||0)+1; }); });
+    return { results:results, counts:counts };
   }
 
-  const chips = $("#chips");
-  EXAMPLES.forEach(e => {
-    const b = document.createElement("button");
-    b.textContent = e;
-    b.style.cssText = "font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid #C0C8C5; border-radius:999px; background:#fff; cursor:pointer; color:#3C3E42;";
-    b.onclick = () => { $("#q").value = e; render(e); };
-    chips.appendChild(b);
-  });
-
-  fetch("/data/nordwerk-corpus.json").then(r=>r.json()).then(d=>{
-    CORPUS = d; render("");
-    const q = $("#q");
-    q.addEventListener("input", () => render(q.value));
-    q.addEventListener("keydown", (e) => { if (e.key === "Enter") askLLM(); });
-    q.focus();
-  }).catch(()=>{ $("#count").textContent = DE?"Korpus konnte nicht geladen werden.":"Could not load corpus."; });
-
-  async function askLLM() {
-    const q = $("#q").value.trim();
-    if (!q) return;
-    const box = $("#answerbox"), ans = $("#answer"), src = $("#sources");
-    box.hidden = false; ans.textContent = DE ? "denkt nach …" : "thinking …"; src.innerHTML = "";
-    try {
-      const r = await fetch("/_ask/", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ q, lang: DE?"de":"en" }) });
-      const d = await r.json();
-      if (!r.ok || d.error || !d.answer) { ans.textContent = DE ? "Antwort gerade nicht verfügbar — die Treffer unten helfen weiter." : "Answer not available right now — see the hits below."; return; }
-      ans.textContent = d.answer;
-      src.innerHTML = (d.sources||[]).map(s2 => `<a href="${s2.ext?s2.href:(DE?'':'/en')+s2.href}" ${s2.ext?'target="_blank" rel="noopener"':''} style="text-decoration:none;font-family:var(--font-mono);font-size:11px;color:#16463E;border:1px solid #C0C8C5;border-radius:999px;padding:3px 9px;">${s2.title} ${s2.ext?'↗':'→'}</a>`).join("");
-    } catch(e) { ans.textContent = DE ? "Antwort gerade nicht verfügbar — die Treffer unten helfen weiter." : "Answer not available right now — see the hits below."; }
+  // MEILI-Engine
+  async function meili(){
+    var H={ "Content-Type":"application/json", "Authorization":"Bearer "+CFG.key };
+    var base=CFG.host+"/indexes/"+CFG.index+"/search";
+    var langFilter='lang = '+(DE?'de':'en');
+    function req(body){ return fetch(base,{method:"POST",headers:H,body:JSON.stringify(body)}).then(function(r){return r.ok?r.json():Promise.reject(r.status);}); }
+    var tagFilter=state.tags.map(function(t){return 'tags = "'+t+'"';});
+    var resFilter=[langFilter].concat(tagFilter).join(" AND ");
+    var rRes=await req({ q:state.q, filter:resFilter, limit:50 });
+    var rFac=await req({ q:state.q, filter:langFilter, facets:["tags"], limit:0 });
+    var counts=(rFac.facetDistribution&&rFac.facetDistribution.tags)||{};
+    var results=(rRes.hits||[]).map(function(h){ return { id:h.id,type:h.type,ext:!!h.ext,url:h.url,tags:h.tags||[],title:h.title,summary:h.summary }; });
+    return { results:results, counts:counts };
   }
-  document.getElementById("askbtn")?.addEventListener("click", askLLM);
+
+  function renderActive(){
+    var a=$("#active"); a.innerHTML="";
+    state.tags.forEach(function(t){
+      var c=document.createElement("button"); c.className="su-chip";
+      c.innerHTML='<b>'+(TM[t]?TM[t].label:t)+'</b> ✕';
+      c.onclick=function(){ state.tags=state.tags.filter(function(x){return x!==t;}); run(); };
+      a.appendChild(c);
+    });
+    if(state.tags.length){ var clr=document.createElement("button"); clr.className="su-chip"; clr.style.background="#fff"; clr.style.borderColor="#C0C8C5"; clr.textContent=T("alle entfernen","clear all"); clr.onclick=function(){ state.tags=[]; run(); }; a.appendChild(clr); }
+  }
+  function renderFacets(counts){
+    var f=$("#facets"); f.innerHTML="";
+    GROUPS.forEach(function(grp){
+      var slugs=Object.keys(TM).filter(function(s){return TM[s].group===grp.g && (counts[s]||state.tags.indexOf(s)>=0);});
+      slugs.sort(function(a,bb){return (counts[bb]||0)-(counts[a]||0);});
+      if(!slugs.length) return;
+      var box=document.createElement("div"); box.className="su-fgroup";
+      box.innerHTML='<p class="su-ftitle">'+grp.label+'</p>';
+      slugs.forEach(function(s){
+        var on=state.tags.indexOf(s)>=0;
+        var btn=document.createElement("button"); btn.className="su-frow"+(on?" on":"");
+        btn.innerHTML='<span>'+(on?"✓ ":"")+TM[s].label+'</span><span class="su-fcount">'+(counts[s]||0)+'</span>';
+        btn.onclick=function(){ if(on){ state.tags=state.tags.filter(function(x){return x!==s;}); } else { state.tags.push(s); } run(); };
+        box.appendChild(btn);
+      });
+      f.appendChild(box);
+    });
+  }
+  function renderResults(results){
+    $("#count").textContent = results.length+" "+(state.q||state.tags.length ? T("Treffer","hits") : T("Einträge","entries"));
+    $("#results").innerHTML = results.map(function(d){
+      var tagPills=(d.tags||[]).slice(0,5).map(function(t){return '<span class="su-rtag">'+(TM[t]?TM[t].label:t)+'</span>';}).join(" ");
+      var ty=TYPES[d.type]||d.type;
+      return '<a class="su-res" href="'+d.url+'" '+(d.ext?'target="_blank" rel="noopener"':'')+'>'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">'+
+          '<span class="su-rtag" style="color:#92938F;">'+ty+'</span>'+
+          '<span style="font-weight:600;font-size:16px;">'+d.title+'</span>'+
+          '<span style="margin-left:auto;color:#92938F;font-size:13px;">'+(d.ext?"↗":"→")+'</span></div>'+
+        '<div style="font-size:14px;line-height:1.5;color:#5C5E63;margin-bottom:8px;">'+d.summary+'</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+tagPills+'</div></a>';
+    }).join("") || '<p style="color:#92938F;font:15px var(--font-mono),monospace;">'+T("Nichts gefunden — Tag entfernen oder anderes Stichwort.","Nothing found — remove a tag or try another keyword.")+'</p>';
+  }
+
+  var useMeili = !!CFG.key;
+  async function run(){
+    writeURL(); renderActive();
+    var data;
+    if(useMeili){ try { data=await meili(); if(!data.results.length && !state.q && !state.tags.length){ useMeili=false; data=staticSearch(); } } catch(e){ useMeili=false; data=staticSearch(); } }
+    else data=staticSearch();
+    renderFacets(data.counts); renderResults(data.results);
+  }
+
+  // Init
+  readURL();
+  $("#q").addEventListener("input", function(){ state.q=$("#q").value; run(); });
+  $("#q").addEventListener("keydown", function(e){ if(e.key==="Enter") askLLM(); });
+  run();
+
+  async function askLLM(){
+    var q=state.q.trim(); var tagWords=state.tags.map(function(t){return TM[t]?TM[t].label:t;}).join(", ");
+    var query=(q+" "+tagWords).trim(); if(!query) return;
+    var box=$("#answerbox"), ans=$("#answer"); box.hidden=false; ans.textContent=T("denkt nach …","thinking …");
+    try{
+      var r=await fetch("/_ask/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:query,lang:DE?"de":"en"})});
+      var d=await r.json();
+      ans.textContent=(r.ok&&d.answer)?d.answer:T("Antwort gerade nicht verfügbar — die Treffer unten helfen weiter.","Answer not available right now — see the hits below.");
+    }catch(e){ ans.textContent=T("Antwort gerade nicht verfügbar — die Treffer unten helfen weiter.","Answer not available right now — see the hits below."); }
+  }
+  $("#askbtn").addEventListener("click", askLLM);
+})();
 </script>

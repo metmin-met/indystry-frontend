@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Simulationen from "../components/views/Simulationen.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Prozess-Simulationen" description="Animierte, live tickende Prozess-Simulationen — Lichtbogenschweißen, Laserschneiden, CNC-Zerspanung, Abkanten. Jeder Schritt als digitaler Zwilling, gefahrlos im Modell." path="/simulationen/" altPath="/en/simulationen/">
+  <Simulationen lang={lang} />
+</Base>

@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Compliance from "../../components/views/Compliance.astro";
+const lang = "en" as const;
+---
+<Base lang={lang} title="Compliance & security" description="A living ISMS to ISO 27001:2022 — risk heatmap, Annex A controls, NIS2/BSI/NIST mappings, SIEM & seamless technical auditability. Self-hosted." path="/en/compliance/" altPath="/compliance/">
+  <Compliance lang={lang} />
+</Base>

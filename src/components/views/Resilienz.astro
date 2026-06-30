@@ -1,0 +1,110 @@
+---
+// /resilienz/ — Resilienz & Wiederanlauf (Out-of-Band-Recovery, Backups, HA). Un-branded.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const AC = "#4a6fa5";
+
+const oob = [
+  { t: L("KVM über IP", "KVM over IP"), d: L("Bild abgreifen, Tastatur/Maus simulieren — als säße jemand davor, auch wenn das Betriebssystem nicht mehr startet.", "Capture the screen, simulate keyboard/mouse — as if someone sat in front, even when the OS won't boot.") },
+  { t: L("Virtuelle Medien & BIOS", "Virtual media & BIOS"), d: L("ISO einhängen, BIOS/UEFI bedienen, neu installieren — alles aus der Ferne.", "Mount an ISO, drive BIOS/UEFI, reinstall — all remotely.") },
+  { t: L("Strom schalten", "Power control"), d: L("Hartes Aus/Ein per Fernzugriff, wenn nichts mehr reagiert.", "Hard power cycle remotely when nothing responds anymore.") },
+  { t: L("Eigener Mobilfunk-Uplink", "Own cellular uplink"), d: L("Mobilfunk-Verbindung unabhängig vom Werksnetz — funktioniert, wenn das lokale Netz tot ist.", "A cellular link independent of the plant network — works when the local net is dead.") },
+  { t: L("Netzstart / Wiederherstellung", "Network boot / recovery"), d: L("Rechner über das Netz starten und automatisiert wiederherstellen.", "Boot machines over the network and restore them automatically.") },
+  { t: L("Audit-first", "Audit-first"), d: L("Jede Aktion wird protokolliert, fortlaufend und manipulationssicher — read-only, bis es sein muss.", "Every action is logged, append-only and tamper-evident — read-only until it has to act.") },
+];
+const backup = [
+  { t: L("3-2-1, gelebt", "3-2-1, lived"), d: L("Drei Kopien, zwei Medien, eine außer Haus — nicht als Folie, sondern als laufender Job.", "Three copies, two media, one off-site — not a slide, a running job.") },
+  { t: L("Verschlüsselte Offsite-Kopie", "Encrypted off-site copy"), d: L("Die Auslagerung ist verschlüsselt — der Standort sieht eure Daten nie im Klartext.", "The off-site copy is encrypted — the location never sees your data in clear text.") },
+  { t: L("Getestete Restores", "Tested restores"), d: L("Ein Backup zählt erst, wenn der Restore bewiesen ist — regelmäßig, nicht im Ernstfall zum ersten Mal.", "A backup only counts once the restore is proven — regularly, not for the first time in an emergency.") },
+  { t: L("Snapshots & schnelle Rückkehr", "Snapshots & fast rollback"), d: L("Vor jeder Änderung ein Stand, zu dem man in Minuten zurückkehrt.", "A point before every change you can return to in minutes.") },
+];
+const ha = [
+  { t: L("Virtualisiert & migrierbar", "Virtualised & migratable"), d: L("Dienste laufen als Container/VM — verschiebbar zwischen Knoten, ohne Ausfall.", "Services run as container/VM — movable between nodes, without downtime.") },
+  { t: L("Selbstheilend", "Self-healing"), d: L("Watchdog erkennt Hänger und startet neu, statt stundenlang tot dazuliegen.", "A watchdog spots hangs and restarts, instead of lying dead for hours.") },
+  { t: L("Mesh-Failover", "Mesh failover"), d: L("Verschlüsseltes Netz zwischen den Standorten mit alternativen Wegen.", "An encrypted network between sites with alternative paths.") },
+];
+---
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(74,111,165,.20),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Resilienz & Wiederanlauf", "Resilience & recovery")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Wenn alles steht —", "When everything's down —")} <span style="color:#E6B23A;">{L("kommst du trotzdem rein.", "you still get in.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Server hängt, Netz tot, niemand vor Ort — der klassische Albtraum. Mit einem Out-of-Band-Zugang, geprüften Backups und selbstheilender Infrastruktur wird daraus eine Stunde Arbeit statt ein Tag Stillstand. Sauber protokolliert.", "Server hung, network dead, nobody on site — the classic nightmare. With out-of-band access, tested backups and self-healing infrastructure it becomes an hour of work instead of a day of downtime. Cleanly logged.")}</p>
+  </div>
+</section>
+
+<!-- §01 OOB -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(24px,3vw,40px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Out-of-Band-Zugang", "Out-of-band access")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 10px; max-width:22ch;">{L("Ein Notfall-Koffer, der überall reinkommt.", "An emergency kit that gets in anywhere.")}</h2>
+    <p style="font-size:15px; color:#5C5E63; margin:0 0 24px; max-width:64ch;">{L("Ein eigenständiges Gerät mit eigenem Mobilfunk — hängt sich an die kranke Maschine, nicht ans kaputte Netz.", "A standalone device with its own cellular link — attaches to the sick machine, not the broken network.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
+      {oob.map((o) => (
+        <div style={`border:1px solid #E2E8F0; border-left:3px solid ${AC}; border-radius:12px; background:#fff; padding:16px 18px;`}>
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §02 BACKUPS (beige) -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Backups, die man getestet hat", "Backups you've tested")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <p style="font-family:var(--font-head); font-weight:600; font-size:clamp(18px,2vw,24px); line-height:1.4; color:#1B1C1E; margin:0 0 24px; max-width:60ch;">{L("Ein Backup, das nie zurückgespielt wurde, ist eine Hoffnung — kein Backup.", "A backup that's never been restored is a hope — not a backup.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      {backup.map((o) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §03 HA -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Hochverfügbar & selbstheilend", "Highly available & self-healing")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;">
+      {ha.map((o) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Status, Backups und Stabilität sieht man live im Status-Board.", "Status, backups and stability are visible live on the status board.")} <a href={b + "/status/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Status-Board", "To the status board")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Was kostet euch ein Tag Stillstand?", "What does a day of downtime cost you?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Genau das ist das Budget, das Resilienz spart. Einmal eingerichtet, läuft sie im Hintergrund.", "That's exactly the budget resilience saves. Set up once, it runs in the background.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={b + "/compliance/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Teil der Sicherheits-Story", "Part of the security story")} ↗</a>
+    </div>
+  </div>
+</section>

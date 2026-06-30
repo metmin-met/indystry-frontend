@@ -8,6 +8,27 @@ const de = lang === "de";
 const kontakt = de ? "/kontakt/" : "/en/kontakt/";
 const demo = "https://erp-demo.indystry.works/web/login";
 const saeule = de ? "/saeule/erp-betrieb/" : "/en/pillar/erp-betrieb/";
+const L = (d: string, e: string) => (de ? d : e);
+const b = de ? "" : "/en";
+const flow = de
+  ? ["Anfrage","Angebot","Auftrag","Fertigung","Qualität","Lieferung","Rechnung"]
+  : ["Inquiry","Quote","Order","Production","Quality","Delivery","Invoice"];
+const modules = [
+  L("Aufträge & Verkauf","Orders & sales"), L("Einkauf","Purchasing"), L("Fertigung (MRP)","Manufacturing (MRP)"),
+  L("Planung & Gantt","Planning & Gantt"), L("Lager & Chargen","Stock & lots"), L("Qualität (QC)","Quality (QC)"),
+  L("Wartung","Maintenance"), L("Kostenrechnung","Costing"), L("Buchhaltung","Accounting"),
+  L("Zeit & Anwesenheit","Time & attendance"), L("Projekte","Projects"), L("Werker-App","Shop-floor app"),
+];
+const deep = [
+  { t: L("Instandhaltung & Anlagen","Maintenance & assets"), d: L("QM-konform: Hierarchie, Normen, Prüffristen, 3D/DXF.","QM-compliant: hierarchy, standards, intervals, 3D/DXF."), h: b+"/instandhaltung/" },
+  { t: L("Kosten & Controlling","Costing & controlling"), d: L("Lot-Costing, IFRS/HGB, NRV, Plan-Ist.","Lot costing, IFRS/HGB, NRV, plan vs. actual."), h: b+"/kosten/" },
+  { t: L("Kennzahlen & Review","KPIs & review"), d: L("27 Management-Review-KPIs, snapshot-auditiert.","27 management-review KPIs, snapshot-audited."), h: b+"/kennzahlen/" },
+  { t: L("Werker-App","Shop-floor app"), d: L("Stempeln, Zeit, Fertigung, NFC — offline-first.","Clocking, time, manufacturing, NFC — offline-first."), h: b+"/app/" },
+  { t: L("Compliance & QM","Compliance & QM"), d: L("ISO 9001 + ISO 27001 in einem System, lebendes Handbuch.","ISO 9001 + ISO 27001 in one system, living handbook."), h: b+"/compliance/" },
+  { t: L("Schnittstellen","Interfaces"), d: L("OPC-UA, SPS, REST, MCP, PEPPOL, DATEV, BMD, ETL.","OPC-UA, PLC, REST, MCP, PEPPOL, DATEV, BMD, ETL."), h: b+"/schnittstellen/" },
+  { t: L("Suche & Wissen","Search & knowledge"), d: L("Föderierte Suche + lebendes Handbuch + KI-Antworten.","Federated search + living handbook + AI answers."), h: b+"/suche/" },
+  { t: L("Resilienz & Betrieb","Resilience & operations"), d: L("Backups/Restore, Out-of-Band, Software-Rollout.","Backups/restore, out-of-band, software rollout."), h: b+"/resilienz/" },
+];
 const feats = de ? [
   { t: "Datenhoheit & Sicherheit", d: "Eure sensiblen Produktionsdaten bleiben in eurem Netzwerk — geschützt durch eure eigenen Sicherheitsprotokolle.", l: "Mehr erfahren →", h: "/#souv" },
   { t: "Maßgeschneiderte Add-ons", d: "Von Lagerlogistik bis komplexe Fertigung — das System passt sich eurem Prozess an, nicht umgekehrt. Voller Zugriff auf den Quellcode.", l: "Bausteine ansehen →", h: saeule },
@@ -63,6 +84,47 @@ const feats = de ? [
   </div>
 </section>
 
+<!-- AUFTRAG→RECHNUNG + MODUL-MAP -->
+<section style="background:#fff; border-top:1px solid #E2E8F0;">
+  <div style="max-width:1280px; margin:0 auto; padding:clamp(48px,6vw,88px) clamp(24px,5vw,56px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Ein Auftrag, ein Datenmodell","One order, one data model")}</p>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 14px;">
+      {flow.map((step, i) => (
+        <>
+          {i > 0 && <span style="color:#E6B23A; font-weight:700;">→</span>}
+          <span style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#123A33; background:#F8F9FA; border:1px solid #C0C8C5; border-radius:9999px; padding:7px 14px;">{step}</span>
+        </>
+      ))}
+    </div>
+    <p style="font-size:15px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(32px,4vw,44px); max-width:64ch;">{L("Einmal eingegeben, überall sichtbar — Planung, Fertigung, Qualität, Lager und Buchhaltung ziehen sich die Daten von selbst. Kein Zuruf, kein doppeltes Tippen.","Entered once, visible everywhere — planning, production, quality, stock and accounting pull the data themselves. No shouting, no double typing.")}</p>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 14px;">{L("Module im Kern","Core modules")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+      {modules.map((m) => (
+        <span style="font-size:14px; font-weight:500; color:#1B1C1E; background:#fff; border:1px solid #E2E8F0; border-radius:8px; padding:9px 14px;">{m}</span>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- IN DIE TIEFE — Hub auf die Spezialseiten -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1280px; margin:0 auto; padding:clamp(56px,7vw,96px) clamp(24px,5vw,56px);">
+    <h2 style="font-weight:700; font-family:var(--font-head); font-size:clamp(28px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 10px; max-width:22ch;">{L("Der Kern — und alles, was andockt.","The core — and everything that plugs in.")}</h2>
+    <p style="font-size:clamp(16px,1.6vw,19px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(32px,4vw,44px); max-width:62ch;">{L("Das ERP ist die Mitte. Drumherum greifen die Spezial-Bereiche ineinander — jeder mit eigener Tiefe, alle auf demselben Datenmodell.","The ERP is the centre. Around it the specialist areas interlock — each with its own depth, all on the same data model.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;">
+      {deep.map((x) => (
+        <a href={x.h} class="erp-deep" style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:20px 22px; display:flex; flex-direction:column; gap:8px;">
+          <span style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span style="font-family:var(--font-head); font-weight:700; font-size:17px;">{x.t}</span>
+            <span class="erp-deep-arr" style="color:#16463E;">→</span>
+          </span>
+          <span style="font-size:14px; line-height:1.55; color:#5C5E63;">{x.d}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
 <!-- 3-up Feature-Cards -->
 <section style="background:#F8F9FA; border-top:1px solid #E2E8F0;">
   <div style="max-width:1280px; margin:0 auto; padding:clamp(72px,9vw,128px) clamp(24px,5vw,56px);">
@@ -94,4 +156,4 @@ const feats = de ? [
   </div>
 </section>
 
-<style>.erp-feat:hover { color: #1B1C1E; }</style>
+<style>.erp-feat:hover { color: #1B1C1E; } .erp-deep{transition:transform .15s,box-shadow .15s,border-color .15s;} .erp-deep:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(11,28,25,.10);border-color:#123A33;} .erp-deep:hover .erp-deep-arr{transform:translateX(4px);} .erp-deep-arr{transition:transform .2s;display:inline-block;}</style>

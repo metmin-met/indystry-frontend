@@ -5,18 +5,56 @@ interface Props { lang: "de" | "en"; embed?: boolean }
 const { lang, embed = false } = Astro.props;
 const de = lang === "de";
 const L = (d: string, e: string) => (de ? d : e);
+const b = de ? "" : "/en";
+const DEMO = "https://twin-demo.indystry.works";
+const badges = ["OPC-UA", "Beckhoff TwinCAT", "TimescaleDB", "Soft-PLC", "Python · scikit-learn", "R Shiny"];
+const ebenen = [
+  { n: L("1 · Spiegel", "1 · Mirror"), d: L("Live-Abbild aus dem Historian — Millionen Messpunkte, jede Maschine in Echtzeit gespiegelt. Der Zwilling weiß, was die echte Anlage gerade tut.", "Live image from the historian — millions of data points, every machine mirrored in real time. The twin knows what the real plant is doing right now.") },
+  { n: L("2 · Simulation", "2 · Simulation"), d: L("Läuft auf den echten Strukturen und Tags eurer Steuerung (Soft-PLC) — Struktur real, Werte simuliert. So lassen sich Parameter gefahrlos durchspielen, ohne ein Werkstück zu riskieren.", "Runs on the real structures and tags of your controller (soft PLC) — structure real, values simulated. Parameters can be tried safely, without risking a single part.") },
+  { n: L("3 · Optimierung", "3 · Optimisation"), d: L("What-if-Rechnung und ML schlagen bessere Parameter vor und erkennen Drift, bevor Ausschuss entsteht — Vorhersage statt Reaktion.", "What-if computation and ML suggest better parameters and detect drift before scrap occurs — prediction instead of reaction.") },
+];
+const backbone = [
+  { t: L("Historian (TimescaleDB)", "Historian (TimescaleDB)"), d: L("Millionen Messpunkte als Faktenbasis — der Zwilling rät nicht, er rechnet auf echten Verläufen.", "Millions of data points as the factual base — the twin doesn't guess, it computes on real histories.") },
+  { t: L("OPC-UA (bidirektional)", "OPC-UA (bidirectional)"), d: L("Herstellerneutrale Kopplung an SPS und Leittechnik — lesen und, wo freigegeben, zurückschreiben.", "Vendor-neutral coupling to PLC and control system — read and, where authorised, write back.") },
+  { t: L("Soft-PLC-Sandkasten", "Soft-PLC sandbox"), d: L("Ein Klon der Steuerungslogik mit echten Strukturen und Tag-Namen — experimentieren, ohne die Linie anzufassen.", "A clone of the control logic with real structures and tag names — experiment without touching the line.") },
+  { t: L("Beckhoff TwinCAT", "Beckhoff TwinCAT"), d: L("PC-basierte Steuerung als offene Zielplattform — anschlussfähig statt proprietäre Insel.", "PC-based control as an open target platform — connectable instead of a proprietary island.") },
+  { t: L("ML & R/Python", "ML & R/Python"), d: L("scikit-learn und R Shiny für What-if, Korrelation und Restlebensdauer-Vorhersage.", "scikit-learn and R Shiny for what-if, correlation and remaining-life prediction.") },
+];
+const usecases = [
+  { t: L("Virtuelle Inbetriebnahme", "Virtual commissioning"), d: L("Steuerungslogik gegen das Modell testen, bevor die Hardware steht — Inbetriebnahmen verkürzen, Fehler vorab finden.", "Test control logic against the model before the hardware exists — shorten commissioning, find errors up front.") },
+  { t: L("Durchsatz & Energie", "Throughput & energy"), d: L("Parameter am Modell optimieren statt an der laufenden Produktion — kein Ausschuss beim Suchen des Optimums.", "Optimise parameters on the model instead of on live production — no scrap while searching for the optimum.") },
+  { t: L("Vorausschauende Wartung", "Predictive maintenance"), d: L("Restlebensdauer aus Vibration und Temperatur — eingreifen, bevor ein Lager die Linie stoppt.", "Remaining life from vibration and temperature — act before a bearing stops the line.") },
+  { t: L("Schulung ohne Risiko", "Risk-free training"), d: L("Bediener üben am Zwilling Grenzfälle, die man an der echten Anlage nie provozieren würde.", "Operators practise edge cases on the twin that you'd never provoke on the real plant.") },
+];
 ---
 {!embed && (<section style="background:#0E2522; color:#F4F6F5;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(40px,5vw,56px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Digitaler Zwilling · Live", "Digital twin · live")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Der CNC-Fräse beim Denken zusehen.", "Watch the CNC mill think.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Echtbetrieb mit Röntgenblick: sieh hinein, übersteuere die Parameter und schau, wie die Anlage reagiert — und frag den KI-Optimizer, ob er Verbesserungen oder Probleme sieht.", "Real operation with X-ray vision: look inside, override the parameters and watch the plant react — then ask the AI optimizer whether it sees improvements or problems.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Digitaler Zwilling · Engineering", "Digital twin · engineering")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Die Anlage als Modell — bevor ihr sie anfasst.", "The plant as a model — before you touch it.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Ein digitaler Zwilling ist kein Schaubild, sondern ein rechnendes Abbild eurer Anlage: gespeist aus dem Historian, simuliert auf den echten Strukturen eurer Steuerung, gekoppelt über OPC-UA. Damit testet ihr Parameter, sagt Verschleiß voraus und fahrt Inbetriebnahmen virtuell — ohne ein echtes Werkstück zu riskieren.", "A digital twin is not a diagram but a computing model of your plant: fed from the historian, simulated on the real structures of your controller, coupled via OPC-UA. You test parameters, predict wear and run commissioning virtually — without risking a single real part.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;">
+      {badges.map((x) => (<span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; border:1px solid #2E5A52; border-radius:999px; padding:5px 12px;">{x}</span>))}
+    </div>
+  </div>
+</section>)}
+{!embed && (<section style="background:#0E2522; color:#F4F6F5;">
+  <div style="max-width:1100px; margin:0 auto; padding:0 clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+      {ebenen.map((e) => (
+        <div style="border:1px solid #214740; border-radius:14px; background:#10322C; padding:22px 24px;">
+          <p style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#3FB57E; margin:0 0 10px;">{e.n}</p>
+          <p style="font-size:14.5px; line-height:1.6; color:#CADAD5; margin:0;">{e.d}</p>
+        </div>
+      ))}
+    </div>
   </div>
 </section>)}
 
 <section style="background:#F8F9FA;" data-de={String(de)} data-embed={String(embed)}>
   <div style="max-width:1100px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
     {embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Ebene 3 · Digitaler Zwilling — der Maschine beim Arbeiten zusehen", "Level 3 · Digital twin — watch the machine work")}</p>}
+    {!embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 6px;">{L("Interaktive Live-Simulation", "Interactive live simulation")}</p>}
+    {!embed && <p style="font-size:13px; color:#92938F; margin:0 0 18px;">{L("Vereinfachtes Modell einer CNC-Fräse zur Veranschaulichung — die vollständige Simulation läuft in der Demo.", "Simplified model of a CNC mill for illustration — the full simulation runs in the demo.")}</p>}
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; align-items:start;">
 
       <!-- Echtbetrieb -->
@@ -27,7 +65,7 @@ const L = (d: string, e: string) => (de ? d : e);
           <span id="tw-state" style="margin-left:auto; font-family:var(--font-mono); font-size:11px; color:#16794a;">{L("stabil", "stable")}</span>
         </div>
         <div id="tw-metrics"></div>
-        <button id="tw-xray" class="tw-btn" type="button" style="margin-top:16px;">🔎 {L("Röntgenblick", "X-ray view")}</button>
+        <button id="tw-xray" class="tw-btn" type="button" style="margin-top:16px;">{L("Röntgenblick", "X-ray view")}</button>
         <div id="tw-inside" hidden style="margin-top:14px; border-top:1px dashed #C0C8C5; padding-top:14px;">
           <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Innenansicht", "Inside view")}</p>
           <div id="tw-internals"></div>
@@ -89,12 +127,58 @@ const L = (d: string, e: string) => (de ? d : e);
       <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
         <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Optimizer fragen", "Ask the optimizer")}</span>
         <span style="font-size:13px; color:#5C5E63;">{L("KI bewertet den aktuellen Zustand — Verbesserungen & Risiken.", "AI assesses the current state — improvements & risks.")}</span>
-        <button id="tw-ask" class="tw-btn primary" type="button" style="margin-left:auto;">✦ {L("Analysieren", "Analyse")}</button>
+        <button id="tw-ask" class="tw-btn primary" type="button" style="margin-left:auto;">{L("Analysieren", "Analyse")}</button>
       </div>
       <div id="tw-answer" hidden style="margin-top:16px; font-size:15px; line-height:1.6; color:#1B1C1E; white-space:pre-wrap;"></div>
     </div>
   </div>
 </section>
+
+{!embed && (<section style="background:#F8F9FA;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Worauf der Zwilling läuft", "What the twin runs on")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
+      {backbone.map((x) => (
+        <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{x.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{x.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>)}
+
+{!embed && (<section style="background:#EFEAE0;">
+  <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wofür man ihn einsetzt", "What it's used for")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px;">
+      {usecases.map((x) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px 20px;">
+          <p style="font-family:var(--font-head); font-weight:700; font-size:16px; color:#1B1C1E; margin:0 0 6px;">{x.t}</p>
+          <p style="font-size:13.5px; line-height:1.55; color:#5C5E63; margin:0;">{x.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>)}
+
+{!embed && (<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Erst im Modell. Dann in echt.", "First in the model. Then for real.")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Jede Parameteränderung, jede Umrüstung, jede neue Logik — zuerst gefahrlos am Zwilling. Das spart Ausschuss, Stillstand und Risiko.", "Every parameter change, every changeover, every new logic — first safely on the twin. That saves scrap, downtime and risk.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation")} ↗</a>
+      <a href={b + "/historian/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Die Datenbasis dahinter", "The data base behind it")} →</a>
+      <a href={b + "/simulationen/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Mehr Prozess-Simulationen", "More process simulations")} →</a>
+    </div>
+  </div>
+</section>)}
 
 <style>
   .tw-row { display:grid; grid-template-columns:130px 64px 1fr; align-items:center; gap:10px; margin:9px 0; }

@@ -1,0 +1,160 @@
+---
+// /demos/ — Redesign (Handoff ZIP 7): Demo-Firma-Hub. Radiales Hub-SVG + 6 Demo-Karten mit
+// animierten Preview-Grafiken je slug. Daten = die 6 Live-Demos (aus content.json demos[]).
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const demos = [
+  { slug:"grafana-cockpit", mono:"CK", hue:"#d97a26", url:"https://grafana-demo.indystry.works", login:"", t:L("Werks-Cockpit","Factory cockpit"), s:L("Live-Monitoring","Live monitoring"), d:L("Echtzeit-Dashboards auf Maschinen- und Sensordaten — Temperatur, Vibration, Ausschuss.","Real-time dashboards on machine & sensor data — temperature, vibration, scrap.") },
+  { slug:"metabase-bi", mono:"BI", hue:"#1f8a73", url:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", login:"", t:L("BI-Cockpit","BI cockpit"), s:L("Auswertungen","Analytics"), d:L("Produktion, Qualität und Ausschussquote als interaktives Dashboard.","Production, quality and scrap rate as an interactive dashboard.") },
+  { slug:"app", mono:"AP", hue:"#2389b0", url:"https://app-demo.indystry.works", login:"", t:L("Werker-App","Shop-floor app"), s:L("Mobile","Mobile"), d:L("Anwesenheit, Zeiterfassung, Fertigung und Behälter — direkt im Browser.","Attendance, time tracking, manufacturing and containers — right in the browser.") },
+  { slug:"erp", mono:"ER", hue:"#9a4bb0", url:"https://erp-demo.indystry.works/web/login", login:"demo / demo", t:L("ERP","ERP"), s:L("Ein System für die Firma","One system for the company"), d:L("Aufträge, Qualität, Lager, Wartung — eine Demo-Instanz zum Durchklicken.","Orders, quality, stock, maintenance — a demo instance to click through.") },
+  { slug:"jupyter", mono:"DS", hue:"#3771b3", url:"https://lab-demo.indystry.works", login:"", t:L("Data-Science-Sandbox","Data-science sandbox"), s:L("Notebooks","Notebooks"), d:L("Notebooks auf den synthetischen Werksdaten — Computer-Vision, ML, Korrelationen.","Notebooks on the synthetic factory data — computer vision, ML, correlations.") },
+  { slug:"shiny", mono:"TW", hue:"#7b5cc4", url:"https://twin-demo.indystry.works", login:"", t:L("Digital Twin","Digital twin"), s:L("Interaktive Simulation","Interactive simulation"), d:L("What-if am Modell: Parameter schieben, Durchsatz und Qualität vorhersagen.","What-if on the model: shift parameters, predict throughput and quality.") },
+];
+const cx=160, cy=160, R=116;
+const nodes = demos.map((dm,i)=>{ const a=(-90+i*60)*Math.PI/180; return { ...dm, x:+(cx+R*Math.cos(a)).toFixed(1), y:+(cy+R*Math.sin(a)).toFixed(1) }; });
+const noLogin = demos.filter(d=>!d.login).length;
+---
+<!-- HERO + HUB -->
+<section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(28px,4vw,44px); display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(24px,4vw,48px); align-items:center;">
+    <div>
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Demo-Firma · Nordwerk Manufacturing","Demo company · Nordwerk Manufacturing")}</p>
+      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Eine ganze Firma.","A whole company.")} <span style="color:#E6B23A;">{L("Zum Durchklicken.","To click through.")}</span></h1>
+      <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 24px;">{L("Nordwerk ist ein fiktiver Metallteile-Hersteller (Auftragsfertigung). Sechs echte, klickbare Systeme auf synthetischen Daten — vom Live-Cockpit bis zum digitalen Zwilling. Kein Login nötig (außer ERP: demo/demo).","Nordwerk is a fictional metal-parts maker (make-to-order). Six real, clickable systems on synthetic data — from the live cockpit to the digital twin. No login needed (except ERP: demo/demo).")}</p>
+      <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        <a href={b + "/tour/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 22px; border-radius:10px;">{L("Geführte Tour","Guided tour")} →</a>
+        <a href="#demoliste" style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("↓ Alle Demos","↓ All demos")}</a>
+      </div>
+    </div>
+    <div style="justify-self:center; width:100%; max-width:380px;">
+      <svg viewBox="0 0 320 320" style="width:100%; height:auto;" aria-label="Demo-Hub">
+        {nodes.map((n)=>(<line x1={cx} y1={cy} x2={n.x} y2={n.y} stroke="#214740" stroke-width="2"/>))}
+        {nodes.map((n)=>(<line class="dm-spoke" x1={cx} y1={cy} x2={n.x} y2={n.y} stroke="#E6B23A" stroke-width="1.5" stroke-dasharray="3 9" stroke-linecap="round"/>))}
+        <circle cx={cx} cy={cy} r="30" fill="#123A33" stroke="#E6B23A" stroke-width="2"/>
+        <text x={cx} y={cy-2} text-anchor="middle" font-family="var(--font-head),sans-serif" font-weight="800" font-size="15" fill="#E6B23A">NW</text>
+        <text x={cx} y={cy+12} text-anchor="middle" font-family="var(--font-mono),monospace" font-size="7" fill="#A6CFC5">Nordwerk</text>
+        {nodes.map((n)=>(
+          <a href={`#demo-${n.slug}`}>
+            <circle cx={n.x} cy={n.y} r="22" fill="#10322C" stroke={n.hue} stroke-width="2"/>
+            <text x={n.x} y={n.y+4} text-anchor="middle" font-family="var(--font-mono),monospace" font-weight="700" font-size="11" fill={n.hue}>{n.mono}</text>
+          </a>
+        ))}
+      </svg>
+    </div>
+  </div>
+  <!-- KPI-Band -->
+  <div style="position:relative; border-top:1px solid rgba(166,207,197,.16);">
+    <div style="max-width:1120px; margin:0 auto; padding:18px clamp(24px,5vw,56px); display:grid; grid-template-columns:repeat(4,1fr); gap:16px;" class="dm-kpis">
+      {[[String(demos.length),L("Live-Systeme","live systems")],["8",L("Maschinen","machines")],[String(noLogin),L("ohne Login","no login")],["100%",L("synthetisch","synthetic")]].map(([v,k])=>(
+        <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:14px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(22px,3vw,32px); line-height:1; color:#F4F8F6;">{v}</div><div style="font-family:var(--font-mono); font-size:10px; color:#8FB0A8; margin-top:5px; letter-spacing:.04em; text-transform:uppercase;">{k}</div></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- DEMO-KARTEN -->
+<section style="background:#F8F9FA;" id="demoliste">
+  <div style="max-width:1120px; margin:0 auto; padding:clamp(40px,5vw,72px) clamp(24px,5vw,56px) clamp(56px,7vw,88px);">
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:18px;">
+      {demos.map((dm)=>(
+        <div id={`demo-${dm.slug}`} class="dm-card" style="scroll-margin-top:84px;">
+          <div class="dm-prev" style={`--hue:${dm.hue};`}>
+            {dm.slug==="grafana-cockpit" && (<div class="dm-cockpit">
+              <div class="dm-tiles"><span><b>41°C</b>Temp</span><span><b>3.1</b>Vib</span><span><b>4%</b>Ausschuss</span></div>
+              <svg viewBox="0 0 200 56" class="dm-spark"><polyline points="0,40 20,34 40,38 60,26 80,30 100,18 120,24 140,14 160,20 180,10 200,16" fill="none" stroke={dm.hue} stroke-width="2"/><line class="dm-scan" x1="0" y1="0" x2="0" y2="56" stroke="#ffffff55" stroke-width="2"/></svg>
+            </div>)}
+            {dm.slug==="metabase-bi" && (<div class="dm-bi">
+              <div class="dm-bars">{[40,62,48,75,58,92].map((h,i)=>(<span class="dm-bar" style={`height:${h}%; animation-delay:${i*0.12}s; background:${i===5?"#E6B23A":dm.hue};`}></span>))}</div>
+              <div class="dm-donut" style={`background:conic-gradient(${dm.hue} 0 96%, #20403a 96% 100%);`}><span>96%</span></div>
+            </div>)}
+            {dm.slug==="app" && (<div class="dm-phone">
+              <div class="dm-phtop"></div>
+              {["Stempeln","Auftrag 1042","Behälter NW-23"].map((r,i)=>(<div class="dm-phrow"><span class="dm-phdot" style={`background:${["#3FBF7F","#E6B23A","#3FBF7F"][i]};`}></span>{r}</div>))}
+            </div>)}
+            {dm.slug==="erp" && (<div class="dm-kanban">
+              {[[L("Angebot","Quote"),6],[L("Auftrag","Order"),22],[L("Fertig","Done"),18]].map(([t,n],ci)=>(<div class="dm-col"><span class="dm-coltt">{t} · {n}</span>{[0,1,2].map((r)=>(<span class={`dm-kc${ci===1&&r===0?" dm-pulse":""}`}></span>))}</div>))}
+            </div>)}
+            {dm.slug==="jupyter" && (<div class="dm-jup">
+              <div class="dm-code"><span style="color:#7b9">df</span>.<span style="color:#d9a">plot</span>(x,y)</div>
+              <svg viewBox="0 0 200 60" class="dm-scatter"><line x1="6" y1="54" x2="194" y2="14" stroke={dm.hue} stroke-width="1.5" stroke-dasharray="4 4"/>{[[20,46],[44,42],[70,38],[96,30],[120,28],[150,20],[176,16]].map((p,i)=>(<circle class="dm-dot" cx={p[0]} cy={p[1]} r="3.2" fill={dm.hue} style={`animation-delay:${i*0.12}s;`}/>))}</svg>
+            </div>)}
+            {dm.slug==="shiny" && (<div class="dm-twin">
+              <svg viewBox="0 0 200 120" class="dm-gauge"><path d="M20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#20403a" stroke-width="12"/><path d="M20 110 A 80 80 0 0 1 180 110" fill="none" stroke={dm.hue} stroke-width="12" stroke-dasharray="160 400"/><line class="dm-needle" x1="100" y1="110" x2="100" y2="44" stroke="#E6B23A" stroke-width="3"/><circle cx="100" cy="110" r="5" fill="#E6B23A"/></svg>
+              <span class="dm-thru">103/h</span>
+            </div>)}
+          </div>
+          <div class="dm-head"><span class="dm-dot" style={`background:${dm.hue};`}></span><b>{dm.t}</b><span class="dm-sub">{dm.s}</span></div>
+          <p class="dm-d">{dm.d}</p>
+          <div class="dm-foot">
+            <span class="dm-login">{dm.login ? L("Login ","Login ")+dm.login : L("ohne Login","no login")}</span>
+            <a href={dm.url} target="_blank" rel="noopener" class="dm-open" style={`color:${dm.hue}; border-color:${dm.hue}55;`}>{L("Demo öffnen","Open demo")} ↗</a>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p style="font-family:var(--font-mono); font-size:12.5px; color:#92938F; margin-top:22px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.")}</p>
+  </div>
+</section>
+
+<style>
+  .dm-card{border:1px solid #E2E8F0;border-radius:16px;background:#fff;padding:14px;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s,border-color .18s;}
+  .dm-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(11,28,25,.10);border-color:#C0C8C5;}
+  .dm-prev{height:120px;border-radius:11px;background:#0A1F1B;border:1px solid #1c3a34;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:12px;margin-bottom:12px;}
+  .dm-head{display:flex;align-items:center;gap:9px;}
+  .dm-dot{width:10px;height:10px;border-radius:50%;flex:none;}
+  .dm-head b{font-family:var(--font-head);font-weight:700;font-size:16px;color:#1B1C1E;}
+  .dm-sub{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:#92938F;}
+  .dm-d{font-size:13.5px;line-height:1.5;color:#5C5E63;margin:8px 0 12px;flex:1;}
+  .dm-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .dm-login{font-family:var(--font-mono);font-size:10.5px;color:#92938F;}
+  .dm-open{font-family:var(--font-mono);font-size:11px;font-weight:600;text-decoration:none;border:1px solid;border-radius:999px;padding:5px 11px;}
+  .dm-spoke{animation:dm-dash 2.6s linear infinite;}
+  @keyframes dm-dash{to{stroke-dashoffset:-120;}}
+  /* cockpit */
+  .dm-cockpit{width:100%;}
+  .dm-tiles{display:flex;gap:8px;margin-bottom:8px;}
+  .dm-tiles span{flex:1;border:1px solid #1c3a34;border-radius:7px;padding:5px;text-align:center;font-family:var(--font-mono);font-size:8.5px;color:#8FB3AA;}
+  .dm-tiles b{display:block;font-size:14px;color:#EAF1EE;}
+  .dm-spark{width:100%;height:48px;position:relative;}
+  .dm-scan{animation:dm-scan 2.4s linear infinite;}
+  @keyframes dm-scan{from{transform:translateX(0);}to{transform:translateX(200px);}}
+  /* bi */
+  .dm-bi{display:flex;align-items:center;gap:16px;width:100%;justify-content:center;}
+  .dm-bars{display:flex;align-items:flex-end;gap:6px;height:80px;}
+  .dm-bar{width:12px;border-radius:3px 3px 0 0;transform-origin:bottom;animation:dm-grow .7s ease both;}
+  @keyframes dm-grow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+  .dm-donut{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .dm-donut span{width:42px;height:42px;border-radius:50%;background:#0A1F1B;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:700;color:#EAF1EE;}
+  /* phone */
+  .dm-phone{width:150px;background:#0E2E29;border:1px solid #2E5A52;border-radius:14px;padding:10px;animation:dm-float 3.2s ease-in-out infinite;}
+  @keyframes dm-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+  .dm-phtop{height:5px;width:42px;background:#2E5A52;border-radius:99px;margin:0 auto 9px;}
+  .dm-phrow{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;color:#CADAD5;padding:5px 6px;border-radius:6px;background:rgba(255,255,255,.03);margin-bottom:5px;}
+  .dm-phdot{width:7px;height:7px;border-radius:50%;flex:none;}
+  /* kanban */
+  .dm-kanban{display:flex;gap:8px;width:100%;}
+  .dm-col{flex:1;background:rgba(255,255,255,.03);border:1px solid #1c3a34;border-radius:7px;padding:6px;}
+  .dm-coltt{display:block;font-family:var(--font-mono);font-size:8px;color:#8FB3AA;margin-bottom:6px;}
+  .dm-kc{display:block;height:9px;border-radius:3px;background:#22443d;margin-bottom:5px;}
+  .dm-pulse{background:var(--hue);animation:dm-pulse 1.6s ease-in-out infinite;}
+  @keyframes dm-pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  /* jupyter */
+  .dm-jup{width:100%;}
+  .dm-code{font-family:var(--font-mono);font-size:11px;color:#A6CFC5;background:rgba(255,255,255,.04);border-radius:6px;padding:6px 8px;margin-bottom:8px;}
+  .dm-scatter{width:100%;height:60px;}
+  .dm-dot{animation:dm-pop .4s ease both;}
+  @keyframes dm-pop{from{opacity:0;transform:scale(0);}to{opacity:1;transform:scale(1);}}
+  /* twin */
+  .dm-twin{position:relative;width:100%;display:flex;justify-content:center;}
+  .dm-gauge{width:170px;height:auto;}
+  .dm-needle{transform-box:fill-box;transform-origin:100px 110px;animation:dm-ndl 2.4s ease-in-out infinite alternate;}
+  @keyframes dm-ndl{from{transform:rotate(-46deg);}to{transform:rotate(46deg);}}
+  .dm-thru{position:absolute;bottom:4px;font-family:var(--font-mono);font-size:11px;color:#EAF1EE;}
+  @media(max-width:760px){.dm-kpis{grid-template-columns:1fr 1fr !important;} section>div[style*="grid-template-columns:1.05fr"]{grid-template-columns:1fr !important;}}
+  @media(prefers-reduced-motion:reduce){.dm-spoke,.dm-scan,.dm-bar,.dm-phone,.dm-pulse,.dm-dot,.dm-needle{animation:none !important;}.dm-bar{transform:none;}.dm-dot{opacity:1;transform:none;}}
+</style>

@@ -1,0 +1,9 @@
+---
+// Klickbarer Tag-Pill → /suche/?tag=<slug>. Macht die vielen Pills der Seite zu Such-Facetten.
+import type { Lang } from "../lib/tags";
+import { tagHref, tagLabel } from "../lib/tags";
+interface Props { slug: string; label?: string; lang: Lang; cls?: string; title?: string; }
+const { slug, label, lang, cls = "", title } = Astro.props;
+const text = label ?? tagLabel(slug, lang);
+---
+<a class={"taglink " + cls} href={tagHref(slug, lang)} title={title ?? text} data-tag={slug}>{text}</a>

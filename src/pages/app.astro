@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import App from "../components/views/App.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Werker-App" description="Die mobile Werker-App: Anwesenheit, Zeiterfassung, Fertigung/QC, NFC-Behälter-Tracking — offline-first, verschlüsselt, SSO. Self-hosted, Demo im Browser." path="/app/" altPath="/en/app/">
+  <App lang={lang} />
+</Base>

@@ -82,3 +82,26 @@ const apps = [
     </div>
   </div>
 </section>
+
+<!-- DOCS-AS-CODE + ARCHIV -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wie das Wissen aktuell bleibt","How the knowledge stays current")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;">
+      <div style="border:1px solid #E2E8F0; border-top:3px solid #16463E; border-radius:14px; background:#fff; padding:22px 24px;">
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Handbuch als Code","Handbook as code")}</p>
+        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Eine Quelle, überall aktuell","One source, current everywhere")}</h3>
+        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Das Handbuch wird einmal versioniert gepflegt — und fließt automatisch ins ERP, ins Wiki und in die KI-Suche. Kein Copy-Paste, keine drei Stände, die auseinanderlaufen. Jede Änderung ist nachvollziehbar wie ein Commit.","The handbook is maintained once, under version control — and flows automatically into the ERP, the wiki and the AI search. No copy-paste, no three versions drifting apart. Every change is traceable like a commit.")}</p>
+      </div>
+      <div style="border:1px solid #E2E8F0; border-top:3px solid #E6B23A; border-radius:14px; background:#fff; padding:22px 24px;">
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("E-Mail-Archiv","Email archive")}</p>
+        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Nichts geht verloren, alles auffindbar","Nothing lost, everything findable")}</h3>
+        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Ein- und ausgehende E-Mails landen revisionssicher in einem durchsuchbaren Archiv — auch nach Jahren auffindbar, manipulationssicher, Teil der Unternehmenssuche. Wichtig für Audit und Nachweispflichten.","Inbound and outbound emails land tamper-evident in a searchable archive — findable even after years, manipulation-proof, part of the company-wide search. Important for audits and retention duties.")}</p>
+      </div>
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Beides fließt in die eine Suche.","Both feed into the one search.")} <a href={P("/suche/")} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Unternehmenssuche","To company-wide search")} →</a></p>
+  </div>
+</section>

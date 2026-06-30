@@ -6,6 +6,7 @@ const { lang } = Astro.props;
 const de = lang === "de";
 const L = (d: string, e: string) => (de ? d : e);
 const P = (path: string) => (de ? "" : "/en") + path;
+import { tagHref, tagForLabel } from "../../lib/tags";
 const ERP = "https://erp-demo.indystry.works/odoo";
 const TWIN = "https://twin-demo.indystry.works";
 const BI = "https://bi-demo.indystry.works";
@@ -45,6 +46,36 @@ const groups: { name: string; terms: T[] }[] = [
     { k: "Lock-in", d: L("Abhängigkeit von einem Anbieter — genau das vermeidet der Stack.", "Dependence on one vendor — exactly what the stack avoids."), href: P("/stack/") },
     { k: L("Souveränität", "Sovereignty"), d: L("Alles selbst gehostet, Daten bleiben im Haus.", "All self-hosted, data stays in-house."), href: P("/stack/") },
   ]},
+  { name: L("Sicherheit & Compliance", "Security & compliance"), terms: [
+    { k: "ISMS", d: L("Informationssicherheits-Managementsystem: Regeln, Risiken und Nachweise an einem Ort.", "Information security management system: rules, risks and evidence in one place."), href: P("/compliance/") },
+    { k: "ISO 27001:2022", d: L("Der Standard für Informationssicherheit — 93 Controls in vier Themen (Annex A).", "The standard for information security — 93 controls in four themes (Annex A)."), href: P("/compliance/") },
+    { k: "NIS2", d: L("EU-Richtlinie für kritische & wichtige Einrichtungen — Pflicht zur Risikovorsorge.", "EU directive for essential & important entities — duty of risk preparedness."), href: P("/compliance/") },
+    { k: L("Risiko-Heatmap", "Risk heatmap"), d: L("Wahrscheinlichkeit × Auswirkung je Risiko, mit hinterlegter Maßnahme.", "Likelihood × impact per risk, with the measure attached."), href: P("/compliance/") },
+    { k: "SIEM", d: L("Angriffserkennung: auffälliges Verhalten auf Servern und Clients wird alarmiert.", "Intrusion detection: suspicious behaviour on servers and clients is alerted."), href: P("/compliance/") },
+    { k: "SSO / MFA", d: L("Ein Login per offenem Standard, zweiter Faktor als Schutz.", "One login via open standard, a second factor as protection."), href: P("/software-rollout/") },
+    { k: L("Audit-Trail", "Audit trail"), d: L("Wer hat wann was getan — nachvollziehbar und manipulationssicher.", "Who did what when — traceable and tamper-evident."), href: P("/compliance/") },
+  ]},
+  { name: L("Betrieb & Resilienz", "Operations & resilience"), terms: [
+    { k: L("Out-of-Band (OOB)", "Out-of-band (OOB)"), d: L("Zugang zur Maschine, auch wenn Netz oder Betriebssystem tot sind — eigener Mobilfunk.", "Access to the machine even when network or OS is dead — its own cellular link."), href: P("/resilienz/") },
+    { k: L("Backup 3-2-1", "Backup 3-2-1"), d: L("Drei Kopien, zwei Medien, eine außer Haus.", "Three copies, two media, one off-site."), href: P("/resilienz/") },
+    { k: L("Restore-Test", "Restore test"), d: L("Ein Backup zählt erst, wenn der Restore bewiesen ist.", "A backup only counts once the restore is proven."), href: P("/resilienz/") },
+    { k: L("App-Kiosk", "App kiosk"), d: L("Self-Service-Software ohne Adminrechte für den Nutzer.", "Self-service software with no admin rights for the user."), href: P("/software-rollout/") },
+    { k: "LAPS", d: L("Rotierendes lokales Admin-Passwort je Gerät — kein Domain-Admin nötig.", "A rotating local admin password per device — no domain admin needed."), href: P("/software-rollout/") },
+    { k: "MDM", d: L("Mobile Geräte zentral verwalten: Enrollment, Kiosk-Modus, Apps, Sperren.", "Manage mobile devices centrally: enrollment, kiosk mode, apps, locking."), href: P("/software-rollout/") },
+    { k: L("CMDB / Netz-BIM", "CMDB / network BIM"), d: L("Standorte, Geräte, VLANs und Verkabelung als lebendes Modell.", "Sites, devices, VLANs and cabling as a living model."), href: P("/koennen/") },
+    { k: "Mesh-VPN", d: L("Verschlüsseltes Netz zwischen Standorten mit alternativen Wegen.", "An encrypted network between sites with alternative paths."), href: P("/stack/") },
+  ]},
+  { name: L("Kosten, Kennzahlen & Anlagen", "Costing, KPIs & assets"), terms: [
+    { k: L("Lot-Costing", "Lot costing"), d: L("Selbstkosten je Charge, nachvollziehbar bis zum Beleg.", "Cost per batch, traceable down to the document."), href: P("/kosten/") },
+    { k: L("Niederstwert (NRV)", "Net realisable value (NRV)"), d: L("Bestände zum niedrigeren Wert bewerten — automatisch, prüfsicher.", "Value inventory at the lower amount — automatic, audit-proof."), href: P("/kosten/") },
+    { k: "Landed-Cost", d: L("Fracht, Zoll und Versicherung in die Materialkosten einrechnen.", "Roll freight, duty and insurance into material cost."), href: P("/kosten/") },
+    { k: L("Management-Review", "Management review"), d: L("Regelmäßiger Review der Kennzahlen mit Maßnahmen und Verantwortlichen.", "Regular review of the KPIs with actions and owners."), href: P("/kennzahlen/") },
+    { k: L("KPI-Snapshot", "KPI snapshot"), d: L("Jeder Monatsstand wird eingefroren — revisionssicher, keine Schönung.", "Every monthly state is frozen — audit-proof, no polishing."), href: P("/kennzahlen/") },
+    { k: L("Instandhaltung (Asset)", "Maintenance (asset)"), d: L("Anlage, Norm, Prüffrist und Doku an einem Objekt.", "Asset, standard, inspection interval and docs on one object."), href: P("/instandhaltung/") },
+    { k: "PED", d: L("EU-Druckgeräte-Richtlinie für Kessel, Behälter und Leitungen.", "EU Pressure Equipment Directive for vessels, tanks and lines."), href: P("/instandhaltung/") },
+    { k: "MCP", d: L("Protokoll, über das die KI rechtegeprüft auf die Suche zugreift.", "Protocol through which the AI accesses search, permission-checked."), href: P("/suche/") },
+    { k: L("NFC-Tracking", "NFC tracking"), d: L("Behälter per Funk-Chip scannen, Standort und Foto festhalten.", "Scan containers by radio chip, record location and photo."), href: P("/app/") },
+  ]},
 ];
 const total = groups.reduce((a, g) => a + g.terms.length, 0);
 ---
@@ -61,16 +92,16 @@ const total = groups.reduce((a, g) => a + g.terms.length, 0);
           <span style="flex:1; height:1px; background:#E2E8F0;"></span>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px;">
-          {g.terms.map((t) => (
-            <a href={t.href} target={t.ext ? "_blank" : undefined} rel={t.ext ? "noopener" : undefined}
+          {g.terms.map((t) => { const sl = tagForLabel(t.k); const href = sl ? tagHref(sl, lang) : t.href; const ext = !sl && t.ext; return (
+            <a href={href} target={ext ? "_blank" : undefined} rel={ext ? "noopener" : undefined} class={sl ? "taglink" : ""}
               style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 16px; display:block;">
               <span style="display:flex; align-items:center; gap:8px;">
                 <span style="font-weight:600; font-size:15px;">{t.k}</span>
-                <span style="margin-left:auto; color:#92938F; font-size:13px;">{t.ext ? "↗" : "→"}</span>
+                <span style="margin-left:auto; color:#92938F; font-size:13px;">{sl ? (de ? "suchen" : "search") + " ⌕" : (t.ext ? "↗" : "→")}</span>
               </span>
               <span style="display:block; font-size:14px; line-height:1.5; color:#5C5E63; margin-top:4px;">{t.d}</span>
             </a>
-          ))}
+          ); })}
         </div>
       </div>
     ))}

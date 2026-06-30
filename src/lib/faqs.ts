@@ -42,6 +42,30 @@ export const FAQS: Record<Lang, QA[]> = {
       q: "Wie fange ich an?",
       a: "Schreib uns über das Kontaktformular kurz, worum es geht. Wir schauen gemeinsam, welche Bausteine passen — und bauen auf Open Source plus unserem Wissen auf.",
     },
+    {
+      q: "Macht ihr uns ISO-27001-/NIS2-fit?",
+      a: "Ja. Wir richten ein gelebtes ISMS ein — Risikoregister mit Heatmap, Annex-A-Controls und Mappings auf NIS2, BSI und NIST. Ein Control wird einmal gepflegt und gilt für mehrere Normen. Dazu lückenlose technische Auditierbarkeit (SIEM, zentrale Logs). Kein Ordner, sondern ein laufender Betrieb.",
+    },
+    {
+      q: "Und unser QM-System nach ISO 9001?",
+      a: "Läuft im selben System: Dokumentenlenkung, interne Audits, Maßnahmen (CAPA), Abweichungen und Reklamationen (8D) — verknüpft mit Anlagen, Chargen und Prüfungen. Das Handbuch ist „lebendig“: einmal als Quelle gepflegt, fließt es automatisch ins ERP, ins Wiki und in die KI-Suche. Keine drei Stände, die auseinanderlaufen.",
+    },
+    {
+      q: "Was, wenn der Server oder das Internet ausfällt?",
+      a: "Dann wird aus einem Tag Stillstand eine Stunde Arbeit. Es gibt einen Out-of-Band-Zugang mit eigenem Mobilfunk (kommt rein, auch wenn das Netz tot ist), geprüfte Offsite-Backups mit echten Restore-Tests und selbstheilende Infrastruktur. Alles protokolliert.",
+    },
+    {
+      q: "Können die Leute in der Halle mitmachen?",
+      a: "Ja, über die Werker-App: stempeln, Zeit buchen, Fertigung quittieren und Behälter per NFC scannen — direkt an der Maschine, auch ohne Empfang (offline-first), ein Login per SSO.",
+    },
+    {
+      q: "Wo liegen unsere Daten — und auch die KI?",
+      a: "Bei euch. Alles läuft auf eurer Hardware oder eurem Server, in der EU oder on-prem. Auch die KI lässt sich self-hosted betreiben, sodass kein Prompt das Haus verlässt — ihr wählt den Punkt zwischen schneller Cloud-KI und eigenem Modell.",
+    },
+    {
+      q: "Wie schnell sind wir umgestellt?",
+      a: "Schritt für Schritt statt Big-Bang. Wir starten dort, wo der größte Schmerz ist, bringen euch schnell auf ein tragfähiges Niveau und bauen dann aus. Kein Stillstand, kein Risiko-Sprung.",
+    },
   ],
   en: [
     {
@@ -79,6 +103,30 @@ export const FAQS: Record<Lang, QA[]> = {
     {
       q: "How do I get started?",
       a: "Drop us a line via the contact form about what you need. We'll look together at which building blocks fit — and build on open source plus our knowledge.",
+    },
+    {
+      q: "Will you get us ISO 27001 / NIS2 ready?",
+      a: "Yes. We set up a living ISMS — risk register with heatmap, Annex A controls and mappings to NIS2, BSI and NIST. A control is maintained once and counts for several standards. Plus seamless technical auditability (SIEM, central logs). Not a binder, a running operation.",
+    },
+    {
+      q: "And our ISO 9001 quality system?",
+      a: "It runs in the same system: document control, internal audits, corrective actions (CAPA), non-conformities and complaints (8D) — linked to assets, batches and inspections. The handbook is living: maintained once as a source, it flows automatically into the ERP, the wiki and the AI search. No three versions drifting apart.",
+    },
+    {
+      q: "What if the server or the internet goes down?",
+      a: "Then a day of downtime becomes an hour of work. There's out-of-band access with its own cellular link (gets in even when the network is dead), tested off-site backups with real restore drills, and self-healing infrastructure. All logged.",
+    },
+    {
+      q: "Can the people on the floor take part?",
+      a: "Yes, via the shop-floor app: clock in, book time, sign off manufacturing and scan containers by NFC — right at the machine, even without signal (offline-first), one login via SSO.",
+    },
+    {
+      q: "Where does our data live — and the AI?",
+      a: "With you. Everything runs on your hardware or your server, in the EU or on-prem. The AI can be self-hosted too, so no prompt leaves the house — you choose the point between fast cloud AI and your own model.",
+    },
+    {
+      q: "How fast are we migrated?",
+      a: "Step by step, not big bang. We start where the pain is greatest, get you to a solid level quickly, then expand. No standstill, no risky leap.",
     },
   ],
 };

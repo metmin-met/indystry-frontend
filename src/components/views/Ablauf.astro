@@ -1,148 +1,164 @@
 ---
-// /ablauf/ — Prozess-Dokument als gestaltete Web-Seite: Hero + sticky Inhaltsverzeichnis (Scroll-Spy)
-// + gerahmte Mermaid-Diagramme/Tabellen. Inhalt aus dem pandoc-Fragment (Single-Source zu .md/PDF).
-// Regen bei Doku-Änderung: pandoc -f gfm -t html --no-highlight PROZESS-ABLAUF.md -o frontend/src/data/ablauf-content.txt
+// /ablauf/ — Redesign (Handoff ZIP 6): Auftrags-Cockpit. Fluss-Landkarte (Phasen/Akte) +
+// Detail-Panel + Regelkreis-SVG. Daten aus phases.ts (PHASES/TOOLS/AKTE). Das verifizierte
+// Doku-Fragment (ablauf-content) bleibt als ausklappbare Referenz. Single-Source bleibt.
 import html from "../../data/ablauf-content.txt?raw";
 import htmlEn from "../../data/ablauf-content.en.txt?raw";
 import { linkifyDemos } from "../../lib/linkify";
-import PhaseMatrix from "./PhaseMatrix.astro";
+import { PHASES, TOOLS, AKTE } from "../../data/phases.ts";
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const src = de ? html : htmlEn;
+const b = de ? "" : "/en";
 const L = (d: string, e: string) => (de ? d : e);
-const chips = de
-  ? ["Business + echter System-Status", "✅ klickbare Live-Demo", "aus der Demo-DB verifiziert"]
-  : ["Business + real system status", "✅ clickable live demo", "verified from the demo DB"];
-
-// Die flache „Phase → Live-Demo-Matrix“-Tabelle herausschneiden und durch das
-// interaktive Herzstück ersetzen; den Rest des Dokuments klickbar machen (linkify).
+// Doku-Fragment ohne die alte Matrix (durch Explorer ersetzt), Rest klickbar
+const src = de ? html : htmlEn;
 const MARK = '<h2 id="5--phase--live-demo-matrix">';
 const mi = src.indexOf(MARK);
 const headRaw = mi >= 0 ? src.slice(0, mi) : src;
 let tailRaw = "";
 if (mi >= 0) { const rest = src.slice(mi); const te = rest.indexOf("</table>"); tailRaw = te >= 0 ? rest.slice(te + 8) : ""; }
-const head = linkifyDemos(headRaw, lang);
-const tail = linkifyDemos(tailRaw, lang);
+const doc = linkifyDemos(headRaw + tailRaw, lang);
+const aktColor: Record<string,string> = { I:"#4a6fa5", II:"#16463E", III:"#c4673f" };
+const phasesJ = PHASES.map((p)=>({
+  id:p.id, akt:p.akt, star:!!(p as any).star, titel:p.titel[lang], kurz:p.kurz[lang],
+  tools:p.tools.map((k)=>{ const t=TOOLS[k]; return { name:t.name[lang], desc:t.desc[lang], color:t.color, ext:!!t.ext, href:t.ext?t.href:(b+t.href) }; }),
+}));
+const akteList = (["I","II","III"] as const).map((a)=>({ a, label:AKTE[a][lang], color:aktColor[a], phases:phasesJ.filter((p)=>p.akt===a) }));
+const kpis = de
+  ? [["22","Aufträge"],["8","Maschinen"],["12","Lieferungen"],["6","Wartungen"]]
+  : [["22","orders"],["8","machines"],["12","deliveries"],["6","maintenances"]];
 ---
-<section class="ablauf-hero">
-  <div class="ablauf-hero-inner">
-    <p class="ablauf-eyebrow">{L("Auftragsfluss & Zustände", "Order flow & states")}</p>
-    <h1 class="ablauf-h1">{L("Vom Bestelleingang bis zur Lieferung.", "From order intake to delivery.")}</h1>
-    <p class="ablauf-lead">{L("Eine Bestellung, der ganze Weg durch die Firma — mit jedem Status, den sie durchläuft, und dem, was unser Stack in jeder Phase dafür tut.", "One order, the whole way through the company — with every state it passes through, and what our stack does in each phase.")}</p>
-    <div class="ablauf-chips">{chips.map((c) => <span class="ablauf-chip">{c}</span>)}</div>
-    <p class="ablauf-dl"><a href="/PROZESS-ABLAUF.pdf" download>{L("Ganzen Ablauf als PDF mitnehmen", "Take the whole flow as PDF")} ↓</a></p>
+<!-- HERO -->
+<section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(30px,4vw,44px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Auftragsfluss & Zustände","Order flow & states")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Eine Bestellung. Der ganze Weg.","One order. The whole way.")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0 0 24px;">{L("Klick dich durch die Phasen — jede zeigt ihr Ziel und was der Stack dort tut. Was Nordwerk vom reinen ERP unterscheidet: ein geschlossener Optimierungs-Kreislauf.","Click through the phases — each shows its goal and what the stack does there. What sets Nordwerk apart from a plain ERP: a closed optimisation loop.")}</p>
+    <div data-afk style="display:grid; grid-template-columns:repeat(4,auto); gap:28px; width:max-content; max-width:100%;">
+      {kpis.map(([v,k])=>(<div><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(26px,3.4vw,40px); line-height:1; color:#E6B23A;"><span class="af-count" data-to={v}>{v}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:.04em; text-transform:uppercase;">{k}</div></div>))}
+    </div>
+    <p style="margin:22px 0 0;"><a href="/PROZESS-ABLAUF.pdf" download style="font-family:var(--font-mono); font-size:12.5px; color:#A6CFC5; border-bottom:1px solid #2E5A52; text-decoration:none;">{L("Ganzen Ablauf als PDF","Whole flow as PDF")} ↓</a></p>
   </div>
 </section>
 
-<section class="ablauf-wrap">
-  <div class="ablauf-layout">
-    <aside class="ablauf-toc" aria-label={L("Auf dieser Seite", "On this page")}>
-      <p class="ablauf-toc-title">{L("Auf dieser Seite", "On this page")}</p>
-      <nav id="ablauf-toc-nav"></nav>
-    </aside>
-    <article class="ablauf-doc">
-      <Fragment set:html={head} />
-      <section class="ablauf-matrix">
-        <h2 id="5--phase--live-demo-matrix">{L("5 · Phase → Live-Demo-Matrix", "5 · Phase → live-demo matrix")}</h2>
-        <p class="ablauf-matrix-intro">{L("Jede Phase mit ihren passenden Live-Demos — alles anklickbar. Die ganze Reise als große Landkarte: ", "Every phase with its matching live demos — all clickable. The whole journey as one big map: ")}<a href={de ? "/landkarte/" : "/en/landkarte/"}>{L("Werks-Landkarte", "factory map")} →</a></p>
-        <PhaseMatrix lang={lang} variant="embed" />
-      </section>
-      <Fragment set:html={tail} />
-    </article>
+<!-- FLUSS-LANDKARTE + DETAIL -->
+<section style="background:#F8F9FA;">
+  <div data-flow style="max-width:1120px; margin:0 auto; padding:clamp(36px,5vw,64px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
+    {akteList.map((ak)=>(
+      <div style="margin-bottom:22px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <span style={`font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:${ak.color};`}>{ak.label}</span>
+          <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:stretch;">
+          {ak.phases.map((p,i)=>(<>
+            {i>0 && <span style="align-self:center; color:#C0C8C5;">→</span>}
+            <button class="af-node" data-id={p.id} style={`--ac:${ak.color};`}>
+              <span class="af-nid">{p.id}{p.star && <span class="af-star">★</span>}</span>
+              <span class="af-nt">{p.titel}</span>
+            </button>
+          </>))}
+        </div>
+      </div>
+    ))}
+    <!-- Detail-Panel -->
+    <div id="af-detail" class="af-detail"></div>
   </div>
 </section>
+
+<!-- REGELKREIS -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(24px,3.6vw,40px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 6px; max-width:26ch;">{L("Was Nordwerk vom reinen ERP unterscheidet.","What sets Nordwerk apart from a plain ERP.")}</h2>
+    <p style="font-size:15px; color:#A6CFC5; margin:0 0 28px; max-width:60ch;">{L("Ein geschlossener Kreislauf: Maschinendaten fließen zurück in bessere Fertigung.","A closed loop: machine data flows back into better production.")}</p>
+    <div class="af-loop">
+      {[
+        {t:L("Maschinen","Machines"),c:"#3f9a52"},{t:L("Historian","Historian"),c:"#2a86a8"},
+        {t:L("BI · Wartung","BI · maintenance"),c:"#4a6fa5"},{t:L("Digital Twin","Digital twin"),c:"#7b5cc4"},
+        {t:L("Fertigung","Production"),c:"#16794a"},
+      ].map((n,i)=>(<>
+        {i>0 && <span class="af-larr">→</span>}
+        <div class="af-lnode" style={`border-color:${n.c};`}><span style={`width:8px;height:8px;border-radius:50%;background:${n.c};display:inline-block;`}></span>{n.t}</div>
+      </>))}
+      <span class="af-larr" style="color:#E6B23A;">↺</span>
+    </div>
+    <p style="font-family:var(--font-mono); font-size:11.5px; color:#8FB0A8; margin:18px 0 0;">{L("Telemetrie → Auswertung → optimierte Parameter → zurück in die Fertigung.","Telemetry → analysis → optimised parameters → back into production.")}</p>
+  </div>
+</section>
+
+<!-- GANZER ABLAUF (Doku-Referenz) -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:880px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(64px,8vw,100px);">
+    <details class="af-doc">
+      <summary>{L("Ganzer Ablauf — die ausführliche Doku","Whole flow — the detailed documentation")} <span class="af-docp">+</span></summary>
+      <div class="af-docbody" set:html={doc}></div>
+    </details>
+  </div>
+</section>
+
+<script type="application/json" id="af-data" is:inline set:html={JSON.stringify(phasesJ)}></script>
+<script is:inline>
+  (function(){
+    var root=document.querySelector("[data-flow]"); if(!root) return;
+    var P=JSON.parse(document.getElementById("af-data").textContent);
+    var de=document.documentElement.lang!=="en";
+    var T=function(d,e){return de?d:e;};
+    var box=document.getElementById("af-detail");
+    function sel(id){
+      var p=P.find(function(x){return x.id===id;}); if(!p) return;
+      root.querySelectorAll(".af-node").forEach(function(n){ n.setAttribute("aria-pressed", n.getAttribute("data-id")===id?"true":"false"); });
+      var tools=p.tools.map(function(t){ return '<a class="af-tool" href="'+t.href+'" '+(t.ext?'target="_blank" rel="noopener"':'')+' title="'+t.desc.replace(/"/g,"&quot;")+'"><span class="af-td" style="background:'+t.color+';"></span>'+t.name+' '+(t.ext?"↗":"→")+'</a>'; }).join("");
+      box.innerHTML =
+        '<div class="af-dh"><span class="af-did">'+p.id+'</span>'+(p.star?'<span class="af-dstar">★ '+T("Meilenstein","Milestone")+'</span>':'')+'<h3 class="af-dt">'+p.titel+'</h3></div>'+
+        '<p class="af-dgoal">'+p.kurz+'</p>'+
+        '<p class="af-dlbl">'+T("Live-Demos & Bausteine dieser Phase","Live demos & building blocks of this phase")+'</p>'+
+        '<div class="af-tools">'+tools+'</div>';
+    }
+    root.querySelectorAll(".af-node").forEach(function(n){ n.addEventListener("click",function(){ sel(n.getAttribute("data-id")); box.scrollIntoView({behavior:"smooth",block:"nearest"}); }); });
+    sel("P6");
+    // KPI-Zähler
+    var kr=document.querySelector("[data-afk]");
+    if(kr){ var io=new IntersectionObserver(function(es){es.forEach(function(e){ if(!e.isIntersecting)return;
+      e.target.querySelectorAll(".af-count").forEach(function(el){ var to=+el.getAttribute("data-to")||0,t0=performance.now();
+        (function st(t){var pr=Math.min((t-t0)/900,1); el.textContent=Math.round(to*(1-Math.pow(1-pr,3))); if(pr<1)requestAnimationFrame(st);})(t0); });
+      io.disconnect(); }); },{threshold:.4}); io.observe(kr); }
+  })();
+</script>
 
 <style>
-  .ablauf-hero { background:#123A33; color:#F4F6F5; }
-  .ablauf-hero-inner { max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(44px,6vw,72px); }
-  .ablauf-eyebrow { font-family:var(--font-mono,monospace); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px; }
-  .ablauf-h1 { font-family:var(--font-head,sans-serif); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch; }
-  .ablauf-lead { font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:62ch; margin:0 0 26px; }
-  .ablauf-chips { display:flex; flex-wrap:wrap; gap:10px; }
-  .ablauf-chip { font-family:var(--font-mono,monospace); font-size:12px; color:#CADAD5; border:1px solid #2E5A52; border-radius:999px; padding:6px 13px; }
-
-  .ablauf-wrap { background:#F8F9FA; }
-  .ablauf-layout { max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,72px) clamp(24px,5vw,56px) clamp(72px,9vw,120px); display:grid; grid-template-columns:1fr; gap:32px; }
-  @media (min-width:1000px) { .ablauf-layout { grid-template-columns:230px minmax(0,1fr); gap:48px; } }
-
-  .ablauf-toc { display:none; }
-  @media (min-width:1000px) {
-    .ablauf-toc { display:block; align-self:start; position:sticky; top:90px; max-height:calc(100dvh - 120px); overflow:auto; }
-  }
-  .ablauf-toc-title { font-family:var(--font-mono,monospace); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#92938F; margin:0 0 12px; }
-  #ablauf-toc-nav a { display:block; font-size:13.5px; line-height:1.35; color:#5C5E63; text-decoration:none; padding:6px 0 6px 12px; border-left:2px solid #E2E8F0; }
-  #ablauf-toc-nav a:hover { color:#16463E; }
-  #ablauf-toc-nav a.active { color:#123A33; font-weight:600; border-left-color:#E6B23A; }
-
-  .ablauf-doc { min-width:0; max-width:780px; }
-  .ablauf-doc > h1:first-child { display:none; }
-  .ablauf-doc > blockquote:first-of-type { background:#fff; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:0 12px 12px 0; padding:16px 20px; margin:0 0 32px; color:#3C3E42; }
-  .ablauf-doc h2 { font-family:var(--font-head,sans-serif); font-weight:600; font-size:clamp(22px,3vw,30px); color:#123A33; margin:clamp(40px,5vw,60px) 0 16px; padding-bottom:8px; border-bottom:2px solid #E6B23A; scroll-margin-top:90px; }
-  .ablauf-doc h3 { font-family:var(--font-head,sans-serif); font-weight:600; font-size:18px; color:#16463E; margin:26px 0 8px; scroll-margin-top:90px; }
-  .ablauf-doc p { font-size:16px; line-height:1.65; color:#3C3E42; margin:8px 0; }
-  .ablauf-doc blockquote { border-left:3px solid #C0C8C5; background:#fff; margin:14px 0; padding:8px 16px; color:#5C5E63; border-radius:0 8px 8px 0; }
-  .ablauf-doc code { font-family:var(--font-mono,monospace); font-size:13px; background:#EFEAE0; padding:1px 6px; border-radius:4px; }
-  .ablauf-doc strong { color:#1B1C1E; }
-  .ablauf-doc table { border-collapse:separate; border-spacing:0; width:100%; margin:16px 0; font-size:14px; display:block; overflow-x:auto; border:1px solid #E2E8F0; border-radius:12px; background:#fff; }
-  .ablauf-doc th, .ablauf-doc td { border-bottom:1px solid #EFEAE0; border-right:1px solid #EFEAE0; padding:9px 13px; text-align:left; vertical-align:top; }
-  .ablauf-doc tr td:last-child, .ablauf-doc tr th:last-child { border-right:none; }
-  .ablauf-doc tbody tr:last-child td { border-bottom:none; }
-  .ablauf-doc th { background:#123A33; color:#fff; font-weight:600; white-space:nowrap; }
-  .ablauf-doc a { color:#16463E; }
-  .ablauf-doc hr { border:none; border-top:1px solid #E2E8F0; margin:32px 0; }
-  .ablauf-doc ul, .ablauf-doc ol { margin:8px 0 8px 20px; }
-  .ablauf-doc li { margin:4px 0; font-size:16px; line-height:1.6; color:#3C3E42; }
-  .ablauf-doc .mermaid { background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:clamp(14px,2vw,24px); margin:18px 0; text-align:center; overflow-x:auto; box-shadow:0 1px 2px rgba(11,28,25,.04); }
-  .ablauf-doc .mermaid svg { max-width:100%; height:auto; }
-  .ablauf-dl { margin:18px 0 0; }
-  .ablauf-dl a { font-family:var(--font-mono,monospace); font-size:12.5px; font-weight:600; color:#CADAD5; text-decoration:none; border:1px solid #2E5A52; border-radius:999px; padding:7px 14px; transition:background .15s,color .15s; }
-  .ablauf-dl a:hover { background:#E6B23A; color:#123A33; border-color:#E6B23A; }
-  .ablauf-matrix { margin-top:clamp(40px,5vw,60px); }
-  .ablauf-matrix-intro { font-size:15px; line-height:1.6; color:#5C5E63; margin:0 0 20px; max-width:70ch; }
-  .ablauf-matrix-intro a { color:#16463E; font-weight:600; text-decoration:none; }
-  .ablauf-matrix-intro a:hover { text-decoration:underline; }
-  .ablauf-doc .demo-chip { display:inline-flex; align-items:center; gap:5px; text-decoration:none; font-family:var(--font-mono,monospace); font-size:12px; font-weight:600; color:#15433b; background:color-mix(in srgb, var(--cc,#16463E) 10%, #fff); border:1px solid color-mix(in srgb, var(--cc,#16463E) 36%, #fff); border-radius:999px; padding:1px 9px; line-height:1.75; white-space:nowrap; transition:background .14s,border-color .14s; }
-  .ablauf-doc .demo-chip:hover { background:color-mix(in srgb, var(--cc,#16463E) 20%, #fff); border-color:var(--cc,#16463E); }
+  .af-node{text-align:left;border:1px solid #E2E8F0;border-top:3px solid var(--ac);border-radius:12px;background:#fff;padding:10px 13px;cursor:pointer;min-width:120px;display:flex;flex-direction:column;gap:4px;transition:transform .15s,box-shadow .15s,border-color .15s;}
+  .af-node:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(11,28,25,.08);}
+  .af-node[aria-pressed="true"]{background:#123A33;border-color:#123A33;}
+  .af-node[aria-pressed="true"] .af-nt{color:#EAF1EE;}
+  .af-node[aria-pressed="true"] .af-nid{color:#E6B23A;}
+  .af-nid{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ac);display:flex;align-items:center;gap:5px;}
+  .af-star{color:#E6B23A;}
+  .af-nt{font-family:var(--font-head);font-weight:600;font-size:13.5px;color:#1B1C1E;line-height:1.2;}
+  .af-detail{margin-top:18px;border:1px solid #E2E8F0;border-left:3px solid #16463E;border-radius:14px;background:#fff;padding:clamp(18px,2.5vw,26px);}
+  .af-dh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+  .af-did{font-family:var(--font-mono);font-weight:700;font-size:13px;color:#fff;background:#16463E;border-radius:8px;padding:4px 10px;}
+  .af-dstar{font-family:var(--font-mono);font-size:11px;color:#b5851a;border:1px solid #E6B23A55;border-radius:999px;padding:2px 9px;}
+  .af-dt{font-family:var(--font-head);font-weight:700;font-size:clamp(20px,2.6vw,28px);color:#1B1C1E;margin:0;}
+  .af-dgoal{font-size:15.5px;line-height:1.6;color:#3C3E42;margin:0 0 16px;max-width:70ch;}
+  .af-dlbl{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#92938F;margin:0 0 10px;}
+  .af-tools{display:flex;flex-wrap:wrap;gap:8px;}
+  .af-tool{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1B1C1E;text-decoration:none;border:1px solid #E2E8F0;border-radius:999px;padding:6px 12px;background:#fff;}
+  .af-tool:hover{border-color:#123A33;}
+  .af-td{width:9px;height:9px;border-radius:50%;flex:none;}
+  .af-loop{display:flex;flex-wrap:wrap;align-items:center;gap:9px;}
+  .af-lnode{display:inline-flex;align-items:center;gap:8px;border:1.5px solid;border-radius:11px;background:#10322C;padding:10px 14px;font-size:13.5px;color:#EAF1EE;}
+  .af-larr{font-size:17px;font-weight:700;color:#A6CFC5;}
+  .af-doc{border:1px solid #E2E8F0;border-radius:14px;background:#fff;padding:4px 20px;}
+  .af-doc>summary{list-style:none;cursor:pointer;font-family:var(--font-head);font-weight:600;font-size:17px;color:#1B1C1E;display:flex;align-items:center;justify-content:space-between;padding:16px 0;}
+  .af-doc>summary::-webkit-details-marker{display:none;}
+  .af-docp{color:#16463E;font-weight:400;font-size:22px;}
+  .af-doc[open] .af-docp{transform:rotate(45deg);display:inline-block;}
+  .af-docbody{padding:6px 0 18px;font-size:15px;line-height:1.65;color:#3C3E42;}
+  .af-docbody :global(h2){font-family:var(--font-head);font-size:20px;color:#1B1C1E;margin:24px 0 8px;}
+  .af-docbody :global(h3){font-family:var(--font-head);font-size:16px;color:#1B1C1E;margin:18px 0 6px;}
+  .af-docbody :global(table){width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
+  .af-docbody :global(td),.af-docbody :global(th){border:1px solid #E2E8F0;padding:7px 9px;text-align:left;vertical-align:top;}
+  .af-docbody :global(a){color:#16463E;}
+  @media(prefers-reduced-motion:reduce){.af-node{transition:none;}}
 </style>
-
-<script>
-  import mermaid from "mermaid";
-  const root = document.querySelector(".ablauf-doc");
-  if (root) {
-    // Mermaid
-    root.querySelectorAll("pre.mermaid, pre > code.mermaid, code.language-mermaid").forEach((el) => {
-      const pre = el.closest("pre") || el;
-      const div = document.createElement("div");
-      div.className = "mermaid";
-      div.textContent = el.textContent || "";
-      pre.replaceWith(div);
-    });
-    mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict", flowchart: { useMaxWidth: true } });
-    mermaid.run({ nodes: Array.from(root.querySelectorAll(".mermaid")) }).catch(() => {});
-
-    // Inhaltsverzeichnis aus den H2 + Scroll-Spy
-    const nav = document.getElementById("ablauf-toc-nav");
-    const heads = Array.from(root.querySelectorAll("h2[id]"));
-    if (nav && heads.length) {
-      const map = new Map();
-      heads.forEach((h) => {
-        const a = document.createElement("a");
-        a.href = "#" + h.id;
-        a.textContent = h.textContent || "";
-        nav.appendChild(a);
-        map.set(h.id, a);
-      });
-      const spy = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            map.forEach((a) => a.classList.remove("active"));
-            const a = map.get(en.target.id);
-            if (a) a.classList.add("active");
-          }
-        });
-      }, { rootMargin: "-80px 0px -70% 0px", threshold: 0 });
-      heads.forEach((h) => spy.observe(h));
-    }
-  }
-</script>

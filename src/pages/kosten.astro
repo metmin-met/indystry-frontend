@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Kosten from "../components/views/Kosten.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Kosten & Controlling" description="Lot-genaue Kostenrechnung von der Charge bis zur Rechnung — IFRS/HGB, NRV, Landed-Cost, Plan-Ist, Rohstoffpreis-Feed. Self-hosted, kein Lock-in." path="/kosten/" altPath="/en/kosten/">
+  <Kosten lang={lang} />
+</Base>

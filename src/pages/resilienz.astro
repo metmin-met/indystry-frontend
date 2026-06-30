@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Resilienz from "../components/views/Resilienz.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Resilienz & Wiederanlauf" description="Out-of-Band-Recovery, geprüfte Offsite-Backups mit Restore-Tests und selbstheilende Infrastruktur — aus einem Tag Stillstand wird eine Stunde Arbeit. Self-hosted." path="/resilienz/" altPath="/en/resilienz/">
+  <Resilienz lang={lang} />
+</Base>

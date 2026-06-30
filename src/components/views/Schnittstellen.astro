@@ -2,6 +2,7 @@
 // /schnittstellen/ — „Womit reden wir?“: OT-Maschinenebene, Daten/Integration, Business/Finanz.
 // Pro Schnittstelle Richtung (↘ rein / ↗ raus / ↔ bidi), Status, Deep-Link. Leak-sicher (nur Standards).
 import type { Lang } from "../../lib/content";
+import { tagHref } from "../../lib/tags";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
@@ -19,25 +20,25 @@ const bands: { name: string; sub: string; cc: string; items: If[] }[] = [
   { name: L("OT · Maschinenebene", "OT · machine level"), cc: "var(--p-automation)",
     sub: L("So kommen Maschinen- & Sensordaten herein — herstellerneutral bis auf die Steuerung.", "How machine & sensor data comes in — vendor-neutral, down to the controller."),
     items: [
-      { n: "OPC-UA", d: L("Die gemeinsame Sprache der Maschinen: Werte herstellerneutral in den Historian.", "The shared language of machines: values vendor-neutrally into the historian."), dir: "bi", href: "/historian/" },
-      { n: "SPS / Steuerungen", d: L("Takt, Zustände, Störungen direkt von der Anlagensteuerung.", "Cycle, states, faults straight from the plant controller."), dir: "in", href: "/anlage/" },
-      { n: "Beckhoff / TwinCAT", d: L("PC-basierte Steuerung: Variablen & Achsdaten direkt abgegriffen.", "PC-based control: variables & axis data tapped directly."), dir: "in", href: "/leitstand/" },
-      { n: "PROFINET", d: L("Feldbus: Antriebe, I/O und Sensoren am Maschinennetz.", "Fieldbus: drives, I/O and sensors on the machine network."), dir: "in", href: "/anlage/" },
+      { tag:"opc-ua", n: "OPC-UA", d: L("Die gemeinsame Sprache der Maschinen: Werte herstellerneutral in den Historian.", "The shared language of machines: values vendor-neutrally into the historian."), dir: "bi", href: "/historian/" },
+      { tag:"sps", n: "SPS / Steuerungen", d: L("Takt, Zustände, Störungen direkt von der Anlagensteuerung.", "Cycle, states, faults straight from the plant controller."), dir: "in", href: "/anlage/" },
+      { tag:"beckhoff", n: "Beckhoff / TwinCAT", d: L("PC-basierte Steuerung: Variablen & Achsdaten direkt abgegriffen.", "PC-based control: variables & axis data tapped directly."), dir: "in", href: "/leitstand/" },
+      { tag:"profinet", n: "PROFINET", d: L("Feldbus: Antriebe, I/O und Sensoren am Maschinennetz.", "Fieldbus: drives, I/O and sensors on the machine network."), dir: "in", href: "/anlage/" },
     ]},
   { name: L("Daten · Integration", "Data · integration"), cc: "var(--p-ai)",
     sub: L("Andere Systeme, Altdaten und die KI andocken — sauber und rechtegeprüft.", "Connect other systems, legacy data and the AI — cleanly and permission-checked."),
     items: [
-      { n: L("REST-API", "REST API"), d: L("Offene Schnittstelle: Fremdsysteme lesen & schreiben Aufträge, Status, Daten.", "Open interface: external systems read & write orders, status, data."), dir: "bi", href: "/portal/" },
-      { n: "MCP (Model-Context-Protocol)", d: L("Die KI-Brücke: die KI greift rechtegeprüft auf Suche & Firmendaten zu — Antworten mit echten Zahlen.", "The AI bridge: the AI accesses search & company data permission-checked — answers with real numbers."), dir: "bi", href: "/suche/" },
-      { n: L("ETL aus Excel & Files", "ETL from Excel & files"), d: L("Die „Krake“: Altdaten, Tabellen und Dateien werden eingesaugt, bereinigt und verknüpft.", "The catch-all: legacy data, spreadsheets and files get pulled in, cleaned and linked."), dir: "in", href: "/suche/" },
+      { tag:"rest-api", n: L("REST-API", "REST API"), d: L("Offene Schnittstelle: Fremdsysteme lesen & schreiben Aufträge, Status, Daten.", "Open interface: external systems read & write orders, status, data."), dir: "bi", href: "/portal/" },
+      { tag:"mcp", n: "MCP (Model-Context-Protocol)", d: L("Die KI-Brücke: die KI greift rechtegeprüft auf Suche & Firmendaten zu — Antworten mit echten Zahlen.", "The AI bridge: the AI accesses search & company data permission-checked — answers with real numbers."), dir: "bi", href: "/suche/" },
+      { tag:"etl", n: L("ETL aus Excel & Files", "ETL from Excel & files"), d: L("Die „Krake“: Altdaten, Tabellen und Dateien werden eingesaugt, bereinigt und verknüpft.", "The catch-all: legacy data, spreadsheets and files get pulled in, cleaned and linked."), dir: "in", href: "/suche/" },
     ]},
   { name: L("Business · Finanz", "Business · finance"), cc: "var(--p-erp)",
     sub: L("Rechnungen, Buchhaltung und Meldungen — strukturiert rein und raus.", "Invoices, accounting and filings — structured, in and out."),
     items: [
-      { n: L("PEPPOL (E-Rechnung)", "PEPPOL (e-invoice)"), d: L("Strukturierte E-Rechnung rein & raus (UBL / BIS Billing 3.0) — im Kundenportal demonstriert.", "Structured e-invoicing in & out (UBL / BIS Billing 3.0) — demonstrated in the customer portal."), dir: "bi", href: "/portal/", live: true },
-      { n: "DATEV", d: L("Buchhaltungs-Export an den Steuerberater — auf Knopfdruck.", "Accounting export to the tax advisor — at the push of a button."), dir: "out", href: "/koennen/", key: "datev" },
-      { n: "BMD", d: L("Export ins BMD-Finanzpaket (AT/DACH).", "Export into the BMD finance suite (AT/DACH)."), dir: "out", href: "/koennen/" },
-      { n: L("UVA / Steuer", "VAT / tax"), d: L("Umsatzsteuer-Voranmeldung & gesetzliche Meldungen.", "Advance VAT returns & statutory filings."), dir: "out", href: "/koennen/" },
+      { tag:"peppol", n: L("PEPPOL (E-Rechnung)", "PEPPOL (e-invoice)"), d: L("Strukturierte E-Rechnung rein & raus (UBL / BIS Billing 3.0) — im Kundenportal demonstriert.", "Structured e-invoicing in & out (UBL / BIS Billing 3.0) — demonstrated in the customer portal."), dir: "bi", href: "/portal/", live: true },
+      { tag:"datev", n: "DATEV", d: L("Buchhaltungs-Export an den Steuerberater — auf Knopfdruck.", "Accounting export to the tax advisor — at the push of a button."), dir: "out", href: "/koennen/", key: "datev" },
+      { tag:"bmd", n: "BMD", d: L("Export ins BMD-Finanzpaket (AT/DACH).", "Export into the BMD finance suite (AT/DACH)."), dir: "out", href: "/koennen/" },
+      { tag:"uva", n: L("UVA / Steuer", "VAT / tax"), d: L("Umsatzsteuer-Voranmeldung & gesetzliche Meldungen.", "Advance VAT returns & statutory filings."), dir: "out", href: "/koennen/" },
     ]},
 ];
 const mono = (s: string) => s.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
@@ -61,7 +62,7 @@ const mono = (s: string) => s.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCa
         <p style="font-size:14px; color:#5C5E63; margin:0 0 16px; max-width:70ch;">{band.sub}</p>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;">
           {band.items.map((it) => { const dd = DIR[it.dir]; return (
-            <a href={it.ext ? it.href : b + it.href} target={it.ext ? "_blank" : undefined} rel={it.ext ? "noopener" : undefined}
+            <a href={tagHref(it.tag, lang)} class="taglink"
                style={`text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-top:3px solid ${band.cc}; border-radius:13px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:9px;`}>
               <span style="display:flex; align-items:center; gap:11px;">
                 {it.key && LOGOS.has(it.key)

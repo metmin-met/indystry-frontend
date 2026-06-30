@@ -1,0 +1,226 @@
+---
+// /compliance/ — ISMS (ISO 27001:2022), Risiko-Heatmap, Mappings, Observability/Audit. Un-branded.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+
+const annex = [
+  { n: L("Organisatorisch", "Organizational"), c: 37, d: L("Richtlinien, Rollen, Lieferanten, Vorfallmanagement.", "Policies, roles, suppliers, incident management.") },
+  { n: L("Personenbezogen", "People"), c: 8, d: L("Awareness, Onboarding/Offboarding, Verantwortung.", "Awareness, on/offboarding, accountability.") },
+  { n: L("Physisch", "Physical"), c: 14, d: L("Zutritt, Verkabelung, Entsorgung, Standortsicherheit.", "Access, cabling, disposal, site security.") },
+  { n: L("Technologisch", "Technological"), c: 34, d: L("Zugriff, Härtung, Logging, Backup, Kryptografie.", "Access, hardening, logging, backup, cryptography.") },
+];
+const maps = [
+  { n: "NIS2", d: L("EU-Richtlinie für kritische & wichtige Einrichtungen — Risiko, Meldepflicht, Lieferkette.", "EU directive for essential & important entities — risk, reporting, supply chain.") },
+  { n: "BSI IT-Grundschutz", d: L("Bausteine und Maßnahmen, anschlussfähig an die ISO-Controls.", "Modules and measures, mappable to the ISO controls.") },
+  { n: "NIST CSF 2.0", d: L("Govern · Identify · Protect · Detect · Respond · Recover.", "Govern · Identify · Protect · Detect · Respond · Recover.") },
+];
+const obs = [
+  { t: L("SIEM — Angriffserkennung", "SIEM — intrusion detection"), d: L("Auffälliges Verhalten auf Servern und Clients wird erkannt und alarmiert.", "Suspicious behaviour on servers and clients is detected and alerted."), tool: "Wazuh" },
+  { t: L("Metriken & Alarme", "Metrics & alerts"), d: L("Auslastung, Verfügbarkeit, Schwellwerte — bevor etwas ausfällt.", "Load, availability, thresholds — before something fails."), tool: "Zabbix" },
+  { t: L("Zentrale Logs", "Central logs"), d: L("Alle Log-Ströme an einem Ort, durchsuchbar und aufbewahrt.", "All log streams in one place, searchable and retained."), tool: "Graylog" },
+  { t: L("Technische Revisionssicherheit", "Technical auditability"), d: L("Wer hat wann was getan — nachvollziehbar, manipulationssicher.", "Who did what when — traceable, tamper-evident."), tool: L("Audit-Trail", "audit trail") },
+];
+// 5×5-Risiko-Heatmap (synthetisch). p = Wahrscheinlichkeit 1–5, i = Auswirkung 1–5.
+const risks = [
+  { id: 1, n: L("Ransomware / Verschlüsselung", "Ransomware / encryption"), p: 3, i: 5, ctrl: L("Offsite-Backups + Restore-Tests, SIEM, Netzsegmentierung.", "Offsite backups + restore tests, SIEM, network segmentation.") },
+  { id: 2, n: L("Datenabfluss über Cloud-KI", "Data leak via cloud AI"), p: 3, i: 4, ctrl: L("On-Prem-Modell, Rechte-Trennung, kein Prompt verlässt das Haus.", "On-prem model, permission separation, no prompt leaves the house.") },
+  { id: 3, n: L("Phishing / Account-Übernahme", "Phishing / account takeover"), p: 4, i: 3, ctrl: L("SSO + MFA, Awareness-Schulung, Login-Logging.", "SSO + MFA, awareness training, login logging.") },
+  { id: 4, n: L("Lieferketten-Kompromiss", "Supply-chain compromise"), p: 2, i: 4, ctrl: L("Lieferanten-Prüfung, schnelle Updates, Komponenten-Inventar.", "Supplier vetting, fast updates, component inventory.") },
+  { id: 5, n: L("Hardware-Ausfall Produktion", "Production hardware failure"), p: 2, i: 5, ctrl: L("Redundanz, Out-of-Band-Recovery, Ersatzteile.", "Redundancy, out-of-band recovery, spare parts.") },
+  { id: 6, n: L("Ausfall Schlüsselperson", "Loss of a key person"), p: 2, i: 3, ctrl: L("Doku-as-Code, Vertretungsregeln, Vier-Augen-Prinzip.", "Docs-as-code, deputy rules, four-eyes principle.") },
+];
+const cellColor = (s: number) => s <= 4 ? { bg: "#E7F4EC", bd: "#bfe3cd" } : s <= 9 ? { bg: "#FBF3DA", bd: "#ecd9a0" } : s <= 14 ? { bg: "#FBE7D6", bd: "#e6c3a0" } : { bg: "#F7DCDC", bd: "#e6b3b3" };
+const rows = [5, 4, 3, 2, 1]; // Auswirkung oben→unten
+const cols = [1, 2, 3, 4, 5]; // Wahrscheinlichkeit links→rechts
+const risksJSON = JSON.stringify(risks);
+---
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(230,178,58,.12),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Compliance · Qualität & Sicherheit", "Compliance · quality & security")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Sicherheit, die man", "Security you can")} <span style="color:#E6B23A;">{L("vorzeigen kann.", "actually show.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Ein gelebtes ISMS nach ISO 27001:2022 — mit Risikoregister, Maßnahmen und Nachweisen. NIS2, BSI und NIST sprechen dabei dieselbe Sprache: ein Control, viele Rahmenwerke.", "A living ISMS to ISO 27001:2022 — with risk register, measures and evidence. NIS2, BSI and NIST all speak the same language: one control, many frameworks.")}</p>
+  </div>
+</section>
+
+<!-- §01 ANNEX A -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(24px,3vw,40px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("ISO 27001:2022 — Annex A", "ISO 27001:2022 — Annex A")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("93 Controls, vier Themen, ein Register.", "93 controls, four themes, one register.")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:14px;">
+      {annex.map((a) => (
+        <div style="border:1px solid #E2E8F0; border-top:3px solid #16463E; border-radius:14px; background:#fff; padding:20px 22px;">
+          <div style="font-family:var(--font-head); font-weight:800; font-size:34px; line-height:1; color:#16463E;">{a.c}</div>
+          <p style="font-family:var(--font-head); font-weight:700; font-size:16px; color:#1B1C1E; margin:8px 0 6px;">{a.n}</p>
+          <p style="font-size:13.5px; line-height:1.5; color:#5C5E63; margin:0;">{a.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- QM / ISO 9001 -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(24px,3vw,40px) clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Qualitätsmanagement · ISO 9001", "Quality management · ISO 9001")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 10px; max-width:24ch;">{L("Ein Managementsystem für beides.", "One management system for both.")}</h2>
+    <p style="font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 24px; max-width:66ch;">{L("Qualität und Informationssicherheit teilen sich dasselbe System und dasselbe lebende Handbuch — kein zweiter Papierkram für das zweite Audit.", "Quality and information security share the same system and the same living handbook — no second pile of paperwork for the second audit.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Dokumentenlenkung", "Document control")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Geprüft, freigegeben, versioniert — alle sehen die gültige Fassung, alte sind archiviert.", "Reviewed, released, versioned — everyone sees the valid version, old ones archived.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Interne Audits", "Internal audits")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Geplant, durchgeführt, dokumentiert — mit Findings, Fristen und Verantwortlichen.", "Planned, performed, documented — with findings, deadlines and owners.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Maßnahmen (CAPA)", "Actions (CAPA)")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Korrektur- und Vorbeugemaßnahmen bis zur nachgewiesenen Wirksamkeit verfolgt.", "Corrective and preventive actions tracked to proven effectiveness.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Abweichungen (NC)", "Non-conformities (NC)")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Nichtkonformitäten erfassen, bewerten und abstellen — nichts versandet.", "Capture, assess and resolve non-conformities — nothing slips through.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Reklamationen (8D)", "Complaints (8D)")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Strukturierte Ursachenanalyse, Wiederholung verhindern — verknüpft mit Charge und Anlage.", "Structured root-cause analysis, prevent recurrence — linked to batch and asset.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16794a; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Zertifikate & Nachweise", "Certificates & evidence")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Prüfzeugnisse und Zertifikate je Charge und Anlage — auffindbar auf Knopfdruck.", "Test certificates and certificates per batch and asset — findable at a click.")}</p></div>
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Das Handbuch dahinter ist lebendig — eine Quelle, automatisch in ERP, Wiki und KI-Suche.", "The handbook behind it is living — one source, automatically in ERP, wiki and AI search.")} <a href={b + "/wissen/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum lebenden Handbuch", "To the living handbook")} →</a></p>
+  </div>
+</section>
+
+<!-- §02 RISIKO-HEATMAP (interaktiv) -->
+<section style="background:#F8F9FA;">
+  <div class="cm" data-cm style="max-width:1080px; margin:0 auto; padding:clamp(24px,3vw,40px) clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Risiko-Heatmap", "Risk heatmap")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span><span style="width:7px; height:7px; border:1.5px solid #C0C8C5;"></span>
+    </div>
+    <p style="font-family:var(--font-mono); font-size:13px; color:#5C5E63; margin:0 0 20px;">{L("Wahrscheinlichkeit × Auswirkung. Klick ein Risiko — die Zelle leuchtet, die Maßnahme erscheint.", "Likelihood × impact. Click a risk — the cell lights up, the measure appears.")}</p>
+    <div class="cm-wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:24px; align-items:start;">
+      <!-- Grid -->
+      <div>
+        <div style="display:flex; gap:8px;">
+          <div style="writing-mode:vertical-rl; transform:rotate(180deg); font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; text-align:center; padding:4px 0;">{L("Auswirkung →", "Impact →")}</div>
+          <div style="flex:1;">
+            <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;">
+              {rows.map((i) => cols.map((p) => {
+                const col = cellColor(p * i);
+                return (
+                  <div id={`cm-cell-${p}-${i}`} class="cm-cell" style={`position:relative; aspect-ratio:1; border:1px solid ${col.bd}; background:${col.bg}; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:3px; flex-wrap:wrap; transition:box-shadow .15s;`}>
+                    {risks.filter((r) => r.p === p && r.i === i).map((r) => (
+                      <span class="cm-dot" data-id={r.id} style="width:20px; height:20px; border-radius:50%; background:#123A33; color:#fff; font-family:var(--font-mono); font-size:11px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">{r.id}</span>
+                    ))}
+                  </div>
+                );
+              }))}
+            </div>
+            <div style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; text-align:center; margin-top:8px;">{L("Wahrscheinlichkeit →", "Likelihood →")}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Liste + Detail -->
+      <div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          {risks.map((r) => (
+            <button class="cm-risk" data-id={r.id} style="text-align:left; border:1px solid #E2E8F0; border-radius:10px; background:#fff; padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:10px;">
+              <span style="width:20px; height:20px; border-radius:50%; background:#123A33; color:#fff; font-family:var(--font-mono); font-size:11px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; flex:none;">{r.id}</span>
+              <span style="font-size:13.5px; font-weight:600; color:#1B1C1E; line-height:1.25;">{r.n}</span>
+            </button>
+          ))}
+        </div>
+        <div id="cm-detail" style="margin-top:14px; border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p id="cm-d-name" style="font-family:var(--font-head); font-weight:700; font-size:16px; color:#1B1C1E; margin:0 0 8px;"></p>
+          <div style="display:flex; gap:14px; font-family:var(--font-mono); font-size:11px; color:#5C5E63; margin:0 0 10px;">
+            <span>{L("Wahrsch.", "Likelih.")} <b id="cm-d-p" style="color:#1B1C1E;"></b>/5</span>
+            <span>{L("Auswirkung", "Impact")} <b id="cm-d-i" style="color:#1B1C1E;"></b>/5</span>
+            <span>{L("Score", "Score")} <b id="cm-d-s" style="color:#1B1C1E;"></b></span>
+          </div>
+          <p style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F; margin:0 0 4px;">{L("Maßnahmen", "Measures")}</p>
+          <p id="cm-d-ctrl" style="font-size:13.5px; line-height:1.55; color:#3C3E42; margin:0;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §03 MAPPINGS (beige) -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Ein Control, viele Rahmenwerke", "One control, many frameworks")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <p style="font-size:15px; color:#3C3E42; margin:0 0 22px; max-width:64ch;">{L("Du pflegst die Maßnahme einmal — die Zuordnung zu den Normen läuft mit. Kein dreifaches Dokumentieren für drei Audits.", "You maintain the measure once — the mapping to the standards comes along. No documenting three times for three audits.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px;">
+      {maps.map((m) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px 20px;">
+          <p style="font-family:var(--font-head); font-weight:700; font-size:18px; color:#16463E; margin:0 0 6px;">{m.n}</p>
+          <p style="font-size:13.5px; line-height:1.55; color:#5C5E63; margin:0;">{m.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §04 OBSERVABILITY / AUDIT -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§04 · {L("Sehen, was passiert — und es belegen", "See what happens — and prove it")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("Lückenlose technische Auditierbarkeit.", "Seamless technical auditability.")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
+      {obs.map((o) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0;">{o.t}</p>
+            <span style="font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.04em; color:#16463E; border:1px solid #9ccdb9; background:#EAF6F0; border-radius:999px; padding:2px 7px;">{o.tool}</span>
+          </div>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Alles selbst gehostet, alle Logs im Haus.", "All self-hosted, all logs in-house.")} <a href={b + "/datenhoheit/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Mehr zur Datenhoheit", "More on data sovereignty")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Kommt NIS2 — oder seid ihr vorbereitet?", "Is NIS2 coming — or are you ready?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Ein ISMS ist kein Ordner, sondern ein laufender Betrieb. Wir richten ihn so ein, dass er trägt.", "An ISMS isn't a binder, it's a running operation. We set it up so it holds.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={b + "/resilienz/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Und wenn doch was passiert?", "And if something does happen?")} ↗</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width:760px){ .cm-wrap{ grid-template-columns:1fr !important; } }
+  .cm-risk[aria-pressed="true"]{ border-color:#123A33 !important; box-shadow:0 6px 16px rgba(11,28,25,.10); }
+  .cm-cell.cm-on{ box-shadow:0 0 0 3px #123A33; }
+</style>
+<script is:inline define:vars={{ risksJSON }}>
+  (function(){
+    var root = document.querySelector("[data-cm]"); if(!root) return;
+    var R = JSON.parse(risksJSON);
+    function sel(id){
+      var r = R.find(function(x){ return x.id===id; }); if(!r) return;
+      root.querySelectorAll(".cm-risk").forEach(function(b){ b.setAttribute("aria-pressed", (+b.getAttribute("data-id")===id)?"true":"false"); });
+      root.querySelectorAll(".cm-cell").forEach(function(c){ c.classList.remove("cm-on"); });
+      var cell = document.getElementById("cm-cell-"+r.p+"-"+r.i); if(cell) cell.classList.add("cm-on");
+      document.getElementById("cm-d-name").textContent = r.n;
+      document.getElementById("cm-d-p").textContent = r.p;
+      document.getElementById("cm-d-i").textContent = r.i;
+      document.getElementById("cm-d-s").textContent = r.p*r.i;
+      document.getElementById("cm-d-ctrl").textContent = r.ctrl;
+    }
+    root.querySelectorAll(".cm-risk").forEach(function(b){ b.addEventListener("click", function(){ sel(+b.getAttribute("data-id")); }); });
+    root.querySelectorAll(".cm-dot").forEach(function(d){ d.addEventListener("click", function(){ sel(+d.getAttribute("data-id")); }); });
+    sel(1);
+  })();
+</script>

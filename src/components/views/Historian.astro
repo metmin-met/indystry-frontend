@@ -35,6 +35,25 @@ const de = lang === "de";
   .spark.sel { border-color:#123A33; box-shadow:0 0 0 1px #123A33; }
 </style>
 
+<!-- DATEN-BACKBONE -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{de ? "Das Rückgrat darunter" : "The backbone beneath"}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{de ? "Millionen Messpunkte — und trotzdem schnell." : "Millions of data points — and still fast."}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Zeitreihen-Datenbank" : "Time-series database"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Jahre an Sensor- und Maschinenwerten, Abfragen in Millisekunden." : "Years of sensor and machine values, queried in milliseconds."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Data-Lake (Object-Store)" : "Data lake (object store)"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Rohdateien, Bilder, Reports — günstig und praktisch endlos abgelegt." : "Raw files, images, reports — stored cheaply and practically endlessly."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Automatischer Ingest" : "Automatic ingest"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Neue Messdateien werden selbst eingelesen — kein manuelles Importieren." : "New measurement files are ingested automatically — no manual importing."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "ETL & fertige Sichten" : "ETL & ready-made views"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Verteilte Quellen sauber zusammengeführt, aufgelöste Auswertungs-Views." : "Scattered sources merged cleanly, resolved analytics views."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Direkt aus der Steuerung" : "Straight from the controls"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Werte aus SPS und Leittechnik fließen live in die Historie (OPC-UA)." : "Values from PLC and control system flow live into the history (OPC-UA)."}</p></div>
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{de ? "Aus denselben Daten speisen sich Leitstand, Auswertung und Zwilling." : "The same data feeds the control room, analysis and the twin."} <a href={(de?"":"/en")+"/analyse/"} style="color:#16463E; font-weight:600; text-decoration:none;">{de ? "Zur Werkstoff-Analyse" : "To material analysis"} →</a></p>
+  </div>
+</section>
+
 <script>
   const DE = document.querySelector("[data-de]")?.getAttribute("data-de") === "true";
   const L = DE ? "de-DE" : "en-GB";

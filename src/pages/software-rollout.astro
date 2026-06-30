@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Rollout from "../components/views/Rollout.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Software-Rollout ohne Admin" description="Self-Service-App-Store, serverseitige Installation (LAPS + Fernzugriff, kein Admin-Prompt), MDM für mobile Geräte und SSO als Fundament. Self-hosted." path="/software-rollout/" altPath="/en/software-rollout/">
+  <Rollout lang={lang} />
+</Base>

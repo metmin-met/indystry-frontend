@@ -7,6 +7,8 @@ const { lang } = Astro.props;
 const de = lang === "de";
 const L = (d: string, e: string) => (de ? d : e);
 const b = de ? "" : "/en";
+import { tagHref, PERSONA_SLUGS } from "../../lib/tags";
+const PS = new Set(PERSONA_SLUGS);
 const ERP = "https://erp-demo.indystry.works/odoo", BI = "https://bi-demo.indystry.works", TWIN = "https://twin-demo.indystry.works";
 const D: Record<string, {l:string;h:string;x?:boolean}> = {
   erp:{l:"ERP",h:ERP,x:true}, bi:{l:"BI",h:BI,x:true}, twin:{l:"Twin",h:TWIN,x:true},
@@ -207,7 +209,7 @@ const mono = (s: string) => s.replace(/[^A-Za-zÄÖÜ]/g,"").slice(0,2).toUpperC
             <span class="pcard-mono">{mono(tr(r.n))}</span>
             <div style="min-width:0;">
               <p class="pcard-cl">{c.name}</p>
-              <p class="pcard-name">{tr(r.n)}</p>
+              {PS.has(slug(r.n)) ? <a class="pcard-name taglink" href={tagHref(slug(r.n), lang)} title={L("Diese Rolle in der Suche","This role in search")} style="text-decoration:none; color:inherit; display:block;">{tr(r.n)}</a> : <p class="pcard-name">{tr(r.n)}</p>}
             </div>
           </div>
           <p class="pcard-desc">{tr(r.desc)}</p>

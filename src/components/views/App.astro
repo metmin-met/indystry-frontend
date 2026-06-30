@@ -1,0 +1,129 @@
+---
+// /app/ — Werker-App (Flutter, mobil). Flagship-Seite. Demo lebt: app-demo.indystry.works.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const AC = "#2a86a8";
+const DEMO = "https://app-demo.indystry.works";
+const tabs = [
+  { t: L("Anwesenheit", "Attendance"), d: L("Kommt & geht — sicher gestempelt, auch ohne Stechuhr an der Wand.", "Clock in & out — securely stamped, no wall terminal needed.") },
+  { t: L("Zeiterfassung", "Time tracking"), d: L("Zeit auf Auftrag und Projekt buchen, direkt an der Maschine.", "Book time to order and project, right at the machine.") },
+  { t: L("Fertigung & QC", "Manufacturing & QC"), d: L("Arbeitsschritte abhaken, Prüfwerte erfassen, n.i.O. melden.", "Tick off steps, capture inspection values, flag rejects.") },
+  { t: L("Behälter-Tracking", "Container tracking"), d: L("Behälter per NFC scannen, Standort und Foto festhalten.", "Scan containers by NFC, record location and photo.") },
+  { t: L("Einstellungen", "Settings"), d: L("Sprache, Konto, Gerät — ein Login per SSO, fertig.", "Language, account, device — one SSO login, done.") },
+];
+const feats = [
+  { t: L("Offline-first", "Offline-first"), d: L("Kein Empfang in der Halle? Macht nichts — alles wird lokal gespeichert und synchronisiert, sobald wieder Netz da ist.", "No signal in the hall? No problem — everything is stored locally and syncs as soon as the network is back.") },
+  { t: L("Verschlüsselt am Gerät", "Encrypted on device"), d: L("Die lokale Datenbank ist verschlüsselt — geht das Handy verloren, sind die Daten geschützt.", "The local database is encrypted — if the phone is lost, the data is protected.") },
+  { t: L("Ein Login (SSO)", "One login (SSO)"), d: L("Anmeldung per offenem Standard gegen dasselbe Konto wie alle anderen Werkzeuge.", "Sign in via open standard against the same account as every other tool.") },
+  { t: L("Push-Hinweise", "Push notifications"), d: L("Wichtiges kommt aufs Handy — Freigaben, Störungen, Schichtwechsel.", "What matters reaches the phone — approvals, faults, shift changes.") },
+  { t: L("Fotos & Belege", "Photos & evidence"), d: L("Foto direkt aus der App, sicher abgelegt am Objekt — nicht in der Kamerarolle.", "Photo straight from the app, stored safely on the object — not in the camera roll.") },
+  { t: L("Quelloffen & self-hosted", "Open & self-hosted"), d: L("Läuft gegen euren eigenen Server — keine fremde Cloud, kein App-Store-Zwang.", "Runs against your own server — no foreign cloud, no app-store lock-in.") },
+];
+const factors = [
+  { t: L("Standort", "Location"), d: L("Stempeln nur am Werk — per Geofence geprüft.", "Stamp only at the plant — geofence-checked.") },
+  { t: L("Touch / Biometrie", "Touch / biometrics"), d: L("Es ist wirklich die Person — Fingerabdruck statt geteilter Karte.", "It really is the person — fingerprint instead of a shared card.") },
+  { t: L("Scan", "Scan"), d: L("QR/NFC am Arbeitsplatz bestätigt: hier, jetzt, an dieser Station.", "QR/NFC at the workplace confirms: here, now, at this station.") },
+];
+---
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:60%; width:55%; height:90%; background:radial-gradient(circle,rgba(42,134,168,.20),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px); display:grid; grid-template-columns:1.3fr 0.7fr; gap:32px; align-items:center;">
+    <div>
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Werker-App · Mobil", "Shop-floor app · mobile")}</p>
+      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Die Werkstatt in der", "The shop floor in your")} <span style="color:#E6B23A;">{L("Hosentasche.", "pocket.")}</span></h1>
+      <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 26px;">{L("Stempeln, Zeit buchen, Fertigung quittieren, Behälter scannen — direkt an der Maschine, auch ohne Empfang. Eine App auf eurem eigenen Server, kein fremder Cloud-Dienst.", "Clock in, book time, sign off manufacturing, scan containers — right at the machine, even without signal. One app on your own server, no foreign cloud service.")}</p>
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px; display:inline-block;">{L("App-Demo im Browser", "App demo in the browser")} ↗</a>
+    </div>
+    <!-- Phone-Mockup -->
+    <div style="justify-self:center;">
+      <div style="width:200px; border:2px solid #2E5A52; border-radius:28px; background:#0E2E29; padding:14px 12px; box-shadow:0 24px 60px rgba(0,0,0,.35);">
+        <div style="height:5px; width:46px; background:#2E5A52; border-radius:99px; margin:0 auto 12px;"></div>
+        {tabs.map((t, i) => (
+          <div style={`display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:9px; margin-bottom:6px; background:${i===0 ? "rgba(42,134,168,.22)" : "rgba(255,255,255,.03)"};`}>
+            <span style={`width:8px; height:8px; border-radius:50%; background:${i===0 ? "#3FB57E" : AC};`}></span>
+            <span style="font-family:var(--font-mono); font-size:11px; color:#CADAD5;">{t.t}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §01 TABS -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(24px,3vw,40px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Fünf Tabs, ein Arbeitstag", "Five tabs, one working day")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px;">
+      {tabs.map((t) => (
+        <div style={`border:1px solid #E2E8F0; border-left:3px solid ${AC}; border-radius:12px; background:#fff; padding:16px 18px;`}>
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{t.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{t.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §02 STEMPELN MULTI-FAKTOR (beige) -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Stempeln, dem man trauen kann", "Clocking you can trust")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <p style="font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 24px; max-width:62ch;">{L("Drei Faktoren zusammen — damit die Zeiterfassung stimmt und keine Karte mehr für den Kollegen mitstempelt.", "Three factors together — so the time record is correct and no card stamps in for a colleague anymore.")}</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+      {factors.map((f, i) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px 20px;">
+          <div style="font-family:var(--font-head); font-weight:800; font-size:24px; color:#2a86a8; margin-bottom:6px;">{i + 1}</div>
+          <p style="font-weight:600; font-size:15.5px; color:#1B1C1E; margin:0 0 5px;">{f.t}</p>
+          <p style="font-size:13.5px; line-height:1.5; color:#5C5E63; margin:0;">{f.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §03 FEATURES -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Gebaut für die Halle", "Built for the floor")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      {feats.map((f) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{f.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{f.d}</p>
+        </div>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Die App ist die mobile Hand des ERP — dieselben Daten, dasselbe Konto.", "The app is the mobile hand of the ERP — same data, same account.")} <a href={b + "/erp/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum ERP-System", "To the ERP system")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Noch immer Zettel und Stechuhr?", "Still paper and a punch clock?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Probier die App im Browser — ohne Installation, einfach durchtippen.", "Try the app in the browser — no install, just tap through.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("App-Demo öffnen", "Open the app demo")} ↗</a>
+      <a href={b + "/kontakt/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Pain-List schicken", "Send pain list")} →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width:760px){ section > div[style*="grid-template-columns:1.3fr"]{ grid-template-columns:1fr !important; } }
+</style>

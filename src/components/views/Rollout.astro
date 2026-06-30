@@ -1,0 +1,120 @@
+---
+// /software-rollout/ — Self-Service-Software + serverseitige Elevation + MDM + SSO. Un-branded.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const AC = "#3f9a52";
+const flow = de
+  ? ["Mitarbeiter klickt", "Auftrag an den Server", "Installation per Fernzugriff", "fertig — kein Prompt"]
+  : ["Employee clicks", "Job to the server", "Remote installation", "done — no prompt"];
+const steps = [
+  { t: L("App-Store zum Selbstbedienen", "Self-service app store"), d: L("Mitarbeiter wählen freigegebene Software selbst aus — wie im Handy-Store, nur intern und kuratiert.", "Employees pick approved software themselves — like a phone store, but internal and curated.") },
+  { t: L("Serverseitige Installation", "Server-side installation"), d: L("Der Server installiert mit einem rotierenden, lokalen Admin-Passwort — der Nutzer braucht selbst keine Adminrechte und sieht keinen Prompt.", "The server installs with a rotating local admin password — the user needs no admin rights and sees no prompt.") },
+  { t: L("Kein Domain-Admin im Spiel", "No domain admin involved"), d: L("Pro Gerät ein eigenes, automatisch gewechseltes Passwort — eine geknackte Kiste öffnet nicht das ganze Netz.", "One auto-rotated password per device — one cracked box doesn't open the whole network.") },
+  { t: L("Nachvollziehbar", "Traceable"), d: L("Wer hat was wann installiert — protokolliert, prüfbar, Teil des Audit-Trails.", "Who installed what when — logged, auditable, part of the audit trail.") },
+];
+const mdm = [
+  { t: L("QR-Enrollment", "QR enrollment"), d: L("Neues Gerät per QR-Code aufnehmen — in Minuten einsatzbereit.", "Onboard a new device via QR code — ready in minutes.") },
+  { t: L("Kiosk-Modus", "Kiosk mode"), d: L("Tablet am Shopfloor zeigt nur die eine App, die es zeigen soll.", "A shop-floor tablet shows only the one app it should.") },
+  { t: L("App-Verteilung & Regeln", "App distribution & policy"), d: L("Apps zentral ausrollen, Restriktionen setzen, verlorene Geräte sperren.", "Roll out apps centrally, set restrictions, lock lost devices.") },
+];
+const sso = [
+  { t: L("Ein Login für alles", "One login for everything"), d: L("Single Sign-On per offenem Standard (OIDC/SAML) — ein Konto, alle Werkzeuge.", "Single sign-on via open standard (OIDC/SAML) — one account, all tools.") },
+  { t: L("Gruppen & Rollen", "Groups & roles"), d: L("Wer was darf, kommt aus dem Verzeichnis — automatisch, nicht von Hand.", "Who may do what comes from the directory — automatically, not by hand.") },
+  { t: L("MFA & Logging", "MFA & logging"), d: L("Zweiter Faktor und lückenlose Login-Protokolle als Standard.", "Second factor and complete login logs as standard.") },
+];
+---
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(63,154,82,.18),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Software-Rollout & Geräte", "Software rollout & devices")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Software auf jeden Rechner.", "Software on every machine.")} <span style="color:#E6B23A;">{L("Ohne Admin-Prompt.", "No admin prompt.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Keine USB-Sticks, keine Vor-Ort-Termine, keine Adminrechte für jeden. Der Mitarbeiter klickt, der Server installiert — sicher, serverseitig, protokolliert. Für Notebooks am Schreibtisch genauso wie für Tablets in der Halle.", "No USB sticks, no on-site visits, no admin rights for everyone. The employee clicks, the server installs — securely, server-side, logged. For desk laptops as much as for tablets in the hall.")}</p>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(24px,5vw,56px) clamp(8px,2vw,16px);">
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+      {flow.map((step, i) => (
+        <>
+          {i > 0 && <span style="color:#E6B23A; font-weight:700;">→</span>}
+          <span style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#123A33; background:#fff; border:1px solid #C0C8C5; border-radius:9999px; padding:7px 14px;">{step}</span>
+        </>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §01 ROLLOUT -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(28px,3vw,44px) clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Self-Service ohne Risiko", "Self-service without risk")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      {steps.map((o) => (
+        <div style={`border:1px solid #E2E8F0; border-left:3px solid ${AC}; border-radius:12px; background:#fff; padding:16px 18px;`}>
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §02 MDM (beige) -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Mobile Geräte (MDM)", "Mobile devices (MDM)")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;">
+      {mdm.map((o) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- §03 SSO -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("SSO als Fundament", "SSO as the foundation")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;">
+      {sso.map((o) => (
+        <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{o.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{o.d}</p>
+        </div>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Alles auf offenen Bausteinen, selbst gehostet.", "All on open building blocks, self-hosted.")} <a href={b + "/stack/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Stack", "To the stack")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:24ch;">{L("Wie oft fährt bei euch jemand zum Software-Installieren raus?", "How often does someone drive out to install software?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Wenn die Antwort „zu oft“ ist, ist das hier die Abkürzung.", "If the answer is “too often”, this is the shortcut.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={b + "/resilienz/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Und wenn mal was ausfällt", "And when something fails")} ↗</a>
+    </div>
+  </div>
+</section>

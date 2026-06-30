@@ -1,0 +1,275 @@
+---
+// /simulationen/ — INTERAKTIVE Prozess-Simulationen (bedienbar: Regler → Modell rechnet →
+// Animation + Messwerte + Status reagieren). Un-branded/leak-sicher: generischer Metallbau
+// (Schweißen/Laser/Zerspanung/Umformung) — generische Fertigungsprozesse, un-branded.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const DEMO = "https://twin-demo.indystry.works";
+---
+<section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:60%; width:55%; height:90%; background:radial-gradient(circle,rgba(230,178,58,.14),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Dreh an den Parametern. Sieh zu, was passiert.", "Turn the parameters. Watch what happens.")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#A6CFC5; max-width:64ch; margin:0;">{L("Jeder Fertigungsschritt als bedienbares Modell — schieb die Regler, und Naht, Schnitt, Werkzeug und Presse reagieren live. Das Modell rechnet mit, bewertet die Qualität und warnt vor dem Grenzfall. Probier den Grenzfall ruhig aus — hier kostet er nichts.", "Every production step as an operable model — move the sliders and the weld, cut, tool and press react live. The model computes along, rates the quality and warns at the edge. Push it to the edge — here it costs nothing.")}</p>
+  </div>
+</section>
+
+<section style="background:#F8F9FA;">
+  <div data-simroot data-de={String(de)} style="max-width:1180px; margin:0 auto; padding:clamp(40px,5vw,72px) clamp(24px,5vw,56px) clamp(56px,7vw,88px);">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:18px;">
+
+      <!-- 1 · LICHTBOGENSCHWEISSEN -->
+      <div class="sm-card sm-feat" data-sim="weld">
+        <div class="sm-head"><span class="sm-dot" style="background:#E6B23A;"></span>{L("Lichtbogenschweißen", "Arc welding")}<span class="sm-tag">MIG/MAG</span></div>
+        <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
+        <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="sm-arc"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#bfe0ff"/><stop offset=".7" stop-color="#5b8fd6" stop-opacity=".5"/><stop offset="1" stop-color="#5b8fd6" stop-opacity="0"/></radialGradient>
+            <radialGradient id="sm-heat"><stop offset="0" stop-color="#ff8a3c"/><stop offset="1" stop-color="#ff8a3c" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect x="20" y="116" width="150" height="44" fill="#22443d" stroke="#3a554e"/>
+          <rect x="190" y="116" width="150" height="44" fill="#22443d" stroke="#3a554e"/>
+          <g class="sm-bead"><circle cx="180" cy="116" r="5" fill="#E6B23A"/><circle cx="172" cy="116" r="5" fill="#d98f2a"/><circle cx="164" cy="116" r="5" fill="#c47a1f"/><circle cx="156" cy="116" r="5" fill="#a8631a"/><circle cx="148" cy="116" r="5" fill="#8a5117"/></g>
+          <circle class="sm-heat" cx="180" cy="116" r="34" fill="url(#sm-heat)"/>
+          <g class="sm-torch"><rect x="206" y="32" width="20" height="62" rx="4" transform="rotate(24 216 63)" fill="#13322D" stroke="#3FBF7F"/><rect x="196" y="88" width="6" height="22" transform="rotate(24 199 99)" fill="#A6CFC5"/></g>
+          <circle class="sm-arc" cx="180" cy="114" r="22" fill="url(#sm-arc)"/>
+          <circle class="sm-arccore" cx="180" cy="114" r="4" fill="#fff"/>
+          <g class="sm-sparks" fill="#ffd27a"><circle class="sm-sp sm-sp1" cx="180" cy="114" r="1.8"/><circle class="sm-sp sm-sp2" cx="180" cy="114" r="1.4"/><circle class="sm-sp sm-sp3" cx="180" cy="114" r="2"/><circle class="sm-sp sm-sp4" cx="180" cy="114" r="1.3"/><circle class="sm-sp sm-sp5" cx="180" cy="114" r="1.6"/><circle class="sm-sp sm-sp6" cx="180" cy="114" r="1.5"/></g>
+        </svg>
+        <div class="sm-ctrl">
+          <label><span class="lab">{L("Strom","Current")}</span><input type="range" data-k="strom" data-u=" A" min="140" max="320" step="5" value="220"><b class="sv" data-k="strom"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" mm/s" data-dec="1" min="3" max="12" step="0.5" value="6.5"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"strom":220,"feed":6.5}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"strom":310,"feed":4}'>{L("Grenzfall","Edge case")}</button></div>
+        </div>
+        <div class="sm-reads"></div>
+        <p class="sm-note">{L("Zu heiß heißt Verzug und Durchbrand, zu kalt heißt Bindefehler — das Modell hält den Energieeintrag im Fenster.", "Too hot means distortion and burn-through, too cold means lack of fusion — the model keeps the heat input in the window.")}</p>
+      </div>
+
+      <!-- 2 · LASERSCHNEIDEN -->
+      <div class="sm-card" data-sim="laser">
+        <div class="sm-head"><span class="sm-dot" style="background:#ff5a4d;"></span>{L("Laserschneiden", "Laser cutting")}<span class="sm-tag">{L("Faser","Fibre")}</span></div>
+        <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
+        <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+          <rect x="30" y="118" width="300" height="38" fill="#22443d" stroke="#3a554e"/>
+          <rect class="sm-kerf" x="40" y="118" width="0" height="38" fill="#0A1F1B"/>
+          <g class="sm-laser"><rect x="-12" y="40" width="24" height="42" rx="4" fill="#13322D" stroke="#3FBF7F"/><rect x="-3" y="82" width="6" height="36" fill="#ff5a4d"/><line x1="0" y1="116" x2="0" y2="122" stroke="#fff" stroke-width="3"/><g fill="#ffd27a"><circle class="sm-sp sm-sp1" cx="0" cy="120" r="1.6"/><circle class="sm-sp sm-sp3" cx="0" cy="120" r="1.3"/><circle class="sm-sp sm-sp5" cx="0" cy="120" r="1.8"/><circle class="sm-sp sm-sp2" cx="0" cy="120" r="1.2"/></g></g>
+        </svg>
+        <div class="sm-ctrl">
+          <label><span class="lab">{L("Leistung","Power")}</span><input type="range" data-k="power" data-u=" W" min="1000" max="6000" step="100" value="4000"><b class="sv" data-k="power"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" mm/s" min="10" max="80" step="2" value="38"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"power":4000,"feed":38}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"power":1500,"feed":74}'>{L("Grenzfall","Edge case")}</button></div>
+        </div>
+        <div class="sm-reads"></div>
+        <p class="sm-note">{L("Zu schnell für die Leistung — der Schnitt trennt nicht durch. Zu langsam — Grat und Verbrand. Das Optimum liegt dazwischen.", "Too fast for the power — the cut won't sever. Too slow — burr and burn. The optimum is in between.")}</p>
+      </div>
+
+      <!-- 3 · CNC-ZERSPANUNG -->
+      <div class="sm-card" data-sim="cnc">
+        <div class="sm-head"><span class="sm-dot" style="background:#3FBF7F;"></span>{L("CNC-Zerspanung", "CNC machining")}<span class="sm-tag">{L("3-Achs","3-axis")}</span></div>
+        <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
+        <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+          <rect x="110" y="126" width="140" height="34" rx="3" fill="#22443d" stroke="#3a554e"/>
+          <rect x="160" y="32" width="40" height="78" rx="6" fill="#13322D" stroke="#3FBF7F"/>
+          <rect x="176" y="110" width="8" height="22" fill="#A6CFC5"/>
+          <g transform="translate(180 134)"><g class="sm-tool"><line x1="-13" y1="0" x2="13" y2="0" stroke="#E6B23A" stroke-width="3"/><line x1="0" y1="-13" x2="0" y2="13" stroke="#E6B23A" stroke-width="3"/></g></g>
+          <circle class="sm-cncheat" cx="180" cy="128" r="26" fill="url(#sm-heat)"/>
+          <g class="sm-sparks" fill="#ffd27a"><circle class="sm-sp sm-sp2" cx="180" cy="128" r="1.4"/><circle class="sm-sp sm-sp4" cx="180" cy="128" r="1.6"/><circle class="sm-sp sm-sp6" cx="180" cy="128" r="1.2"/></g>
+        </svg>
+        <div class="sm-ctrl">
+          <label><span class="lab">{L("Drehzahl","Speed")}</span><input type="range" data-k="rpm" data-u=" rpm" min="4000" max="14000" step="100" value="9000"><b class="sv" data-k="rpm"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" %" min="40" max="110" step="1" value="82"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":9000,"feed":82}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"rpm":13500,"feed":108}'>{L("Grenzfall","Edge case")}</button></div>
+        </div>
+        <div class="sm-reads"></div>
+        <p class="sm-note">{L("Aus Vibration und Temperatur leitet das Modell Werkzeugverschleiß und Restlebensdauer ab — Rattern frisst Standzeit.", "From vibration and temperature the model derives tool wear and remaining life — chatter eats tool life.")}</p>
+      </div>
+
+      <!-- 4 · ABKANTEN -->
+      <div class="sm-card" data-sim="press">
+        <div class="sm-head"><span class="sm-dot" style="background:#4a9fd0;"></span>{L("Abkanten / Umformung", "Press brake / forming")}<span class="sm-tag">{L("Gesenkbiegen","Air bending")}</span></div>
+        <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
+        <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+          <path d="M120 146 L175 146 L180 161 L185 146 L240 146 L240 164 L120 164 Z" fill="#22443d" stroke="#3a554e"/>
+          <g class="sm-sheet"><path d="M95 134 L180 134 L265 134" fill="none" stroke="#A6CFC5" stroke-width="6" stroke-linecap="round"/></g>
+          <g class="sm-punch"><path d="M170 38 L190 38 L182 116 L178 116 Z" fill="#13322D" stroke="#3FBF7F"/></g>
+        </svg>
+        <div class="sm-ctrl">
+          <label><span class="lab">{L("Presskraft","Force")}</span><input type="range" data-k="force" data-u=" kN" min="200" max="1000" step="20" value="640"><b class="sv" data-k="force"></b></label>
+          <label><span class="lab">{L("Zielwinkel","Target angle")}</span><input type="range" data-k="angle" data-u=" °" min="45" max="120" step="1" value="90"><b class="sv" data-k="angle"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"force":760,"angle":90}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"force":280,"angle":90}'>{L("Grenzfall","Edge case")}</button></div>
+        </div>
+        <div class="sm-reads"></div>
+        <p class="sm-note">{L("Das Modell sagt die Rückfederung voraus und rechnet den Istwinkel — zu wenig Kraft, und das Blech federt zurück.", "The model predicts springback and computes the actual angle — too little force, and the sheet springs back.")}</p>
+      </div>
+
+      <!-- 5 · MISCHER / RÜHRWERK -->
+      <div class="sm-card" data-sim="mix">
+        <div class="sm-head"><span class="sm-dot" style="background:#c98bdd;"></span>{L("Mischer / Rührwerk", "Mixer / agitator")}<span class="sm-tag">{L("Chargenbetrieb","Batch")}</span></div>
+        <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
+        <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+          <path d="M118 44 L118 150 Q118 158 126 158 L234 158 Q242 158 242 150 L242 44" fill="none" stroke="#3a554e" stroke-width="3"/>
+          <rect class="sm-liquid" x="121" y="80" width="118" height="76" rx="3" fill="#1d5a64" opacity="0.85"/>
+          <path class="sm-vortex" d="" fill="#0A1F1B"/>
+          <g class="sm-foam" opacity="0"><circle cx="160" cy="0" r="2.6" fill="#dff1f4"/><circle cx="176" cy="0" r="3.1" fill="#eaf7f9"/><circle cx="192" cy="0" r="2.3" fill="#dff1f4"/><circle cx="184" cy="0" r="2.7" fill="#cfeaf0"/><circle cx="168" cy="0" r="2.1" fill="#cfeaf0"/></g>
+          <g class="sm-swirl"><circle cx="180" cy="118" r="3" fill="#8fd0d8" opacity=".85" transform="translate(34 0)"/><circle cx="180" cy="118" r="2.4" fill="#8fd0d8" opacity=".6" transform="translate(0 26)"/><circle cx="180" cy="118" r="2.6" fill="#8fd0d8" opacity=".7" transform="translate(-30 -8)"/><circle cx="180" cy="118" r="2.2" fill="#8fd0d8" opacity=".5" transform="translate(8 -28)"/></g>
+          <rect x="177" y="22" width="6" height="116" fill="#A6CFC5"/>
+          <rect x="168" y="20" width="24" height="9" rx="2" fill="#13322D" stroke="#3FBF7F"/>
+          <g transform="translate(180 136)"><g class="sm-mix"><rect x="-27" y="-3" width="54" height="6" rx="2" fill="#E6B23A"/><rect x="-3" y="-16" width="6" height="32" rx="2" fill="#d98f2a"/></g></g>
+        </svg>
+        <div class="sm-ctrl">
+          <label><span class="lab">{L("Drehzahl","Speed")}</span><input type="range" data-k="rpm" data-u=" rpm" min="20" max="200" step="5" value="90"><b class="sv" data-k="rpm"></b></label>
+          <label><span class="lab">{L("Füllgrad","Fill level")}</span><input type="range" data-k="fill" data-u=" %" min="30" max="100" step="1" value="80"><b class="sv" data-k="fill"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":90,"fill":80}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"rpm":185,"fill":45}'>{L("Grenzfall","Edge case")}</button></div>
+        </div>
+        <div class="sm-reads"></div>
+        <p class="sm-note">{L("Zu langsam bleibt es inhomogen mit Totzonen, zu schnell zieht die Trombe Luft ein — das Modell hält die Mischgüte im Fenster.", "Too slow stays inhomogeneous with dead zones, too fast the vortex draws in air — the model keeps blend quality in the window.")}</p>
+      </div>
+
+    </div>
+
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:clamp(28px,3.5vw,40px); padding-top:18px; max-width:74ch;">{L("Vereinfachte, bedienbare Modelle zur Veranschaulichung — die vollständige, parametrierbare Simulation läuft in der Demo, gespeist aus dem Historian.", "Simplified, operable models for illustration — the full, parametric simulation runs in the demo, fed from the historian.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:20px;">
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#123A33; color:#F8F9FA; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation")} ↗</a>
+      <a href={b + "/twin/"} style="font-family:var(--font-mono); font-size:13px; color:#16463E; display:inline-flex; align-items:center; border-bottom:1.5px solid #16463E; padding-bottom:3px; text-decoration:none;">{L("Wie der digitale Zwilling arbeitet", "How the digital twin works")} →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sm-card { border:1px solid #214740; border-radius:16px; background:#0E2522; padding:clamp(16px,2vw,22px); display:flex; flex-direction:column; }
+  @media (min-width:980px){ .sm-feat { grid-column:span 2; } }
+  .sm-head { display:flex; align-items:center; gap:10px; font-family:var(--font-head); font-weight:600; font-size:17px; color:#F4F6F5; margin-bottom:10px; }
+  .sm-dot { width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px currentColor; flex:none; }
+  .sm-tag { margin-left:auto; font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; color:#A6CFC5; border:1px solid #2E5A52; border-radius:999px; padding:3px 9px; }
+  .sm-status { display:flex; align-items:center; gap:8px; margin:0 0 12px; font-family:var(--font-mono); font-size:12px; flex-wrap:wrap; }
+  .sm-stled { width:9px; height:9px; border-radius:50%; background:#3FBF7F; box-shadow:0 0 8px currentColor; flex:none; }
+  .sm-stt { font-weight:700; color:#EAF1EE; }
+  .sm-verdict { color:#8FB3AA; }
+  .sm-stage { width:100%; height:auto; display:block; background:#0A1F1B; border:1px solid #1c3a34; border-radius:12px; }
+  .sm-ctrl { margin-top:14px; display:flex; flex-direction:column; gap:9px; }
+  .sm-ctrl label { display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:12px; color:#A6CFC5; }
+  .sm-ctrl label .lab { width:78px; flex:none; }
+  .sm-ctrl label .sv { color:#EAF1EE; width:78px; text-align:right; flex:none; font-weight:600; }
+  .sm-ctrl input[type=range] { flex:1; accent-color:#E6B23A; height:4px; }
+  .sm-btns { display:flex; flex-wrap:wrap; gap:8px; }
+  .sm-run, .sm-chip { font-family:var(--font-mono); font-size:11px; padding:6px 12px; border-radius:999px; border:1px solid #2E5A52; background:#10322C; color:#A6CFC5; cursor:pointer; }
+  .sm-run:hover, .sm-chip:hover { border-color:#3FBF7F; color:#EAF1EE; }
+  .sm-reads { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin:14px 0 0; }
+  .sm-reads span { font-family:var(--font-mono); font-size:12px; color:#8FB3AA; }
+  .sm-reads b { color:#EAF1EE; font-weight:600; }
+  .sm-note { font-size:13px; line-height:1.5; color:#8FB3AA; margin:12px 0 0; }
+
+  .sm-heat, .sm-cncheat { transform-box:fill-box; transform-origin:center; }
+  .sm-arc { transform-box:fill-box; transform-origin:center; animation:sm-flick .14s steps(2) infinite; }
+  .sm-arccore { animation:sm-flick .1s steps(2) infinite; }
+  @keyframes sm-flick { 0%{opacity:.55; transform:scale(.85);} 50%{opacity:1; transform:scale(1.12);} 100%{opacity:.7; transform:scale(.95);} }
+  .sm-heat { animation:sm-pulse 1.6s ease-in-out infinite; }
+  .sm-cncheat { animation:sm-pulse 1.3s ease-in-out infinite; }
+  @keyframes sm-pulse { 0%,100%{opacity:.55;} 50%{opacity:.9;} }
+  .sm-bead { animation:sm-grow 3.2s ease-in-out infinite; transform-box:fill-box; }
+  @keyframes sm-grow { 0%{clip-path:inset(0 100% 0 0);} 60%{clip-path:inset(0 0 0 0);} 100%{clip-path:inset(0 0 0 0); opacity:.9;} }
+  .sm-torch { animation:sm-jit .16s linear infinite; transform-box:fill-box; }
+  @keyframes sm-jit { 0%,100%{transform:translate(0,0);} 50%{transform:translate(.6px,-.4px);} }
+  .sm-sp { opacity:0; }
+  .sm-sp1{ animation:sm-fly1 .7s linear infinite; } .sm-sp2{ animation:sm-fly2 .9s linear infinite .1s; }
+  .sm-sp3{ animation:sm-fly3 .6s linear infinite .2s; } .sm-sp4{ animation:sm-fly4 .8s linear infinite .15s; }
+  .sm-sp5{ animation:sm-fly5 .75s linear infinite .05s; } .sm-sp6{ animation:sm-fly6 .85s linear infinite .25s; }
+  @keyframes sm-fly1 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-34px,26px);} }
+  @keyframes sm-fly2 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(30px,30px);} }
+  @keyframes sm-fly3 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-20px,34px);} }
+  @keyframes sm-fly4 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(40px,18px);} }
+  @keyframes sm-fly5 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(-44px,12px);} }
+  @keyframes sm-fly6 { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(22px,36px);} }
+  .sm-laser { animation:sm-laserx 3.4s ease-in-out infinite; }
+  @keyframes sm-laserx { 0%{transform:translateX(50px);} 50%{transform:translateX(310px);} 100%{transform:translateX(50px);} }
+  .sm-kerf { animation:sm-kerfw 3.4s ease-in-out infinite; }
+  @keyframes sm-kerfw { 0%{width:0;} 50%{width:270px;} 100%{width:0;} }
+  .sm-tool { transform-box:fill-box; transform-origin:center; animation:sm-spin .9s linear infinite; }
+  @keyframes sm-spin { to { transform:rotate(360deg); } }
+  .sm-mix { transform-box:fill-box; transform-origin:center; animation:sm-spin .9s linear infinite; }
+  .sm-swirl { transform-box:fill-box; transform-origin:180px 118px; animation:sm-spin 2s linear infinite; }
+  .sm-foam circle { animation:sm-pulse 1.1s ease-in-out infinite; }
+  .sm-punch { animation:sm-press 2.6s ease-in-out infinite; transform-box:fill-box; }
+  @keyframes sm-press { 0%,100%{transform:translateY(-14px);} 45%{transform:translateY(8px);} 55%{transform:translateY(8px);} }
+  .sm-sheet { animation:sm-bend 2.6s ease-in-out infinite; transform-box:fill-box; transform-origin:180px 134px; }
+  @keyframes sm-bend { 0%,100%{transform:scaleY(1) translateY(0);} 50%{transform:scaleY(.78) translateY(10px);} }
+  .sm-card.sm-paused .sm-stage * { animation-play-state:paused !important; }
+  @media (prefers-reduced-motion: reduce){ .sm-stage *{ animation:none !important; } .sm-bead{ clip-path:none !important; } .sm-sp{ opacity:.5; } }
+</style>
+<script is:inline>
+  (function(){
+    var root=document.querySelector("[data-simroot]"); if(!root) return;
+    var DE=root.dataset.de==="true"; var C=function(d,e){return DE?d:e;};
+    var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+    var n=function(a){return (Math.random()-0.5)*2*a;};
+    var COL={ok:"#3FBF7F",warn:"#E6B23A",crit:"#ff5a4d"};
+    var ENG={
+      weld:{ model:function(v){
+        var heat=v.strom/v.feed, energie=v.strom*0.024/v.feed, temp=1180+(heat-30)*8+n(15), span=17+v.strom*0.032+n(0.4);
+        var st="ok",vd=C("Einbrand sauber","sound fusion");
+        if(heat>44){st="crit";vd=C("zu heiß — Verzug/Durchbrand","too hot — distortion/burn-through");}
+        else if(heat<26){st="warn";vd=C("zu kalt — Bindefehler","too cold — lack of fusion");}
+        return {st:st,vd:vd,reads:[[C("Strom","Current"),v.strom+" A"],[C("Spannung","Voltage"),span.toFixed(1)+" V"],[C("Nahttemp.","Seam temp"),Math.round(temp)+" °C"],[C("Vorschub","Feed"),v.feed.toFixed(1)+" mm/s"],[C("Energie","Heat input"),energie.toFixed(2)+" kJ/mm"]],
+          d:{bead:clamp(4-v.feed*0.22,1,3.4),spark:clamp(1.05-(v.strom-140)/180*0.7,0.32,1.05),heat:clamp((heat-16)/32,0.45,1.3)} };
+        }, apply:function(c,d){ var be=c.querySelector(".sm-bead"); if(be)be.style.animationDuration=d.bead+"s"; c.querySelectorAll(".sm-sp").forEach(function(s){s.style.animationDuration=d.spark+"s";}); var h=c.querySelector(".sm-heat"); if(h)h.style.transform="scale("+d.heat+")"; } },
+      laser:{ model:function(v){
+        var ratio=v.power/v.feed, kerf=0.10+v.power/40000+v.feed/4000+n(0.01), gas=12+v.power/1500+n(0.3);
+        var st="ok",vd=C("Schnittkante sauber","clean cut edge");
+        if(ratio<70){st="crit";vd=C("zu schnell — nicht durchtrennt","too fast — not severed");}
+        else if(ratio>185){st="warn";vd=C("zu langsam — Grat/Verbrand","too slow — burr/burn");}
+        return {st:st,vd:vd,reads:[[C("Leistung","Power"),v.power+" W"],[C("Vorschub","Feed"),v.feed+" mm/s"],[C("Schnittfuge","Kerf"),kerf.toFixed(2)+" mm"],[C("Gasdruck","Gas"),gas.toFixed(1)+" bar"]],
+          d:{dur:clamp(5.6-v.feed*0.052,1.2,5)} };
+        }, apply:function(c,d){ var l=c.querySelector(".sm-laser"); if(l)l.style.animationDuration=d.dur+"s"; var k=c.querySelector(".sm-kerf"); if(k)k.style.animationDuration=d.dur+"s"; } },
+      cnc:{ model:function(v){
+        var vib=clamp(1.2+(v.rpm-9000)/4200+(v.feed-80)*0.02+n(0.12),0.6,9), temp=40+(v.rpm-9000)/300+(v.feed-80)*0.12+n(1.2), life=clamp(Math.round(70-(v.rpm-9000)/130-Math.max(0,vib-2)*11-Math.max(0,temp-55)*1.6),1,180);
+        var st="ok",vd=C("stabil","stable");
+        if(vib>4.2){st="crit";vd=C("Rattern — Werkzeugverschleiß","chatter — tool wear");}
+        else if(vib>3.4){st="warn";vd=C("erhöhte Vibration","elevated vibration");}
+        return {st:st,vd:vd,reads:[[C("Drehzahl","Speed"),v.rpm+" rpm"],[C("Vorschub","Feed"),v.feed+" %"],[C("Spindeltemp.","Spindle"),temp.toFixed(1)+" °C"],[C("Vibration","Vibration"),vib.toFixed(2)+" mm/s"],[C("Restlebensd.","Tool life"),life+C(" Tage"," days")]],
+          d:{spin:clamp(8000/v.rpm,0.18,2),heat:clamp((temp-38)/30,0.45,1.25)} };
+        }, apply:function(c,d){ var t=c.querySelector(".sm-tool"); if(t)t.style.animationDuration=d.spin+"s"; var h=c.querySelector(".sm-cncheat"); if(h)h.style.transform="scale("+d.heat+")"; } },
+      press:{ model:function(v){
+        var spring=clamp(2.6-v.force/480,0,2.4), ist=v.angle+spring, takt=clamp(Math.round(14-v.force/120),5,16), hub=clamp(Math.round(60-v.angle*0.18),18,55);
+        var st="ok",vd=C("Winkel in Toleranz","angle within tolerance");
+        if(spring>1.2){st="crit";vd=C("Rückfederung zu groß — nachstellen","springback too high — adjust");}
+        else if(spring>0.6){st="warn";vd=C("leichte Rückfederung","slight springback");}
+        return {st:st,vd:vd,reads:[[C("Presskraft","Force"),v.force+" kN"],[C("Zielwinkel","Target"),v.angle+" °"],[C("Istwinkel","Actual"),ist.toFixed(1)+" °"],[C("Takt","Cycle"),takt+" /min"]],
+          d:{dur:clamp(3.6-takt*0.13,1.2,3.2)} };
+        }, apply:function(c,d){ var p=c.querySelector(".sm-punch"); if(p)p.style.animationDuration=d.dur+"s"; var s=c.querySelector(".sm-sheet"); if(s)s.style.animationDuration=d.dur+"s"; } },
+      mix:{ model:function(v){
+        var homog=clamp(58+(v.rpm-40)*0.42-Math.max(0,v.fill-85)*1.4-Math.max(0,45-v.rpm)*1.6+n(0.8),40,99.5);
+        var power=(v.rpm*v.fill*0.00095)+n(0.05); var mz=clamp(Math.round(800/v.rpm+v.fill*0.4),18,300);
+        var st="ok",vd=C("homogen vermischt","homogeneously blended");
+        if(v.rpm<45){st="warn";vd=C("inhomogen — Totzonen","inhomogeneous — dead zones");}
+        else if(v.rpm>160&&v.fill<55){st="crit";vd=C("Trombe — Lufteinzug","vortex — air entrainment");}
+        else if(homog<82){st="warn";vd=C("noch nicht homogen","not yet homogeneous");}
+        return {st:st,vd:vd,reads:[[C("Drehzahl","Speed"),v.rpm+" rpm"],[C("Füllgrad","Fill"),v.fill+" %"],[C("Mischgüte","Blend"),homog.toFixed(1)+" %"],[C("Leistung","Power"),power.toFixed(2)+" kW"],[C("Mischzeit","Mix time"),mz+" s"]],
+          d:{spin:clamp(120/v.rpm,0.25,4),fill:v.fill/100,rpm:v.rpm} };
+        }, apply:function(c,d){ var m=c.querySelector(".sm-mix"); if(m)m.style.animationDuration=d.spin+"s"; var sw=c.querySelector(".sm-swirl"); if(sw)sw.style.animationDuration=clamp(d.spin*2.2,0.6,8)+"s"; var top=50,bot=156, surfY=bot-(bot-top)*d.fill;
+        var lq=c.querySelector(".sm-liquid"); if(lq){ lq.setAttribute("y",surfY.toFixed(0)); lq.setAttribute("height",(bot-surfY).toFixed(0)); }
+        var cx=180, vd=clamp((d.rpm-95)/105*44,0,46), vw=clamp(d.rpm/6.2,7,34);
+        var vo=c.querySelector(".sm-vortex"); if(vo){ vo.setAttribute("d", vd<2 ? "" : ("M"+(cx-vw).toFixed(0)+" "+surfY.toFixed(0)+" Q"+cx+" "+(surfY+vd).toFixed(0)+" "+(cx+vw).toFixed(0)+" "+surfY.toFixed(0)+" Z")); }
+        var fo=c.querySelector(".sm-foam"); if(fo){ fo.setAttribute("transform","translate(0 "+surfY.toFixed(0)+")"); fo.setAttribute("opacity", clamp((d.rpm-120)/80,0,0.9).toFixed(2)); } } }
+    };
+    function vals(card){ var v={}; card.querySelectorAll("input[type=range]").forEach(function(i){ v[i.dataset.k]=+i.value; var b=card.querySelector('.sv[data-k="'+i.dataset.k+'"]'); if(b){ var dec=+(i.dataset.dec||0); b.textContent=(+i.value).toFixed(dec)+(i.dataset.u||""); } }); return v; }
+    function update(card){ var e=ENG[card.dataset.sim]; if(!e) return; var m=e.model(vals(card)); var c=COL[m.st];
+      var led=card.querySelector(".sm-stled"); led.style.background=c; led.style.color=c;
+      var stt=card.querySelector(".sm-stt"); stt.textContent=m.st==="ok"?"i.O.":m.st==="warn"?C("Warnung","Warning"):C("kritisch","critical"); stt.style.color=c;
+      card.querySelector(".sm-verdict").textContent="· "+m.vd;
+      card.querySelector(".sm-reads").innerHTML=m.reads.map(function(r){return '<span>'+r[0]+' <b>'+r[1]+'</b></span>';}).join("");
+      e.apply(card,m.d);
+    }
+    root.querySelectorAll(".sm-card").forEach(function(card){
+      card.querySelectorAll("input[type=range]").forEach(function(i){ i.addEventListener("input",function(){update(card);}); });
+      card.querySelectorAll(".sm-chip").forEach(function(ch){ ch.addEventListener("click",function(){ var pre=JSON.parse(ch.dataset.preset); Object.keys(pre).forEach(function(k){ var inp=card.querySelector('input[data-k="'+k+'"]'); if(inp) inp.value=pre[k]; }); update(card); }); });
+      var run=card.querySelector(".sm-run"); if(run) run.addEventListener("click",function(){ var on=card.classList.toggle("sm-paused"); run.textContent=on?C("Start","Start"):"Pause"; });
+      update(card);
+    });
+    if(!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(function(){ root.querySelectorAll(".sm-card:not(.sm-paused)").forEach(update); },1300);
+  })();
+</script>

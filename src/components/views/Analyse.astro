@@ -41,6 +41,18 @@ const classes = [
   </div>
 </div>
 
+<!-- COMPUTER-VISION & DATA-SCIENCE -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1180px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Vom Bild zur Zahl","From image to number")}</span>
+      <span style="flex:1; height:1px; background:#C0C8C5;"></span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("Bilder, die rechnen.","Images that compute.")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;"><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Partikelgröße (PSD)","Particle size (PSD)")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Korngrößen-Verteilung automatisch ausgewertet — D10/D50/D90 und Spannweite je Charge.","Particle size distribution auto-evaluated — D10/D50/D90 and span per batch.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Oberfläche & Gefüge","Surface & microstructure")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Aus Bildern werden messbare Größen: Rauheit, Poren, Strukturmerkmale.","Images become measurable values: roughness, pores, structural features.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Korrelation & ML","Correlation & ML")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Zusammenhänge zwischen Prozessparametern und Ergebnis im Notebook sichtbar machen.","Surface links between process parameters and outcome in the notebook.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Auto-Report je Charge","Auto report per batch")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Charge-Dossier auf Knopfdruck — Bilder, Messwerte, Bewertung in einem Dokument.","Batch dossier at a click — images, values, assessment in one document.")}</p></div></div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Gerechnet wird in offenen Notebooks auf den echten Werksdaten.","The computing happens in open notebooks on the real factory data.")} <a href={(de?"":"/en")+"/historian/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Historian","To the historian")} →</a></p>
+  </div>
+</section>
 <script type="application/json" id="an-data" is:inline set:html={JSON.stringify(charges)}></script>
 <script>
   const DE = document.documentElement.lang !== "en";

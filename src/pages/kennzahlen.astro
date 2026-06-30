@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Kennzahlen from "../components/views/Kennzahlen.astro";
+const lang = "de" as const;
+---
+<Base lang={lang} title="Kennzahlen & Management-Review" description="27 Management-Review-KPIs (Finanzen + Operativ), snapshot-auditiert, aus echten Daten — eigenes Cockpit im ERP, kein Vendor-Lock-in." path="/kennzahlen/" altPath="/en/kennzahlen/">
+  <Kennzahlen lang={lang} />
+</Base>

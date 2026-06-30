@@ -12,6 +12,7 @@ const L = (d: string, e: string) => (de ? d : e);
     <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Der dritte Weg · Skalierung","The third way · scaling")}</p>
     <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("So skaliert das System","How the system scales")}</h1>
     <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Core bleibt gleich — dieselbe Software vom ersten Tag an. Du wächst über Hardware, nicht über Lizenzen pro Kopf. Und erst wenn richtig viele Maschinen gleichzeitig Daten liefern, lohnt sich ein Streaming-Puffer (Kafka). Schieb die Regler.","The core stays the same — the same software from day one. You grow through hardware, not per-seat licences. And only once a lot of machines stream data at once does a streaming buffer (Kafka) pay off. Move the sliders.")}</p>
+    <div id="rc-readout" style="margin-top:22px; display:flex; flex-wrap:wrap; gap:10px 20px; font-family:var(--font-mono); font-size:13px; color:#A6CFC5;"></div>
   </div>
 </section>
 
@@ -20,6 +21,7 @@ const L = (d: string, e: string) => (de ? d : e);
 
     <div class="rc-card">
       <p class="rc-h">{L("Dein Betrieb","Your operation")}</p>
+      <div id="rc-presets" style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px;"></div>
       <div id="rc-sliders"></div>
       <p style="font-family:var(--font-mono); font-size:10.5px; color:#92938F; margin:14px 0 0;">{L("Illustrative Sizing-Heuristik, keine Angebote. Der Software-Core ist konstant — was wächst, ist die Hardware darunter.","Illustrative sizing heuristic, not a quote. The software core is constant — what grows is the hardware beneath it.")}</p>
     </div>
@@ -104,6 +106,12 @@ const L = (d: string, e: string) => (de ? d : e);
   const SIG = 8;            // Sensor-Signale je Maschine @1 Hz
   const KAFKA_EPS = 2400;   // Break-even Events/s (~300 Maschinen)
   const state = { M:60, U:50, S:1, Y:5 };
+  const PRESETS = [
+    { k:"klein",  label:T("Klein","Small"),       M:20, U:15, S:1, Y:3 },
+    { k:"mittel", label:T("Mittel","Medium"),     M:80, U:60, S:1, Y:5 },
+    { k:"gross",  label:T("Groß","Large"),        M:250, U:180, S:2, Y:7 },
+    { k:"multi",  label:T("Multi-Standort","Multi-site"), M:400, U:300, S:4, Y:10 },
+  ];
 
   const sliders = [
     { k:"M", min:5,  max:500, label:T("Maschinen / Sensorquellen","Machines / sensor sources"), unit:"" },
@@ -136,6 +144,10 @@ const L = (d: string, e: string) => (de ? d : e);
     ["ERP / order core","PostgreSQL","Historian (time-series)","BI & dashboards","measurement gateway","search & knowledge index","AI assistant"]
   );
 
+  function renderPresets(){
+    $("#rc-presets").innerHTML = PRESETS.map(p=>`<button data-k="${p.k}" class="rc-preset" style="font-family:var(--font-mono);font-size:12px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid #C0C8C5;background:#fff;color:#16463E;cursor:pointer;">${p.label}</button>`).join("");
+    document.querySelectorAll("#rc-presets .rc-preset").forEach(btn=>btn.addEventListener("click",()=>{ const p=PRESETS.find(x=>x.k===btn.dataset.k); state.M=p.M; state.U=p.U; state.S=p.S; state.Y=p.Y; renderSliders(); render(); }));
+  }
   function renderSliders(){
     $("#rc-sliders").innerHTML = sliders.map(s=>{
       const v = state[s.k];
@@ -186,6 +198,8 @@ const L = (d: string, e: string) => (de ? d : e);
 
   function render(){
     const r = calc(state.M, state.U, state.S, state.Y);
+    const ro=$("#rc-readout"); if(ro) ro.innerHTML = `<span>${nf(state.M)} ${T("Maschinen","machines")}</span><span>&rarr; ${r.vcpu} vCPU</span><span>${r.nodes} ${T("Nodes","nodes")}</span><span style="color:${r.kafka?"#E6B23A":"#3FB57E"};">Kafka ${r.kafka?T("an","on"):T("aus","off")}</span>`;
+    document.querySelectorAll("#rc-presets .rc-preset").forEach(btn=>{ const p=PRESETS.find(x=>x.k===btn.dataset.k); const on=p&&state.M===p.M&&state.U===p.U&&state.S===p.S&&state.Y===p.Y; btn.style.background=on?"#123A33":"#fff"; btn.style.color=on?"#fff":"#16463E"; btn.style.borderColor=on?"#123A33":"#C0C8C5"; });
     // Slider-Labels
     sliders.forEach(s=>{ const el=$("#vl-"+s.k); if(!el) return;
       const v=state[s.k];
@@ -221,6 +235,7 @@ const L = (d: string, e: string) => (de ? d : e);
     $("#rc-chart").innerHTML = chart();
   }
 
+  renderPresets();
   renderSliders();
   render();
 </script>

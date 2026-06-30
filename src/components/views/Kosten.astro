@@ -1,0 +1,97 @@
+---
+// /kosten/ — Kosten & Controlling (Lot-Costing, normkonforme Bewertung). Un-branded.
+import type { Lang } from "../../lib/content";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const de = lang === "de";
+const b = de ? "" : "/en";
+const L = (d: string, e: string) => (de ? d : e);
+const AC = "#c4673f"; // Domänen-Akzent (Finanzen/ERP)
+const flow = de
+  ? ["Charge", "Kalkulation", "Bewertung", "Abschluss"]
+  : ["Batch", "Calculation", "Valuation", "Closing"];
+const blocks = [
+  { t: L("Lot-genaue Kosten", "Lot-level costing"), d: L("Jede Charge trägt ihre echten Kosten — Material, Energie, Arbeit, Gemeinkosten, bis zur Quelle nachvollziehbar.", "Every batch carries its real cost — material, energy, labour, overhead, traceable to the source.") },
+  { t: L("11 Kostenarten", "11 cost types"), d: L("Sauber getrennt statt ein Topf: Rohstoff, Bearbeitung, Veredelung, Prüfung, Verpackung …", "Cleanly separated instead of one bucket: raw material, processing, finishing, inspection, packaging …") },
+  { t: L("Cost-Trail", "Cost trail"), d: L("Jeder Wert zeigt, woher er kommt — vom Endpreis zurück bis zum Beleg.", "Every figure shows where it comes from — from final price back to the document.") },
+  { t: L("IFRS- & HGB-Bewertung", "IFRS & HGB valuation"), d: L("Aktivierung nach beiden Regelwerken parallel — kein doppeltes Rechnen.", "Capitalisation under both frameworks in parallel — no double bookkeeping.") },
+  { t: L("Niederstwert (NRV)", "Net realisable value"), d: L("Bestände werden zum niedrigeren Wert bewertet — automatisch, prüfsicher.", "Inventory valued at the lower amount — automatically, audit-proof.") },
+  { t: L("Landed-Cost", "Landed cost"), d: L("Fracht, Zoll, Versicherung wandern in die Materialkosten, wo sie hingehören.", "Freight, duty, insurance flow into material cost, where they belong.") },
+  { t: L("Plan-Ist-Abweichung", "Plan vs. actual variance"), d: L("Kalkuliert gegen tatsächlich — die Abweichung ist sofort sichtbar, nicht erst im Jahresabschluss.", "Calculated vs. actual — the variance shows immediately, not only at year-end.") },
+  { t: L("Rohstoffpreis-Feed", "Commodity price feed"), d: L("Metallpreise (LME & Co.) fließen automatisch in Kalkulation und Bewertung ein.", "Metal prices (LME etc.) feed automatically into calculation and valuation.") },
+  { t: L("Budget & Szenarien", "Budget & scenarios"), d: L("Budgets mit Warnschwellen, Forecast und Was-wäre-wenn — auf einer Datenbasis.", "Budgets with alert thresholds, forecast and what-if — on one data base.") },
+];
+---
+<!-- HERO -->
+<section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(196,103,63,.18),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Kosten & Controlling", "Costing & controlling")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Was eine Charge", "What a batch")} <span style="color:#E6B23A;">{L("wirklich kostet.", "really costs.")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Nicht der Durchschnitt übers Jahr — der echte Selbstkostenpreis je Charge, durchgängig von der Fertigung bis zur Rechnung, nach IFRS und HGB, ohne Medienbruch und ohne Excel-Schattenbuchhaltung.", "Not the yearly average — the real cost per batch, end to end from production to invoice, under IFRS and HGB, no media breaks and no Excel shadow ledger.")}</p>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(24px,5vw,56px) clamp(8px,2vw,16px);">
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+      {flow.map((step, i) => (
+        <>
+          {i > 0 && <span style="color:#E6B23A; font-weight:700;">→</span>}
+          <span style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#123A33; background:#fff; border:1px solid #C0C8C5; border-radius:9999px; padding:7px 14px;">{step}</span>
+        </>
+      ))}
+    </div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin:14px 0 0; max-width:62ch;">{L("Ein Datenfluss: Was in der Produktion passiert, landet ohne Abtippen in der Kalkulation — und von dort in Bewertung und Abschluss.", "One data flow: what happens in production lands in the calculation without re-typing — and from there into valuation and closing.")}</p>
+  </div>
+</section>
+
+<!-- BLOCKS -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(36px,4vw,56px) clamp(24px,5vw,56px) clamp(44px,6vw,80px);">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Was drinsteckt", "What's inside")}</span>
+      <span style="flex:1; height:1px; background:#E2E8F0;"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
+      {blocks.map((m) => (
+        <div style={`border:1px solid #E2E8F0; border-left:3px solid ${AC}; border-radius:12px; background:#fff; padding:16px 18px;`}>
+          <p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{m.t}</p>
+          <p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{m.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- WARUM (beige) -->
+<section style="background:#EFEAE0;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(40px,5vw,72px) clamp(24px,5vw,56px);">
+    <div style="display:flex; gap:14px; align-items:flex-start; max-width:80ch;">
+      <span style="font-family:var(--font-mono); font-size:15px; color:#16463E; flex:none; margin-top:2px;">★</span>
+      <p style="margin:0; font-size:clamp(17px,1.8vw,22px); line-height:1.55; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Wenn der Steuerberater fragt, warum die Marge gesunken ist, ist die Antwort einen Klick entfernt — nicht eine Woche Excel.", "When the accountant asks why the margin dropped, the answer is one click away — not a week of Excel.")}</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORAUF -->
+<section style="background:#F8F9FA;">
+  <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Worauf das aufbaut", "What it builds on")}</p>
+    <p style="font-size:16px; line-height:1.7; color:#3C3E42; margin:0; max-width:70ch;">{L("Offenes ERP-Fundament mit voller Kostenrechnung, eine robuste Datenbank für die Historie, und offene Export-Wege zum Steuerberater (DATEV · BMD).", "An open ERP foundation with full cost accounting, a robust database for the history, and open export paths to the tax advisor (DATEV · BMD).")} <a href={b + "/schnittstellen/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zu den Schnittstellen", "To the interfaces")} →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
+  <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
+  <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Kennt ihr euren Selbstkostenpreis je Charge?", "Do you know your cost per batch?")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Die meisten kennen den Durchschnitt. Der echte Wert steckt in der einzelnen Charge.", "Most know the average. The real value sits in the single batch.")}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={b + "/kennzahlen/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Und die Kennzahlen dazu", "And the KPIs to match")} ↗</a>
+    </div>
+  </div>
+</section>

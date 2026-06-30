@@ -3,6 +3,8 @@
 // hell/dunkel-Rhythmus, kinetische Live-Daten, Scroll-Timeline-Reveals). Server-gerendert,
 // in Base eingebettet (Header/Footer/Related liefert das Layout). Daten inline (bilingual).
 import type { Lang } from "../../lib/content";
+import SimTeaser from "../SimTeaser.astro";
+import { tagHref } from "../../lib/tags";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
@@ -52,9 +54,12 @@ const stats = [
 ];
 const machines = [ "DREHZENTRUM B1", "CNC-FRÄSE A1", "MONTAGEZELLE M2" ];
 const demos = [
-  { t:L("Digital Twin","Digital twin"), d:L("Erst ausprobieren, dann umstellen.","Try first, switch later."), href:"https://twin-demo.indystry.works", color:"#7b5cc4" },
-  { t:L("BI & Analytics","BI & analytics"), d:L("Zahlen, die du sofort verstehst.","Numbers you grasp instantly."), href:"https://grafana-demo.indystry.works", color:"#c08a2e" },
-  { t:L("ERP & Betrieb","ERP & operations"), d:L("Ein Programm für die ganze Firma.","One program for the whole company."), href:"https://erp-demo.indystry.works", color:"#c4673f" },
+  { t:L("Werks-Cockpit (Live-Monitoring)","Factory cockpit (live monitoring)"), d:L("Echtzeit-Dashboards auf Maschinendaten. Ohne Login.","Real-time dashboards on machine data. No login."), href:"https://grafana-demo.indystry.works", color:"#c08a2e" },
+  { t:L("BI-Cockpit (Auswertungen)","BI cockpit (analytics)"), d:L("Produktion, Qualität, Ausschuss als Dashboard.","Production, quality, scrap as a dashboard."), href:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", color:"#2a86a8" },
+  { t:L("Digital Twin (Simulation)","Digital twin (simulation)"), d:L("Parameter schieben, Optimum finden — erst im Modell.","Move parameters, find the optimum — first in the model."), href:"https://twin-demo.indystry.works", color:"#7b5cc4" },
+  { t:L("Data-Science-Sandbox","Data-science sandbox"), d:L("Notebooks auf den Werksdaten — CV, ML, Korrelationen.","Notebooks on factory data — CV, ML, correlations."), href:"https://lab-demo.indystry.works", color:"#2f6df6" },
+  { t:L("ERP & Betrieb","ERP & operations"), d:L("Ein System für die ganze Firma. Login demo/demo.","One system for the whole company. Login demo/demo."), href:"https://erp-demo.indystry.works/web/login", color:"#c4673f" },
+  { t:L("Werker-App (mobil)","Shop-floor app (mobile)"), d:L("Stempeln, Zeit, Fertigung, NFC — im Browser.","Clocking, time, manufacturing, NFC — in the browser."), href:"https://app-demo.indystry.works", color:"#16794a" },
 ];
 const explore = [
   { t:L("Werks-Landkarte","Factory map"), d:L("Jede Phase, jedes Tool, jede Live-Demo — klickbar.","Every phase, tool & live demo — clickable."), p:"/landkarte/" },
@@ -101,13 +106,13 @@ const diag = [
   { tag:"OPT 04", label:"25+",   v:L("Tabellen-Hölle. Höchste Zeit für ein System.","Spreadsheet hell. High time for a system.") },
 ];
 const interfaces = [
-  { l:"PEPPOL", d:L("Standard für strukturierte E-Rechnungen — rein und raus, ohne PDF-Abtippen.","Standard for structured e-invoices — in and out, no PDF re-typing.") },
-  { l:L("Buchhaltung","Accounting"), d:L("Export zu DATEV, BMD & Co. — Belege landen direkt beim Steuerberater.","Export to DATEV, BMD & co. — records land straight with the tax advisor.") },
-  { l:L("Versand-API","Shipping API"), d:L("Anbindung an Versanddienstleister: Etiketten und Tracking automatisch.","Connects to carriers: labels and tracking automatically.") },
-  { l:L("Lieferanten","Suppliers"), d:L("Bestellungen, Preise und Wareneingänge digital mit Lieferanten austauschen.","Exchange orders, prices and receipts with suppliers digitally.") },
-  { l:"OPC-UA", d:L("Herstellerneutrale Maschinensprache — Sensor- und Maschinendaten standardisiert herein.","Vendor-neutral machine language — sensor and machine data in, standardised.") },
-  { l:"SPS", d:L("Speicherprogrammierbare Steuerung — direkt an die Maschinensteuerung angebunden.","PLC — connected straight to the machine controller.") },
-  { l:"MCP", d:L("Model-Context-Protocol — gibt der KI rechtegeprüften Zugriff auf Daten und Tools.","Model Context Protocol — gives the AI permission-checked access to data and tools.") },
+  { tag:"peppol", l:"PEPPOL", d:L("Standard für strukturierte E-Rechnungen — rein und raus, ohne PDF-Abtippen.","Standard for structured e-invoices — in and out, no PDF re-typing.") },
+  { tag:"datev", l:L("Buchhaltung","Accounting"), d:L("Export zu DATEV, BMD & Co. — Belege landen direkt beim Steuerberater.","Export to DATEV, BMD & co. — records land straight with the tax advisor.") },
+  { tag:"rest-api", l:L("Versand-API","Shipping API"), d:L("Anbindung an Versanddienstleister: Etiketten und Tracking automatisch.","Connects to carriers: labels and tracking automatically.") },
+  { tag:"rest-api", l:L("Lieferanten","Suppliers"), d:L("Bestellungen, Preise und Wareneingänge digital mit Lieferanten austauschen.","Exchange orders, prices and receipts with suppliers digitally.") },
+  { tag:"opc-ua", l:"OPC-UA", d:L("Herstellerneutrale Maschinensprache — Sensor- und Maschinendaten standardisiert herein.","Vendor-neutral machine language — sensor and machine data in, standardised.") },
+  { tag:"sps", l:"SPS", d:L("Speicherprogrammierbare Steuerung — direkt an die Maschinensteuerung angebunden.","PLC — connected straight to the machine controller.") },
+  { tag:"mcp", l:"MCP", d:L("Model-Context-Protocol — gibt der KI rechtegeprüften Zugriff auf Daten und Tools.","Model Context Protocol — gives the AI permission-checked access to data and tools.") },
 ];
 const fxExamples = de
   ? ["Niemand sieht, was die Maschinen machen","Wir verlieren ständig Messdaten","Auswertungen kosten jeden Monat Tage","Audit steht an, nichts ist auffindbar"]
@@ -116,17 +121,17 @@ const fxExamples = de
 const finderData = baust.map((x) => ({ nr:x.nr, name:x.n, desc:x.d, color:x.color, href:`${S}/saeule/${x.slug}/`, kw:x.kw }));
 const kick = (n:string) => n; // helper noop
 const branchen = [
-  { n:L("Zerspanung & Metallbearbeitung","Machining & metalworking"), d:L("CNC-Fräsen, Drehen, viele Varianten, enge Toleranzen.","CNC milling, turning, many variants, tight tolerances."), c:"#c4673f" },
-  { n:L("Anlagen- & Maschinenbau","Plant & machine building"), d:L("Einzel- und Sondermaschinen, Projektfertigung, lange Stücklisten.","One-off and special machines, project builds, long BOMs."), c:"#2a86a8" },
-  { n:L("Serien- & Variantenfertigung","Series & variant production"), d:L("Wiederkehrende Aufträge, Chargen, lückenlose Rückverfolgung.","Recurring orders, batches, seamless traceability."), c:"#3d4fc0" },
-  { n:L("Verfahrens- & Prozesstechnik","Process technology"), d:L("Misch-, Reaktions- und Chargenprozesse mit vielen Messwerten.","Mixing, reaction and batch processes with lots of readings."), c:"#7b5cc4" },
-  { n:L("Blech, Schweiß & Metallbau","Sheet, welding & metal fab"), d:L("Zuschnitt, Umformung, Baugruppen, Endkontrolle.","Cutting, forming, assemblies, final inspection."), c:"#4a6fa5" },
-  { n:L("Kunststoff & Spritzguss","Plastics & injection moulding"), d:L("Werkzeuge, Zyklen, Qualität pro Schuss.","Tools, cycles, quality per shot."), c:"#c08a2e" },
-  { n:L("Elektronik & Baugruppen","Electronics & assembly"), d:L("Bestückung, Prüfung, Seriennummern.","Placement, testing, serial numbers."), c:"#b03f93" },
-  { n:L("Lohnfertigung & Job-Shop","Contract & job-shop"), d:L("Viele Kunden, viele Teile, knappe Termine.","Many customers, many parts, tight dates."), c:"#5a8a98" },
-  { n:L("Lebensmittel & Getränke","Food & beverage"), d:L("Chargen, Rückverfolgbarkeit, Hygiene- und Qualitätsnachweise.","Batches, traceability, hygiene and quality records."), c:"#3f9a52" },
-  { n:L("Holz & Papier","Wood & paper"), d:L("Zuschnitt, Serien, Materialfluss — durchgängige Daten statt Zettel.","Cutting, series, material flow — continuous data instead of paper."), c:"#b5852a" },
-  { n:L("Automotive-Zulieferer","Automotive suppliers"), d:L("Serien, enge Toleranzen, lückenlose Rückverfolgung (IATF).","Series, tight tolerances, seamless traceability (IATF)."), c:"#6b54b0" },
+  { tag:"zerspanung", n:L("Zerspanung & Metallbearbeitung","Machining & metalworking"), d:L("CNC-Fräsen, Drehen, viele Varianten, enge Toleranzen.","CNC milling, turning, many variants, tight tolerances."), c:"#c4673f" },
+  { tag:"maschinenbau", n:L("Anlagen- & Maschinenbau","Plant & machine building"), d:L("Einzel- und Sondermaschinen, Projektfertigung, lange Stücklisten.","One-off and special machines, project builds, long BOMs."), c:"#2a86a8" },
+  { tag:"serienfertigung", n:L("Serien- & Variantenfertigung","Series & variant production"), d:L("Wiederkehrende Aufträge, Chargen, lückenlose Rückverfolgung.","Recurring orders, batches, seamless traceability."), c:"#3d4fc0" },
+  { tag:"prozesstechnik", n:L("Verfahrens- & Prozesstechnik","Process technology"), d:L("Misch-, Reaktions- und Chargenprozesse mit vielen Messwerten.","Mixing, reaction and batch processes with lots of readings."), c:"#7b5cc4" },
+  { tag:"blech-schweiss", n:L("Blech, Schweiß & Metallbau","Sheet, welding & metal fab"), d:L("Zuschnitt, Umformung, Baugruppen, Endkontrolle.","Cutting, forming, assemblies, final inspection."), c:"#4a6fa5" },
+  { tag:"kunststoff", n:L("Kunststoff & Spritzguss","Plastics & injection moulding"), d:L("Werkzeuge, Zyklen, Qualität pro Schuss.","Tools, cycles, quality per shot."), c:"#c08a2e" },
+  { tag:"elektronik", n:L("Elektronik & Baugruppen","Electronics & assembly"), d:L("Bestückung, Prüfung, Seriennummern.","Placement, testing, serial numbers."), c:"#b03f93" },
+  { tag:"lohnfertigung", n:L("Lohnfertigung & Job-Shop","Contract & job-shop"), d:L("Viele Kunden, viele Teile, knappe Termine.","Many customers, many parts, tight dates."), c:"#5a8a98" },
+  { tag:"lebensmittel", n:L("Lebensmittel & Getränke","Food & beverage"), d:L("Chargen, Rückverfolgbarkeit, Hygiene- und Qualitätsnachweise.","Batches, traceability, hygiene and quality records."), c:"#3f9a52" },
+  { tag:"holz-papier", n:L("Holz & Papier","Wood & paper"), d:L("Zuschnitt, Serien, Materialfluss — durchgängige Daten statt Zettel.","Cutting, series, material flow — continuous data instead of paper."), c:"#b5852a" },
+  { tag:"automotive", n:L("Automotive-Zulieferer","Automotive suppliers"), d:L("Serien, enge Toleranzen, lückenlose Rückverfolgung (IATF).","Series, tight tolerances, seamless traceability (IATF)."), c:"#6b54b0" },
 ];
 ---
 <!-- Fortschrittsbalken + Readout -->
@@ -147,6 +152,7 @@ const branchen = [
       <div class="ov-cta-row">
         <a class="ctagold ov-cta-gold" href="#saeulen">{L("Den Stack ansehen","See the stack")} →</a>
         <a class="ctaghost ov-cta-ghost" href="#demos">{L("Live ausprobieren","Try it live")} ↗</a>
+        <a class="ctaghost ov-cta-ghost" href={`${b}/einstieg/`}>{L("Einstieg & Förderung","Getting started & funding")} ↗</a>
       </div>
     </div>
     <div class="ov-dash-wrap">
@@ -199,6 +205,19 @@ const branchen = [
   </div>
 </section>
 
+<!-- REFERENZ -->
+<section style="background:#EFEAE0;">
+  <div class="ov-wrap" style="padding-top:clamp(40px,5vw,64px); padding-bottom:clamp(40px,5vw,64px);">
+    <div class="rv" style="display:flex; gap:16px; align-items:flex-start; max-width:84ch; margin:0 auto;">
+      <span style="font-family:var(--font-mono); font-size:17px; color:#16463E; flex:none; margin-top:4px;">★</span>
+      <div>
+        <p style="margin:0; font-size:clamp(18px,2vw,26px); line-height:1.45; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Ein produzierender Industriebetrieb aus der Steiermark führt seine gesamte Fertigung auf diesem Stack.","A manufacturing company in Styria runs its entire production on this stack.")}</p>
+        <p style="margin:12px 0 0; font-size:14px; line-height:1.6; color:#5C5E63;">{L("Kein Prototyp, keine Folien — gelebte Praxis. ","Not a prototype, not slides — lived practice. ")}<a class="navx" href={`${b}/einstieg/`}>{L("Wie der Einstieg läuft","How getting started works")} →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FÜR WEN -->
 <section class="ov-wrap ov-sec ov-sec-tight2">
   <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Für wen","Who it's for")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
@@ -208,12 +227,45 @@ const branchen = [
     {branchen.map((x) => (
       <div class="lift ov-card rv1">
         <div class="ov-br-top"><span class="ov-br-dot" style={`background:${x.c}`}></span></div>
-        <h3 class="ov-card-h ov-br-h">{x.n}</h3>
+        <a class="ov-card-h ov-br-h taglink" href={tagHref(x.tag, lang)} style="text-decoration:none; color:inherit; display:block;">{x.n}</a>
         <p class="ov-card-d">{x.d}</p>
       </div>
     ))}
   </div>
   <p class="rv2 ov-br-note">{L("Nicht dabei? Die Bausteine sind dieselben — egal welches Werk. ","Not listed? The building blocks are the same — whatever the works. ")}<a class="navx" href={`${b}/kontakt/`}>{L("Schick uns deine Pain-List","Send us your pain list")} →</a></p>
+</section>
+
+<!-- MEHR FÜRS WERK -->
+<section class="ov-wrap ov-sec">
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Mehr fürs Werk","More for the works")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Was sonst noch im System steckt.","What else lives in the system.")}</h2>
+  <p class="ov-sub rv1">{L("Über die Bausteine hinaus — die Themen, die im Alltag den Unterschied machen.","Beyond the building blocks — the topics that make the difference day to day.")}</p>
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; margin-top:22px;">
+        <a class="lift rv1" href={`${b}/compliance/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Compliance & Sicherheit","Compliance & security")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("ISMS, ISO 27001 & 9001, NIS-2, lückenloses Audit.","ISMS, ISO 27001 & 9001, NIS-2, full audit trail.")}</span>
+        </a>
+        <a class="lift rv1" href={`${b}/instandhaltung/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Instandhaltung","Maintenance")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Anlagen, Prüffristen, Wartungspläne — QM-konform.","Assets, intervals, maintenance plans — QM-compliant.")}</span>
+        </a>
+        <a class="lift rv1" href={`${b}/kosten/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kosten & Controlling","Costing & controlling")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Lot-genaue Selbstkosten nach IFRS und HGB.","Lot-level cost under IFRS and HGB.")}</span>
+        </a>
+        <a class="lift rv1" href={`${b}/kennzahlen/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kennzahlen","KPIs")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("27 Management-Kennzahlen aus echten Daten.","27 management KPIs from real data.")}</span>
+        </a>
+        <a class="lift rv1" href={`${b}/app/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Werker-App","Shop-floor app")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Stempeln, Fertigung, NFC — offline-first.","Clocking, manufacturing, NFC — offline-first.")}</span>
+        </a>
+        <a class="lift rv1" href={`${b}/einstieg/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Einstieg & Förderung","Getting started & funding")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Geförderter Start in drei schlanken Schritten.","A funded start in three lean steps.")}</span>
+        </a>
+  </div>
 </section>
 
 <!-- §02 LÖSUNG -->
@@ -253,7 +305,7 @@ const branchen = [
   <div class="rv1">
     <div class="ov-head"><span class="ov-mono ov-kick">{L("Schnittstellen","Interfaces")}</span><span class="ov-hair"></span></div>
     <h2 class="ov-h3b">{L("Spricht mit allem, was zählt.","Talks to everything that matters.")}</h2>
-    <div class="ov-ifs">{interfaces.map((x) => <a class="ov-if" href={`${b}/schnittstellen/`} title={x.d}>{x.l}</a>)}</div>
+    <div class="ov-ifs">{interfaces.map((x) => <a class="ov-if taglink" href={tagHref(x.tag, lang)} title={x.d}>{x.l}</a>)}</div>
   </div>
 </div></section>
 
@@ -328,7 +380,11 @@ const branchen = [
       </a>
     ))}
   </div>
+  <p class="ov-mono rv1" style="color:#92938F; margin-top:14px; font-size:12.5px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.")}</p>
 </div></section>
+
+<!-- PROZESS-SIM-TEASER -->
+<SimTeaser lang={lang} />
 
 <!-- ZUM ERKUNDEN -->
 <section class="ov-wrap ov-sec">
