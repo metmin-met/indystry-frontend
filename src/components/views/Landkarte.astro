@@ -7,15 +7,16 @@ import { PHASES, TOOLS, CATS } from "../../data/phases";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const hrefOf = (t: any) => (t.ext ? t.href : b + t.href);
 const glyph = (t: any) => (t.ext ? "↗" : "→");
 
 const AKT = [
-  { id: "I",   roman: "I",   name: L("Anbahnung", "Initiation"),          range: "P0–P3" },
-  { id: "II",  roman: "II",  name: L("Auftrag → Lieferung", "Order → delivery"), range: "P4–P9" },
-  { id: "III", roman: "III", name: L("Nach der Lieferung", "After delivery"),    range: "P10–P12" },
+  { id: "I",   roman: "I",   name: L("Anbahnung", "Initiation", "初步接洽"),          range: "P0–P3" },
+  { id: "II",  roman: "II",  name: L("Auftrag → Lieferung", "Order → delivery", "订单 → 交付"), range: "P4–P9" },
+  { id: "III", roman: "III", name: L("Nach der Lieferung", "After delivery", "交付之后"),    range: "P10–P12" },
 ] as const;
 
 const liveCount = PHASES.flatMap((p) => p.tools).filter((k) => TOOLS[k].ext).length;
@@ -41,38 +42,38 @@ const lineCap = (i: number) => `top:${i === 0 ? "2rem" : "0"};bottom:${i === ite
 ---
 <section class="lk-hero">
   <div class="lk-eyrow">
-    <span class="lk-eyebrow">{L("Werks-Landkarte", "Factory map")}</span>
-    <span class="lk-livepill"><span class="lk-livedot"></span>{liveCount} {L("Live-Demos", "live demos")}</span>
+    <span class="lk-eyebrow">{L("Werks-Landkarte", "Factory map", "工厂地图")}</span>
+    <span class="lk-livepill"><span class="lk-livedot"></span>{liveCount} {L("Live-Demos", "live demos", "在线演示")}</span>
   </div>
-  <h1 class="lk-h1">{L("Die ganze Firma — als klickbare Landkarte.", "The whole company — as a clickable map.")}</h1>
-  <p class="lk-lead">{L("Jede Phase vom Erstkontakt bis zur Wartung, jedes Tool, jede Live-Demo — alles anklickbar. Filtere nach Akt, Bereich oder nur Live-Demos und spring direkt rein.", "Every phase from first contact to maintenance, every tool, every live demo — all clickable. Filter by act, area or live demos only and jump straight in.")}</p>
+  <h1 class="lk-h1">{L("Die ganze Firma — als klickbare Landkarte.", "The whole company — as a clickable map.", "整个公司 —— 化作一张可点击的地图。")}</h1>
+  <p class="lk-lead">{L("Jede Phase vom Erstkontakt bis zur Wartung, jedes Tool, jede Live-Demo — alles anklickbar. Filtere nach Akt, Bereich oder nur Live-Demos und spring direkt rein.", "Every phase from first contact to maintenance, every tool, every live demo — all clickable. Filter by act, area or live demos only and jump straight in.", "从首次接触到维护的每个阶段、每个工具、每个在线演示 —— 全部可点击。按幕、按领域或仅按在线演示筛选，直接进入。")}</p>
   <div class="lk-glyphs">
-    <span><span class="g-live">↗</span> {L("Live-Demo öffnen", "Open live demo")}</span>
-    <span><span class="g-page">→</span> {L("Seite ansehen", "View page")}</span>
-    <span><span class="g-star">★</span> {L("Meilenstein", "Milestone")}</span>
+    <span><span class="g-live">↗</span> {L("Live-Demo öffnen", "Open live demo", "打开在线演示")}</span>
+    <span><span class="g-page">→</span> {L("Seite ansehen", "View page", "查看页面")}</span>
+    <span><span class="g-star">★</span> {L("Meilenstein", "Milestone", "里程碑")}</span>
   </div>
 </section>
 
 <div class="lk-bar">
   <div class="lk-bar-inner">
     <div class="lk-grp">
-      <span class="lk-lab">{L("Akt", "Act")}</span>
+      <span class="lk-lab">{L("Akt", "Act", "幕")}</span>
       <div class="lk-seg-wrap">
-        <button type="button" class="lk-seg on" data-akt="all">{L("Alle", "All")}</button>
+        <button type="button" class="lk-seg on" data-akt="all">{L("Alle", "All", "全部")}</button>
         {AKT.map((a) => <button type="button" class="lk-seg" data-akt={a.id}>{a.roman}</button>)}
       </div>
     </div>
     <div class="lk-grp">
-      <span class="lk-lab">{L("Bereich", "Area")}</span>
+      <span class="lk-lab">{L("Bereich", "Area", "领域")}</span>
       <select class="lk-sel" id="lk-bereich">
-        <option value="all">{L("Alle", "All")}</option>
+        <option value="all">{L("Alle", "All", "全部")}</option>
         {catOrder.map((c) => <option value={c}>{CATS[c][lang]}</option>)}
       </select>
     </div>
-    <button type="button" class="lk-live" id="lk-live"><span class="lk-live-dot"></span>{L("nur Live-Demos", "live demos only")} ↗</button>
+    <button type="button" class="lk-live" id="lk-live"><span class="lk-live-dot"></span>{L("nur Live-Demos", "live demos only", "仅在线演示")} ↗</button>
     <div class="lk-bar-right">
       <span class="lk-count" id="lk-count"></span>
-      <button type="button" class="lk-reset" id="lk-reset" hidden>{L("Zurücksetzen", "Reset")} ✕</button>
+      <button type="button" class="lk-reset" id="lk-reset" hidden>{L("Zurücksetzen", "Reset", "重置")} ✕</button>
     </div>
   </div>
 </div>
@@ -90,17 +91,17 @@ const lineCap = (i: number) => `top:${i === 0 ? "2rem" : "0"};bottom:${i === ite
         <div class="lk-content">
           {it.kind === "act" ? (
             <div class="lk-act">
-              <span class="lk-act-eyebrow">{L("Akt", "Act")} {it.roman}</span>
+              <span class="lk-act-eyebrow">{L("Akt", "Act", "幕")} {it.roman}</span>
               <div class="lk-act-row">
                 <span class="lk-act-h">{it.name}</span>
-                <span class="lk-act-cap" data-range={it.range} data-count={it.count}>{it.range} · {it.count} {L("Phasen", "phases")}</span>
+                <span class="lk-act-cap" data-range={it.range} data-count={it.count}>{it.range} · {it.count} {L("Phasen", "phases", "个阶段")}</span>
               </div>
             </div>
           ) : (
             <article class="lk-card">
               <div class="lk-card-top">
                 <span class={`lk-code${it.star ? " star" : ""}`}>{it.id}</span>
-                {it.star && <span class="lk-star"><span class="lk-star-sym">★</span> {L("Meilenstein", "Milestone")}</span>}
+                {it.star && <span class="lk-star"><span class="lk-star-sym">★</span> {L("Meilenstein", "Milestone", "里程碑")}</span>}
               </div>
               <h3 class="lk-title">{it.title}</h3>
               <p class="lk-desc">{it.desc}</p>
@@ -120,14 +121,14 @@ const lineCap = (i: number) => `top:${i === 0 ? "2rem" : "0"};bottom:${i === ite
 
   <div class="lk-empty" id="lk-empty" hidden>
     <div class="lk-empty-mark">∅</div>
-    <p>{L("Keine Phase passt zu diesem Filter.", "No phase matches this filter.")}</p>
-    <button type="button" class="lk-reset2" id="lk-reset2">{L("Filter zurücksetzen", "Reset filters")}</button>
+    <p>{L("Keine Phase passt zu diesem Filter.", "No phase matches this filter.", "没有阶段符合此筛选条件。")}</p>
+    <button type="button" class="lk-reset2" id="lk-reset2">{L("Filter zurücksetzen", "Reset filters", "重置筛选")}</button>
   </div>
 
   <section class="lk-legend">
     <div class="lk-legend-head">
-      <h2>{L("Alle Tools im Überblick", "All tools at a glance")}</h2>
-      <span class="lk-legend-sub">{toolCount} {L("Werkzeuge", "tools")} · {catCount} {L("Bereiche", "areas")}</span>
+      <h2>{L("Alle Tools im Überblick", "All tools at a glance", "所有工具一览")}</h2>
+      <span class="lk-legend-sub">{toolCount} {L("Werkzeuge", "tools", "个工具")} · {catCount} {L("Bereiche", "areas", "个领域")}</span>
     </div>
     <div class="lk-legend-grid">
       {Object.values(TOOLS).map((t: any) => (

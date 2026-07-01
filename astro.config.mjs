@@ -12,10 +12,13 @@ export default defineConfig({
   site: process.env.SITE_URL || brand.url,
   output: "static",
   i18n: {
+    // URL-Segmente: DE an der Root, EN unter /en/, Chinesisch unter /cn/ (hreflang zh-Hans).
     defaultLocale: "de",
-    locales: ["de", "en"],
+    locales: ["de", "en", "cn"],
     routing: { prefixDefaultLocale: false },
   },
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    i18n: { defaultLocale: "de", locales: { de: "de", en: "en", cn: "zh-Hans" } },
+  })],
   vite: { plugins: [tailwindcss()] },
 });

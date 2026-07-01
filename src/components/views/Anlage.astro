@@ -6,38 +6,39 @@ import Twin from "./Twin.astro";
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const lines = [
-  { name: "Linie Nord", kind: L("Zerspanung", "Machining"), machines: [
+  { name: "Linie Nord", kind: L("Zerspanung", "Machining", "切削加工"), machines: [
     { name: "CNC-Fräse A1", suffix: "A1", status: "run" },
     { name: "CNC-Fräse A2", suffix: "A2", status: "run" },
     { name: "Drehzentrum B1", suffix: "B1", status: "warn" },
   ]},
-  { name: "Linie Süd", kind: L("Montage / Prüfung", "Assembly / inspection"), machines: [
+  { name: "Linie Süd", kind: L("Montage / Prüfung", "Assembly / inspection", "装配 / 检验"), machines: [
     { name: "Montagezelle M1", suffix: "M1", status: "run" },
     { name: "Montagezelle M2", suffix: "M2", status: "idle" },
     { name: "Prüfstand P1", suffix: "P1", status: "run" },
   ]},
-  { name: "Linie West", kind: L("Zuschnitt / Umformung", "Cutting / forming"), machines: [
+  { name: "Linie West", kind: L("Zuschnitt / Umformung", "Cutting / forming", "下料 / 成形"), machines: [
     { name: "Laserschneider L1", suffix: "L1", status: "run" },
     { name: "Abkantpresse K1", suffix: "K1", status: "run" },
   ]},
 ];
 const ST: Record<string, { c: string; t: string }> = {
-  run:  { c: "#16794a", t: L("läuft", "running") },
-  warn: { c: "#E6B23A", t: L("Wartung fällig", "maintenance due") },
-  idle: { c: "#92938F", t: L("Leerlauf", "idle") },
-  stop: { c: "#b4232a", t: L("Störung", "fault") },
+  run:  { c: "#16794a", t: L("läuft", "running", "运行中") },
+  warn: { c: "#E6B23A", t: L("Wartung fällig", "maintenance due", "维护到期") },
+  idle: { c: "#92938F", t: L("Leerlauf", "idle", "空闲") },
+  stop: { c: "#b4232a", t: L("Störung", "fault", "故障") },
 };
-const WERK = L("Werk", "Plant");
-const SCHRANK = L("Schaltschrank", "Cabinet");
+const WERK = L("Werk", "Plant", "工厂");
+const SCHRANK = L("Schaltschrank", "Cabinet", "电气柜");
 ---
 <section style="background:#F8F9FA;" data-de={String(de)} data-werk={WERK} data-schrank={SCHRANK}>
   <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Anlage · Digitaler Zwilling · read-only", "Plant · digital twin · read-only")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Bis auf den Stromlaufplan.", "Down to the wiring plan.")}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{L("Das ganze Werk: drei Linien, acht Maschinen. Wähl eine Maschine, klick in den Schaltschrank — und sieh Schalter und Leitungen in Aktion, inklusive Ausfall-Prognose.", "The whole plant: three lines, eight machines. Pick a machine, click into the cabinet — and see switches and wiring in action, including failure prediction.")}</p>
-    <p style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,44px);">{L("Status = aktueller Demo-Stand der Anlage", "Status = current demo state of the plant")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Anlage · Digitaler Zwilling · read-only", "Plant · digital twin · read-only", "设备 · 数字孪生 · 只读")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Bis auf den Stromlaufplan.", "Down to the wiring plan.", "深入到电气原理图。")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{L("Das ganze Werk: drei Linien, acht Maschinen. Wähl eine Maschine, klick in den Schaltschrank — und sieh Schalter und Leitungen in Aktion, inklusive Ausfall-Prognose.", "The whole plant: three lines, eight machines. Pick a machine, click into the cabinet — and see switches and wiring in action, including failure prediction.", "整座工厂：三条产线、八台机器。选一台机器，点进电气柜——即可看到开关与线路实时运行，还含故障预测。")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,44px);">{L("Status = aktueller Demo-Stand der Anlage", "Status = current demo state of the plant", "状态 = 设备当前的演示状态")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 clamp(20px,3vw,32px);">
       {["3D im Browser","Stromlaufplan","OPC-UA","Anlagendoku (BIM)","Ausfall-Prognose"].map((x) => (<span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#16463E; border:1px solid #C0C8C5; border-radius:999px; padding:5px 12px;">{x}</span>))}
     </div>
@@ -67,42 +68,42 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
     <div id="machine3d" style="background:#123A33; border-radius:12px; overflow:hidden; position:relative;">
       <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #2E5A52;">
         <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#A6CFC5;"><span id="mv-title">CNC-FRÄSE A1</span> · <span id="mv-status" style="color:#16794a;">● {ST.run.t}</span></span>
-        <span style="font-family:var(--font-mono); font-size:11px; color:#7C9A92;">{L("Hotspot klicken", "click a hotspot")}</span>
+        <span style="font-family:var(--font-mono); font-size:11px; color:#7C9A92;">{L("Hotspot klicken", "click a hotspot", "点击热点")}</span>
       </div>
       <model-viewer id="mv-machine" src="/anlage/cnc-maschine.glb" camera-controls auto-rotate touch-action="pan-y" exposure="1.15" shadow-intensity="1" camera-orbit="40deg 68deg 5m" style="width:100%; height:min(60vh,520px); background:#123A33;">
         <button class="hot" slot="hotspot-schrank" data-position="1.15 1.55 0.25" data-normal="0 0 1" data-act="schrank" data-label={SCHRANK}>{SCHRANK}</button>
-        <button class="hot" slot="hotspot-hmi" data-position="0.85 1.45 0.5" data-normal="0 0 1" data-act="info" data-label={L("Steuerung / HMI","Control / HMI")} data-info={L("Steuerung / HMI — Bedienpult. Aufträge starten, Rüsten, Störungen quittieren.","Control / HMI — operator panel. Start orders, set up, acknowledge faults.")}>HMI</button>
-        <button class="hot" slot="hotspot-spindel" data-position="-0.45 1.35 0.45" data-normal="0 0 1" data-act="info" data-label={L("Spindel","Spindle")} data-info={L("Spindel — Hauptantrieb. Drehzahl/Temperatur live im Cockpit.","Spindle — main drive. Speed/temperature live in the cockpit.")}>Spindle</button>
+        <button class="hot" slot="hotspot-hmi" data-position="0.85 1.45 0.5" data-normal="0 0 1" data-act="info" data-label={L("Steuerung / HMI","Control / HMI","控制 / HMI")} data-info={L("Steuerung / HMI — Bedienpult. Aufträge starten, Rüsten, Störungen quittieren.","Control / HMI — operator panel. Start orders, set up, acknowledge faults.","控制 / HMI——操作面板。启动订单、换型准备、确认故障。")}>HMI</button>
+        <button class="hot" slot="hotspot-spindel" data-position="-0.45 1.35 0.45" data-normal="0 0 1" data-act="info" data-label={L("Spindel","Spindle","主轴")} data-info={L("Spindel — Hauptantrieb. Drehzahl/Temperatur live im Cockpit.","Spindle — main drive. Speed/temperature live in the cockpit.","主轴——主驱动。转速/温度在中控实时显示。")}>Spindle</button>
       </model-viewer>
     </div>
     <p id="machine-info" style="font-size:15px; color:#3C3E42; margin:16px 0 0; min-height:1.4em;"></p>
 
     <div id="cabinet" style="margin-top:clamp(40px,5vw,64px);">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E;">{SCHRANK} <span id="cab-suffix">A1</span> · {L("Stromlaufplan", "Wiring plan")}</span>
+        <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E;">{SCHRANK} <span id="cab-suffix">A1</span> · {L("Stromlaufplan", "Wiring plan", "电气原理图")}</span>
         <span style="flex:1; height:1px; background:#E2E8F0;"></span>
-        <button id="back" style="cursor:pointer; font-family:var(--font-mono); font-size:12px; color:#92938F; background:none; border:none;">← {L("zurück zur Maschine","back to machine")}</button>
+        <button id="back" style="cursor:pointer; font-family:var(--font-mono); font-size:12px; color:#92938F; background:none; border:none;">← {L("zurück zur Maschine","back to machine","返回机器")}</button>
       </div>
       <div style="display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr); gap:20px; align-items:start;" class="cab-grid">
         <div style="background:#0E2E29; border-radius:12px; overflow:hidden;">
           <model-viewer id="mv-cab" src="/anlage/schaltschrank.glb" camera-controls auto-rotate rotation-per-second="12deg" touch-action="pan-y" exposure="1.35" shadow-intensity="1" camera-orbit="20deg 70deg 3.9m" style="width:100%; height:min(55vh,460px); background:#15453D;">
             <button class="hot" slot="hotspot-sps" data-position="-0.22 1.42 0.36" data-normal="0 0 1" data-sys="sps" data-label="SPS / CPU">SPS</button>
-            <button class="hot" slot="hotspot-ant" data-position="0.10 1.05 0.36" data-normal="0 0 1" data-sys="antriebe" data-label={L("Antriebe","Drives")}>Antriebe</button>
-            <button class="hot" slot="hotspot-kl" data-position="0 0.55 0.36" data-normal="0 0 1" data-sys="klemmen" data-label={L("Klemmenblock","Terminals")}>Klemmen</button>
-            <button class="hot" slot="hotspot-si" data-position="0.18 1.62 0.36" data-normal="0 0 1" data-sys="sicherungen" data-label={L("Sicherungen","Fuses")}>Sicherungen</button>
+            <button class="hot" slot="hotspot-ant" data-position="0.10 1.05 0.36" data-normal="0 0 1" data-sys="antriebe" data-label={L("Antriebe","Drives","驱动器")}>Antriebe</button>
+            <button class="hot" slot="hotspot-kl" data-position="0 0.55 0.36" data-normal="0 0 1" data-sys="klemmen" data-label={L("Klemmenblock","Terminals","端子排")}>Klemmen</button>
+            <button class="hot" slot="hotspot-si" data-position="0.18 1.62 0.36" data-normal="0 0 1" data-sys="sicherungen" data-label={L("Sicherungen","Fuses","熔断器")}>Sicherungen</button>
           </model-viewer>
         </div>
 
         <div class="sp-panel">
           <div class="sp-controls">
-            <button id="sp-power" class="sp-btn on" type="button">● {L("Strom", "Power")}</button>
-            <button id="sp-prog-btn" class="sp-btn" type="button">⚠ {L("Prognose", "Prediction")}</button>
-            <span id="sp-status" class="sp-status">{L("Strom fließt · Anlage aktiv", "current flowing · plant active")}</span>
+            <button id="sp-power" class="sp-btn on" type="button">● {L("Strom", "Power", "电源")}</button>
+            <button id="sp-prog-btn" class="sp-btn" type="button">⚠ {L("Prognose", "Prediction", "预测")}</button>
+            <span id="sp-status" class="sp-status">{L("Strom fließt · Anlage aktiv", "current flowing · plant active", "电流通过 · 设备运行中")}</span>
           </div>
           <div id="sp-progcard" class="sp-progcard" hidden>
-            ⚠ {L("Prognose · Achse Y", "Prediction · axis Y")} — {L("Lagerschaden wahrscheinlich · Restlebensdauer ~9 Tage · Wartung einplanen, bevor die Linie steht.", "bearing failure likely · remaining life ~9 days · schedule maintenance before the line stops.")}
+            ⚠ {L("Prognose · Achse Y", "Prediction · axis Y", "预测 · Y 轴")} — {L("Lagerschaden wahrscheinlich · Restlebensdauer ~9 Tage · Wartung einplanen, bevor die Linie steht.", "bearing failure likely · remaining life ~9 days · schedule maintenance before the line stops.", "轴承很可能损坏 · 剩余寿命约 9 天 · 请在产线停机前安排维护。")}
           </div>
-          <svg id="sp-svg" class="sp-svg energized" viewBox="0 0 900 560" role="img" aria-label={L("Animierter Stromlaufplan", "Animated wiring plan")}>
+          <svg id="sp-svg" class="sp-svg energized" viewBox="0 0 900 560" role="img" aria-label={L("Animierter Stromlaufplan", "Animated wiring plan", "动态电气原理图")}>
             <!-- Sammelschienen -->
             <text class="sp-txt sm" x="30" y="58">L1</text><text class="sp-txt sm" x="30" y="74">L2</text><text class="sp-txt sm" x="30" y="90">L3</text><text class="sp-txt sm" x="30" y="122">PE</text>
             <path class="sp-bus" d="M62 54 H838"/><path class="sp-bus" d="M62 70 H838"/><path class="sp-bus" d="M62 86 H838"/>
@@ -124,9 +125,9 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
             <g class="sp-group" data-sys="sps">
               <rect class="sp-node" x="180" y="235" width="180" height="140" rx="6"/>
               <text class="sp-txt" x="270" y="262" text-anchor="middle">SPS / CPU</text>
-              <text class="sp-txt sm" x="196" y="300">{L("Eingänge", "Inputs")}</text>
+              <text class="sp-txt sm" x="196" y="300">{L("Eingänge", "Inputs", "输入")}</text>
               <circle class="sp-dot" cx="180" cy="320" r="4"/><circle class="sp-dot" cx="180" cy="345" r="4"/>
-              <text class="sp-txt sm" x="344" y="300" text-anchor="end">{L("Ausgänge", "Outputs")}</text>
+              <text class="sp-txt sm" x="344" y="300" text-anchor="end">{L("Ausgänge", "Outputs", "输出")}</text>
               <circle class="sp-dot" cx="360" cy="320" r="4"/><circle class="sp-dot" cx="360" cy="345" r="4"/>
               <path class="sp-wire" d="M360 320 H395 V212"/>
             </g>
@@ -143,19 +144,19 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
               <path class="sp-wire predict" d="M620 301 V440"/>
               <path class="sp-wire" d="M760 301 V440"/>
               <!-- Motoren -->
-              <circle class="sp-motor" cx="470" cy="470" r="30"/><line class="sp-rotor" x1="470" y1="470" x2="470" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="470" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="470" y="518" text-anchor="middle">{L("Achse X", "Axis X")}</text>
-              <circle class="sp-motor predict-node" cx="620" cy="470" r="30"/><line class="sp-rotor" x1="620" y1="470" x2="620" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="620" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="620" y="518" text-anchor="middle">{L("Achse Y", "Axis Y")}</text>
-              <circle class="sp-motor" cx="760" cy="470" r="30"/><line class="sp-rotor" x1="760" y1="470" x2="760" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="760" y="475" text-anchor="middle">SP</text><text class="sp-txt sm" x="760" y="518" text-anchor="middle">{L("Spindel", "Spindle")}</text>
+              <circle class="sp-motor" cx="470" cy="470" r="30"/><line class="sp-rotor" x1="470" y1="470" x2="470" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="470" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="470" y="518" text-anchor="middle">{L("Achse X", "Axis X", "X 轴")}</text>
+              <circle class="sp-motor predict-node" cx="620" cy="470" r="30"/><line class="sp-rotor" x1="620" y1="470" x2="620" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="620" y="475" text-anchor="middle">M</text><text class="sp-txt sm" x="620" y="518" text-anchor="middle">{L("Achse Y", "Axis Y", "Y 轴")}</text>
+              <circle class="sp-motor" cx="760" cy="470" r="30"/><line class="sp-rotor" x1="760" y1="470" x2="760" y2="448" stroke="#3FBF7F" stroke-width="3"/><text class="sp-txt" x="760" y="475" text-anchor="middle">SP</text><text class="sp-txt sm" x="760" y="518" text-anchor="middle">{L("Spindel", "Spindle", "主轴")}</text>
             </g>
             <!-- Klemmen -->
             <g class="sp-group" data-sys="klemmen">
-              <text class="sp-txt sm" x="186" y="396">{L("Klemmen X1", "Terminals X1")}</text>
+              <text class="sp-txt sm" x="186" y="396">{L("Klemmen X1", "Terminals X1", "端子排 X1")}</text>
               <path class="sp-wire" d="M360 345 V410"/>
               <rect class="sp-fuse" x="190" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="212" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="234" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="256" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="278" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="300" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="322" y="404" width="14" height="26" rx="2"/><rect class="sp-fuse" x="344" y="404" width="14" height="26" rx="2"/>
               <path class="sp-wire" d="M197 404 V392 H360"/>
             </g>
           </svg>
-          <p class="sp-hint">{L("Hotspots im Schaltschrank (links) heben die Baugruppe hervor · Q1 oder „Strom“ schaltet · „Prognose“ zeigt den vorhergesagten Ausfall.", "Cabinet hotspots (left) highlight a subsystem · Q1 or “Power” switches · “Prediction” shows the predicted failure.")}</p>
+          <p class="sp-hint">{L("Hotspots im Schaltschrank (links) heben die Baugruppe hervor · Q1 oder „Strom“ schaltet · „Prognose“ zeigt den vorhergesagten Ausfall.", "Cabinet hotspots (left) highlight a subsystem · Q1 or “Power” switches · “Prediction” shows the predicted failure.", "电气柜热点（左）会高亮相应组件 · Q1 或「电源」进行开合 · 「预测」显示预测到的故障。")}</p>
         </div>
       </div>
     </div>
@@ -218,16 +219,16 @@ const SCHRANK = L("Schaltschrank", "Cabinet");
 <section style="background:#EFEAE0;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Anlagendoku, die mitlebt", "Plant docs that stay alive")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Anlagendoku, die mitlebt", "Plant docs that stay alive", "与设备同步演进的资料")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
-      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Drilldown bis zum Plan", "Drilldown to the plan")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Werk → Maschine → Schaltschrank → Stromlaufplan — ohne CAD-Lizenz, direkt im Browser.", "Plant → machine → cabinet → wiring plan — no CAD licence, right in the browser.")}</p></div>
-      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Offene Formate", "Open formats")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("3D-Modell, DXF und PDF im Browser — kein proprietärer Vendor-Viewer, kein Lock-in.", "3D model, DXF and PDF in the browser — no proprietary vendor viewer, no lock-in.")}</p></div>
-      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Mit der Wartung verbunden", "Linked to maintenance")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Jede Komponente kennt ihre Norm, Prüffrist und Doku — die Anlage ist ein Objekt, kein Ordner.", "Every component knows its standard, interval and docs — the asset is an object, not a folder.")}</p></div>
-      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Ausfall-Prognose", "Failure prediction")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Vorhergesagter Lagerschaden, bevor er die Linie stoppt — aus Vibration und Temperatur.", "Predicted bearing failure before it stops the line — from vibration and temperature.")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Drilldown bis zum Plan", "Drilldown to the plan", "逐层钻取到图纸")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Werk → Maschine → Schaltschrank → Stromlaufplan — ohne CAD-Lizenz, direkt im Browser.", "Plant → machine → cabinet → wiring plan — no CAD licence, right in the browser.", "工厂 → 机器 → 电气柜 → 电气原理图——无需 CAD 授权，直接在浏览器中查看。")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Offene Formate", "Open formats", "开放格式")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("3D-Modell, DXF und PDF im Browser — kein proprietärer Vendor-Viewer, kein Lock-in.", "3D model, DXF and PDF in the browser — no proprietary vendor viewer, no lock-in.", "3D 模型、DXF 和 PDF 皆在浏览器中——没有专有的厂商查看器，没有厂商锁定。")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Mit der Wartung verbunden", "Linked to maintenance", "与维护相连")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Jede Komponente kennt ihre Norm, Prüffrist und Doku — die Anlage ist ein Objekt, kein Ordner.", "Every component knows its standard, interval and docs — the asset is an object, not a folder.", "每个组件都清楚自己的标准、检验周期和资料——设备是一个对象，而不是一个文件夹。")}</p></div>
+      <div style="border:1px solid #E2E8F0; border-left:3px solid #16463E; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Ausfall-Prognose", "Failure prediction", "故障预测")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Vorhergesagter Lagerschaden, bevor er die Linie stoppt — aus Vibration und Temperatur.", "Predicted bearing failure before it stops the line — from vibration and temperature.", "在轴承损坏导致产线停机之前预先预测——基于振动和温度。")}</p></div>
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Dieselbe Anlage steckt im Instandhaltungs-Modul — mit Hierarchie, Normen und Prüffristen.", "The same asset lives in the maintenance module — with hierarchy, standards and intervals.")} <a href={(de?"":"/en")+"/instandhaltung/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Instandhaltung", "To maintenance")} →</a></p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Dieselbe Anlage steckt im Instandhaltungs-Modul — mit Hierarchie, Normen und Prüffristen.", "The same asset lives in the maintenance module — with hierarchy, standards and intervals.", "同一台设备也存在于维护模块中——带有层级、标准和检验周期。")} <a href={(de?"":en?"/en":"/cn")+"/instandhaltung/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Instandhaltung", "To maintenance", "前往维护")} →</a></p>
   </div>
 </section>
 

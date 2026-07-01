@@ -4,36 +4,39 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const AC = "#3f9a52";
 const flow = de
   ? ["Mitarbeiter klickt", "Auftrag an den Server", "Installation per Fernzugriff", "fertig — kein Prompt"]
-  : ["Employee clicks", "Job to the server", "Remote installation", "done — no prompt"];
+  : en
+  ? ["Employee clicks", "Job to the server", "Remote installation", "done — no prompt"]
+  : ["员工点击", "任务发往服务器", "远程完成安装", "搞定——无需授权提示"];
 const steps = [
-  { t: L("App-Store zum Selbstbedienen", "Self-service app store"), d: L("Mitarbeiter wählen freigegebene Software selbst aus — wie im Handy-Store, nur intern und kuratiert.", "Employees pick approved software themselves — like a phone store, but internal and curated.") },
-  { t: L("Serverseitige Installation", "Server-side installation"), d: L("Der Server installiert mit einem rotierenden, lokalen Admin-Passwort — der Nutzer braucht selbst keine Adminrechte und sieht keinen Prompt.", "The server installs with a rotating local admin password — the user needs no admin rights and sees no prompt.") },
-  { t: L("Kein Domain-Admin im Spiel", "No domain admin involved"), d: L("Pro Gerät ein eigenes, automatisch gewechseltes Passwort — eine geknackte Kiste öffnet nicht das ganze Netz.", "One auto-rotated password per device — one cracked box doesn't open the whole network.") },
-  { t: L("Nachvollziehbar", "Traceable"), d: L("Wer hat was wann installiert — protokolliert, prüfbar, Teil des Audit-Trails.", "Who installed what when — logged, auditable, part of the audit trail.") },
+  { t: L("App-Store zum Selbstbedienen", "Self-service app store", "自助式应用商店"), d: L("Mitarbeiter wählen freigegebene Software selbst aus — wie im Handy-Store, nur intern und kuratiert.", "Employees pick approved software themselves — like a phone store, but internal and curated.", "员工自行挑选已批准的软件——就像手机应用商店，只是内部专用且经过甄选。") },
+  { t: L("Serverseitige Installation", "Server-side installation", "服务器端安装"), d: L("Der Server installiert mit einem rotierenden, lokalen Admin-Passwort — der Nutzer braucht selbst keine Adminrechte und sieht keinen Prompt.", "The server installs with a rotating local admin password — the user needs no admin rights and sees no prompt.", "服务器使用定期轮换的本地管理员密码完成安装——用户自身无需管理员权限，也看不到任何授权提示。") },
+  { t: L("Kein Domain-Admin im Spiel", "No domain admin involved", "不涉及域管理员"), d: L("Pro Gerät ein eigenes, automatisch gewechseltes Passwort — eine geknackte Kiste öffnet nicht das ganze Netz.", "One auto-rotated password per device — one cracked box doesn't open the whole network.", "每台设备拥有各自、自动轮换的密码——一台被攻破的机器不会打开整个网络。") },
+  { t: L("Nachvollziehbar", "Traceable", "可追溯"), d: L("Wer hat was wann installiert — protokolliert, prüfbar, Teil des Audit-Trails.", "Who installed what when — logged, auditable, part of the audit trail.", "谁在何时安装了什么——全程记录、可审查，是审计追踪的一部分。") },
 ];
 const mdm = [
-  { t: L("QR-Enrollment", "QR enrollment"), d: L("Neues Gerät per QR-Code aufnehmen — in Minuten einsatzbereit.", "Onboard a new device via QR code — ready in minutes.") },
-  { t: L("Kiosk-Modus", "Kiosk mode"), d: L("Tablet am Shopfloor zeigt nur die eine App, die es zeigen soll.", "A shop-floor tablet shows only the one app it should.") },
-  { t: L("App-Verteilung & Regeln", "App distribution & policy"), d: L("Apps zentral ausrollen, Restriktionen setzen, verlorene Geräte sperren.", "Roll out apps centrally, set restrictions, lock lost devices.") },
+  { t: L("QR-Enrollment", "QR enrollment", "扫码注册"), d: L("Neues Gerät per QR-Code aufnehmen — in Minuten einsatzbereit.", "Onboard a new device via QR code — ready in minutes.", "通过二维码接入新设备——几分钟即可投入使用。") },
+  { t: L("Kiosk-Modus", "Kiosk mode", "自助终端模式"), d: L("Tablet am Shopfloor zeigt nur die eine App, die es zeigen soll.", "A shop-floor tablet shows only the one app it should.", "车间的平板电脑只显示它应当显示的那一个应用。") },
+  { t: L("App-Verteilung & Regeln", "App distribution & policy", "应用分发与策略"), d: L("Apps zentral ausrollen, Restriktionen setzen, verlorene Geräte sperren.", "Roll out apps centrally, set restrictions, lock lost devices.", "集中部署应用、设定使用限制、锁定丢失的设备。") },
 ];
 const sso = [
-  { t: L("Ein Login für alles", "One login for everything"), d: L("Single Sign-On per offenem Standard (OIDC/SAML) — ein Konto, alle Werkzeuge.", "Single sign-on via open standard (OIDC/SAML) — one account, all tools.") },
-  { t: L("Gruppen & Rollen", "Groups & roles"), d: L("Wer was darf, kommt aus dem Verzeichnis — automatisch, nicht von Hand.", "Who may do what comes from the directory — automatically, not by hand.") },
-  { t: L("MFA & Logging", "MFA & logging"), d: L("Zweiter Faktor und lückenlose Login-Protokolle als Standard.", "Second factor and complete login logs as standard.") },
+  { t: L("Ein Login für alles", "One login for everything", "一次登录，畅通所有系统"), d: L("Single Sign-On per offenem Standard (OIDC/SAML) — ein Konto, alle Werkzeuge.", "Single sign-on via open standard (OIDC/SAML) — one account, all tools.", "基于开放标准（OIDC/SAML）的单点登录（SSO）——一个账户，所有工具。") },
+  { t: L("Gruppen & Rollen", "Groups & roles", "用户组与角色"), d: L("Wer was darf, kommt aus dem Verzeichnis — automatisch, nicht von Hand.", "Who may do what comes from the directory — automatically, not by hand.", "谁能做什么，均来自目录服务——自动同步，无需手工维护。") },
+  { t: L("MFA & Logging", "MFA & logging", "多因素认证与日志记录"), d: L("Zweiter Faktor und lückenlose Login-Protokolle als Standard.", "Second factor and complete login logs as standard.", "第二重身份验证与完整的登录日志，皆为标准配置。") },
 ];
 ---
 <!-- HERO -->
 <section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(63,154,82,.18),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Software-Rollout & Geräte", "Software rollout & devices")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Software auf jeden Rechner.", "Software on every machine.")} <span style="color:#E6B23A;">{L("Ohne Admin-Prompt.", "No admin prompt.")}</span></h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Keine USB-Sticks, keine Vor-Ort-Termine, keine Adminrechte für jeden. Der Mitarbeiter klickt, der Server installiert — sicher, serverseitig, protokolliert. Für Notebooks am Schreibtisch genauso wie für Tablets in der Halle.", "No USB sticks, no on-site visits, no admin rights for everyone. The employee clicks, the server installs — securely, server-side, logged. For desk laptops as much as for tablets in the hall.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Software-Rollout & Geräte", "Software rollout & devices", "软件部署与设备")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Software auf jeden Rechner.", "Software on every machine.", "软件装到每一台电脑。")} <span style="color:#E6B23A;">{L("Ohne Admin-Prompt.", "No admin prompt.", "无需授权提示。")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Keine USB-Sticks, keine Vor-Ort-Termine, keine Adminrechte für jeden. Der Mitarbeiter klickt, der Server installiert — sicher, serverseitig, protokolliert. Für Notebooks am Schreibtisch genauso wie für Tablets in der Halle.", "No USB sticks, no on-site visits, no admin rights for everyone. The employee clicks, the server installs — securely, server-side, logged. For desk laptops as much as for tablets in the hall.", "无需 U 盘，无需上门，也无需人人拥有管理员权限。员工点击，服务器安装——安全、在服务器端完成、全程记录。既适用于办公桌上的笔记本，也适用于车间里的平板。")}</p>
   </div>
 </section>
 
@@ -55,7 +58,7 @@ const sso = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(28px,3vw,44px) clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Self-Service ohne Risiko", "Self-service without risk")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Self-Service ohne Risiko", "Self-service without risk", "无风险的自助服务")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
@@ -73,7 +76,7 @@ const sso = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Mobile Geräte (MDM)", "Mobile devices (MDM)")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Mobile Geräte (MDM)", "Mobile devices (MDM)", "移动设备（MDM）")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;">
@@ -91,7 +94,7 @@ const sso = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("SSO als Fundament", "SSO as the foundation")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("SSO als Fundament", "SSO as the foundation", "以 SSO 为基石")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;">
@@ -102,7 +105,7 @@ const sso = [
         </div>
       ))}
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Alles auf offenen Bausteinen, selbst gehostet.", "All on open building blocks, self-hosted.")} <a href={b + "/stack/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Stack", "To the stack")} →</a></p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Alles auf offenen Bausteinen, selbst gehostet.", "All on open building blocks, self-hosted.", "全部构建于开源模块之上，自托管运行。")} <a href={b + "/stack/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Stack", "To the stack", "查看技术栈")} →</a></p>
   </div>
 </section>
 
@@ -110,11 +113,11 @@ const sso = [
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:24ch;">{L("Wie oft fährt bei euch jemand zum Software-Installieren raus?", "How often does someone drive out to install software?")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Wenn die Antwort „zu oft“ ist, ist das hier die Abkürzung.", "If the answer is “too often”, this is the shortcut.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:24ch;">{L("Wie oft fährt bei euch jemand zum Software-Installieren raus?", "How often does someone drive out to install software?", "在贵厂，为了装个软件，有人要跑现场多少次？")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Wenn die Antwort „zu oft“ ist, ist das hier die Abkürzung.", "If the answer is “too often”, this is the shortcut.", "如果答案是「太频繁了」，那么这里就是捷径。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
-      <a href={b + "/resilienz/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Und wenn mal was ausfällt", "And when something fails")} ↗</a>
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list", "发送痛点清单")} →</a>
+      <a href={b + "/resilienz/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Und wenn mal was ausfällt", "And when something fails", "万一出了故障怎么办")} ↗</a>
     </div>
   </div>
 </section>

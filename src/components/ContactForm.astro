@@ -32,7 +32,7 @@ const ui = t(lang);
     </div>
     <button type="submit" class="btn">{ui.contact_send}</button>
     <p id="lead-status" class="status" role="status" aria-live="polite"></p>
-    <p id="lead-next" hidden style="margin:.2rem 0 0;font-weight:600;"><a class="link-accent" href={lang === "de" ? "/demos/" : "/en/demos/"}>{ui.nav_demos} →</a></p>
+    <p id="lead-next" hidden style="margin:.2rem 0 0;font-weight:600;"><a class="link-accent" href={lang === "de" ? "/demos/" : lang === "en" ? "/en/demos/" : "/cn/demos/"}>{ui.nav_demos} →</a></p>
     <p class="privacy">{ui.contact_privacy}</p>
   </form>
 </section>

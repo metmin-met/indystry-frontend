@@ -5,175 +5,176 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 import { tagHref, PERSONA_SLUGS } from "../../lib/tags";
 const PS = new Set(PERSONA_SLUGS);
 const ERP = "https://erp-demo.indystry.works/odoo", BI = "https://bi-demo.indystry.works", TWIN = "https://twin-demo.indystry.works";
 const D: Record<string, {l:string;h:string;x?:boolean}> = {
   erp:{l:"ERP",h:ERP,x:true}, bi:{l:"BI",h:BI,x:true}, twin:{l:"Twin",h:TWIN,x:true},
-  leit:{l:L("Leitstand","Control"),h:`${b}/leitstand/`}, anlage:{l:L("Anlage","Plant"),h:`${b}/anlage/`},
-  hist:{l:"Historian",h:`${b}/historian/`}, suche:{l:L("Suche","Search"),h:`${b}/suche/`},
-  portal:{l:"Portal",h:`${b}/portal/`}, werk:{l:L("Website","Website"),h:`${b}/werk/`},
-  wissen:{l:L("Wissen","Knowledge"),h:`${b}/wissen/`}, status:{l:"Status",h:`${b}/status/`},
-  stack:{l:"Stack",h:`${b}/stack/`}, ki:{l:L("KI & Mensch","AI & humans"),h:`${b}/ki-mensch/`},
+  leit:{l:L("Leitstand","Control","中控"),h:`${b}/leitstand/`}, anlage:{l:L("Anlage","Plant","设备"),h:`${b}/anlage/`},
+  hist:{l:"Historian",h:`${b}/historian/`}, suche:{l:L("Suche","Search","搜索"),h:`${b}/suche/`},
+  portal:{l:"Portal",h:`${b}/portal/`}, werk:{l:L("Website","Website","官网"),h:`${b}/werk/`},
+  wissen:{l:L("Wissen","Knowledge","知识"),h:`${b}/wissen/`}, status:{l:"Status",h:`${b}/status/`},
+  stack:{l:"Stack",h:`${b}/stack/`}, ki:{l:L("KI & Mensch","AI & humans","AI 与人"),h:`${b}/ki-mensch/`},
 };
 type R = { n:string; tags:string[]; desc:string; day:string; demos:{l:string;h:string;x?:boolean}[] };
 const clusters: { name:string; c:string; roles:R[] }[] = [
-  { name:L("A · Produktion","A · Production"), c:"#2e7d57", roles:[
+  { name:L("A · Produktion","A · Production","A · 生产"), c:"#2e7d57", roles:[
     { n:"Produktionsleitung", tags:["Produktions-KPIs","Produktionsreporting","Schichtplanung","Eskalationsmanagement"],
-      desc:L("Führt die Produktion, verantwortet Termin & Auslastung.","Runs production, owns deadlines & utilisation."),
-      day:L("Morgens der Blick auf den Leitstand: läuft alles? Tagsüber Engpässe glätten, Schichten koordinieren, Kennzahlen im Auge.","Morning glance at the control room: is everything running? During the day smoothing bottlenecks, coordinating shifts, watching the numbers."),
+      desc:L("Führt die Produktion, verantwortet Termin & Auslastung.","Runs production, owns deadlines & utilisation.","负责生产运行，掌控交期与产能利用率。"),
+      day:L("Morgens der Blick auf den Leitstand: läuft alles? Tagsüber Engpässe glätten, Schichten koordinieren, Kennzahlen im Auge.","Morning glance at the control room: is everything running? During the day smoothing bottlenecks, coordinating shifts, watching the numbers.","早上先看中控室：一切是否正常运行？白天疏通瓶颈、协调班次、紧盯各项指标。"),
       demos:[D.leit,D.bi,D.anlage] },
     { n:"Schichtleitung", tags:["Schichtführung","Personaleinteilung","Schichtübergabe-Doku"],
-      desc:L("Führt eine Schicht, teilt Leute ein, übergibt sauber.","Leads a shift, assigns people, hands over cleanly."),
-      day:L("Übergabe lesen, Aufträge verteilen, bei Störungen sofort umsteuern — und am Ende sauber weitergeben.","Read the handover, assign jobs, re-route on faults — and hand over cleanly at the end."),
+      desc:L("Führt eine Schicht, teilt Leute ein, übergibt sauber.","Leads a shift, assigns people, hands over cleanly.","带领一个班次，分派人员，规范交接。"),
+      day:L("Übergabe lesen, Aufträge verteilen, bei Störungen sofort umsteuern — und am Ende sauber weitergeben.","Read the handover, assign jobs, re-route on faults — and hand over cleanly at the end.","查看交接记录、分派订单、故障时立即调整——最后规范交班。"),
       demos:[D.leit,D.anlage] },
     { n:"Produktionsplanung / Disposition", tags:["Fertigungsplanung","Materialdisposition","Auftragssteuerung"],
-      desc:L("Macht Aufträge fertigungsreif und plant sie ein.","Makes orders production-ready and schedules them."),
-      day:L("Aufträge in Reihenfolge bringen, Material sichern, Maschinen belegen — damit nichts steht.","Sequence orders, secure material, load machines — so nothing stalls."),
+      desc:L("Macht Aufträge fertigungsreif und plant sie ein.","Makes orders production-ready and schedules them.","将订单准备到可生产状态并排产。"),
+      day:L("Aufträge in Reihenfolge bringen, Material sichern, Maschinen belegen — damit nichts steht.","Sequence orders, secure material, load machines — so nothing stalls.","排定订单顺序、备妥物料、安排机台——确保不停工。"),
       demos:[D.erp,D.bi] },
     { n:"Operator / Werker", tags:["Zerspanung","Wärmebehandlung","Entgraten/Sortieren","Messtechnik","Verpackung"],
-      desc:L("Bedient die Maschine, fertigt die Teile.","Operates the machine, makes the parts."),
-      day:L("Rüsten, Programm starten, Erststück prüfen, Mengen an der Maschine zurückmelden — kein Zettel mehr.","Set up, start the program, check the first part, report quantities at the machine — no more paper."),
+      desc:L("Bedient die Maschine, fertigt die Teile.","Operates the machine, makes the parts.","操作机台，加工零件。"),
+      day:L("Rüsten, Programm starten, Erststück prüfen, Mengen an der Maschine zurückmelden — kein Zettel mehr.","Set up, start the program, check the first part, report quantities at the machine — no more paper.","装夹调机、启动程序、检验首件、在机台上直接报工——不再用纸单。"),
       demos:[D.anlage,D.leit] },
     { n:"Verfahrenstechnik / R&D", tags:["Prozessentwicklung","Versuchsplanung","Werkstoffanalytik","Messauswertung","Mikroskopie/Analytik"],
-      desc:L("Entwickelt und sichert Prozesse ab.","Develops and de-risks processes."),
-      day:L("Versuche planen, Messwerte auswerten, am Twin durchspielen — bis der Prozess stabil läuft.","Plan trials, evaluate readings, run them on the twin — until the process is stable."),
+      desc:L("Entwickelt und sichert Prozesse ab.","Develops and de-risks processes.","开发并稳定工艺流程。"),
+      day:L("Versuche planen, Messwerte auswerten, am Twin durchspielen — bis der Prozess stabil läuft.","Plan trials, evaluate readings, run them on the twin — until the process is stable.","规划试验、分析测量值、在数字孪生上推演——直到工艺稳定运行。"),
       demos:[D.hist,D.bi,D.twin] },
     { n:"Anlagenbau / Anlagentechnik", tags:["Anlagenmontage","Automatisierung","Leittechnik/SCADA","Instandsetzung"],
-      desc:L("Baut, automatisiert und repariert Anlagen.","Builds, automates and repairs plants."),
-      day:L("Neue Zelle aufbauen, Leittechnik anbinden, bei Stillstand schnell instand setzen.","Build a new cell, connect controls, repair fast on downtime."),
+      desc:L("Baut, automatisiert und repariert Anlagen.","Builds, automates and repairs plants.","建造、自动化并维修设备。"),
+      day:L("Neue Zelle aufbauen, Leittechnik anbinden, bei Stillstand schnell instand setzen.","Build a new cell, connect controls, repair fast on downtime.","搭建新的产线单元、接入控制系统、停机时快速抢修。"),
       demos:[D.anlage,D.twin] },
   ]},
-  { name:L("B · Qualität","B · Quality"), c:"#2563eb", roles:[
+  { name:L("B · Qualität","B · Quality","B · 质量"), c:"#2563eb", roles:[
     { n:"QM-Manager", tags:["QM-System","Audits","Dokumentenlenkung","Reklamationsbearbeitung","Projektsteuerung"],
-      desc:L("Verantwortet Qualität, Audits, Nachweise.","Owns quality, audits, records."),
-      day:L("Reklamationen nachhalten, Audit vorbereiten, Drift in der BI früh erkennen — Nachweise lückenlos.","Track complaints, prep the audit, catch drift in BI early — gap-free records."),
+      desc:L("Verantwortet Qualität, Audits, Nachweise.","Owns quality, audits, records.","负责质量、审核与记录。"),
+      day:L("Reklamationen nachhalten, Audit vorbereiten, Drift in der BI früh erkennen — Nachweise lückenlos.","Track complaints, prep the audit, catch drift in BI early — gap-free records.","跟踪投诉、准备审核、在 BI 中尽早发现漂移——记录无缺口。"),
       demos:[D.bi,D.hist,D.suche] },
     { n:"Qualitätsprüfer", tags:["Messtechnik","Laboranalytik","Werkstoffprüfung","Prüfmittelverwaltung"],
-      desc:L("Prüft Teile, erfasst Messwerte.","Inspects parts, captures readings."),
-      day:L("Maße, Oberfläche, Gewicht prüfen, Grenzwerte automatisch bewerten, Protokoll erzeugen.","Check dimensions, surface, weight, auto-grade against limits, generate the record."),
+      desc:L("Prüft Teile, erfasst Messwerte.","Inspects parts, captures readings.","检验零件，采集测量值。"),
+      day:L("Maße, Oberfläche, Gewicht prüfen, Grenzwerte automatisch bewerten, Protokoll erzeugen.","Check dimensions, surface, weight, auto-grade against limits, generate the record.","检查尺寸、表面、重量，按公差自动判定，生成检验记录。"),
       demos:[D.bi,D.hist] },
     { n:"Interner Auditor / ISMS", tags:["ISMS","Interne Audits","Compliance"],
-      desc:L("Prüft Konformität und Informationssicherheit.","Audits compliance and information security."),
-      day:L("Prozesse gegen Norm prüfen, Lücken dokumentieren, Maßnahmen bis zur Wirksamkeit verfolgen.","Check processes against the standard, document gaps, track actions to effect."),
+      desc:L("Prüft Konformität und Informationssicherheit.","Audits compliance and information security.","审核合规性与信息安全。"),
+      day:L("Prozesse gegen Norm prüfen, Lücken dokumentieren, Maßnahmen bis zur Wirksamkeit verfolgen.","Check processes against the standard, document gaps, track actions to effect.","对照标准审查流程、记录差距、跟踪措施直至见效。"),
       demos:[D.wissen,D.status] },
   ]},
-  { name:L("C · Lager / Logistik","C · Warehouse / logistics"), c:"#b45309", roles:[
+  { name:L("C · Lager / Logistik","C · Warehouse / logistics","C · 库存 / 物流"), c:"#b45309", roles:[
     { n:"Lager-Mitarbeiter", tags:["Wareneingang","Kommissionierung","Versand","Staplerfahrer"],
-      desc:L("Nimmt an, kommissioniert, versendet.","Receives, picks, ships."),
-      day:L("Wareneingang buchen, Aufträge mobil kommissionieren, mit Echtzeit-Bestand verladen.","Book goods in, pick orders mobile, ship with real-time stock."),
+      desc:L("Nimmt an, kommissioniert, versendet.","Receives, picks, ships.","收货、拣货、发货。"),
+      day:L("Wareneingang buchen, Aufträge mobil kommissionieren, mit Echtzeit-Bestand verladen.","Book goods in, pick orders mobile, ship with real-time stock.","登记入库、用移动端拣货、依实时库存装车发运。"),
       demos:[D.erp] },
     { n:"Lager- / Logistik-Verantwortlicher", tags:["Lagerplanung","Inventur","Versandsteuerung","Lager-Berichtswesen"],
-      desc:L("Steuert Bestände, Inventur, Versand.","Manages stock, inventory, shipping."),
-      day:L("Bestände planen, Inventur fahren, Versand takten — keine bösen Überraschungen.","Plan stock, run inventory, time shipping — no nasty surprises."),
+      desc:L("Steuert Bestände, Inventur, Versand.","Manages stock, inventory, shipping.","管理库存、盘点与发运。"),
+      day:L("Bestände planen, Inventur fahren, Versand takten — keine bösen Überraschungen.","Plan stock, run inventory, time shipping — no nasty surprises.","规划库存、执行盘点、安排发运节奏——不出意外状况。"),
       demos:[D.erp,D.bi] },
   ]},
-  { name:L("D · Vertrieb / Einkauf","D · Sales / purchasing"), c:"#7c3aed", roles:[
+  { name:L("D · Vertrieb / Einkauf","D · Sales / purchasing","D · 销售 / 采购"), c:"#7c3aed", roles:[
     { n:"Vertriebs-Innendienst", tags:["Angebotswesen","Auftragsabwicklung","Kundenbetreuung"],
-      desc:L("Macht Angebote, betreut Kunden, wickelt Aufträge ab.","Quotes, serves customers, handles orders."),
-      day:L("Anfrage zum Angebot, am Twin absichern, per Klick zum Auftrag — und den Kunden auf dem Laufenden halten.","Inquiry to quote, de-risk on the twin, one click to the order — and keep the customer posted."),
+      desc:L("Macht Angebote, betreut Kunden, wickelt Aufträge ab.","Quotes, serves customers, handles orders.","报价、服务客户、处理订单。"),
+      day:L("Anfrage zum Angebot, am Twin absichern, per Klick zum Auftrag — und den Kunden auf dem Laufenden halten.","Inquiry to quote, de-risk on the twin, one click to the order — and keep the customer posted.","从询价到报价、在数字孪生上核验、一键转订单——并让客户随时知情。"),
       demos:[D.erp,D.twin,D.portal] },
     { n:"Einkauf", tags:["Bestellwesen","Lieferantenmanagement","Wareneingangsprüfung"],
-      desc:L("Beschafft Material termingerecht.","Procures material on time."),
-      day:L("Bestellvorschläge aus dem Bedarf prüfen, Lieferanten wählen, Wareneingang absichern.","Review purchase suggestions from demand, pick suppliers, secure goods-in."),
+      desc:L("Beschafft Material termingerecht.","Procures material on time.","按期采购物料。"),
+      day:L("Bestellvorschläge aus dem Bedarf prüfen, Lieferanten wählen, Wareneingang absichern.","Review purchase suggestions from demand, pick suppliers, secure goods-in.","审核由需求生成的采购建议、选择供应商、把关收货。"),
       demos:[D.erp] },
   ]},
-  { name:L("E · Finanzen / Geschäftsleitung","E · Finance / management"), c:"#0e7490", roles:[
+  { name:L("E · Finanzen / Geschäftsleitung","E · Finance / management","E · 财务 / 管理层"), c:"#0e7490", roles:[
     { n:"Buchhaltung", tags:["Debitoren","Kreditoren","Jahresabschluss","Kontenabstimmung"],
-      desc:L("Bucht, fakturiert, schließt ab.","Posts, invoices, closes the books."),
-      day:L("Aus der Lieferung die E-Rechnung, Zahlungen abgleichen, Monat sauber abschließen — ohne Abtippen.","E-invoice from the delivery, reconcile payments, close the month cleanly — no retyping."),
+      desc:L("Bucht, fakturiert, schließt ab.","Posts, invoices, closes the books.","记账、开票、结账。"),
+      day:L("Aus der Lieferung die E-Rechnung, Zahlungen abgleichen, Monat sauber abschließen — ohne Abtippen.","E-invoice from the delivery, reconcile payments, close the month cleanly — no retyping.","从发货直接生成电子发票、核对收付款、干净利落地月结——无需重复录入。"),
       demos:[D.erp,D.bi] },
     { n:"Controller", tags:["Budgetplanung","Kostenrechnung","Management-Reporting"],
-      desc:L("Steuert Budget, Kosten, Marge.","Steers budget, cost, margin."),
-      day:L("Soll/Ist vergleichen, Nachkalkulation, Reporting — wo läuft Geld weg?","Compare plan vs actual, post-calc, reporting — where's money leaking?"),
+      desc:L("Steuert Budget, Kosten, Marge.","Steers budget, cost, margin.","管控预算、成本与利润率。"),
+      day:L("Soll/Ist vergleichen, Nachkalkulation, Reporting — wo läuft Geld weg?","Compare plan vs actual, post-calc, reporting — where's money leaking?","对比计划与实际、事后核算、出具报表——钱到底漏在哪里？"),
       demos:[D.bi,D.erp] },
     { n:"Geschäftsleitung (GF)", tags:["Strategie","Finanzverantwortung","Personalführung","Konzern-Reporting","Treasury"],
-      desc:L("Führt die Firma, entscheidet, verantwortet.","Runs the company, decides, is accountable."),
-      day:L("Ein Blick aufs Cockpit: Auftrag → Liefertreue → Marge. Entscheiden auf Zahlen, die alle teilen.","A glance at the cockpit: order → on-time → margin. Decide on numbers everyone shares."),
+      desc:L("Führt die Firma, entscheidet, verantwortet.","Runs the company, decides, is accountable.","领导公司、做出决策、承担责任。"),
+      day:L("Ein Blick aufs Cockpit: Auftrag → Liefertreue → Marge. Entscheiden auf Zahlen, die alle teilen.","A glance at the cockpit: order → on-time → margin. Decide on numbers everyone shares.","一眼看驾驶舱：订单 → 准交率 → 利润率。基于人人共享的数字做决策。"),
       demos:[D.bi,D.status] },
   ]},
-  { name:L("F · Querschnitt","F · Cross-functional"), c:"#475569", roles:[
+  { name:L("F · Querschnitt","F · Cross-functional","F · 跨职能"), c:"#475569", roles:[
     { n:"IT-Administrator", tags:["IT-Infrastruktur","AD/SSO","Monitoring","ERP-Administration"],
-      desc:L("Hält Systeme verfügbar und sicher.","Keeps systems available and secure."),
-      day:L("Backups prüfen, Zugänge verwalten, Monitoring im Blick — alles selbst gehostet, kein Lock-in.","Check backups, manage access, watch monitoring — all self-hosted, no lock-in."),
+      desc:L("Hält Systeme verfügbar und sicher.","Keeps systems available and secure.","保障系统可用与安全。"),
+      day:L("Backups prüfen, Zugänge verwalten, Monitoring im Blick — alles selbst gehostet, kein Lock-in.","Check backups, manage access, watch monitoring — all self-hosted, no lock-in.","检查备份、管理权限、盯着监控——全部自托管，无厂商锁定。"),
       demos:[D.stack,D.status,D.ki] },
     { n:"Personal (HR)", tags:["Personalverwaltung","Recruiting","Schulungsorganisation","Zeitwirtschaft"],
-      desc:L("Verwaltet, stellt ein, schult.","Administers, hires, trains."),
-      day:L("Bewerbungen sichten, Onboarding starten, Schulungen organisieren, Zeiten pflegen.","Screen applications, start onboarding, organise training, maintain time records."),
+      desc:L("Verwaltet, stellt ein, schult.","Administers, hires, trains.","管理人事、招聘、培训。"),
+      day:L("Bewerbungen sichten, Onboarding starten, Schulungen organisieren, Zeiten pflegen.","Screen applications, start onboarding, organise training, maintain time records.","筛选简历、启动入职引导、组织培训、维护工时记录。"),
       demos:[D.wissen] },
     { n:"Helpdesk-Agent", tags:["Ticket-Bearbeitung","User-Support","IT-Onboarding"],
-      desc:L("Löst Anfragen, unterstützt Nutzer.","Resolves requests, supports users."),
-      day:L("Tickets abarbeiten, Nutzer unterstützen, neue Geräte einrichten.","Work tickets, support users, set up new devices."),
+      desc:L("Löst Anfragen, unterstützt Nutzer.","Resolves requests, supports users.","解决请求，支持用户。"),
+      day:L("Tickets abarbeiten, Nutzer unterstützen, neue Geräte einrichten.","Work tickets, support users, set up new devices.","处理工单、支持用户、配置新设备。"),
       demos:[D.suche,D.wissen] },
     { n:"Maintenance / Instandhaltung", tags:["Instandhaltung","Wartungsplanung","Ersatzteilmanagement"],
-      desc:L("Hält Maschinen am Laufen.","Keeps machines running."),
-      day:L("Wartungsplan abarbeiten, bei Störung von der Maschine zum Plan, Lager dank Prognose schon bereit.","Work the maintenance plan, jump machine→plan on a fault, spare already reserved thanks to prediction."),
+      desc:L("Hält Maschinen am Laufen.","Keeps machines running.","让机器持续运转。"),
+      day:L("Wartungsplan abarbeiten, bei Störung von der Maschine zum Plan, Lager dank Prognose schon bereit.","Work the maintenance plan, jump machine→plan on a fault, spare already reserved thanks to prediction.","执行维护计划、故障时从机器直达图纸、备件因预测已提前备好。"),
       demos:[D.anlage,D.hist,D.twin] },
     { n:"Mitarbeiter (allgemein)", tags:["Allgemeine Tätigkeiten"],
-      desc:L("Macht den Tagesjob, nutzt Handbuch & Kiosk.","Does the daily job, uses handbook & kiosk."),
-      day:L("Arbeit erledigen, im Handbuch nachsehen, Software selbst aus dem Kiosk holen.","Get work done, look it up in the handbook, install software from the kiosk."),
+      desc:L("Macht den Tagesjob, nutzt Handbuch & Kiosk.","Does the daily job, uses handbook & kiosk.","完成日常工作，使用手册与自助终端。"),
+      day:L("Arbeit erledigen, im Handbuch nachsehen, Software selbst aus dem Kiosk holen.","Get work done, look it up in the handbook, install software from the kiosk.","完成工作、在手册里查阅、自己从自助终端安装软件。"),
       demos:[D.wissen] },
     { n:"SPS-Programmierer", tags:["SPS-Programmierung","Antriebstechnik","PROFINET"],
-      desc:L("Programmiert Steuerungen.","Programs controllers."),
-      day:L("Steuerung programmieren, Antriebe parametrieren, in Betrieb nehmen.","Program the controller, set up drives, commission."),
+      desc:L("Programmiert Steuerungen.","Programs controllers.","编写控制器程序。"),
+      day:L("Steuerung programmieren, Antriebe parametrieren, in Betrieb nehmen.","Program the controller, set up drives, commission.","编写控制器程序、设定驱动参数、投入运行。"),
       demos:[D.anlage] },
     { n:"Leittechnik-Programmierer", tags:["Leittechnik/SCADA","OPC-UA","SPS-Programmierung"],
-      desc:L("Baut Leittechnik/SCADA, bindet an.","Builds control systems / SCADA, connects them."),
-      day:L("Visualisierung bauen, OPC-UA anbinden, Signale auf den Leitstand bringen.","Build the HMI, connect OPC-UA, get signals onto the control room."),
+      desc:L("Baut Leittechnik/SCADA, bindet an.","Builds control systems / SCADA, connects them.","搭建控制系统 / SCADA 并完成对接。"),
+      day:L("Visualisierung bauen, OPC-UA anbinden, Signale auf den Leitstand bringen.","Build the HMI, connect OPC-UA, get signals onto the control room.","搭建人机界面、接入 OPC-UA、把信号送上中控室。"),
       demos:[D.anlage,D.twin] },
     { n:"Ferialpraktikant", tags:["Hilfstätigkeiten"],
-      desc:L("Unterstützt, lernt die Abläufe.","Helps out, learns the ropes."),
-      day:L("Mit anpacken, zuschauen, Schritt für Schritt die Fertigung verstehen.","Pitch in, watch, learn the shop floor step by step."),
+      desc:L("Unterstützt, lernt die Abläufe.","Helps out, learns the ropes.","协助工作，学习流程。"),
+      day:L("Mit anpacken, zuschauen, Schritt für Schritt die Fertigung verstehen.","Pitch in, watch, learn the shop floor step by step.","动手帮忙、观察、一步步了解生产现场。"),
       demos:[D.wissen] },
     { n:"Werkstudent", tags:["Datenpflege","Unterstützung Analytik"],
-      desc:L("Pflegt Daten, unterstützt Analytik.","Maintains data, supports analytics."),
-      day:L("Daten aufbereiten, Auswertungen vorbereiten, im Historian stöbern.","Prep data, set up analyses, dig around in the historian."),
+      desc:L("Pflegt Daten, unterstützt Analytik.","Maintains data, supports analytics.","维护数据，支持分析。"),
+      day:L("Daten aufbereiten, Auswertungen vorbereiten, im Historian stöbern.","Prep data, set up analyses, dig around in the historian.","整理数据、准备分析、在历史数据库中查探。"),
       demos:[D.bi,D.hist] },
   ]},
-  { name:L("G · Externe Stakeholder","G · External stakeholders"), c:"#be185d", roles:[
+  { name:L("G · Externe Stakeholder","G · External stakeholders","G · 外部相关方"), c:"#be185d", roles:[
     { n:"Kunde", tags:["Auftragsvergabe","Prüfzeugnisse/Konformität","Reklamation"],
-      desc:L("Bestellt, erwartet Transparenz.","Orders, expects transparency."),
-      day:L("Im Portal nachsehen: wo ist mein Auftrag, meine Rechnung, mein Service — ohne Rückfrage.","Check the portal: where's my order, invoice, service — without asking."),
+      desc:L("Bestellt, erwartet Transparenz.","Orders, expects transparency.","下订单，期待透明度。"),
+      day:L("Im Portal nachsehen: wo ist mein Auftrag, meine Rechnung, mein Service — ohne Rückfrage.","Check the portal: where's my order, invoice, service — without asking.","在门户里查看：我的订单、发票、服务在哪儿——无需追问。"),
       demos:[D.portal,D.werk] },
     { n:"Potentieller Kunde / Lead", tags:["Muster-Anfragen","Datenblätter/NDA","Werks-Audit"],
-      desc:L("Prüft Eignung, fragt Muster an.","Checks fit, requests samples."),
-      day:L("Website ansehen, Muster und Datenblätter anfragen, Werk auditieren.","Look at the website, request samples and datasheets, audit the plant."),
+      desc:L("Prüft Eignung, fragt Muster an.","Checks fit, requests samples.","评估适配性，索取样品。"),
+      day:L("Website ansehen, Muster und Datenblätter anfragen, Werk auditieren.","Look at the website, request samples and datasheets, audit the plant.","浏览官网、索取样品与数据表、审核工厂。"),
       demos:[D.werk,D.suche] },
     { n:"Lieferant", tags:["Rohmaterial-Lieferung","Rechnungsstellung","Kalibrierung/Wartung"],
-      desc:L("Liefert Material, stellt Rechnungen.","Supplies material, invoices."),
-      day:L("Bestellungen annehmen, liefern, Rechnung stellen, Service leisten.","Accept orders, deliver, invoice, service."),
+      desc:L("Liefert Material, stellt Rechnungen.","Supplies material, invoices.","供应物料，开具发票。"),
+      day:L("Bestellungen annehmen, liefern, Rechnung stellen, Service leisten.","Accept orders, deliver, invoice, service.","接受订单、交货、开票、提供服务。"),
       demos:[D.erp] },
     { n:"Externer Auditor", tags:["Zertifizierungsaudits","Pre-Audit","Main Audit"],
-      desc:L("Bestätigt Konformität extern.","Confirms compliance externally."),
-      day:L("Unterlagen prüfen, Werk begehen, Zertifikat ausstellen.","Review documents, walk the plant, issue the certificate."),
+      desc:L("Bestätigt Konformität extern.","Confirms compliance externally.","从外部确认合规性。"),
+      day:L("Unterlagen prüfen, Werk begehen, Zertifikat ausstellen.","Review documents, walk the plant, issue the certificate.","审阅文件、现场巡查工厂、出具证书。"),
       demos:[D.wissen,D.status] },
     { n:"Steuerberater (extern)", tags:["Jahresabschluss","Steuerbuchung","Latente Steuern","Abschluss-Anpassungen"],
-      desc:L("Macht Abschluss und Steuern.","Handles closing and taxes."),
-      day:L("Sauberen Export ziehen, Abschluss erstellen, Steuern melden.","Pull a clean export, prepare the closing, file taxes."),
+      desc:L("Macht Abschluss und Steuern.","Handles closing and taxes.","负责结账与税务。"),
+      day:L("Sauberen Export ziehen, Abschluss erstellen, Steuern melden.","Pull a clean export, prepare the closing, file taxes.","导出干净的数据、编制年度结算、申报税务。"),
       demos:[D.erp] },
     { n:"Muttergesellschaft", tags:["Konzern-Reporting","Konzern-Konsolidierung","Konzernverrechnung"],
-      desc:L("Konzernsicht: Reporting, Konsolidierung.","Group view: reporting, consolidation."),
-      day:L("Zahlen konsolidieren, Konzern-Reporting, Verrechnung über Gesellschaften.","Consolidate figures, group reporting, inter-company settlement."),
+      desc:L("Konzernsicht: Reporting, Konsolidierung.","Group view: reporting, consolidation.","集团视角：报表与合并。"),
+      day:L("Zahlen konsolidieren, Konzern-Reporting, Verrechnung über Gesellschaften.","Consolidate figures, group reporting, inter-company settlement.","合并数据、集团报表、公司间内部结算。"),
       demos:[D.bi,D.status] },
     { n:"Eigentümer-Familie", tags:["Eigentümer-Reporting","Strategische Entscheidungen"],
-      desc:L("Steuert langfristig, trägt Verantwortung.","Steers long-term, carries responsibility."),
-      day:L("Aufs Große schauen: Strategie, Investitionen, Werte über Generationen.","Look at the big picture: strategy, investment, values across generations."),
+      desc:L("Steuert langfristig, trägt Verantwortung.","Steers long-term, carries responsibility.","着眼长远掌舵，承担责任。"),
+      day:L("Aufs Große schauen: Strategie, Investitionen, Werte über Generationen.","Look at the big picture: strategy, investment, values across generations.","着眼大局：战略、投资、代代相传的价值。"),
       demos:[D.bi] },
   ]},
-  { name:L("H · Bedrohungsakteure (ISMS)","H · Threat actors (ISMS)"), c:"#b4232a", roles:[
+  { name:L("H · Bedrohungsakteure (ISMS)","H · Threat actors (ISMS)","H · 威胁行为者（ISMS）"), c:"#b4232a", roles:[
     { n:"Mitbewerber", tags:["ISMS"],
-      desc:L("Bedrohungsakteur im ISMS-Modell.","Threat actor in the ISMS model."),
-      day:L("Wir modellieren auch, wer uns schaden könnte — und schützen Daten entsprechend.","We also model who could harm us — and protect data accordingly."),
+      desc:L("Bedrohungsakteur im ISMS-Modell.","Threat actor in the ISMS model.","ISMS 模型中的威胁行为者。"),
+      day:L("Wir modellieren auch, wer uns schaden könnte — und schützen Daten entsprechend.","We also model who could harm us — and protect data accordingly.","我们也建模谁可能危害我们——并据此保护数据。"),
       demos:[D.ki,D.stack] },
     { n:"Industriespion", tags:["ISMS"],
-      desc:L("Will an Know-how — wird abgewehrt.","Wants the know-how — gets countered."),
-      day:L("Gegen Spionage: Souveränität, Zugriffsschutz, alles im eigenen Haus.","Against espionage: sovereignty, access control, all in-house."),
+      desc:L("Will an Know-how — wird abgewehrt.","Wants the know-how — gets countered.","觊觎技术诀窍——将被防范。"),
+      day:L("Gegen Spionage: Souveränität, Zugriffsschutz, alles im eigenen Haus.","Against espionage: sovereignty, access control, all in-house.","防范谍报：自主可控（数据主权）、访问控制、一切都在自家。"),
       demos:[D.stack] },
     { n:"Opportunistischer Angreifer", tags:["ISMS"],
-      desc:L("Sucht die schnelle Lücke.","Looks for the quick gap."),
-      day:L("Gegen Gelegenheitsangriffe: SSO, Backups, gepatchte, selbstgehostete Systeme.","Against opportunistic attacks: SSO, backups, patched self-hosted systems."),
+      desc:L("Sucht die schnelle Lücke.","Looks for the quick gap.","寻找可乘之机的漏洞。"),
+      day:L("Gegen Gelegenheitsangriffe: SSO, Backups, gepatchte, selbstgehostete Systeme.","Against opportunistic attacks: SSO, backups, patched self-hosted systems.","防范机会型攻击：SSO、备份、已打补丁的自托管系统。"),
       demos:[D.stack,D.status] },
   ]},
 ];
@@ -185,22 +186,22 @@ const mono = (s: string) => s.replace(/[^A-Za-zÄÖÜ]/g,"").slice(0,2).toUpperC
 ---
 <section style="background:#123A33; color:#F4F6F5;">
   <div style="max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ich bin …", "I am …")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Das ganze Team. Auf Karten.", "The whole team. On cards.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L(`${total} Rollen einer Fertigung — jede mit ihrem Alltag und ihren Aufgaben. Filter über die Pills oder die Suche, klick eine Demo und sieh, was indystry für sie tut.`, `${total} roles of a manufacturer — each with their day and their tasks. Filter via the pills or search, click a demo and see what indystry does for them.`)}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ich bin …", "I am …", "我是……")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Das ganze Team. Auf Karten.", "The whole team. On cards.", "整个团队，尽在卡片上。")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L(`${total} Rollen einer Fertigung — jede mit ihrem Alltag und ihren Aufgaben. Filter über die Pills oder die Suche, klick eine Demo und sieh, was indystry für sie tut.`, `${total} roles of a manufacturer — each with their day and their tasks. Filter via the pills or search, click a demo and see what indystry does for them.`, `一家制造企业的 ${total} 个角色——每个都有各自的日常和任务。用标签或搜索筛选，点开一个演示，看看 indystry 为他们做了什么。`)}</p>
   </div>
 </section>
 
 <section style="background:#F8F9FA;">
   <div style="max-width:1180px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
     <div class="ib-controls">
-      <input id="ib-search" type="search" autocomplete="off" placeholder={L("Suchen … Rolle, Aufgabe (z. B. Wartung, Rechnung)","Search … role, task (e.g. maintenance, invoice)")} />
+      <input id="ib-search" type="search" autocomplete="off" placeholder={L("Suchen … Rolle, Aufgabe (z. B. Wartung, Rechnung)","Search … role, task (e.g. maintenance, invoice)","搜索……角色、任务（如：维护、发票）")} />
     </div>
     <div class="ib-chips" id="ib-clf">
-      <button class="ib-chip" data-cl="" aria-pressed="true">{L("Alle","All")} · {total}</button>
+      <button class="ib-chip" data-cl="" aria-pressed="true">{L("Alle","All","全部")} · {total}</button>
       {clusters.map((c) => <button class="ib-chip" data-cl={c.name} style={`--cc:${c.c}`}>{c.name} · {c.roles.length}</button>)}
     </div>
-    <p id="ib-empty" hidden style="font-family:var(--font-mono); font-size:14px; color:#92938F;">{L("Keine Rolle passt — anderes Stichwort?","No role matches — try another keyword?")}</p>
+    <p id="ib-empty" hidden style="font-family:var(--font-mono); font-size:14px; color:#92938F;">{L("Keine Rolle passt — anderes Stichwort?","No role matches — try another keyword?","没有匹配的角色——换个关键词试试？")}</p>
 
     <div class="ib-grid">
       {clusters.map((c) => c.roles.map((r) => (
@@ -209,11 +210,11 @@ const mono = (s: string) => s.replace(/[^A-Za-zÄÖÜ]/g,"").slice(0,2).toUpperC
             <span class="pcard-mono">{mono(tr(r.n))}</span>
             <div style="min-width:0;">
               <p class="pcard-cl">{c.name}</p>
-              {PS.has(slug(r.n)) ? <a class="pcard-name taglink" href={tagHref(slug(r.n), lang)} title={L("Diese Rolle in der Suche","This role in search")} style="text-decoration:none; color:inherit; display:block;">{tr(r.n)}</a> : <p class="pcard-name">{tr(r.n)}</p>}
+              {PS.has(slug(r.n)) ? <a class="pcard-name taglink" href={tagHref(slug(r.n), lang)} title={L("Diese Rolle in der Suche","This role in search","在搜索中查看此角色")} style="text-decoration:none; color:inherit; display:block;">{tr(r.n)}</a> : <p class="pcard-name">{tr(r.n)}</p>}
             </div>
           </div>
           <p class="pcard-desc">{tr(r.desc)}</p>
-          <div class="pcard-day"><span class="pcard-day-lbl">{L("Mein Tag","My day")}</span> {tr(r.day)}</div>
+          <div class="pcard-day"><span class="pcard-day-lbl">{L("Mein Tag","My day","我的一天")}</span> {tr(r.day)}</div>
           <div class="pcard-tags">{r.tags.map((t) => <button class="ptag" data-tag={tr(t).toLowerCase()}>{tr(t)}</button>)}</div>
           <div class="pcard-demos">{r.demos.map((d) => <a class="pdemo" href={d.h} target={d.x?"_blank":undefined} rel={d.x?"noopener":undefined}>{d.l} {d.x?"↗":"→"}</a>)}</div>
         </article>

@@ -4,8 +4,8 @@ import { t, type Lang } from "../lib/i18n";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const ui = t(lang);
-const placeholder = lang === "de" ? "z.B. Audit, Maschine, Backup …" : "e.g. audit, machine, backup …";
-const empty = lang === "de" ? "Keine Treffer." : "No results.";
+const placeholder = lang === "de" ? "z.B. Audit, Maschine, Backup …" : lang === "en" ? "e.g. audit, machine, backup …" : "例如：审计、机器、备份 …";
+const empty = lang === "de" ? "Keine Treffer." : lang === "en" ? "No results." : "无匹配结果。";
 ---
 {searchEnabled && (
   <>

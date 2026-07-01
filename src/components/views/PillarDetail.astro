@@ -6,9 +6,11 @@ import { t } from "../../lib/i18n";
 interface Props { pillar: Pillar; lang: Lang }
 const { pillar, lang } = Astro.props;
 const de = lang === "de";
-const c = pillar[lang];
+const en = lang === "en";
+const c = pillar[lang] ?? pillar.en; // Fallback bis pillars.yaml zh trägt
 const ui = t(lang);
-const back = de ? "/#saeulen" : "/en/#saeulen";
+const b = de ? "" : en ? "/en" : "/cn";
+const back = `${b}/#saeulen`;
 const related = pillars.filter((p) => p.slug !== pillar.slug).slice(0, 3);
 const stack = STACK[pillar.slug];
 const nr = String(Math.round(pillar.sequence / 10)).padStart(2, "0");
@@ -18,23 +20,25 @@ const CAT: Record<string, string> = {
   "ki-suche-nlp": "KI", "wissen-compliance-kiosk": "Wissen", "web-aussenauftritt": "Betrieb",
 };
 const cat = CAT[pillar.slug] || "";
-const detailUrl = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s + "/");
-const L = (d: string, e: string) => (de ? d : e);
+const detailUrl = (s: string) => (de ? "/saeule/" + s + "/" : (b + "/pillar/" + s + "/"));
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const isErp = pillar.slug === "erp-betrieb";
 const erpFlow = de
   ? ["Auftrag", "Planung", "Fertigung", "Qualität", "Lager", "Rechnung"]
-  : ["Order", "Planning", "Production", "Quality", "Stock", "Invoice"];
+  : en
+  ? ["Order", "Planning", "Production", "Quality", "Stock", "Invoice"]
+  : ["订单", "计划", "生产", "质量", "库存", "发票"];
 const erpModules = [
-  { t: L("Aufträge & Verkauf", "Orders & sales"), d: L("Angebot, Auftrag, Lieferung, Rechnung in einem Fluss.", "Quote, order, delivery, invoice in one flow.") },
-  { t: L("Einkauf & Lieferanten", "Purchasing & suppliers"), d: L("Bestellungen, Wareneingang, Lieferantenpreise.", "POs, goods receipt, supplier pricing.") },
-  { t: L("Fertigung (MRP)", "Manufacturing (MRP)"), d: L("Stücklisten, Arbeitspläne, Fertigungsaufträge.", "BOMs, routings, work orders.") },
-  { t: L("Planung mit Gantt", "Planning with Gantt"), d: L("Kapazitäten und Termine sichtbar steuern.", "Steer capacity and dates visually.") },
-  { t: L("Lager & Chargen", "Stock & lots"), d: L("Bestände, Buchungen, lückenlose Rückverfolgung.", "Stock, moves, seamless lot traceability.") },
-  { t: L("Qualitätsprüfung", "Quality control"), d: L("Prüfpläne, Grenzwerte, Prüfprotokolle am Auftrag.", "Control plans, limits, inspection records on the order.") },
-  { t: L("Wartung", "Maintenance"), d: L("Geplante und Ad-hoc-Instandhaltung der Anlagen.", "Planned and ad-hoc equipment maintenance.") },
-  { t: L("Kostenrechnung & Fakturierung", "Costing & invoicing"), d: L("Von der Kalkulation bis zur Rechnung.", "From calculation to invoice.") },
-  { t: L("Zeit & Anwesenheit", "Time & attendance"), d: L("Arbeitszeit, Schicht, Projektzeiten.", "Working hours, shifts, project time.") },
-  { t: L("Mobile-App + NFC", "Mobile app + NFC"), d: L("Anwesenheit und Behälter-Tracking direkt an der Maschine.", "Attendance and container tracking right at the machine.") },
+  { t: L("Aufträge & Verkauf", "Orders & sales", "订单与销售"), d: L("Angebot, Auftrag, Lieferung, Rechnung in einem Fluss.", "Quote, order, delivery, invoice in one flow.", "报价、订单、发货、开票一气呵成。") },
+  { t: L("Einkauf & Lieferanten", "Purchasing & suppliers", "采购与供应商"), d: L("Bestellungen, Wareneingang, Lieferantenpreise.", "POs, goods receipt, supplier pricing.", "采购单、收货、供应商价格。") },
+  { t: L("Fertigung (MRP)", "Manufacturing (MRP)", "生产（MRP）"), d: L("Stücklisten, Arbeitspläne, Fertigungsaufträge.", "BOMs, routings, work orders.", "物料清单、工艺路线、生产工单。") },
+  { t: L("Planung mit Gantt", "Planning with Gantt", "甘特图排产"), d: L("Kapazitäten und Termine sichtbar steuern.", "Steer capacity and dates visually.", "可视化地掌控产能与交期。") },
+  { t: L("Lager & Chargen", "Stock & lots", "库存与批次"), d: L("Bestände, Buchungen, lückenlose Rückverfolgung.", "Stock, moves, seamless lot traceability.", "库存、出入库、无缝批次追溯。") },
+  { t: L("Qualitätsprüfung", "Quality control", "质量检验"), d: L("Prüfpläne, Grenzwerte, Prüfprotokolle am Auftrag.", "Control plans, limits, inspection records on the order.", "检验计划、限值、随单检验记录。") },
+  { t: L("Wartung", "Maintenance", "维护"), d: L("Geplante und Ad-hoc-Instandhaltung der Anlagen.", "Planned and ad-hoc equipment maintenance.", "设备的计划性与临时性维护。") },
+  { t: L("Kostenrechnung & Fakturierung", "Costing & invoicing", "成本核算与开票"), d: L("Von der Kalkulation bis zur Rechnung.", "From calculation to invoice.", "从核算到开票一体贯通。") },
+  { t: L("Zeit & Anwesenheit", "Time & attendance", "工时与考勤"), d: L("Arbeitszeit, Schicht, Projektzeiten.", "Working hours, shifts, project time.", "工作时长、班次、项目工时。") },
+  { t: L("Mobile-App + NFC", "Mobile app + NFC", "移动应用 + NFC"), d: L("Anwesenheit und Behälter-Tracking direkt an der Maschine.", "Attendance and container tracking right at the machine.", "在机台旁直接完成考勤与料箱追踪。") },
 ];
 ---
 <article style="background:#F8F9FA;">
@@ -44,7 +48,7 @@ const erpModules = [
     <!-- Spine-Kopf -->
     <div style="display:flex; align-items:center; gap:20px; margin:clamp(40px,5vw,64px) 0 clamp(32px,4vw,44px);">
       <span style="font-size:13px; font-weight:600; color:#16463E;">{nr}</span>
-      <span style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F;">{cat} — {de ? "Baustein" : "Building block"}</span>
+      <span style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F;">{cat} — {de ? "Baustein" : en ? "Building block" : "模块"}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <h1 style="font-weight:600; font-size:clamp(36px,6vw,72px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px); max-width:16ch;">{c.hook.headline}</h1>
@@ -53,7 +57,7 @@ const erpModules = [
 
     <!-- Spec-Badges + Modul-Mockup (Stitch-Produktlook) -->
     <div style="display:flex; flex-wrap:wrap; gap:8px; margin:clamp(28px,4vw,40px) 0 0;">
-      {[de ? "Quelloffen" : "Open source", "Self-hosted", "DSGVO", "NIS2-ready"].map((b) => (
+      {[de ? "Quelloffen" : en ? "Open source" : "开源", "Self-hosted", "DSGVO", "NIS2-ready"].map((b) => (
         <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#16463E; border:1px solid #C0C8C5; border-radius:9999px; padding:5px 12px;">{b}</span>
       ))}
     </div>
@@ -64,7 +68,7 @@ const erpModules = [
           <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#92938F;">{pillar.slug.toUpperCase().replaceAll("-", "_")}</span>
         </div>
         <div style="padding:clamp(20px,3vw,28px);">
-          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{cat} — {de ? "Modul" : "Module"}</p>
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{cat} — {de ? "Modul" : en ? "Module" : "模块"}</p>
           <div style="display:grid; gap:10px; margin:0 0 18px;">
             {c.deep.components.slice(0, 5).map((x) => (
               <div style="display:flex; align-items:center; gap:10px; font-size:15px; color:#1B1C1E;">
@@ -73,7 +77,7 @@ const erpModules = [
             ))}
           </div>
           <div style="background:#123A33; border-radius:8px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; color:#A6CFC5;">
-            <span>{de ? "BETRIEB" : "DEPLOYMENT"}</span><span style="color:#E6B23A;">SELF-HOSTED · ON-PREM</span>
+            <span>{de ? "BETRIEB" : en ? "DEPLOYMENT" : "部署"}</span><span style="color:#E6B23A;">SELF-HOSTED · ON-PREM</span>
           </div>
         </div>
       </div>
@@ -81,7 +85,7 @@ const erpModules = [
 
     {isErp && (
       <section style="margin-top:clamp(40px,5vw,60px); border-top:1px solid #E2E8F0; padding-top:clamp(32px,4vw,44px);">
-        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Auftrag → Rechnung: ein Datenmodell", "Order → invoice: one data model")}</p>
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Auftrag → Rechnung: ein Datenmodell", "Order → invoice: one data model", "订单 → 发票：同一套数据模型")}</p>
         <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 8px;">
           {erpFlow.map((step, i) => (
             <>
@@ -90,9 +94,9 @@ const erpModules = [
             </>
           ))}
         </div>
-        <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(28px,4vw,40px); max-width:60ch;">{L("Einmal eingegeben, überall sichtbar — kein Zuruf-Telefonat, kein doppeltes Tippen.", "Entered once, visible everywhere — no shouted phone calls, no double typing.")}</p>
+        <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(28px,4vw,40px); max-width:60ch;">{L("Einmal eingegeben, überall sichtbar — kein Zuruf-Telefonat, kein doppeltes Tippen.", "Entered once, visible everywhere — no shouted phone calls, no double typing.", "录入一次，处处可见 —— 无需口头电话确认，无需重复录入。")}</p>
 
-        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Was alles drinsteckt", "What's inside")}</p>
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 16px;">{L("Was alles drinsteckt", "What's inside", "内含哪些能力")}</p>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:12px;">
           {erpModules.map((m) => (
             <div style="border:1px solid #E2E8F0; border-left:3px solid #c4673f; border-radius:12px; background:#fff; padding:15px 16px;">
@@ -103,8 +107,8 @@ const erpModules = [
         </div>
 
         <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:clamp(28px,4vw,40px);">
-          <a href={pillar.demo.url} target="_blank" rel="noopener" style="text-decoration:none; background:#123A33; color:#F8F9FA; font-weight:600; font-size:15px; padding:14px 24px; border-radius:10px;">{L("ERP live ausprobieren", "Try the ERP live")} ↗</a>
-          <a href={de ? "/erp/" : "/en/erp/"} class="pd-rel" style="text-decoration:none; color:#1B1C1E; display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:15px; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{L("Zur ERP-Produktseite", "To the ERP product page")} →</a>
+          <a href={pillar.demo.url} target="_blank" rel="noopener" style="text-decoration:none; background:#123A33; color:#F8F9FA; font-weight:600; font-size:15px; padding:14px 24px; border-radius:10px;">{L("ERP live ausprobieren", "Try the ERP live", "在线体验 ERP")} ↗</a>
+          <a href={de ? "/erp/" : en ? "/en/erp/" : "/cn/erp/"} class="pd-rel" style="text-decoration:none; color:#1B1C1E; display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:15px; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{L("Zur ERP-Produktseite", "To the ERP product page", "前往 ERP 产品页")} →</a>
         </div>
       </section>
     )}
@@ -123,7 +127,7 @@ const erpModules = [
         <p style="font-size:16px; line-height:1.7; color:#5C5E63; margin:0; max-width:62ch;">{c.deep.body}</p>
         <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:24px 0 12px;">{ui.components_label}</p>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
-          {c.deep.components.map((x) => <a href={pillar.demo.status === "live" ? pillar.demo.url : (de ? "/kontakt/" : "/en/kontakt/")} class="chip-link" style="text-decoration:none; font-size:13px; font-weight:500; color:#1B1C1E; border:1px solid #E2E8F0; padding:7px 14px;">{x}</a>)}
+          {c.deep.components.map((x) => <a href={pillar.demo.status === "live" ? pillar.demo.url : (de ? "/kontakt/" : en ? "/en/kontakt/" : "/cn/kontakt/")} class="chip-link" style="text-decoration:none; font-size:13px; font-weight:500; color:#1B1C1E; border:1px solid #E2E8F0; padding:7px 14px;">{x}</a>)}
         </div>
       </div>
     </details>
@@ -163,8 +167,8 @@ const erpModules = [
         {related.map((p) => (
           <a href={detailUrl(p.slug)} style="text-decoration:none; color:#1B1C1E; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline; padding:20px 0; border-bottom:1px solid #E2E8F0;" class="pd-rel">
             <span style="display:flex; flex-direction:column; gap:6px;">
-              <span style="font-weight:600; font-size:18px; letter-spacing:-0.015em;">{p[lang].hook.headline}</span>
-              <span style="color:#5C5E63; font-size:14px;">{p[lang].hook.subline}</span>
+              <span style="font-weight:600; font-size:18px; letter-spacing:-0.015em;">{(p[lang] ?? p.en).hook.headline}</span>
+              <span style="color:#5C5E63; font-size:14px;">{(p[lang] ?? p.en).hook.subline}</span>
             </span>
             <span style="color:#92938F;">↗</span>
           </a>
@@ -177,11 +181,11 @@ const erpModules = [
 <!-- Dunkler Pain-List-CTA (konsistent zur Landing) -->
 <section style="background:#123A33; color:#F8F9FA;">
   <div style="max-width:880px; margin:0 auto; padding:clamp(72px,10vw,128px) clamp(24px,5vw,56px);">
-    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Pain-List → Lösung" : "Pain list → solution"}</p>
-    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(28px,4vw,40px);">{de ? "Schick uns deine Pain-List." : "Send us your pain list."}</h2>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Pain-List → Lösung" : en ? "Pain list → solution" : "痛点清单 → 解决方案"}</p>
+    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(28px,4vw,40px);">{de ? "Schick uns deine Pain-List." : en ? "Send us your pain list." : "把您的痛点清单发给我们。"}</h2>
     <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center;">
-      <a href={de ? "/kontakt/" : "/en/kontakt/"} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px;">{de ? "Pain-List schicken →" : "Send pain list →"}</a>
-      <a href="mailto:hallo@datendrang.com" style="text-decoration:none; font-size:15px; color:#F8F9FA; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "oder direkt: hallo@datendrang.com" : "or email: hallo@datendrang.com"}</a>
+      <a href={de ? "/kontakt/" : en ? "/en/kontakt/" : "/cn/kontakt/"} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px;">{de ? "Pain-List schicken →" : en ? "Send pain list →" : "发送痛点清单 →"}</a>
+      <a href="mailto:hallo@datendrang.com" style="text-decoration:none; font-size:15px; color:#F8F9FA; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "oder direkt: hallo@datendrang.com" : en ? "or email: hallo@datendrang.com" : "或直接发邮件：hallo@datendrang.com"}</a>
     </div>
   </div>
 </section>

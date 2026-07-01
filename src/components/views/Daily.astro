@@ -5,15 +5,16 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 ---
 <section class="dl-mast">
   <div class="dl-mast-inner">
-    <p class="dl-eyebrow">{L("Daily · Industrie 4.0", "Daily · Industry 4.0")}</p>
-    <h1 class="dl-masthead">{L("Industrie-4.0-Rundschau", "Industry 4.0 Review")}</h1>
+    <p class="dl-eyebrow">{L("Daily · Industrie 4.0", "Daily · Industry 4.0", "每日 · 工业 4.0")}</p>
+    <h1 class="dl-masthead">{L("Industrie-4.0-Rundschau", "Industry 4.0 Review", "工业 4.0 纵览")}</h1>
     <p class="dl-edition" id="dl-edition"></p>
-    <p class="dl-note">{L("Selbst gehostet, kein fremder Cloud-Dienst — kuratiert und bewertet von genau der KI-/Such-Pipeline, die wir auch im Haus betreiben.", "Self-hosted, no third-party cloud — curated and rated by the very AI/search pipeline we run in-house.")} <a href={b + "/schnittstellen/"}>{L("Wie das geht", "How it works")} →</a></p>
+    <p class="dl-note">{L("Selbst gehostet, kein fremder Cloud-Dienst — kuratiert und bewertet von genau der KI-/Such-Pipeline, die wir auch im Haus betreiben.", "Self-hosted, no third-party cloud — curated and rated by the very AI/search pipeline we run in-house.", "自托管，无第三方云服务 —— 由我们自家运行的同一套 AI/搜索流水线来筛选和评级。")} <a href={b + "/schnittstellen/"}>{L("Wie das geht", "How it works", "运作原理")} →</a></p>
   </div>
 </section>
 
@@ -24,11 +25,11 @@ const L = (d: string, e: string) => (de ? d : e);
       <div class="dl-controls">
         <span class="dl-search">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
-          <input type="search" id="dl-q" placeholder={L("Suchen…", "Search…")} aria-label={L("Suchen", "Search")} />
+          <input type="search" id="dl-q" placeholder={L("Suchen…", "Search…", "搜索…")} aria-label={L("Suchen", "Search", "搜索")} />
         </span>
-        <select id="dl-sort" class="dl-select" aria-label={L("Sortierung", "Sort")}>
-          <option value="rel">{L("Relevanz", "Relevance")}</option>
-          <option value="date">{L("Neueste", "Newest")}</option>
+        <select id="dl-sort" class="dl-select" aria-label={L("Sortierung", "Sort", "排序")}>
+          <option value="rel">{L("Relevanz", "Relevance", "相关度")}</option>
+          <option value="date">{L("Neueste", "Newest", "最新")}</option>
         </select>
       </div>
     </div>
@@ -42,15 +43,15 @@ const L = (d: string, e: string) => (de ? d : e);
         <div id="dl-themes" class="dl-widget"></div>
         <div id="dl-sources" class="dl-widget"></div>
         <div class="dl-widget dl-about">
-          <p class="dl-wh">{L("Über diesen Digest", "About this digest")}</p>
-          <p class="dl-about-t">{L("Täglich frisch: eine KI durchsucht und bewertet Quellen zu Industrie 4.0, IIoT, OPC-UA, digitalen Zwillingen, MES, Predictive Maintenance und Produktions-KI. Alles selbst gehostet, read-only.", "Fresh daily: an AI searches and rates sources on Industry 4.0, IIoT, OPC-UA, digital twins, MES, predictive maintenance and production AI. All self-hosted, read-only.")}</p>
-          <a class="dl-about-link" href={b + "/stack/"}>{L("Der Stack dahinter", "The stack behind it")} →</a>
+          <p class="dl-wh">{L("Über diesen Digest", "About this digest", "关于本摘要")}</p>
+          <p class="dl-about-t">{L("Täglich frisch: eine KI durchsucht und bewertet Quellen zu Industrie 4.0, IIoT, OPC-UA, digitalen Zwillingen, MES, Predictive Maintenance und Produktions-KI. Alles selbst gehostet, read-only.", "Fresh daily: an AI searches and rates sources on Industry 4.0, IIoT, OPC-UA, digital twins, MES, predictive maintenance and production AI. All self-hosted, read-only.", "每日更新：一个 AI 检索并评估关于工业 4.0、IIoT、OPC-UA、数字孪生、MES、预测性维护和生产 AI 的信息源。全部自托管，只读。")}</p>
+          <a class="dl-about-link" href={b + "/stack/"}>{L("Der Stack dahinter", "The stack behind it", "背后的技术栈")} →</a>
         </div>
       </aside>
     </div>
 
-    <p id="dl-empty" class="dl-empty" hidden>{L("Keine Meldungen für diesen Filter.", "No items for this filter.")}</p>
-    <noscript><p class="dl-empty">{L("Bitte JavaScript aktivieren, um den Digest zu laden.", "Please enable JavaScript to load the digest.")}</p></noscript>
+    <p id="dl-empty" class="dl-empty" hidden>{L("Keine Meldungen für diesen Filter.", "No items for this filter.", "此筛选条件下暂无内容。")}</p>
+    <noscript><p class="dl-empty">{L("Bitte JavaScript aktivieren, um den Digest zu laden.", "Please enable JavaScript to load the digest.", "请启用 JavaScript 以加载本摘要。")}</p></noscript>
   </div>
 </section>
 

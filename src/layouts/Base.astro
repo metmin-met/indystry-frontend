@@ -4,7 +4,7 @@ import "@fontsource-variable/fraunces";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
-import { brand, type Lang } from "../lib/content";
+import { brand, type Lang, LANGS, LANG_LABEL, langPrefix, hreflangCode, ogLocale, stripLangPrefix } from "../lib/content";
 import { t } from "../lib/i18n";
 import Critter from "../components/Critter.astro";
 import Feedback from "../components/Feedback.astro";
@@ -15,68 +15,71 @@ interface Props {
   description: string;
   noindex?: boolean; // robots noindex (interne Tool-Seiten)
   path: string;      // canonical path for THIS page, e.g. "/" or "/saeule/erp-betrieb/"
-  altPath: string;   // same page in the other language
+  altPath?: string;  // (legacy, ungenutzt) — Alt-Sprachpfade werden abgeleitet
+  altPaths?: Partial<Record<Lang, string>>; // Override für irreguläre Routen (z.B. /saeule/ ↔ /en/pillar/ ↔ /cn/pillar/)
 }
-const { lang, title, description, path, altPath, noindex = false } = Astro.props;
+const { lang, title, description, path, altPaths, noindex = false } = Astro.props;
 const ui = t(lang);
 const site = brand.url;
 const canonical = new URL(path, site).href;
-const enHref = new URL(lang === "en" ? path : altPath, site).href;
-const deHref = new URL(lang === "de" ? path : altPath, site).href;
-const otherHref = lang === "de" ? altPath : altPath; // (legacy)
 const isKi = path === "/ki/";
-const deRel = isKi ? "/" : (lang === "de" ? path : altPath);
-const enRel = isKi ? "/en/" : (lang === "en" ? path : altPath);
+// Kanonischer (DE-)Pfad → alle drei Sprachvarianten ableiten; expliziter altPaths-Override gewinnt.
+const canon = stripLangPrefix(path);
+const enOf = (c: string) => (c === "/" ? "/en/" : "/en" + c);
+const zhOf = (c: string) => (c === "/" ? "/cn/" : "/cn" + c);
+const paths: Record<Lang, string> = { de: canon, en: enOf(canon), zh: zhOf(canon), ...(altPaths || {}) };
+const homeOf = (l: Lang) => (l === "de" ? "/" : l === "en" ? "/en/" : "/cn/");
+const switchHref = (l: Lang) => (isKi ? homeOf(l) : paths[l]);
 const fullTitle = `${title} · ${brand.name}`;
 const ogMap: Record<string, string> = {
   "/landkarte/": "/og/landkarte.png", "/daily/": "/og/daily.png", "/schnittstellen/": "/og/schnittstellen.png",
   "/datenhoheit/": "/og/datenhoheit.png", "/stack/": "/og/stack.png", "/ablauf/": "/og/ablauf.png",
   "/rechner/": "/og/rechner.png", "/tour/": "/og/tour.png",
 };
-const ogImage = new URL(ogMap[deRel] || "/og.png", site).href;
-const b = lang === "de" ? "" : "/en";
-const L = (d: string, e: string) => (lang === "de" ? d : e);
+const ogImage = new URL(ogMap[canon] || "/og.png", site).href;
+const b = langPrefix(lang);
+const L = (d: string, e: string, c?: string) => (lang === "de" ? d : lang === "en" ? e : (c ?? e));
 const navGroups = [
-  { title: L("Lösungen", "Solutions"), links: [
-    { label: L("Datenschutz & KI-Souveränität", "Privacy & AI sovereignty"), href: `${b}/datenhoheit/` },
-    { label: L("Aus Erfahrung gebaut", "Built from experience"), href: `${b}/koennen/` },
+  { title: L("Lösungen", "Solutions", "解决方案"), links: [
+    { label: L("Datenschutz & KI-Souveränität", "Privacy & AI sovereignty", "数据保护与 AI 自主可控"), href: `${b}/datenhoheit/` },
+    { label: L("Aus Erfahrung gebaut", "Built from experience", "源于实战经验"), href: `${b}/koennen/` },
     { label: ui.nav_pillars, href: `${b}/#saeulen` },
-    { label: L("Einstieg & Förderung", "Getting started & funding"), href: `${b}/einstieg/` },
+    { label: L("Einstieg & Förderung", "Getting started & funding", "入门与补贴资助"), href: `${b}/einstieg/` },
     { label: "ERP", href: `${b}/erp/` },
-    { label: L("Instandhaltung", "Maintenance"), href: `${b}/instandhaltung/` },
-    { label: L("Kosten & Controlling", "Costing & controlling"), href: `${b}/kosten/` },
-    { label: L("Kennzahlen", "KPIs"), href: `${b}/kennzahlen/` },
-    { label: L("Vergleich", "Compare"), href: `${b}/#vergleich` },
-    { label: L("So skaliert das System", "How it scales"), href: `${b}/rechner/` },
+    { label: L("Instandhaltung", "Maintenance", "维护"), href: `${b}/instandhaltung/` },
+    { label: L("Kosten & Controlling", "Costing & controlling", "成本与管控"), href: `${b}/kosten/` },
+    { label: L("Kennzahlen", "KPIs", "关键指标（KPI）"), href: `${b}/kennzahlen/` },
+    { label: L("Vergleich", "Compare", "对比"), href: `${b}/#vergleich` },
+    { label: L("So skaliert das System", "How it scales", "系统如何扩展"), href: `${b}/rechner/` },
   ] },
-  { title: L("Erleben", "Experience"), links: [
-    { label: L("Daily Industrie 4.0", "Daily Industry 4.0"), href: `${b}/daily/` },
-    { label: L("Werks-Landkarte", "Factory map"), href: `${b}/landkarte/` },
-    { label: L("Geführte Tour", "Guided tour"), href: `${b}/tour/` },
-    { label: L("Ich bin …", "I am …"), href: `${b}/ich-bin/` },
+  { title: L("Erleben", "Experience", "体验"), links: [
+    { label: L("Daily Industrie 4.0", "Daily Industry 4.0", "每日工业 4.0"), href: `${b}/daily/` },
+    { label: L("Werks-Landkarte", "Factory map", "工厂地图"), href: `${b}/landkarte/` },
+    { label: L("Geführte Tour", "Guided tour", "引导式导览"), href: `${b}/tour/` },
+    { label: L("Ich bin …", "I am …", "我是……"), href: `${b}/ich-bin/` },
     { label: ui.nav_demos, href: `${b}/demos/` },
-    { label: L("Ein Tag", "A day"), href: `${b}/tag/` },
-    { label: L("Ablauf", "Process"), href: `${b}/ablauf/` },
-    { label: L("Digitaler Zwilling", "Digital twin"), href: `${b}/twin/` },
-    { label: L("Prozess-Simulationen", "Process simulations"), href: `${b}/simulationen/` },
-    { label: L("Werker-App", "Shop-floor app"), href: `${b}/app/` },
-    { label: L("Wissensgraph 3D", "Knowledge graph 3D"), href: `${b}/graph/` },
-    { label: L("Werkstoff-Analyse", "Material analysis"), href: `${b}/analyse/` },
-    { label: L("Werks-Check", "Check"), href: `${b}/check/` },
+    { label: L("Ein Tag", "A day", "一天"), href: `${b}/tag/` },
+    { label: L("Ablauf", "Process", "流程"), href: `${b}/ablauf/` },
+    { label: L("Digitaler Zwilling", "Digital twin", "数字孪生"), href: `${b}/twin/` },
+    { label: L("Prozess-Simulationen", "Process simulations", "工艺仿真"), href: `${b}/simulationen/` },
+    { label: L("Werker-App", "Shop-floor app", "车间应用"), href: `${b}/app/` },
+    { label: L("Wissensgraph 3D", "Knowledge graph 3D", "3D 知识图谱"), href: `${b}/graph/` },
+    { label: L("Werkstoff-Analyse", "Material analysis", "材料分析"), href: `${b}/analyse/` },
+    { label: L("Werks-Check", "Check", "工厂自检"), href: `${b}/check/` },
   ] },
-  { title: L("Verstehen", "Understand"), links: [
-    { label: L("Onboarding & Lernen", "Onboarding & learning"), href: `${b}/lernen/` },
-    { label: L("Glossar", "Glossary"), href: `${b}/glossar/` },
-    { label: L("KI & Mensch", "AI & humans"), href: `${b}/ki-mensch/` },
+  { title: L("Verstehen", "Understand", "了解"), links: [
+    { label: L("Onboarding & Lernen", "Onboarding & learning", "入职引导与学习"), href: `${b}/lernen/` },
+    { label: L("Glossar", "Glossary", "术语表"), href: `${b}/glossar/` },
+    { label: L("KI & Mensch", "AI & humans", "AI 与人"), href: `${b}/ki-mensch/` },
   ] },
-  { title: L("Plattform", "Platform"), links: [
-    { label: L("Schnittstellen", "Interfaces"), href: `${b}/schnittstellen/` },
-    { label: L("Compliance & Sicherheit", "Compliance & security"), href: `${b}/compliance/` },
-    { label: L("Resilienz & Wiederanlauf", "Resilience & recovery"), href: `${b}/resilienz/` },
-    { label: L("Software-Rollout", "Software rollout"), href: `${b}/software-rollout/` },
-    { label: L("Der Stack", "The stack"), href: `${b}/stack/` },
+  { title: L("Plattform", "Platform", "平台"), links: [
+    { label: L("Schnittstellen", "Interfaces", "接口"), href: `${b}/schnittstellen/` },
+    { label: L("Compliance & Sicherheit", "Compliance & security", "合规与安全"), href: `${b}/compliance/` },
+    { label: L("Resilienz & Wiederanlauf", "Resilience & recovery", "韧性与恢复"), href: `${b}/resilienz/` },
+    { label: L("Software-Rollout", "Software rollout", "软件部署"), href: `${b}/software-rollout/` },
+    { label: L("Der Stack", "The stack", "技术栈"), href: `${b}/stack/` },
     { label: "Status", href: `${b}/status/` },
-    { label: L("Über uns", "About us"), href: `${b}/ueber-uns/` },
+    { label: L("Über uns", "About us", "关于我们"), href: `${b}/ueber-uns/` },
     { label: "Team", href: `${b}/#team` },
   ] },
 ];
@@ -175,7 +178,7 @@ const relMap: Record<string,string[]> = {
   "/ueber-uns/":["/einstieg/","/stack/","/koennen/"],
   "/erp/":["/app/","/instandhaltung/","/einstieg/"],
 };
-const relBase = (path.replace(/^\/en/, "") || "/");
+const relBase = canon;
 const relItems = (relMap[relBase] || []).filter((rp) => relLabels[rp]).map((rp) => ({ href: `${b}${rp}`, label: L(relLabels[rp][0], relLabels[rp][1]), desc: L((relDesc[rp]||["",""])[0], (relDesc[rp]||["",""])[1]) }));
 
 const jsonld = {
@@ -212,15 +215,15 @@ const jsonld = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="de" href={deHref} />
-    <link rel="alternate" hreflang="en" href={enHref} />
-    <link rel="alternate" hreflang="x-default" href={deHref} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={hreflangCode(l)} href={new URL(paths[l], site).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(paths.de, site).href} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={brand.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content={lang === "de" ? "de_DE" : "en_US"} />
+    <meta property="og:locale" content={ogLocale(lang)} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={ogLocale(l)} />)}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -241,7 +244,7 @@ const jsonld = {
   <body>
     <header class="site-header" data-header>
       <div class="wrap header-inner">
-        <a class="brand" href={lang === "de" ? "/" : "/en/"} aria-label={`${brand.name}.works`}>
+        <a class="brand" href={`${b}/`} aria-label={`${brand.name}.works`}>
           <svg class="brand-mark" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
             <rect width="26" height="26" rx="7" fill="#123A33"></rect>
             <rect x="6" y="13.5" width="3.4" height="6.5" rx="1" fill="#ffffff"></rect>
@@ -253,16 +256,15 @@ const jsonld = {
         <nav class="site-nav" aria-label="Hauptnavigation">
           <a class="link-accent nav-quick" href={`${b}/#saeulen`}>{ui.nav_pillars}</a>
           <a class="link-accent nav-quick" href={`${b}/demos/`}>{ui.nav_demos}</a>
-          <a class="link-accent nav-quick" href={`${b}/check/`}>{L("Werks-Check", "Check")}</a>
+          <a class="link-accent nav-quick" href={`${b}/check/`}>{L("Werks-Check", "Check", "工厂自检")}</a>
           <span class="lang-switch" role="group" aria-label="Sprache">
-            <a href={deRel} class={!isKi && lang === "de" ? "on" : ""}>DE</a>
-            <a href={enRel} class={!isKi && lang === "en" ? "on" : ""}>EN</a>
+            {LANGS.map((l) => <a href={switchHref(l)} hreflang={hreflangCode(l)} class={!isKi && lang === l ? "on" : ""}>{LANG_LABEL[l]}</a>)}
             <a href="/ki/" class={isKi ? "on" : ""}>KI</a>
           </span>
           <a class="header-cta nav-quick" href={`${b}/kontakt/`}>{ui.nav_cta}</a>
           <button class="nav-burger" type="button" data-nav-open aria-label="Menü" aria-expanded="false" aria-controls="nav-panel">
             <span class="nav-burger-box" aria-hidden="true"><span></span><span></span><span></span></span>
-            <span class="nav-burger-label">{L("Menü", "Menu")}</span>
+            <span class="nav-burger-label">{L("Menü", "Menu", "菜单")}</span>
           </button>
         </nav>
       </div>
@@ -271,8 +273,8 @@ const jsonld = {
     <div class="nav-scrim" data-nav-scrim hidden></div>
     <aside id="nav-panel" class="nav-panel" data-nav-panel aria-hidden="true" aria-label="Hauptmenü">
       <div class="nav-panel-head">
-        <span class="nav-panel-title">{L("Menü", "Menu")}</span>
-        <button class="nav-panel-close" type="button" data-nav-close aria-label={L("Menü schließen", "Close menu")}>✕</button>
+        <span class="nav-panel-title">{L("Menü", "Menu", "菜单")}</span>
+        <button class="nav-panel-close" type="button" data-nav-close aria-label={L("Menü schließen", "Close menu", "关闭菜单")}>✕</button>
       </div>
       <div class="nav-panel-body">
         {navGroups.map((g) => (
@@ -290,9 +292,9 @@ const jsonld = {
     </main>
 
     {relItems.length > 0 && (
-      <aside class="related" aria-label={L("Das könnte Sie auch interessieren","You might also like")}>
+      <aside class="related" aria-label={L("Das könnte Sie auch interessieren","You might also like","您可能还感兴趣")}>
         <div class="wrap">
-          <p class="related-h">{L("Das könnte Sie auch interessieren","You might also like")}</p>
+          <p class="related-h">{L("Das könnte Sie auch interessieren","You might also like","您可能还感兴趣")}</p>
           <div class="related-grid">
             {relItems.map((r) => (
               <a class="related-card" href={r.href}>
@@ -309,16 +311,16 @@ const jsonld = {
       <div class="wrap" style="padding-block:48px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center;">
         <p style="font-size:14px;margin:0;max-width:42ch;line-height:1.6;">{ui.footer_note}</p>
         <span style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px;font-weight:500;">
-          <a href={lang === "de" ? "/stack/" : "/en/stack/"} style="text-decoration:none;">Stack</a>
-          <a href={lang === "de" ? "/glossar/" : "/en/glossar/"} style="text-decoration:none;">Glossar</a>
-          <a href={lang === "de" ? "/faq/" : "/en/faq/"} style="text-decoration:none;">{ui.nav_faq}</a>
-          <a href={lang === "de" ? "/kontakt/" : "/en/kontakt/"} style="text-decoration:none;">{ui.nav_contact}</a>
-          <a href={lang === "de" ? "/impressum/" : "/en/impressum/"} style="text-decoration:none;">{ui.nav_imprint}</a>
-          <a href={lang === "de" ? "/datenschutz/" : "/en/datenschutz/"} style="text-decoration:none;">{ui.nav_privacy}</a>
+          <a href={`${b}/stack/`} style="text-decoration:none;">Stack</a>
+          <a href={`${b}/glossar/`} style="text-decoration:none;">{L("Glossar", "Glossary", "术语表")}</a>
+          <a href={`${b}/faq/`} style="text-decoration:none;">{ui.nav_faq}</a>
+          <a href={`${b}/kontakt/`} style="text-decoration:none;">{ui.nav_contact}</a>
+          <a href={`${b}/impressum/`} style="text-decoration:none;">{ui.nav_imprint}</a>
+          <a href={`${b}/datenschutz/`} style="text-decoration:none;">{ui.nav_privacy}</a>
         </span>
       </div>
       <div style="border-top:1px solid #23514A;">
-        <div class="wrap" style="padding-block:18px;font-size:12px;letter-spacing:0.04em;color:#5E7E76;">© {new Date().getFullYear()} indystry.works — {lang === "de" ? "Der dritte Weg." : "The third way."}</div>
+        <div class="wrap" style="padding-block:18px;font-size:12px;letter-spacing:0.04em;color:#5E7E76;">© {new Date().getFullYear()} indystry.works — {L("Der dritte Weg.", "The third way.", "第三条路。")}</div>
       </div>
     </footer>
 

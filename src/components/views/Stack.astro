@@ -8,70 +8,71 @@ import { tagHref, tagLabel } from "../../lib/tags";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 // Logos, die wir lokal gebündelt haben (simple-icons, MIT). Sonst Monogramm-Fallback.
 const LOGOS = new Set(["astro","caddy","directus","umami","odoo","postgresql","metabase","grafana","jupyter","meilisearch","mermaid","mistral","nextcloud","collabora","matrix","n8n","docker","proxmox","authentik","timescale","kafka","redis","zabbix","graylog","rustdesk"]);
 const STACKMAP: Record<string,string> = { odoo:"erp", postgresql:"erp", metabase:"bi", grafana:"bi", jupyter:"analyse", timescale:"historian", meilisearch:"suche", mistral:"ki", authentik:"sso", proxmox:"backup", wazuh:"compliance", zabbix:"compliance", graylog:"compliance", rustdesk:"resilienz", netbird:"souveraenitaet", kafka:"historian", nextcloud:"wissen", collabora:"wissen", matrix:"wissen" };
 const ERP = "https://erp-demo.indystry.works", BI = "https://bi-demo.indystry.works", COCKPIT = "https://grafana-demo.indystry.works", LAB = "https://lab-demo.indystry.works";
 type It = { n: string; d: string; lic: string; href: string; key?: string; demo?: string; demoExt?: boolean };
 const groups: { name: string; items: It[] }[] = [
-  { name: L("Web & Außenauftritt", "Web & front"), items: [
-    { n: "Astro", d: L("statische Website", "static site"), lic: "MIT", href: "https://astro.build", key: "astro" },
-    { n: "Caddy", d: L("Webserver & TLS", "web server & TLS"), lic: "Apache-2.0", href: "https://caddyserver.com", key: "caddy" },
-    { n: "Directus", d: L("Headless-CMS", "headless CMS"), lic: "BSL 1.1", href: "https://directus.io", key: "directus" },
-    { n: "Umami", d: L("cookiefreie Analytics", "cookieless analytics"), lic: "MIT", href: "https://umami.is", key: "umami" },
+  { name: L("Web & Außenauftritt", "Web & front", "网站与对外形象"), items: [
+    { n: "Astro", d: L("statische Website", "static site", "静态网站"), lic: "MIT", href: "https://astro.build", key: "astro" },
+    { n: "Caddy", d: L("Webserver & TLS", "web server & TLS", "Web 服务器与 TLS"), lic: "Apache-2.0", href: "https://caddyserver.com", key: "caddy" },
+    { n: "Directus", d: L("Headless-CMS", "headless CMS", "无头 CMS"), lic: "BSL 1.1", href: "https://directus.io", key: "directus" },
+    { n: "Umami", d: L("cookiefreie Analytics", "cookieless analytics", "无 Cookie 分析"), lic: "MIT", href: "https://umami.is", key: "umami" },
   ]},
-  { name: L("ERP & Betrieb", "ERP & operations"), items: [
-    { n: "Odoo", d: L("ERP: Auftrag→Rechnung", "ERP: order→invoice"), lic: "LGPL-3", href: "https://github.com/odoo/odoo", key: "odoo", demo: ERP, demoExt: true },
-    { n: "PostgreSQL", d: L("Datenbank", "database"), lic: "PostgreSQL", href: "https://www.postgresql.org", key: "postgresql" },
+  { name: L("ERP & Betrieb", "ERP & operations", "ERP 与运营"), items: [
+    { n: "Odoo", d: L("ERP: Auftrag→Rechnung", "ERP: order→invoice", "ERP：订单→发票"), lic: "LGPL-3", href: "https://github.com/odoo/odoo", key: "odoo", demo: ERP, demoExt: true },
+    { n: "PostgreSQL", d: L("Datenbank", "database", "数据库"), lic: "PostgreSQL", href: "https://www.postgresql.org", key: "postgresql" },
   ]},
-  { name: L("Daten, BI & Data-Science", "Data, BI & data science"), items: [
-    { n: "Metabase", d: L("BI-Dashboards", "BI dashboards"), lic: "AGPL-3", href: "https://www.metabase.com", key: "metabase", demo: BI, demoExt: true },
-    { n: "Grafana", d: L("Monitoring", "monitoring"), lic: "AGPL-3", href: "https://grafana.com", key: "grafana", demo: COCKPIT, demoExt: true },
-    { n: "JupyterLite", d: L("Notebooks im Browser", "notebooks in browser"), lic: "BSD-3", href: "https://jupyterlite.readthedocs.io", key: "jupyter", demo: LAB, demoExt: true },
-    { n: "Meilisearch", d: L("Volltextsuche", "full-text search"), lic: "MIT", href: "https://www.meilisearch.com", key: "meilisearch", demo: "/suche/" },
+  { name: L("Daten, BI & Data-Science", "Data, BI & data science", "数据、BI 与数据科学"), items: [
+    { n: "Metabase", d: L("BI-Dashboards", "BI dashboards", "BI 仪表盘"), lic: "AGPL-3", href: "https://www.metabase.com", key: "metabase", demo: BI, demoExt: true },
+    { n: "Grafana", d: L("Monitoring", "monitoring", "监控"), lic: "AGPL-3", href: "https://grafana.com", key: "grafana", demo: COCKPIT, demoExt: true },
+    { n: "JupyterLite", d: L("Notebooks im Browser", "notebooks in browser", "浏览器中的 Notebook"), lic: "BSD-3", href: "https://jupyterlite.readthedocs.io", key: "jupyter", demo: LAB, demoExt: true },
+    { n: "Meilisearch", d: L("Volltextsuche", "full-text search", "全文搜索"), lic: "MIT", href: "https://www.meilisearch.com", key: "meilisearch", demo: "/suche/" },
   ]},
-  { name: L("Anlage, Twin & Visualisierung", "Plant, twin & visualisation"), items: [
-    { n: "model-viewer", d: L("3D im Browser", "3D in browser"), lic: "Apache-2.0", href: "https://modelviewer.dev", demo: "/anlage/" },
-    { n: "Mermaid", d: L("Diagramme/Pläne", "diagrams/plans"), lic: "MIT", href: "https://mermaid.js.org", key: "mermaid", demo: "/ablauf/" },
+  { name: L("Anlage, Twin & Visualisierung", "Plant, twin & visualisation", "设备、孪生与可视化"), items: [
+    { n: "model-viewer", d: L("3D im Browser", "3D in browser", "浏览器中的 3D"), lic: "Apache-2.0", href: "https://modelviewer.dev", demo: "/anlage/" },
+    { n: "Mermaid", d: L("Diagramme/Pläne", "diagrams/plans", "图表/图纸"), lic: "MIT", href: "https://mermaid.js.org", key: "mermaid", demo: "/ablauf/" },
   ]},
-  { name: L("KI & Suche", "AI & search"), items: [
-    { n: "Mistral", d: L("Sprachmodell (Antworten)", "language model (answers)"), lic: L("offene Gewichte / API", "open weights / API"), href: "https://mistral.ai", key: "mistral", demo: "/suche/" },
-    { n: "n8n", d: L("Automatisierung", "automation"), lic: L("fair-code", "fair-code"), href: "https://n8n.io", key: "n8n" },
+  { name: L("KI & Suche", "AI & search", "AI 与搜索"), items: [
+    { n: "Mistral", d: L("Sprachmodell (Antworten)", "language model (answers)", "语言模型（应答）"), lic: L("offene Gewichte / API", "open weights / API", "开放权重 / API"), href: "https://mistral.ai", key: "mistral", demo: "/suche/" },
+    { n: "n8n", d: L("Automatisierung", "automation", "自动化"), lic: L("fair-code", "fair-code", "fair-code"), href: "https://n8n.io", key: "n8n" },
   ]},
-  { name: L("Zusammenarbeit", "Collaboration"), items: [
-    { n: "Nextcloud", d: L("Dateien & Office", "files & office"), lic: "AGPL-3", href: "https://nextcloud.com", key: "nextcloud", demo: "/zusammenarbeit/" },
-    { n: "Collabora", d: L("Office Online", "office online"), lic: "MPL-2.0", href: "https://www.collaboraonline.com", key: "collabora", demo: "/zusammenarbeit/" },
-    { n: "Matrix / Element", d: L("Chat & Video (E2EE)", "chat & video (E2EE)"), lic: "Apache-2.0 / AGPL-3", href: "https://matrix.org", key: "matrix", demo: "/zusammenarbeit/" },
-    { n: "XWiki", d: L("Wiki & Wissensbasis", "wiki & knowledge base"), lic: "LGPL-2.1", href: "https://www.xwiki.org", demo: "/wissen/" },
+  { name: L("Zusammenarbeit", "Collaboration", "协作"), items: [
+    { n: "Nextcloud", d: L("Dateien & Office", "files & office", "文件与 Office"), lic: "AGPL-3", href: "https://nextcloud.com", key: "nextcloud", demo: "/zusammenarbeit/" },
+    { n: "Collabora", d: L("Office Online", "office online", "在线 Office"), lic: "MPL-2.0", href: "https://www.collaboraonline.com", key: "collabora", demo: "/zusammenarbeit/" },
+    { n: "Matrix / Element", d: L("Chat & Video (E2EE)", "chat & video (E2EE)", "聊天与视频（端到端加密）"), lic: "Apache-2.0 / AGPL-3", href: "https://matrix.org", key: "matrix", demo: "/zusammenarbeit/" },
+    { n: "XWiki", d: L("Wiki & Wissensbasis", "wiki & knowledge base", "Wiki 与知识库"), lic: "LGPL-2.1", href: "https://www.xwiki.org", demo: "/wissen/" },
   ]},
-  { name: L("Infrastruktur & Souveränität", "Infrastructure & sovereignty"), items: [
-    { n: "Docker", d: L("Container", "containers"), lic: "Apache-2.0", href: "https://www.docker.com", key: "docker" },
-    { n: "Proxmox VE", d: L("Virtualisierung", "virtualisation"), lic: "AGPL-3", href: "https://www.proxmox.com", key: "proxmox", demo: "/status/" },
-    { n: "NetBird", d: L("Mesh-VPN", "mesh VPN"), lic: "BSD-3", href: "https://netbird.io" },
-    { n: "Authentik", d: L("SSO / Login", "SSO / login"), lic: "MIT", href: "https://goauthentik.io", key: "authentik" },
-    { n: "RustDesk", d: L("Fernwartung – selbst gehostet", "remote support – self-hosted"), lic: "AGPL-3", href: "https://rustdesk.com", key: "rustdesk" },
+  { name: L("Infrastruktur & Souveränität", "Infrastructure & sovereignty", "基础设施与自主可控（数据主权）"), items: [
+    { n: "Docker", d: L("Container", "containers", "容器"), lic: "Apache-2.0", href: "https://www.docker.com", key: "docker" },
+    { n: "Proxmox VE", d: L("Virtualisierung", "virtualisation", "虚拟化"), lic: "AGPL-3", href: "https://www.proxmox.com", key: "proxmox", demo: "/status/" },
+    { n: "NetBird", d: L("Mesh-VPN", "mesh VPN", "网状 VPN"), lic: "BSD-3", href: "https://netbird.io" },
+    { n: "Authentik", d: L("SSO / Login", "SSO / login", "SSO / 登录"), lic: "MIT", href: "https://goauthentik.io", key: "authentik" },
+    { n: "RustDesk", d: L("Fernwartung – selbst gehostet", "remote support – self-hosted", "远程维护——自托管"), lic: "AGPL-3", href: "https://rustdesk.com", key: "rustdesk" },
   ]},
-  { name: L("Betrieb, Sicherheit & Audit", "Operations, security & audit"), items: [
-    { n: "Wazuh", d: L("SIEM: Angriffserkennung & Host-Audit", "SIEM: intrusion detection & host audit"), lic: "GPL-2.0", href: "https://wazuh.com", demo: "/status/" },
-    { n: "Zabbix", d: L("Infra-Metriken & Alarme", "infra metrics & alerts"), lic: "AGPL-3", href: "https://www.zabbix.com", key: "zabbix", demo: "/status/" },
-    { n: "Graylog", d: L("zentrale Log-Sammlung", "central log aggregation"), lic: "SSPL-1.0", href: "https://www.graylog.org", key: "graylog", demo: "/status/" },
-    { n: "Grafana", d: L("Live-Cockpits & Alerts", "live cockpits & alerts"), lic: "AGPL-3", href: "https://grafana.com", key: "grafana", demo: COCKPIT, demoExt: true },
+  { name: L("Betrieb, Sicherheit & Audit", "Operations, security & audit", "运行、安全与审计"), items: [
+    { n: "Wazuh", d: L("SIEM: Angriffserkennung & Host-Audit", "SIEM: intrusion detection & host audit", "SIEM：入侵检测与主机审计"), lic: "GPL-2.0", href: "https://wazuh.com", demo: "/status/" },
+    { n: "Zabbix", d: L("Infra-Metriken & Alarme", "infra metrics & alerts", "基础设施指标与告警"), lic: "AGPL-3", href: "https://www.zabbix.com", key: "zabbix", demo: "/status/" },
+    { n: "Graylog", d: L("zentrale Log-Sammlung", "central log aggregation", "集中日志采集"), lic: "SSPL-1.0", href: "https://www.graylog.org", key: "graylog", demo: "/status/" },
+    { n: "Grafana", d: L("Live-Cockpits & Alerts", "live cockpits & alerts", "实时看板与告警"), lic: "AGPL-3", href: "https://grafana.com", key: "grafana", demo: COCKPIT, demoExt: true },
   ]},
 ];
 // Daten-Backbone & Resilienz — was das Rückgrat trägt + wann es greift
 const backbone: It[] = [
-  { n: "TimescaleDB", d: L("Zeitreihen-DB: Millionen Sensor-Messpunkte, blitzschnell ausgewertet — speist Historian & Twin.", "Time-series DB: millions of sensor points, analysed in a flash — feeds historian & twin."), lic: "Apache-2.0", href: "https://www.timescale.com", key: "timescale", demo: "/historian/" },
-  { n: "Object-Store / Data-Lake (S3)", d: L("Der „alles-rein“-Speicher: Rohdateien, Bilder, Reports, Mess-Artefakte — günstig, praktisch endlos.", "The catch-all store: raw files, images, reports, measurement artefacts — cheap, practically endless."), lic: "Apache-2.0", href: "https://seaweedfs.com", demo: "/analyse/" },
-  { n: "Kafka", d: L("Streaming-Puffer: entkoppelt Ingest-Spitzen — erst ab hohem Durchsatz nötig (siehe Skalierung).", "Streaming buffer: decouples ingest spikes — only needed at high throughput (see scaling)."), lic: "Apache-2.0", href: "https://kafka.apache.org", key: "kafka", demo: "/rechner/" },
-  { n: L("Backups & Offsite (PBS)", "Backups & offsite (PBS)"), d: L("Snapshots, Offsite-Kopie, Restore-Tests — damit nichts verloren geht. Im Status-Board sichtbar.", "Snapshots, offsite copy, restore tests — so nothing is ever lost. Visible on the status board."), lic: "AGPL-3", href: "https://www.proxmox.com/proxmox-backup-server", key: "proxmox", demo: "/status/" },
+  { n: "TimescaleDB", d: L("Zeitreihen-DB: Millionen Sensor-Messpunkte, blitzschnell ausgewertet — speist Historian & Twin.", "Time-series DB: millions of sensor points, analysed in a flash — feeds historian & twin.", "时序数据库：数百万个传感器测点，瞬间完成分析——为历史数据库与数字孪生供数。"), lic: "Apache-2.0", href: "https://www.timescale.com", key: "timescale", demo: "/historian/" },
+  { n: "Object-Store / Data-Lake (S3)", d: L("Der „alles-rein“-Speicher: Rohdateien, Bilder, Reports, Mess-Artefakte — günstig, praktisch endlos.", "The catch-all store: raw files, images, reports, measurement artefacts — cheap, practically endless.", "「什么都能放」的存储：原始文件、图像、报表、测量产物——成本低廉，容量几近无限。"), lic: "Apache-2.0", href: "https://seaweedfs.com", demo: "/analyse/" },
+  { n: "Kafka", d: L("Streaming-Puffer: entkoppelt Ingest-Spitzen — erst ab hohem Durchsatz nötig (siehe Skalierung).", "Streaming buffer: decouples ingest spikes — only needed at high throughput (see scaling).", "流式缓冲：解耦采集峰值——仅在高吞吐时才需要（参见扩展）。"), lic: "Apache-2.0", href: "https://kafka.apache.org", key: "kafka", demo: "/rechner/" },
+  { n: L("Backups & Offsite (PBS)", "Backups & offsite (PBS)", "备份与异地存储（PBS）"), d: L("Snapshots, Offsite-Kopie, Restore-Tests — damit nichts verloren geht. Im Status-Board sichtbar.", "Snapshots, offsite copy, restore tests — so nothing is ever lost. Visible on the status board.", "快照、异地副本、恢复测试——确保任何数据都不丢失。在状态面板上可见。"), lic: "AGPL-3", href: "https://www.proxmox.com/proxmox-backup-server", key: "proxmox", demo: "/status/" },
 ];
 // Suche, Archiv & KI-Brücke
 const search: It[] = [
-  { n: L("Volltext-Suche (alle Firmendaten)", "Full-text search (all company data)"), d: L("Eine Suche über Dokumente, Mails, Notizen, Wiki und Maschinendaten — mit Tippfehler-Toleranz und Bedeutung.", "One search across documents, mails, notes, wiki and machine data — typo-tolerant and meaning-aware."), lic: "MIT", href: "https://www.meilisearch.com", key: "meilisearch", demo: "/suche/" },
-  { n: L("E-Mail-Archiv", "Email archive"), d: L("Revisionssicheres, durchsuchbares E-Mail-Archiv — alles bleibt auffindbar, auch nach Jahren.", "Tamper-evident, searchable email archive — everything stays findable, even after years."), lic: "AGPL-3", href: "#", demo: "/suche/" },
-  { n: L("MCP-Such-Server (KI-Brücke)", "MCP search server (AI bridge)"), d: L("Model-Context-Protocol: gibt der KI direkten, rechtegeprüften Zugriff auf die Suche — sie antwortet mit echten Firmendaten.", "Model Context Protocol: gives the AI direct, permission-checked access to search — it answers with real company data."), lic: L("offen", "open"), href: "https://modelcontextprotocol.io", demo: "/suche/" },
+  { n: L("Volltext-Suche (alle Firmendaten)", "Full-text search (all company data)", "全文搜索（全部公司数据）"), d: L("Eine Suche über Dokumente, Mails, Notizen, Wiki und Maschinendaten — mit Tippfehler-Toleranz und Bedeutung.", "One search across documents, mails, notes, wiki and machine data — typo-tolerant and meaning-aware.", "一次搜索即可覆盖文档、邮件、笔记、Wiki 与机器数据——容错拼写、理解语义。"), lic: "MIT", href: "https://www.meilisearch.com", key: "meilisearch", demo: "/suche/" },
+  { n: L("E-Mail-Archiv", "Email archive", "邮件归档"), d: L("Revisionssicheres, durchsuchbares E-Mail-Archiv — alles bleibt auffindbar, auch nach Jahren.", "Tamper-evident, searchable email archive — everything stays findable, even after years.", "防篡改、可检索的邮件归档——即便多年之后，一切仍可查找。"), lic: "AGPL-3", href: "#", demo: "/suche/" },
+  { n: L("MCP-Such-Server (KI-Brücke)", "MCP search server (AI bridge)", "MCP 搜索服务器（AI 桥接）"), d: L("Model-Context-Protocol: gibt der KI direkten, rechtegeprüften Zugriff auf die Suche — sie antwortet mit echten Firmendaten.", "Model Context Protocol: gives the AI direct, permission-checked access to search — it answers with real company data.", "MCP（Model Context Protocol）：让 AI 获得经权限校验的直接搜索访问——它以真实的公司数据作答。"), lic: L("offen", "open", "开放"), href: "https://modelcontextprotocol.io", demo: "/suche/" },
 ];
 const total = groups.reduce((a, g) => a + g.items.length, 0) + backbone.length + search.length;
 const mono = (s: string) => s.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
@@ -79,16 +80,16 @@ const hrefOf = (it: It) => (it.demoExt ? it.demo : b + (it.demo || ""));
 ---
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(40px,5vw,56px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Der Stack · Open Source","The stack · open source")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Auf diesen Schultern.","On these shoulders.")}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:64ch; margin:0 0 6px;">{L(`Alles, was diese Demo trägt, ist quelloffen und selbst hostbar — ${total} Bausteine, kein einziges Konzern-Abo, kein Lock-in. Wenn du gehen willst, nimmst du deine Daten mit.`,`Everything behind this demo is open source and self-hostable — ${total} building blocks, not a single corporate subscription, no lock-in. If you want to leave, you take your data with you.`)}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Der Stack · Open Source","The stack · open source","技术栈 · 开源")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Auf diesen Schultern.","On these shoulders.","站在这些基石之上。")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:64ch; margin:0 0 6px;">{L(`Alles, was diese Demo trägt, ist quelloffen und selbst hostbar — ${total} Bausteine, kein einziges Konzern-Abo, kein Lock-in. Wenn du gehen willst, nimmst du deine Daten mit.`,`Everything behind this demo is open source and self-hostable — ${total} building blocks, not a single corporate subscription, no lock-in. If you want to leave, you take your data with you.`,`支撑这套演示的一切都是开源且可自托管的——${total} 个模块，没有任何一项大厂订阅，绝无厂商锁定。若您想离开，尽可带走自己的数据。`)}</p>
   </div>
 </section>
 
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:0 clamp(24px,5vw,56px) clamp(36px,4vw,56px);">
     <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:16px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Wie alles zusammenspielt","How it all fits together")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{L("Wie alles zusammenspielt","How it all fits together","各部分如何协同")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <StackFlow lang={lang} />
@@ -97,7 +98,7 @@ const hrefOf = (it: It) => (it.demoExt ? it.demo : b + (it.demo || ""));
 
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:0 clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    {[...groups, { name: L("Daten-Backbone & Resilienz", "Data backbone & resilience"), items: backbone }, { name: L("Suche, Archiv & KI-Brücke", "Search, archive & AI bridge"), items: search }].map((g) => (
+    {[...groups, { name: L("Daten-Backbone & Resilienz", "Data backbone & resilience", "数据骨干与韧性"), items: backbone }, { name: L("Suche, Archiv & KI-Brücke", "Search, archive & AI bridge", "搜索、归档与 AI 桥接"), items: search }].map((g) => (
       <div style="margin-bottom:clamp(28px,3.5vw,40px);">
         <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:14px;">
           <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E;">{g.name}</span>
@@ -115,10 +116,10 @@ const hrefOf = (it: It) => (it.demoExt ? it.demo : b + (it.demo || ""));
                 <span style="display:flex; flex-wrap:wrap; gap:7px; align-items:center;">
                   <span style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.04em; color:#92938F; border:1px solid #C0C8C5; border-radius:999px; padding:2px 7px;">{it.lic}</span>
                   {it.demo && it.demo !== "#" && (
-                    <a href={hrefOf(it)} target={it.demoExt ? "_blank" : undefined} rel={it.demoExt ? "noopener" : undefined} style="font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:#16463E; text-decoration:none; border:1px solid #9ccdb9; background:#EAF6F0; border-radius:999px; padding:2px 8px;">{L("live ansehen","see live")} {it.demoExt ? "↗" : "→"}</a>
+                    <a href={hrefOf(it)} target={it.demoExt ? "_blank" : undefined} rel={it.demoExt ? "noopener" : undefined} style="font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:#16463E; text-decoration:none; border:1px solid #9ccdb9; background:#EAF6F0; border-radius:999px; padding:2px 8px;">{L("live ansehen","see live","查看在线演示")} {it.demoExt ? "↗" : "→"}</a>
                   )}
                   {it.key && STACKMAP[it.key] && (
-                    <a class="taglink" href={tagHref(STACKMAP[it.key], lang)} title={L("Verwandte Seiten finden","Find related pages")} style="font-family:var(--font-mono); font-size:10.5px; color:#5C5E63; text-decoration:none; border:1px solid #C0C8C5; border-radius:999px; padding:2px 8px;">{tagLabel(STACKMAP[it.key], lang)} ⌕</a>
+                    <a class="taglink" href={tagHref(STACKMAP[it.key], lang)} title={L("Verwandte Seiten finden","Find related pages","查找相关页面")} style="font-family:var(--font-mono); font-size:10.5px; color:#5C5E63; text-decoration:none; border:1px solid #C0C8C5; border-radius:999px; padding:2px 8px;">{tagLabel(STACKMAP[it.key], lang)} ⌕</a>
                   )}
                 </span>
               </span>
@@ -127,6 +128,6 @@ const hrefOf = (it: It) => (it.demoExt ? it.demo : b + (it.demo || ""));
         </div>
       </div>
     ))}
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:clamp(24px,3vw,36px); border-top:1px solid #E2E8F0; padding-top:18px;">{L("Der Mehrwert liegt nicht im Einsperren, sondern im Zusammenbauen: bewährte offene Teile, sauber integriert, im eigenen Haus betrieben.","The value isn't in locking you in — it's in the assembly: proven open parts, cleanly integrated, run in your own house.")}</p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:clamp(24px,3vw,36px); border-top:1px solid #E2E8F0; padding-top:18px;">{L("Der Mehrwert liegt nicht im Einsperren, sondern im Zusammenbauen: bewährte offene Teile, sauber integriert, im eigenen Haus betrieben.","The value isn't in locking you in — it's in the assembly: proven open parts, cleanly integrated, run in your own house.","价值不在于把您锁住，而在于组装：成熟的开源组件，干净地集成，运行在自己家里。")}</p>
   </div>
 </section>

@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Lernen from "../../components/views/Lernen.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Onboarding & learning · Nordwerk" description="Learning path with lesson + quiz per module, progress saved — onboarding & training." path="/cn/lernen/" altPath="/lernen/">
+  <Lernen lang={lang} />
+</Base>

@@ -4,7 +4,8 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const lines = ["Linie Nord", "Linie Süd", "Linie West"];
 const machines: [string, string][] = [
   ["CNC-Fräse A1","Linie Nord"],["CNC-Fräse A2","Linie Nord"],["Drehzentrum B1","Linie Nord"],
@@ -45,17 +46,17 @@ orders.forEach(([id, code, cust]) => { add("ord:"+id, id, "order", 4); links.pus
 charges.forEach(([id, code, ord]) => { add("chg:"+id, id, "charge", 3); links.push({ source:"chg:"+id, target:"prod:"+code }); links.push({ source:"chg:"+id, target:"ord:"+ord }); });
 const graph = { nodes, links };
 const legend = [
-  ["line", L("Linie","Line"), "#E6B23A"], ["machine", L("Maschine","Machine"), "#5FD08A"],
-  ["product", L("Produkt","Product"), "#7FB3FF"], ["raw", L("Rohmaterial","Raw material"), "#9aa0a6"],
-  ["order", L("Auftrag","Order"), "#F0A35E"], ["customer", L("Kunde","Customer"), "#E08BCB"],
-  ["charge", L("Charge","Batch"), "#C9A0FF"],
+  ["line", L("Linie","Line","产线"), "#E6B23A"], ["machine", L("Maschine","Machine","机器"), "#5FD08A"],
+  ["product", L("Produkt","Product","产品"), "#7FB3FF"], ["raw", L("Rohmaterial","Raw material","原材料"), "#9aa0a6"],
+  ["order", L("Auftrag","Order","订单"), "#F0A35E"], ["customer", L("Kunde","Customer","客户"), "#E08BCB"],
+  ["charge", L("Charge","Batch","批次"), "#C9A0FF"],
 ];
 ---
 <section style="background:#0E2522; color:#F4F6F5;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,90px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Wissensgraph · 3D", "Knowledge graph · 3D")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:18ch;">{L("Die ganze Firma als ein Netz.", "The whole company as one network.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Linie, Maschine, Produkt, Rohmaterial, Auftrag, Kunde, Charge — alles hängt zusammen. Dreh den Graphen, klick einen Knoten und folge der Spur ins echte System.", "Line, machine, product, raw material, order, customer, batch — everything is connected. Spin the graph, click a node and follow the trail into the real system.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Wissensgraph · 3D", "Knowledge graph · 3D", "知识图谱 · 3D")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:18ch;">{L("Die ganze Firma als ein Netz.", "The whole company as one network.", "整个公司连成一张网。")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Linie, Maschine, Produkt, Rohmaterial, Auftrag, Kunde, Charge — alles hängt zusammen. Dreh den Graphen, klick einen Knoten und folge der Spur ins echte System.", "Line, machine, product, raw material, order, customer, batch — everything is connected. Spin the graph, click a node and follow the trail into the real system.", "产线、机器、产品、原材料、订单、客户、批次 —— 全部环环相扣。旋转图谱，点击任一节点，顺着线索进入真实系统。")}</p>
   </div>
 </section>
 
@@ -68,7 +69,7 @@ const legend = [
       ))}
     </div>
     <div id="g-info" style="border:1px solid #214740; border-radius:12px; background:#13322D; color:#E8EFEC; padding:16px 18px; min-height:70px;">
-      <span style="font-family:var(--font-mono); font-size:12px; color:#7C9A92;">{L("Knoten anklicken für Details.", "Click a node for details.")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; color:#7C9A92;">{L("Knoten anklicken für Details.", "Click a node for details.", "点击节点查看详情。")}</span>
     </div>
   </div>
 </section>
@@ -77,12 +78,13 @@ const legend = [
 <script>
   import ForceGraph3D from "3d-force-graph";
   const DE = document.documentElement.lang !== "en";
+  const PFX = ({de:"",en:"/en",zh:"/cn"})[document.documentElement.lang] || "";
   const data = JSON.parse(document.getElementById("graph-data").textContent);
   const COL = { line:"#E6B23A", machine:"#5FD08A", product:"#7FB3FF", raw:"#9aa0a6", order:"#F0A35E", customer:"#E08BCB", charge:"#C9A0FF" };
   const TL = DE
     ? { line:"Linie", machine:"Maschine", product:"Produkt", raw:"Rohmaterial", order:"Auftrag", customer:"Kunde", charge:"Charge" }
     : { line:"Line", machine:"Machine", product:"Product", raw:"Raw material", order:"Order", customer:"Customer", charge:"Batch" };
-  const HREF = (t) => ({ machine:(DE?"":"/en")+"/leitstand/", line:(DE?"":"/en")+"/leitstand/", charge:(DE?"":"/en")+"/analyse/", customer:(DE?"":"/en")+"/portal/", product:"https://erp-demo.indystry.works/odoo", order:"https://erp-demo.indystry.works/odoo", raw:"https://erp-demo.indystry.works/odoo" }[t]);
+  const HREF = (t) => ({ machine:PFX+"/leitstand/", line:PFX+"/leitstand/", charge:PFX+"/analyse/", customer:PFX+"/portal/", product:"https://erp-demo.indystry.works/odoo", order:"https://erp-demo.indystry.works/odoo", raw:"https://erp-demo.indystry.works/odoo" }[t]);
   const EXT = (t) => t==="product"||t==="order"||t==="raw";
   const el = document.getElementById("graph3d");
   const info = document.getElementById("g-info");
@@ -98,7 +100,7 @@ const legend = [
     .linkColor(() => "rgba(166,207,197,0.22)")
     .linkWidth(0.6)
     .onNodeClick((n) => {
-      const P=(x)=>(DE?"":"/en")+x, ERPU="https://erp-demo.indystry.works/odoo", BIU="https://bi-demo.indystry.works", TWU="https://twin-demo.indystry.works";
+      const P=(x)=>PFX+x, ERPU="https://erp-demo.indystry.works/odoo", BIU="https://bi-demo.indystry.works", TWU="https://twin-demo.indystry.works";
       const INFO = {
         line:    { d: DE?"Eine Fertigungslinie und ihre Maschinen.":"A production line and its machines.", links:[[DE?"Leitstand":"Control room",P("/leitstand/")],[DE?"Anlage":"Plant",P("/anlage/")]] },
         machine: { d: DE?"Eine von 8 Maschinen — Status, Schaltschrank, Live-Werte.":"One of 8 machines — status, cabinet, live readings.", links:[[DE?"Leitstand":"Control room",P("/leitstand/")],[DE?"Anlage":"Plant",P("/anlage/")],["Twin",TWU,1],["Historian",P("/historian/")]] },

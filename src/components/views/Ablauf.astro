@@ -9,8 +9,9 @@ import { PHASES, TOOLS, AKTE } from "../../data/phases.ts";
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 // Doku-Fragment ohne die alte Matrix (durch Explorer ersetzt), Rest klickbar
 const src = de ? html : htmlEn;
 const MARK = '<h2 id="5--phase--live-demo-matrix">';
@@ -27,18 +28,20 @@ const phasesJ = PHASES.map((p)=>({
 const akteList = (["I","II","III"] as const).map((a)=>({ a, label:AKTE[a][lang], color:aktColor[a], phases:phasesJ.filter((p)=>p.akt===a) }));
 const kpis = de
   ? [["22","Aufträge"],["8","Maschinen"],["12","Lieferungen"],["6","Wartungen"]]
-  : [["22","orders"],["8","machines"],["12","deliveries"],["6","maintenances"]];
+  : en
+  ? [["22","orders"],["8","machines"],["12","deliveries"],["6","maintenances"]]
+  : [["22","订单"],["8","机器"],["12","发货"],["6","维护"]];
 ---
 <!-- HERO -->
 <section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(30px,4vw,44px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Auftragsfluss & Zustände","Order flow & states")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Eine Bestellung. Der ganze Weg.","One order. The whole way.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0 0 24px;">{L("Klick dich durch die Phasen — jede zeigt ihr Ziel und was der Stack dort tut. Was Nordwerk vom reinen ERP unterscheidet: ein geschlossener Optimierungs-Kreislauf.","Click through the phases — each shows its goal and what the stack does there. What sets Nordwerk apart from a plain ERP: a closed optimisation loop.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Auftragsfluss & Zustände","Order flow & states","订单流转与状态")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Eine Bestellung. Der ganze Weg.","One order. The whole way.","一张订单。走完全程。")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0 0 24px;">{L("Klick dich durch die Phasen — jede zeigt ihr Ziel und was der Stack dort tut. Was Nordwerk vom reinen ERP unterscheidet: ein geschlossener Optimierungs-Kreislauf.","Click through the phases — each shows its goal and what the stack does there. What sets Nordwerk apart from a plain ERP: a closed optimisation loop.","逐个点开各个阶段 —— 每个阶段都会展示其目标以及技术栈在此处的作用。Nordwerk 与普通 ERP 的区别在于：一个闭环的优化循环。")}</p>
     <div data-afk style="display:grid; grid-template-columns:repeat(4,auto); gap:28px; width:max-content; max-width:100%;">
       {kpis.map(([v,k])=>(<div><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(26px,3.4vw,40px); line-height:1; color:#E6B23A;"><span class="af-count" data-to={v}>{v}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:.04em; text-transform:uppercase;">{k}</div></div>))}
     </div>
-    <p style="margin:22px 0 0;"><a href="/PROZESS-ABLAUF.pdf" download style="font-family:var(--font-mono); font-size:12.5px; color:#A6CFC5; border-bottom:1px solid #2E5A52; text-decoration:none;">{L("Ganzen Ablauf als PDF","Whole flow as PDF")} ↓</a></p>
+    <p style="margin:22px 0 0;"><a href="/PROZESS-ABLAUF.pdf" download style="font-family:var(--font-mono); font-size:12.5px; color:#A6CFC5; border-bottom:1px solid #2E5A52; text-decoration:none;">{L("Ganzen Ablauf als PDF","Whole flow as PDF","完整流程 PDF")} ↓</a></p>
   </div>
 </section>
 
@@ -70,20 +73,20 @@ const kpis = de
 <!-- REGELKREIS -->
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
-    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(24px,3.6vw,40px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 6px; max-width:26ch;">{L("Was Nordwerk vom reinen ERP unterscheidet.","What sets Nordwerk apart from a plain ERP.")}</h2>
-    <p style="font-size:15px; color:#A6CFC5; margin:0 0 28px; max-width:60ch;">{L("Ein geschlossener Kreislauf: Maschinendaten fließen zurück in bessere Fertigung.","A closed loop: machine data flows back into better production.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(24px,3.6vw,40px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 6px; max-width:26ch;">{L("Was Nordwerk vom reinen ERP unterscheidet.","What sets Nordwerk apart from a plain ERP.","Nordwerk 与普通 ERP 的区别所在。")}</h2>
+    <p style="font-size:15px; color:#A6CFC5; margin:0 0 28px; max-width:60ch;">{L("Ein geschlossener Kreislauf: Maschinendaten fließen zurück in bessere Fertigung.","A closed loop: machine data flows back into better production.","一个闭环：机床数据回流，助力更优的生产。")}</p>
     <div class="af-loop">
       {[
-        {t:L("Maschinen","Machines"),c:"#3f9a52"},{t:L("Historian","Historian"),c:"#2a86a8"},
-        {t:L("BI · Wartung","BI · maintenance"),c:"#4a6fa5"},{t:L("Digital Twin","Digital twin"),c:"#7b5cc4"},
-        {t:L("Fertigung","Production"),c:"#16794a"},
+        {t:L("Maschinen","Machines","机器"),c:"#3f9a52"},{t:L("Historian","Historian","历史数据库"),c:"#2a86a8"},
+        {t:L("BI · Wartung","BI · maintenance","BI · 维护"),c:"#4a6fa5"},{t:L("Digital Twin","Digital twin","数字孪生"),c:"#7b5cc4"},
+        {t:L("Fertigung","Production","生产"),c:"#16794a"},
       ].map((n,i)=>(<>
         {i>0 && <span class="af-larr">→</span>}
         <div class="af-lnode" style={`border-color:${n.c};`}><span style={`width:8px;height:8px;border-radius:50%;background:${n.c};display:inline-block;`}></span>{n.t}</div>
       </>))}
       <span class="af-larr" style="color:#E6B23A;">↺</span>
     </div>
-    <p style="font-family:var(--font-mono); font-size:11.5px; color:#8FB0A8; margin:18px 0 0;">{L("Telemetrie → Auswertung → optimierte Parameter → zurück in die Fertigung.","Telemetry → analysis → optimised parameters → back into production.")}</p>
+    <p style="font-family:var(--font-mono); font-size:11.5px; color:#8FB0A8; margin:18px 0 0;">{L("Telemetrie → Auswertung → optimierte Parameter → zurück in die Fertigung.","Telemetry → analysis → optimised parameters → back into production.","遥测 → 分析 → 优化参数 → 回到生产。")}</p>
   </div>
 </section>
 
@@ -91,7 +94,7 @@ const kpis = de
 <section style="background:#F8F9FA;">
   <div style="max-width:880px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(64px,8vw,100px);">
     <details class="af-doc">
-      <summary>{L("Ganzer Ablauf — die ausführliche Doku","Whole flow — the detailed documentation")} <span class="af-docp">+</span></summary>
+      <summary>{L("Ganzer Ablauf — die ausführliche Doku","Whole flow — the detailed documentation","完整流程 —— 详细文档")} <span class="af-docp">+</span></summary>
       <div class="af-docbody" set:html={doc}></div>
     </details>
   </div>

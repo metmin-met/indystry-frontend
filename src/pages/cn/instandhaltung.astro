@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Instandhaltung from "../../components/views/Instandhaltung.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Maintenance & assets" description="QM-compliant asset management: hierarchy tree, standards catalogue (PED, inspection intervals), docs on the object, 3D/DXF viewer — self-hosted, audit-ready." path="/cn/instandhaltung/" altPath="/instandhaltung/">
+  <Instandhaltung lang={lang} />
+</Base>

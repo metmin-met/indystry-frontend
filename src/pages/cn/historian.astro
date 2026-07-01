@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Historian from "../../components/views/Historian.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Historian explorer · Nordwerk" description="Time-series browser across all machines and metrics — Nordwerk demo, read-only." path="/cn/historian/" altPath="/historian/" noindex={true}>
+  <Historian lang={lang} />
+</Base>

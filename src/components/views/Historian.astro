@@ -4,13 +4,14 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
+const en = lang === "en";
 ---
 <section style="background:#F8F9FA;" data-de={String(de)}>
   <div style="max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{de ? "Historian · Zeitreihen · read-only" : "Historian · time series · read-only"}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{de ? "Jede Maschine, jede Messreihe." : "Every machine, every metric."}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{de ? "Temperatur und Vibration der Nordwerk-Maschinen — dieselben Sensordaten, die auch im BI-Dashboard und in Grafana stecken. Wähl eine Maschine, blätter durch die Messreihen." : "Temperature and vibration of the Nordwerk machines — the same sensor data that feeds the BI dashboard and Grafana. Pick a machine, browse the metrics."}</p>
-    <p id="meta" style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,40px);">{de ? "Snapshot wird geladen …" : "Loading snapshot …"}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{de ? "Historian · Zeitreihen · read-only" : en ? "Historian · time series · read-only" : "历史数据库 · 时间序列 · read-only"}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{de ? "Jede Maschine, jede Messreihe." : en ? "Every machine, every metric." : "每台机器，每条测量序列。"}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 6px;">{de ? "Temperatur und Vibration der Nordwerk-Maschinen — dieselben Sensordaten, die auch im BI-Dashboard und in Grafana stecken. Wähl eine Maschine, blätter durch die Messreihen." : en ? "Temperature and vibration of the Nordwerk machines — the same sensor data that feeds the BI dashboard and Grafana. Pick a machine, browse the metrics." : "Nordwerk 机器的温度与振动 — 与 BI 仪表盘和 Grafana 使用的是同一批传感器数据。选择一台机器，浏览各条测量序列。"}</p>
+    <p id="meta" style="font-family:var(--font-mono); font-size:12px; color:#92938F; margin:0 0 clamp(28px,4vw,40px);">{de ? "Snapshot wird geladen …" : en ? "Loading snapshot …" : "正在加载快照 …"}</p>
 
     <div id="controls" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:18px;"></div>
 
@@ -22,7 +23,7 @@ const de = lang === "de";
       <div id="chart" style="width:100%;"></div>
     </div>
 
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:clamp(32px,4vw,48px) 0 14px;">{de ? "Alle Messreihen" : "All metrics"}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:clamp(32px,4vw,48px) 0 14px;">{de ? "Alle Messreihen" : en ? "All metrics" : "全部测量序列"}</p>
     <div id="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;"></div>
   </div>
 </section>
@@ -39,18 +40,18 @@ const de = lang === "de";
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{de ? "Das Rückgrat darunter" : "The backbone beneath"}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{de ? "Das Rückgrat darunter" : en ? "The backbone beneath" : "底层支撑"}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
-    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{de ? "Millionen Messpunkte — und trotzdem schnell." : "Millions of data points — and still fast."}</h2>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{de ? "Millionen Messpunkte — und trotzdem schnell." : en ? "Millions of data points — and still fast." : "数百万测量点 — 依然飞快。"}</h2>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
-      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Zeitreihen-Datenbank" : "Time-series database"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Jahre an Sensor- und Maschinenwerten, Abfragen in Millisekunden." : "Years of sensor and machine values, queried in milliseconds."}</p></div>
-      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Data-Lake (Object-Store)" : "Data lake (object store)"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Rohdateien, Bilder, Reports — günstig und praktisch endlos abgelegt." : "Raw files, images, reports — stored cheaply and practically endlessly."}</p></div>
-      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Automatischer Ingest" : "Automatic ingest"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Neue Messdateien werden selbst eingelesen — kein manuelles Importieren." : "New measurement files are ingested automatically — no manual importing."}</p></div>
-      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "ETL & fertige Sichten" : "ETL & ready-made views"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Verteilte Quellen sauber zusammengeführt, aufgelöste Auswertungs-Views." : "Scattered sources merged cleanly, resolved analytics views."}</p></div>
-      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Direkt aus der Steuerung" : "Straight from the controls"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Werte aus SPS und Leittechnik fließen live in die Historie (OPC-UA)." : "Values from PLC and control system flow live into the history (OPC-UA)."}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Zeitreihen-Datenbank" : en ? "Time-series database" : "时间序列数据库"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Jahre an Sensor- und Maschinenwerten, Abfragen in Millisekunden." : en ? "Years of sensor and machine values, queried in milliseconds." : "多年的传感器与机器数值，查询仅需毫秒。"}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Data-Lake (Object-Store)" : en ? "Data lake (object store)" : "数据湖（对象存储）"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Rohdateien, Bilder, Reports — günstig und praktisch endlos abgelegt." : en ? "Raw files, images, reports — stored cheaply and practically endlessly." : "原始文件、图像、报告 — 存储成本低廉，容量几乎无限。"}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Automatischer Ingest" : en ? "Automatic ingest" : "自动数据接入"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Neue Messdateien werden selbst eingelesen — kein manuelles Importieren." : en ? "New measurement files are ingested automatically — no manual importing." : "新的测量文件自动读入 — 无需手动导入。"}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "ETL & fertige Sichten" : en ? "ETL & ready-made views" : "ETL 与开箱即用的视图"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Verteilte Quellen sauber zusammengeführt, aufgelöste Auswertungs-Views." : en ? "Scattered sources merged cleanly, resolved analytics views." : "分散的数据源干净整合，形成解析完成的分析视图。"}</p></div>
+      <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{de ? "Direkt aus der Steuerung" : en ? "Straight from the controls" : "直接来自控制系统"}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{de ? "Werte aus SPS und Leittechnik fließen live in die Historie (OPC-UA)." : en ? "Values from PLC and control system flow live into the history (OPC-UA)." : "来自 SPS 与主控系统的数值实时流入历史记录（OPC-UA）。"}</p></div>
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{de ? "Aus denselben Daten speisen sich Leitstand, Auswertung und Zwilling." : "The same data feeds the control room, analysis and the twin."} <a href={(de?"":"/en")+"/analyse/"} style="color:#16463E; font-weight:600; text-decoration:none;">{de ? "Zur Werkstoff-Analyse" : "To material analysis"} →</a></p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{de ? "Aus denselben Daten speisen sich Leitstand, Auswertung und Zwilling." : en ? "The same data feeds the control room, analysis and the twin." : "同一批数据同时供给中控室、分析与数字孪生。"} <a href={(de?"":en?"/en":"/cn")+"/analyse/"} style="color:#16463E; font-weight:600; text-decoration:none;">{de ? "Zur Werkstoff-Analyse" : en ? "To material analysis" : "前往材料分析"} →</a></p>
   </div>
 </section>
 

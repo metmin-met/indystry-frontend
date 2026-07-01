@@ -5,38 +5,41 @@ import { type Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const kontakt = de ? "/kontakt/" : "/en/kontakt/";
+const en = lang === "en";
+const kontakt = de ? "/kontakt/" : en ? "/en/kontakt/" : "/cn/kontakt/";
 const demo = "https://erp-demo.indystry.works/web/login";
-const saeule = de ? "/saeule/erp-betrieb/" : "/en/pillar/erp-betrieb/";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const saeule = de ? "/saeule/erp-betrieb/" : en ? "/en/pillar/erp-betrieb/" : "/cn/pillar/erp-betrieb/";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const flow = de
   ? ["Anfrage","Angebot","Auftrag","Fertigung","Qualität","Lieferung","Rechnung"]
-  : ["Inquiry","Quote","Order","Production","Quality","Delivery","Invoice"];
+  : en
+  ? ["Inquiry","Quote","Order","Production","Quality","Delivery","Invoice"]
+  : ["询价","报价","订单","生产","质量","交付","发票"];
 const modules = [
-  L("Aufträge & Verkauf","Orders & sales"), L("Einkauf","Purchasing"), L("Fertigung (MRP)","Manufacturing (MRP)"),
-  L("Planung & Gantt","Planning & Gantt"), L("Lager & Chargen","Stock & lots"), L("Qualität (QC)","Quality (QC)"),
-  L("Wartung","Maintenance"), L("Kostenrechnung","Costing"), L("Buchhaltung","Accounting"),
-  L("Zeit & Anwesenheit","Time & attendance"), L("Projekte","Projects"), L("Werker-App","Shop-floor app"),
+  L("Aufträge & Verkauf","Orders & sales","订单与销售"), L("Einkauf","Purchasing","采购"), L("Fertigung (MRP)","Manufacturing (MRP)","生产（MRP）"),
+  L("Planung & Gantt","Planning & Gantt","计划与甘特图"), L("Lager & Chargen","Stock & lots","库存与批次"), L("Qualität (QC)","Quality (QC)","质量（QC）"),
+  L("Wartung","Maintenance","维护"), L("Kostenrechnung","Costing","成本核算"), L("Buchhaltung","Accounting","会计"),
+  L("Zeit & Anwesenheit","Time & attendance","工时与考勤"), L("Projekte","Projects","项目"), L("Werker-App","Shop-floor app","车间应用"),
 ];
 const deep = [
-  { t: L("Instandhaltung & Anlagen","Maintenance & assets"), d: L("QM-konform: Hierarchie, Normen, Prüffristen, 3D/DXF.","QM-compliant: hierarchy, standards, intervals, 3D/DXF."), h: b+"/instandhaltung/" },
-  { t: L("Kosten & Controlling","Costing & controlling"), d: L("Lot-Costing, IFRS/HGB, NRV, Plan-Ist.","Lot costing, IFRS/HGB, NRV, plan vs. actual."), h: b+"/kosten/" },
-  { t: L("Kennzahlen & Review","KPIs & review"), d: L("27 Management-Review-KPIs, snapshot-auditiert.","27 management-review KPIs, snapshot-audited."), h: b+"/kennzahlen/" },
-  { t: L("Werker-App","Shop-floor app"), d: L("Stempeln, Zeit, Fertigung, NFC — offline-first.","Clocking, time, manufacturing, NFC — offline-first."), h: b+"/app/" },
-  { t: L("Compliance & QM","Compliance & QM"), d: L("ISO 9001 + ISO 27001 in einem System, lebendes Handbuch.","ISO 9001 + ISO 27001 in one system, living handbook."), h: b+"/compliance/" },
-  { t: L("Schnittstellen","Interfaces"), d: L("OPC-UA, SPS, REST, MCP, PEPPOL, DATEV, BMD, ETL.","OPC-UA, PLC, REST, MCP, PEPPOL, DATEV, BMD, ETL."), h: b+"/schnittstellen/" },
-  { t: L("Suche & Wissen","Search & knowledge"), d: L("Föderierte Suche + lebendes Handbuch + KI-Antworten.","Federated search + living handbook + AI answers."), h: b+"/suche/" },
-  { t: L("Resilienz & Betrieb","Resilience & operations"), d: L("Backups/Restore, Out-of-Band, Software-Rollout.","Backups/restore, out-of-band, software rollout."), h: b+"/resilienz/" },
+  { t: L("Instandhaltung & Anlagen","Maintenance & assets","维护与设备"), d: L("QM-konform: Hierarchie, Normen, Prüffristen, 3D/DXF.","QM-compliant: hierarchy, standards, intervals, 3D/DXF.","符合质量管理：层级结构、标准、检验周期、3D/DXF。"), h: b+"/instandhaltung/" },
+  { t: L("Kosten & Controlling","Costing & controlling","成本与控制"), d: L("Lot-Costing, IFRS/HGB, NRV, Plan-Ist.","Lot costing, IFRS/HGB, NRV, plan vs. actual.","批次成本、IFRS/HGB、NRV、计划对实际。"), h: b+"/kosten/" },
+  { t: L("Kennzahlen & Review","KPIs & review","关键指标与评审"), d: L("27 Management-Review-KPIs, snapshot-auditiert.","27 management-review KPIs, snapshot-audited.","27 项管理评审关键指标，快照可审计。"), h: b+"/kennzahlen/" },
+  { t: L("Werker-App","Shop-floor app","车间应用"), d: L("Stempeln, Zeit, Fertigung, NFC — offline-first.","Clocking, time, manufacturing, NFC — offline-first.","打卡、工时、生产、NFC——离线优先。"), h: b+"/app/" },
+  { t: L("Compliance & QM","Compliance & QM","合规与质量管理"), d: L("ISO 9001 + ISO 27001 in einem System, lebendes Handbuch.","ISO 9001 + ISO 27001 in one system, living handbook.","ISO 9001 + ISO 27001 集于一个系统，活文档手册。"), h: b+"/compliance/" },
+  { t: L("Schnittstellen","Interfaces","接口"), d: L("OPC-UA, SPS, REST, MCP, PEPPOL, DATEV, BMD, ETL.","OPC-UA, PLC, REST, MCP, PEPPOL, DATEV, BMD, ETL.","OPC-UA、PLC、REST、MCP、PEPPOL、DATEV、BMD、ETL。"), h: b+"/schnittstellen/" },
+  { t: L("Suche & Wissen","Search & knowledge","搜索与知识"), d: L("Föderierte Suche + lebendes Handbuch + KI-Antworten.","Federated search + living handbook + AI answers.","联合搜索 + 活文档手册 + 人工智能应答。"), h: b+"/suche/" },
+  { t: L("Resilienz & Betrieb","Resilience & operations","韧性与运维"), d: L("Backups/Restore, Out-of-Band, Software-Rollout.","Backups/restore, out-of-band, software rollout.","备份/恢复、带外管理、软件部署。"), h: b+"/resilienz/" },
 ];
 const feats = de ? [
   { t: "Datenhoheit & Sicherheit", d: "Eure sensiblen Produktionsdaten bleiben in eurem Netzwerk — geschützt durch eure eigenen Sicherheitsprotokolle.", l: "Mehr erfahren →", h: "/#souv" },
   { t: "Maßgeschneiderte Add-ons", d: "Von Lagerlogistik bis komplexe Fertigung — das System passt sich eurem Prozess an, nicht umgekehrt. Voller Zugriff auf den Quellcode.", l: "Bausteine ansehen →", h: saeule },
-  { t: "Industrie 4.0 ready", d: "Gängige Protokolle wie OPC-UA und MQTT für Echtzeit-Monitoring eurer Fertigungslinien — anschlussfähig statt Insellösung.", l: "Integration ansehen →", h: de ? "/saeule/automatisierung-leittechnik/" : "/en/pillar/automatisierung-leittechnik/" },
+  { t: "Industrie 4.0 ready", d: "Gängige Protokolle wie OPC-UA und MQTT für Echtzeit-Monitoring eurer Fertigungslinien — anschlussfähig statt Insellösung.", l: "Integration ansehen →", h: "/saeule/automatisierung-leittechnik/" },
 ] : [
-  { t: "Data sovereignty & security", d: "Your sensitive production data stays in your network — protected by your own security policies.", l: "Learn more →", h: "/en/#souv" },
+  { t: "Data sovereignty & security", d: "Your sensitive production data stays in your network — protected by your own security policies.", l: "Learn more →", h: en ? "/en/#souv" : "/cn/#souv" },
   { t: "Tailored add-ons", d: "From warehouse logistics to complex manufacturing — the system adapts to your process, not the other way round. Full source-code access.", l: "See building blocks →", h: saeule },
-  { t: "Industry 4.0 ready", d: "Common protocols like OPC-UA and MQTT for real-time monitoring of your production lines — connectable, not an island.", l: "See integration →", h: "/en/pillar/automatisierung-leittechnik/" },
+  { t: "Industry 4.0 ready", d: "Common protocols like OPC-UA and MQTT for real-time monitoring of your production lines — connectable, not an island.", l: "See integration →", h: en ? "/en/pillar/automatisierung-leittechnik/" : "/cn/pillar/automatisierung-leittechnik/" },
 ];
 ---
 <!-- HERO (hell · Mockup) -->
@@ -44,17 +47,17 @@ const feats = de ? [
   <div style="max-width:1280px; margin:0 auto; padding:clamp(56px,8vw,112px) clamp(24px,5vw,56px) clamp(64px,8vw,96px);">
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(40px,5vw,72px); align-items:center;">
       <div>
-        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 clamp(20px,3vw,28px);">{de ? "Open-Source ERP-Suite" : "Open-source ERP suite"}</p>
-        <h1 style="font-weight:600; font-size:clamp(36px,5.6vw,72px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px); max-width:15ch;">{de ? "Die Freiheit eurer Daten. Das ERP der nächsten Generation." : "The freedom of your data. The ERP of the next generation."}</h1>
-        <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(28px,4vw,36px); max-width:48ch;">{de ? "Vollständig quelloffen, self-hosted und unter eurer Kontrolle. Auf Odoo-Fundament — verfeinert für die Präzision deutscher Ingenieurskunst." : "Fully open-source, self-hosted and under your control. On an Odoo foundation — refined for engineering precision."}</p>
+        <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 clamp(20px,3vw,28px);">{de ? "Open-Source ERP-Suite" : en ? "Open-source ERP suite" : "开源 ERP 套件"}</p>
+        <h1 style="font-weight:600; font-size:clamp(36px,5.6vw,72px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px); max-width:15ch;">{de ? "Die Freiheit eurer Daten. Das ERP der nächsten Generation." : en ? "The freedom of your data. The ERP of the next generation." : "让您的数据自由。下一代 ERP。"}</h1>
+        <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(28px,4vw,36px); max-width:48ch;">{de ? "Vollständig quelloffen, self-hosted und unter eurer Kontrolle. Auf Odoo-Fundament — verfeinert für die Präzision deutscher Ingenieurskunst." : en ? "Fully open-source, self-hosted and under your control. On an Odoo foundation — refined for engineering precision." : "完全开源、自托管，尽在您的掌控之中。基于 Odoo 构建——为工程级精度而精心打磨。"}</p>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 clamp(28px,4vw,36px);">
-          {[de ? "Quelloffen" : "Open source", "Self-hosted", "DSGVO", "OPC-UA · MQTT"].map((b) => (
+          {[de ? "Quelloffen" : en ? "Open source" : "开源", "Self-hosted", "DSGVO", "OPC-UA · MQTT"].map((b) => (
             <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#16463E; border:1px solid #C0C8C5; border-radius:9999px; padding:5px 12px;">{b}</span>
           ))}
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
-          <a href={kontakt} style="text-decoration:none; background:#1B1C1E; color:#F8F9FA; font-weight:600; font-size:15px; padding:16px 28px; border-radius:4px;">{de ? "Self-hosted starten →" : "Start self-hosted →"}</a>
-          <a href={demo} style="text-decoration:none; color:#1B1C1E; font-weight:500; font-size:15px; padding:16px 4px; border-bottom:1.5px solid #1B1C1E;">{de ? "Demo öffnen ↗" : "Open demo ↗"}</a>
+          <a href={kontakt} style="text-decoration:none; background:#1B1C1E; color:#F8F9FA; font-weight:600; font-size:15px; padding:16px 28px; border-radius:4px;">{de ? "Self-hosted starten →" : en ? "Start self-hosted →" : "开始自托管 →"}</a>
+          <a href={demo} style="text-decoration:none; color:#1B1C1E; font-weight:500; font-size:15px; padding:16px 4px; border-bottom:1.5px solid #1B1C1E;">{de ? "Demo öffnen ↗" : en ? "Open demo ↗" : "打开演示 ↗"}</a>
         </div>
       </div>
       <div style="justify-self:end; width:100%; max-width:520px;">
@@ -64,13 +67,13 @@ const feats = de ? [
             <span style="font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:#92938F;">ERP_BETRIEB</span>
           </div>
           <div style="padding:22px; color:#1B1C1E;">
-            <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 8px;">{de ? "Offene Aufträge" : "Open orders"}</p>
+            <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 8px;">{de ? "Offene Aufträge" : en ? "Open orders" : "未结订单"}</p>
             <div style="display:flex; align-items:baseline; gap:12px; margin:0 0 18px;">
               <span style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,4vw,44px); letter-spacing:-0.02em;">124</span>
               <span style="font-size:13px; color:#16794a; font-weight:600;">▲ 12</span>
             </div>
             <div style="display:grid; gap:9px; margin:0 0 16px;">
-              {[de ? "Aufträge" : "Orders", de ? "Lager & Logistik" : "Stock & logistics", de ? "Wartung" : "Maintenance"].map((x) => (
+              {[de ? "Aufträge" : en ? "Orders" : "订单", de ? "Lager & Logistik" : en ? "Stock & logistics" : "库存与物流", de ? "Wartung" : en ? "Maintenance" : "维护"].map((x) => (
                 <div style="display:flex; align-items:center; gap:10px; font-size:14px;"><span style="color:#16463E; font-weight:700;">✓</span><span>{x}</span></div>
               ))}
             </div>
@@ -87,7 +90,7 @@ const feats = de ? [
 <!-- AUFTRAG→RECHNUNG + MODUL-MAP -->
 <section style="background:#fff; border-top:1px solid #E2E8F0;">
   <div style="max-width:1280px; margin:0 auto; padding:clamp(48px,6vw,88px) clamp(24px,5vw,56px);">
-    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Ein Auftrag, ein Datenmodell","One order, one data model")}</p>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Ein Auftrag, ein Datenmodell","One order, one data model","一个订单，一套数据模型")}</p>
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 14px;">
       {flow.map((step, i) => (
         <>
@@ -96,8 +99,8 @@ const feats = de ? [
         </>
       ))}
     </div>
-    <p style="font-size:15px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(32px,4vw,44px); max-width:64ch;">{L("Einmal eingegeben, überall sichtbar — Planung, Fertigung, Qualität, Lager und Buchhaltung ziehen sich die Daten von selbst. Kein Zuruf, kein doppeltes Tippen.","Entered once, visible everywhere — planning, production, quality, stock and accounting pull the data themselves. No shouting, no double typing.")}</p>
-    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 14px;">{L("Module im Kern","Core modules")}</p>
+    <p style="font-size:15px; line-height:1.6; color:#5C5E63; margin:0 0 clamp(32px,4vw,44px); max-width:64ch;">{L("Einmal eingegeben, überall sichtbar — Planung, Fertigung, Qualität, Lager und Buchhaltung ziehen sich die Daten von selbst. Kein Zuruf, kein doppeltes Tippen.","Entered once, visible everywhere — planning, production, quality, stock and accounting pull the data themselves. No shouting, no double typing.","录入一次，处处可见——计划、生产、质量、库存与会计自行取用数据。无需口头传达，无需重复录入。")}</p>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 14px;">{L("Module im Kern","Core modules","核心模块")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:8px;">
       {modules.map((m) => (
         <span style="font-size:14px; font-weight:500; color:#1B1C1E; background:#fff; border:1px solid #E2E8F0; border-radius:8px; padding:9px 14px;">{m}</span>
@@ -109,8 +112,8 @@ const feats = de ? [
 <!-- IN DIE TIEFE — Hub auf die Spezialseiten -->
 <section style="background:#EFEAE0;">
   <div style="max-width:1280px; margin:0 auto; padding:clamp(56px,7vw,96px) clamp(24px,5vw,56px);">
-    <h2 style="font-weight:700; font-family:var(--font-head); font-size:clamp(28px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 10px; max-width:22ch;">{L("Der Kern — und alles, was andockt.","The core — and everything that plugs in.")}</h2>
-    <p style="font-size:clamp(16px,1.6vw,19px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(32px,4vw,44px); max-width:62ch;">{L("Das ERP ist die Mitte. Drumherum greifen die Spezial-Bereiche ineinander — jeder mit eigener Tiefe, alle auf demselben Datenmodell.","The ERP is the centre. Around it the specialist areas interlock — each with its own depth, all on the same data model.")}</p>
+    <h2 style="font-weight:700; font-family:var(--font-head); font-size:clamp(28px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 10px; max-width:22ch;">{L("Der Kern — und alles, was andockt.","The core — and everything that plugs in.","内核——以及一切与之对接的模块。")}</h2>
+    <p style="font-size:clamp(16px,1.6vw,19px); line-height:1.6; color:#3C3E42; margin:0 0 clamp(32px,4vw,44px); max-width:62ch;">{L("Das ERP ist die Mitte. Drumherum greifen die Spezial-Bereiche ineinander — jeder mit eigener Tiefe, alle auf demselben Datenmodell.","The ERP is the centre. Around it the specialist areas interlock — each with its own depth, all on the same data model.","ERP 是中心。围绕它，各专业领域彼此咬合——各有其深度，全部基于同一套数据模型。")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;">
       {deep.map((x) => (
         <a href={x.h} class="erp-deep" style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:20px 22px; display:flex; flex-direction:column; gap:8px;">
@@ -128,7 +131,7 @@ const feats = de ? [
 <!-- 3-up Feature-Cards -->
 <section style="background:#F8F9FA; border-top:1px solid #E2E8F0;">
   <div style="max-width:1280px; margin:0 auto; padding:clamp(72px,9vw,128px) clamp(24px,5vw,56px);">
-    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(40px,5vw,56px);">{de ? "Warum self-hosted" : "Why self-hosted"}</p>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(40px,5vw,56px);">{de ? "Warum self-hosted" : en ? "Why self-hosted" : "为何选择自托管"}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(20px,2.5vw,28px);">
       {feats.map((f) => (
         <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:clamp(24px,3vw,32px); display:flex; flex-direction:column;">
@@ -146,12 +149,12 @@ const feats = de ? [
 <!-- CTA -->
 <section class="blueprint" style="color:#F8F9FA;">
   <div style="max-width:880px; margin:0 auto; padding:clamp(72px,10vw,128px) clamp(24px,5vw,56px);">
-    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Souveränität" : "Sovereignty"}</p>
-    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px);">{de ? "Bereit für die Souveränität?" : "Ready for sovereignty?"}</h2>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#9FB8B0; margin:0 0 clamp(32px,4vw,44px); max-width:50ch;">{de ? "Startet auf eurer eigenen Infrastruktur — oder lasst euch vorab eine konkrete Lösungsskizze geben." : "Start on your own infrastructure — or get a concrete solution sketch first."}</p>
+    <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#7C9A92; margin:0 0 clamp(24px,4vw,40px);">{de ? "Souveränität" : en ? "Sovereignty" : "自主可控（数据主权）"}</p>
+    <h2 style="font-weight:600; font-size:clamp(34px,6vw,64px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 clamp(20px,3vw,28px);">{de ? "Bereit für die Souveränität?" : en ? "Ready for sovereignty?" : "准备好掌握自主可控了吗？"}</h2>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#9FB8B0; margin:0 0 clamp(32px,4vw,44px); max-width:50ch;">{de ? "Startet auf eurer eigenen Infrastruktur — oder lasst euch vorab eine konkrete Lösungsskizze geben." : en ? "Start on your own infrastructure — or get a concrete solution sketch first." : "在您自己的基础设施上启动——或先获取一份具体的解决方案草案。"}</p>
     <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
-      <a href={kontakt} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px; border-radius:4px;">{de ? "Pain-List schicken →" : "Send pain list →"}</a>
-      <a href={demo} style="text-decoration:none; color:#F8F9FA; font-weight:500; font-size:15px; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗"}</a>
+      <a href={kontakt} style="text-decoration:none; background:#E6B23A; color:#123A33; font-weight:600; font-size:16px; padding:18px 32px; border-radius:4px;">{de ? "Pain-List schicken →" : en ? "Send pain list →" : "发送痛点清单 →"}</a>
+      <a href={demo} style="text-decoration:none; color:#F8F9FA; font-weight:500; font-size:15px; border-bottom:1.5px solid #2E5A52; padding-bottom:3px;">{de ? "ERP-Demo öffnen ↗" : en ? "Open ERP demo ↗" : "打开 ERP 演示 ↗"}</a>
     </div>
   </div>
 </section>

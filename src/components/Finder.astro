@@ -10,9 +10,13 @@ const tx = lang === "de"
   ? { kicker: "Lösungs-Finder", title: "Sag, wo's klemmt — wir zeigen den passenden Baustein.",
       ph: "z. B. Wareneingang, Schichtplan, Auswertung, Wartung …",
       empty: "Nichts Passendes gefunden — schick uns einfach deine Pain-List.", view: "ansehen" }
-  : { kicker: "Solution finder", title: "Tell us where it pinches — we'll point to the right block.",
+  : lang === "en"
+  ? { kicker: "Solution finder", title: "Tell us where it pinches — we'll point to the right block.",
       ph: "e.g. goods-in, shift plan, analytics, maintenance …",
-      empty: "Nothing matched — just send us your pain list.", view: "view" };
+      empty: "Nothing matched — just send us your pain list.", view: "view" }
+  : { kicker: "方案查找器", title: "告诉我们卡在哪里——我们为您指出合适的模块。",
+      ph: "例如：收货、排班、分析、维护 …",
+      empty: "未找到合适的结果——直接把您的痛点清单发给我们即可。", view: "查看" };
 ---
 {searchEnabled && (
   <section id="finder" class="wrap" style="padding-block:clamp(2.5rem,6vw,4rem);">

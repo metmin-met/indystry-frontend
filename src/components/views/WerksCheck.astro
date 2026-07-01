@@ -5,54 +5,55 @@ import { type Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const ph = (s: string) => (de ? "/saeule/" + s + "/" : "/en/pillar/" + s + "/");
+const en = lang === "en";
+const ph = (s: string) => (de ? "/saeule/" + s + "/" : en ? "/en/pillar/" + s + "/" : "/cn/pillar/" + s + "/");
 
 // 5 Profil-Typen (Kundentyp/Bedarf) → Empfehlungen (Säulen) + Demos
 const P: Record<string, any> = {
   jongleur: {
-    name: de ? "Der Tabellen-Jongleur" : "The spreadsheet juggler",
-    blurb: de ? "Du hältst zehn Listen gleichzeitig in der Luft — und betest, dass keine runterfällt. Jede Auswertung ist Handarbeit, jede Zahl wohnt woanders." : "You keep ten lists in the air at once — praying none drops. Every report is manual, every number lives elsewhere.",
+    name: de ? "Der Tabellen-Jongleur" : en ? "The spreadsheet juggler" : "表格杂耍者",
+    blurb: de ? "Du hältst zehn Listen gleichzeitig in der Luft — und betest, dass keine runterfällt. Jede Auswertung ist Handarbeit, jede Zahl wohnt woanders." : en ? "You keep ten lists in the air at once — praying none drops. Every report is manual, every number lives elsewhere." : "您同时抛接着十份清单 — 祈祷没有一份掉下来。每份分析都靠手工，每个数字都散落各处。",
     recs: [
-      { l: de ? "ERP & Betrieb — ein System statt zehn Tabellen" : "ERP & operations — one system instead of ten sheets", h: ph("erp-betrieb") },
-      { l: de ? "BI & Analytics — Auswertungen, die sich selbst aktualisieren" : "BI & analytics — reports that refresh themselves", h: ph("bi-analytics") },
+      { l: de ? "ERP & Betrieb — ein System statt zehn Tabellen" : en ? "ERP & operations — one system instead of ten sheets" : "ERP 与运营 — 用一套系统取代十张表格", h: ph("erp-betrieb") },
+      { l: de ? "BI & Analytics — Auswertungen, die sich selbst aktualisieren" : en ? "BI & analytics — reports that refresh themselves" : "BI 与分析 — 会自动刷新的分析报表", h: ph("bi-analytics") },
     ],
-    demos: [{ l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "BI-Dashboard ansehen ↗" : "View BI dashboard ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }],
+    demos: [{ l: de ? "ERP-Demo öffnen ↗" : en ? "Open ERP demo ↗" : "打开 ERP 演示 ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "BI-Dashboard ansehen ↗" : en ? "View BI dashboard ↗" : "查看 BI 仪表盘 ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }],
   },
   inseln: {
-    name: de ? "Der Insel-Sammler" : "The island collector",
-    blurb: de ? "Viele Tools, keine Brücken. Jedes kann was, aber sie reden nicht miteinander — also kopierst du Daten von Hand hin und her." : "Many tools, no bridges. Each does something, but they don't talk — so you copy data back and forth by hand.",
+    name: de ? "Der Insel-Sammler" : en ? "The island collector" : "孤岛收集者",
+    blurb: de ? "Viele Tools, keine Brücken. Jedes kann was, aber sie reden nicht miteinander — also kopierst du Daten von Hand hin und her." : en ? "Many tools, no bridges. Each does something, but they don't talk — so you copy data back and forth by hand." : "工具很多，却没有桥梁。每个都各有所长，却彼此不通 — 于是您只能手工来回搬运数据。",
     recs: [
-      { l: de ? "Historian & Data-Lake — eine Quelle statt Inseln" : "Historian & data lake — one source instead of islands", h: ph("historian-datalake") },
-      { l: de ? "ERP & Betrieb — der Kern, an den alles andockt" : "ERP & operations — the core everything docks onto", h: ph("erp-betrieb") },
+      { l: de ? "Historian & Data-Lake — eine Quelle statt Inseln" : en ? "Historian & data lake — one source instead of islands" : "历史数据库与数据湖 — 用单一数据源取代孤岛", h: ph("historian-datalake") },
+      { l: de ? "ERP & Betrieb — der Kern, an den alles andockt" : en ? "ERP & operations — the core everything docks onto" : "ERP 与运营 — 万物对接的核心", h: ph("erp-betrieb") },
     ],
-    demos: [{ l: de ? "BI-Dashboard ansehen ↗" : "View BI dashboard ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }, { l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }],
+    demos: [{ l: de ? "BI-Dashboard ansehen ↗" : en ? "View BI dashboard ↗" : "查看 BI 仪表盘 ↗", h: "https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c" }, { l: de ? "ERP-Demo öffnen ↗" : en ? "Open ERP demo ↗" : "打开 ERP 演示 ↗", h: "https://erp-demo.indystry.works/web/login" }],
   },
   blindflug: {
-    name: de ? "Der Blindflieger" : "The blind flyer",
-    blurb: de ? "Du siehst nicht in Echtzeit, was die Maschinen und die Produktion gerade tun. Probleme bemerkst du erst, wenn's zu spät ist." : "You can't see in real time what the machines and production are doing. You spot problems only when it's too late.",
+    name: de ? "Der Blindflieger" : en ? "The blind flyer" : "盲飞者",
+    blurb: de ? "Du siehst nicht in Echtzeit, was die Maschinen und die Produktion gerade tun. Probleme bemerkst du erst, wenn's zu spät ist." : en ? "You can't see in real time what the machines and production are doing. You spot problems only when it's too late." : "您无法实时看到机器和生产正在做什么。等您察觉问题时，往往为时已晚。",
     recs: [
-      { l: de ? "Automatisierung & Leittechnik — Daten direkt von der Maschine" : "Automation & control — data straight from the machine", h: ph("automatisierung-leittechnik") },
-      { l: de ? "BI & Analytics — Live-Monitoring & Drift-Erkennung" : "BI & analytics — live monitoring & drift detection", h: ph("bi-analytics") },
+      { l: de ? "Automatisierung & Leittechnik — Daten direkt von der Maschine" : en ? "Automation & control — data straight from the machine" : "自动化与控制技术 — 数据直接来自机器", h: ph("automatisierung-leittechnik") },
+      { l: de ? "BI & Analytics — Live-Monitoring & Drift-Erkennung" : en ? "BI & analytics — live monitoring & drift detection" : "BI 与分析 — 实时监控与漂移检测", h: ph("bi-analytics") },
     ],
-    demos: [{ l: de ? "Live-Cockpit ansehen ↗" : "View live cockpit ↗", h: "https://grafana-demo.indystry.works" }, { l: de ? "Digital-Twin ausprobieren ↗" : "Try the digital twin ↗", h: "https://twin-demo.indystry.works" }],
+    demos: [{ l: de ? "Live-Cockpit ansehen ↗" : en ? "View live cockpit ↗" : "查看实时驾驶舱 ↗", h: "https://grafana-demo.indystry.works" }, { l: de ? "Digital-Twin ausprobieren ↗" : en ? "Try the digital twin ↗" : "试用数字孪生 ↗", h: "https://twin-demo.indystry.works" }],
   },
   souveraen: {
-    name: de ? "Der Souveränitäts-Sucher" : "The sovereignty seeker",
-    blurb: de ? "Deine Daten sollen dir gehören — kein Vendor-Lock-in, kein US-Cloud-Zugriff, sauber für DSGVO & Audit. Genau dafür ist der dritte Weg gebaut." : "You want your data to be yours — no vendor lock-in, no US-cloud access, clean for GDPR & audits. That's exactly what the third way is built for.",
+    name: de ? "Der Souveränitäts-Sucher" : en ? "The sovereignty seeker" : "自主可控（数据主权）的追求者",
+    blurb: de ? "Deine Daten sollen dir gehören — kein Vendor-Lock-in, kein US-Cloud-Zugriff, sauber für DSGVO & Audit. Genau dafür ist der dritte Weg gebaut." : en ? "You want your data to be yours — no vendor lock-in, no US-cloud access, clean for GDPR & audits. That's exactly what the third way is built for." : "您希望数据真正属于自己 — 没有厂商锁定、没有美国云访问、符合 GDPR 与审计要求。第三条路正是为此而生。",
     recs: [
-      { l: de ? "Betrieb & Infrastruktur — alles im eigenen Haus" : "Operations & infrastructure — all in-house", h: ph("basis-betrieb") },
-      { l: de ? "Digitale Souveränität — der ganze Ansatz auf einen Blick" : "Digital sovereignty — the whole approach at a glance", h: (de ? "/#souv" : "/en/#souv") },
+      { l: de ? "Betrieb & Infrastruktur — alles im eigenen Haus" : en ? "Operations & infrastructure — all in-house" : "运营与基础设施 — 全部自建于本地", h: ph("basis-betrieb") },
+      { l: de ? "Digitale Souveränität — der ganze Ansatz auf einen Blick" : en ? "Digital sovereignty — the whole approach at a glance" : "数字自主可控（数据主权）— 一览整体思路", h: (de ? "/#souv" : en ? "/en/#souv" : "/cn/#souv") },
     ],
-    demos: [{ l: de ? "Alle 10 Bausteine ansehen ↗" : "See all 10 building blocks ↗", h: (de ? "/#saeulen" : "/en/#saeulen") }],
+    demos: [{ l: de ? "Alle 10 Bausteine ansehen ↗" : en ? "See all 10 building blocks ↗" : "查看全部 10 个模块 ↗", h: (de ? "/#saeulen" : en ? "/en/#saeulen" : "/cn/#saeulen") }],
   },
   wachstum: {
-    name: de ? "Der Wachstums-Werker" : "The growth maker",
-    blurb: de ? "Ihr wachst — und die Software kommt nicht mehr mit. Ihr braucht Struktur, die mitwächst, ohne euch in Konzern-Software zu zwingen." : "You're growing — and the software can't keep up. You need structure that scales with you, without forcing you into enterprise software.",
+    name: de ? "Der Wachstums-Werker" : en ? "The growth maker" : "成长型工厂主",
+    blurb: de ? "Ihr wachst — und die Software kommt nicht mehr mit. Ihr braucht Struktur, die mitwächst, ohne euch in Konzern-Software zu zwingen." : en ? "You're growing — and the software can't keep up. You need structure that scales with you, without forcing you into enterprise software." : "贵厂在成长 — 而软件却跟不上了。您需要能随之扩展的架构，却又不必被迫使用大型企业软件。",
     recs: [
-      { l: de ? "ERP & Betrieb — Struktur für die ganze Firma" : "ERP & operations — structure for the whole company", h: ph("erp-betrieb") },
-      { l: de ? "Zusammenarbeit — Team, Wissen & Abläufe an einem Ort" : "Collaboration — team, knowledge & processes in one place", h: ph("zusammenarbeit") },
+      { l: de ? "ERP & Betrieb — Struktur für die ganze Firma" : en ? "ERP & operations — structure for the whole company" : "ERP 与运营 — 面向整家企业的架构", h: ph("erp-betrieb") },
+      { l: de ? "Zusammenarbeit — Team, Wissen & Abläufe an einem Ort" : en ? "Collaboration — team, knowledge & processes in one place" : "协作 — 团队、知识与流程集于一处", h: ph("zusammenarbeit") },
     ],
-    demos: [{ l: de ? "ERP-Demo öffnen ↗" : "Open ERP demo ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "Werker-App ausprobieren ↗" : "Try the shop-floor app ↗", h: "https://app-demo.indystry.works" }],
+    demos: [{ l: de ? "ERP-Demo öffnen ↗" : en ? "Open ERP demo ↗" : "打开 ERP 演示 ↗", h: "https://erp-demo.indystry.works/web/login" }, { l: de ? "Werker-App ausprobieren ↗" : en ? "Try the shop-floor app ↗" : "试用车间应用 ↗", h: "https://app-demo.indystry.works" }],
   },
 };
 
@@ -93,7 +94,7 @@ const Q = de ? [
     { t: "Wichtig, aber zuerst muss der Alltag laufen", p: "jongleur" },
     { t: "Wir wollen vor allem den Überblick zurück", p: "blindflug" },
     { t: "Hauptsache, es trägt unser Wachstum", p: "wachstum" } ] },
-] : [
+] : en ? [
   { q: "When you want to know how much you produced last week — how do you get the number?", o: [
     { t: "Piece it together from several Excel sheets", p: "jongleur" },
     { t: "Check in three different programs", p: "inseln" },
@@ -129,32 +130,68 @@ const Q = de ? [
     { t: "Important, but daily ops come first", p: "jongleur" },
     { t: "We mostly want the overview back", p: "blindflug" },
     { t: "As long as it carries our growth", p: "wachstum" } ] },
+] : [
+  { q: "当您想知道上周产量是多少时 — 您怎么拿到这个数字？", o: [
+    { t: "从好几个 Excel 表格里东拼西凑", p: "jongleur" },
+    { t: "在三个不同的程序里分别查看", p: "inseln" },
+    { t: "根本没有实时数据 — 我得去问别人", p: "blindflug" },
+    { t: "我们增长太快，这个数字总是过时的", p: "wachstum" } ] },
+  { q: "贵厂最重要的运营数据存放在哪里？", o: [
+    { t: "在各个磁盘上的表格里，以及邮件附件中", p: "jongleur" },
+    { t: "分散在许多独立的孤岛工具里", p: "inseln" },
+    { t: "在某家美国供应商的云端", p: "souveraen" },
+    { t: "哪里有空间就放哪里 — 很快就一团乱", p: "wachstum" } ] },
+  { q: "周一早晨最让您头疼的是什么？", o: [
+    { t: "对齐来自不同清单的数字", p: "jongleur" },
+    { t: "在各程序之间来回复制数据", p: "inseln" },
+    { t: "没人知道机器在周末到底做了什么", p: "blindflug" },
+    { t: "流程已经跟不上业务增长", p: "wachstum" } ] },
+  { q: "客户或审计员要求提供一份证明。会发生什么？", o: [
+    { t: "在文件夹和表格里手忙脚乱地翻找", p: "jongleur" },
+    { t: "从好几个工具里东拼西凑", p: "inseln" },
+    { t: "担心数据保护、GDPR 和云访问", p: "souveraen" },
+    { t: "我们意识到自己的流程无法扩展", p: "wachstum" } ] },
+  { q: "贵厂的软件格局给您的感觉是 …", o: [
+    { t: "一片表格丛林", p: "jongleur" },
+    { t: "许多没有桥梁的孤岛", p: "inseln" },
+    { t: "一个黑盒子 — 我看不进去", p: "blindflug" },
+    { t: "全是租来的 — 我们受制于供应商", p: "souveraen" } ] },
+  { q: "眼下什么最能帮到贵厂？", o: [
+    { t: "用一套系统取代十张表格", p: "jongleur" },
+    { t: "让这些程序终于能互相对话", p: "inseln" },
+    { t: "实时看到生产现场发生了什么", p: "blindflug" },
+    { t: "能够随需扩展 — 又不必用大型企业软件", p: "wachstum" } ] },
+  { q: "数据和系统真正归贵厂所有，这对您有多重要？", o: [
+    { t: "非常重要 — 自主可控是主要原因", p: "souveraen" },
+    { t: "很重要，但首先日常运营得转起来", p: "jongleur" },
+    { t: "我们最想要的是重新掌握全局", p: "blindflug" },
+    { t: "只要能支撑我们的增长就行", p: "wachstum" } ] },
 ];
 
 const order = ["jongleur", "inseln", "blindflug", "souveraen", "wachstum"];
 const tx = {
-  eyebrow: de ? "Diagnose — Werks-Check" : "Diagnosis — factory check",
-  h1: de ? "Welcher Typ Werk seid ihr?" : "What kind of plant are you?",
-  lead: de ? "7 Fragen, zwei Minuten. Am Ende weißt du, wo's bei euch wirklich klemmt — und welche Bausteine zuerst etwas bringen." : "7 questions, two minutes. At the end you'll know where it really pinches — and which building blocks help first.",
-  start: de ? "Check starten →" : "Start the check →",
-  of: de ? "von" : "of",
-  back: de ? "← zurück" : "← back",
-  resultKicker: de ? "Dein Ergebnis" : "Your result",
-  gateTitle: de ? "Empfehlungen freischalten" : "Unlock your recommendations",
-  gateText: de ? "Sag uns, wohin wir dein vollständiges Ergebnis schicken dürfen — du bekommst die passenden Bausteine, Demos und einen konkreten ersten Schritt." : "Tell us where to send your full result — you'll get the matching building blocks, demos and a concrete first step.",
-  name: de ? "Name" : "Name", email: de ? "E-Mail" : "Email", company: de ? "Firma (optional)" : "Company (optional)",
-  consent: de ? "Ihr dürft mich zu meinem Ergebnis kontaktieren." : "You may contact me about my result.",
-  submit: de ? "Ergebnis freischalten →" : "Unlock result →",
-  sending: de ? "Wird gesendet …" : "Sending …",
-  required: de ? "Bitte Name und gültige E-Mail angeben." : "Please enter a name and valid email.",
-  err: de ? "Hat nicht geklappt — bitte nochmal." : "Didn't work — please try again.",
-  recsTitle: de ? "Deine Bausteine — der Reihe nach" : "Your building blocks — in order",
-  demosTitle: de ? "Zum Anfassen" : "Try it",
-  restart: de ? "Check nochmal machen" : "Retake the check",
-  contactCta: de ? "Pain-List schicken →" : "Send pain list →",
-  privacy: de ? "Keine Weitergabe, kein Verteiler. Nur für dein Ergebnis." : "No sharing, no mailing list. Only for your result.",
+  eyebrow: de ? "Diagnose — Werks-Check" : en ? "Diagnosis — factory check" : "诊断 — 工厂自查",
+  h1: de ? "Welcher Typ Werk seid ihr?" : en ? "What kind of plant are you?" : "贵厂属于哪种类型？",
+  lead: de ? "7 Fragen, zwei Minuten. Am Ende weißt du, wo's bei euch wirklich klemmt — und welche Bausteine zuerst etwas bringen." : en ? "7 questions, two minutes. At the end you'll know where it really pinches — and which building blocks help first." : "7 道问题，两分钟。结束时您就会知道贵厂真正的痛点在哪 — 以及哪些模块最先见效。",
+  start: de ? "Check starten →" : en ? "Start the check →" : "开始自查 →",
+  of: de ? "von" : en ? "of" : "共",
+  back: de ? "← zurück" : en ? "← back" : "← 返回",
+  resultKicker: de ? "Dein Ergebnis" : en ? "Your result" : "您的结果",
+  gateTitle: de ? "Empfehlungen freischalten" : en ? "Unlock your recommendations" : "解锁您的建议",
+  gateText: de ? "Sag uns, wohin wir dein vollständiges Ergebnis schicken dürfen — du bekommst die passenden Bausteine, Demos und einen konkreten ersten Schritt." : en ? "Tell us where to send your full result — you'll get the matching building blocks, demos and a concrete first step." : "告诉我们把您的完整结果发送到哪里 — 您将收到匹配的模块、演示以及一个具体的第一步。",
+  name: de ? "Name" : en ? "Name" : "姓名", email: de ? "E-Mail" : en ? "Email" : "邮箱", company: de ? "Firma (optional)" : en ? "Company (optional)" : "公司（选填）",
+  consent: de ? "Ihr dürft mich zu meinem Ergebnis kontaktieren." : en ? "You may contact me about my result." : "我同意贵司就我的结果与我联系。",
+  submit: de ? "Ergebnis freischalten →" : en ? "Unlock result →" : "解锁结果 →",
+  sending: de ? "Wird gesendet …" : en ? "Sending …" : "正在发送 …",
+  required: de ? "Bitte Name und gültige E-Mail angeben." : en ? "Please enter a name and valid email." : "请填写姓名和有效的邮箱。",
+  err: de ? "Hat nicht geklappt — bitte nochmal." : en ? "Didn't work — please try again." : "没有成功 — 请再试一次。",
+  recsTitle: de ? "Deine Bausteine — der Reihe nach" : en ? "Your building blocks — in order" : "您的模块 — 按先后顺序",
+  demosTitle: de ? "Zum Anfassen" : en ? "Try it" : "亲手体验",
+  restart: de ? "Check nochmal machen" : en ? "Retake the check" : "重新做一次自查",
+  contactCta: de ? "Pain-List schicken →" : en ? "Send pain list →" : "发送痛点清单 →",
+  privacy: de ? "Keine Weitergabe, kein Verteiler. Nur für dein Ergebnis." : en ? "No sharing, no mailing list. Only for your result." : "不外传、不进邮件列表。仅用于向您反馈结果。",
 };
-const contactHref = de ? "/kontakt/" : "/en/kontakt/";
+const contactHref = de ? "/kontakt/" : en ? "/en/kontakt/" : "/cn/kontakt/";
 ---
 <section style="background:#F8F9FA; min-height:70vh;">
   <div style="max-width:760px; margin:0 auto; padding:clamp(64px,8vw,112px) clamp(24px,5vw,56px) clamp(96px,12vw,168px);">

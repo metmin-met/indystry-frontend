@@ -5,77 +5,78 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const META: Record<string,{mono:string;hue:string}> = {
   safe:{mono:"SI",hue:"#c0392b"}, setup:{mono:"RÜ",hue:"#c4673f"}, erp:{mono:"ER",hue:"#16463E"},
   leit:{mono:"LS",hue:"#3f9a52"}, qs:{mono:"QS",hue:"#4a6fa5"}, rek:{mono:"RK",hue:"#7b5cc4"},
   sec:{mono:"DS",hue:"#2a86a8"}, kpi:{mono:"KZ",hue:"#b5851a"},
 };
 const mods = [
-  { k:"safe", t:L("Sicherheit & erste Schritte","Safety & first steps"), min:5,
-    lesson:L("Willkommen bei Nordwerk. Bevor es an die Maschine geht: Not-Aus kennen, PSA tragen, Meldewege verstehen. Im Notfall zuerst Not-Aus, dann Meldung.","Welcome to Nordwerk. Before going to the machine: know the e-stop, wear PPE, understand reporting paths. In an emergency: e-stop first, then report."),
-    q:L("Was tust du im Notfall zuerst?","What do you do first in an emergency?"),
-    opts:[L("Vorgesetzten suchen","Find your supervisor"),L("Not-Aus drücken","Hit the e-stop"),L("Foto machen","Take a photo")], correct:1,
-    why:L("Erst Not-Aus, dann melden — Sicherheit vor allem.","E-stop first, then report — safety first."),
-    demo:{l:L("Handbuch","Handbook"),h:`${b}/wissen/`} },
-  { k:"setup", t:L("Maschine rüsten","Set up a machine"), min:8,
-    lesson:L("Rüsten heißt: Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen. Erst wenn das Erststück passt, läuft die Serie.","Setup means: change tooling, set the zero point, load the program, check the first part. Only when the first part is good does the series run."),
-    q:L("Wann startet die Serie?","When does the series start?"),
-    opts:[L("Sofort nach dem Programmladen","Right after loading the program"),L("Wenn das Erststück passt","When the first part is good"),L("Nach der Pause","After the break")], correct:1,
-    why:L("Das geprüfte Erststück ist die Freigabe für die Serie.","The checked first part is the go-ahead for the series."),
-    demo:{l:L("Anlage","Plant"),h:`${b}/anlage/`} },
-  { k:"erp", t:L("Auftrag im ERP","Order in the ERP"), min:7,
-    lesson:L("Aus einer Anfrage wird ein Angebot, aus dem bestätigten Angebot ein Auftrag. Mit dem Auftrag entstehen automatisch Fertigung und Lieferung — ohne Doppelerfassung.","An inquiry becomes a quote, a confirmed quote becomes an order. The order automatically creates production and delivery — no double entry."),
-    q:L("Was entsteht mit dem bestätigten Auftrag automatisch?","What does the confirmed order create automatically?"),
-    opts:[L("Nur eine Rechnung","Just an invoice"),L("Fertigung & Lieferung","Production & delivery"),L("Gar nichts","Nothing")], correct:1,
-    why:L("Der Auftrag löst Fertigungsauftrag (MRP) und Lieferung aus.","The order triggers the production order (MRP) and the delivery."),
+  { k:"safe", t:L("Sicherheit & erste Schritte","Safety & first steps","安全与第一步"), min:5,
+    lesson:L("Willkommen bei Nordwerk. Bevor es an die Maschine geht: Not-Aus kennen, PSA tragen, Meldewege verstehen. Im Notfall zuerst Not-Aus, dann Meldung.","Welcome to Nordwerk. Before going to the machine: know the e-stop, wear PPE, understand reporting paths. In an emergency: e-stop first, then report.","欢迎加入 Nordwerk。上机之前：熟悉急停装置、穿戴个人防护装备、了解上报途径。紧急情况下先按急停，再上报。"),
+    q:L("Was tust du im Notfall zuerst?","What do you do first in an emergency?","紧急情况下您首先做什么？"),
+    opts:[L("Vorgesetzten suchen","Find your supervisor","去找主管"),L("Not-Aus drücken","Hit the e-stop","按下急停"),L("Foto machen","Take a photo","拍张照片")], correct:1,
+    why:L("Erst Not-Aus, dann melden — Sicherheit vor allem.","E-stop first, then report — safety first.","先急停，再上报——安全第一。"),
+    demo:{l:L("Handbuch","Handbook","手册"),h:`${b}/wissen/`} },
+  { k:"setup", t:L("Maschine rüsten","Set up a machine","设备调机"), min:8,
+    lesson:L("Rüsten heißt: Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen. Erst wenn das Erststück passt, läuft die Serie.","Setup means: change tooling, set the zero point, load the program, check the first part. Only when the first part is good does the series run.","调机意味着：更换刀具、设定零点、载入程序、检验首件。只有首件合格，批量生产才能开始。"),
+    q:L("Wann startet die Serie?","When does the series start?","批量生产何时开始？"),
+    opts:[L("Sofort nach dem Programmladen","Right after loading the program","载入程序后立即"),L("Wenn das Erststück passt","When the first part is good","首件合格后"),L("Nach der Pause","After the break","休息之后")], correct:1,
+    why:L("Das geprüfte Erststück ist die Freigabe für die Serie.","The checked first part is the go-ahead for the series.","经检验合格的首件即为批量生产的放行。"),
+    demo:{l:L("Anlage","Plant","设备"),h:`${b}/anlage/`} },
+  { k:"erp", t:L("Auftrag im ERP","Order in the ERP","ERP 中的订单"), min:7,
+    lesson:L("Aus einer Anfrage wird ein Angebot, aus dem bestätigten Angebot ein Auftrag. Mit dem Auftrag entstehen automatisch Fertigung und Lieferung — ohne Doppelerfassung.","An inquiry becomes a quote, a confirmed quote becomes an order. The order automatically creates production and delivery — no double entry.","询价转为报价，确认后的报价转为订单。订单会自动生成生产和交付——无需重复录入。"),
+    q:L("Was entsteht mit dem bestätigten Auftrag automatisch?","What does the confirmed order create automatically?","已确认的订单会自动生成什么？"),
+    opts:[L("Nur eine Rechnung","Just an invoice","仅一张发票"),L("Fertigung & Lieferung","Production & delivery","生产与交付"),L("Gar nichts","Nothing","什么都不生成")], correct:1,
+    why:L("Der Auftrag löst Fertigungsauftrag (MRP) und Lieferung aus.","The order triggers the production order (MRP) and the delivery.","订单触发生产订单（MRP）和交付。"),
     demo:{l:"ERP",h:"https://erp-demo.indystry.works/odoo",x:true} },
-  { k:"leit", t:L("Leitstand & Anlage","Control room & plant"), min:6,
-    lesson:L("Der Leitstand zeigt jede Maschine: läuft, Leerlauf, Wartung fällig oder Störung. Bei Wartungsbedarf gehst du von der Maschine in den Schaltschrank bis zum Stromlaufplan.","The control room shows every machine: running, idle, maintenance due or fault. For maintenance you go from the machine into the cabinet down to the wiring plan."),
-    q:L("Was bedeutet eine gelbe Maschine im Leitstand?","What does an amber machine mean in the control room?"),
-    opts:[L("Sie ist aus","It's off"),L("Wartung fällig","Maintenance due"),L("Sie produziert schneller","It runs faster")], correct:1,
-    why:L("Gelb = Wartung fällig — handeln, bevor sie steht.","Amber = maintenance due — act before it stops."),
-    demo:{l:L("Leitstand","Control room"),h:`${b}/leitstand/`} },
-  { k:"qs", t:L("Qualität & Prüfung","Quality & inspection"), min:7,
-    lesson:L("Geprüft wird gegen Grenzwerte: Maßhaltigkeit, Oberfläche, Gewicht. Außerhalb der Grenze heißt n.i.O. — sperren und melden. Jede Charge bekommt ein Protokoll.","Inspection is against limits: dimensions, surface, weight. Outside the limit means fail — block and report. Every batch gets a record."),
-    q:L("Ein Maß liegt außerhalb der Grenze. Was nun?","A dimension is out of limits. What now?"),
-    opts:[L("Trotzdem liefern","Ship anyway"),L("Sperren und melden","Block and report"),L("Grenze ändern","Change the limit")], correct:1,
-    why:L("n.i.O. wird gesperrt und gemeldet — nie einfach durchwinken.","A fail is blocked and reported — never wave it through."),
-    demo:{l:L("Analyse","Analysis"),h:`${b}/analyse/`} },
-  { k:"rek", t:L("Reklamation & Service","Complaints & service"), min:6,
-    lesson:L("Eine Reklamation wird als Fall erfasst, die Ursache strukturiert gesucht (8D), die Korrektur bis zur Wirksamkeit verfolgt. Die KI-Suche findet ähnliche Altfälle.","A complaint is logged as a case, the root cause found structurally (8D), the correction tracked to effect. The AI search finds similar past cases."),
-    q:L("Wozu dient die 8D-Methode?","What is the 8D method for?"),
-    opts:[L("Schneller liefern","Ship faster"),L("Ursache finden & Wiederholung verhindern","Find the cause & prevent recurrence"),L("Rabatt geben","Give a discount")], correct:1,
-    why:L("8D strukturiert die Ursachenanalyse und sichert die Wirksamkeit.","8D structures root-cause analysis and secures effectiveness."),
-    demo:{l:L("Frag die Firma","Ask the company"),h:`${b}/suche/`} },
-  { k:"sec", t:L("Datenschutz & Sicherheit","Privacy & security"), min:6,
-    lesson:L("Ein Login für alles (SSO), zweiter Faktor an, Bildschirm sperren beim Weggehen. Bei Phishing-Mails: nicht klicken, melden. Sicherheit ist Teil der täglichen Arbeit, nicht ein Extra.","One login for everything (SSO), second factor on, lock the screen when you leave. Phishing mails: don't click, report. Security is part of the daily work, not an extra."),
-    q:L("Verdächtige E-Mail mit Link — was tust du?","Suspicious email with a link — what do you do?"),
-    opts:[L("Link öffnen, um zu prüfen","Open the link to check"),L("Nicht klicken, melden","Don't click, report"),L("Weiterleiten an alle","Forward to everyone")], correct:1,
-    why:L("Nie auf verdächtige Links klicken — melden, damit andere gewarnt sind.","Never click suspicious links — report so others are warned."),
-    demo:{l:L("Compliance","Compliance"),h:`${b}/compliance/`} },
-  { k:"kpi", t:L("Kennzahlen lesen","Reading the KPIs"), min:5,
-    lesson:L("Kennzahlen wie OEE, Termintreue und Ausschussquote zeigen, wie der Betrieb läuft. Wichtig ist der Trend, nicht der einzelne Tag. Jeder Stand wird eingefroren, damit man Entwicklungen ehrlich vergleichen kann.","KPIs like OEE, on-time delivery and scrap rate show how the operation runs. What matters is the trend, not a single day. Every state is frozen so you can compare developments honestly."),
-    q:L("Worauf kommt es bei Kennzahlen vor allem an?","What matters most with KPIs?"),
-    opts:[L("Der einzelne Tageswert","The single day's value"),L("Der Trend über die Zeit","The trend over time"),L("Möglichst große Zahlen","The biggest possible numbers")], correct:1,
-    why:L("Der Trend zählt — ein einzelner Tag schwankt immer.","The trend is what counts — a single day always fluctuates."),
-    demo:{l:L("Kennzahlen","KPIs"),h:`${b}/kennzahlen/`} },
+  { k:"leit", t:L("Leitstand & Anlage","Control room & plant","中控室与设备"), min:6,
+    lesson:L("Der Leitstand zeigt jede Maschine: läuft, Leerlauf, Wartung fällig oder Störung. Bei Wartungsbedarf gehst du von der Maschine in den Schaltschrank bis zum Stromlaufplan.","The control room shows every machine: running, idle, maintenance due or fault. For maintenance you go from the machine into the cabinet down to the wiring plan.","中控室显示每台设备的状态：运行、空闲、待维护或故障。需要维护时，您从设备进入配电柜，直至电气原理图。"),
+    q:L("Was bedeutet eine gelbe Maschine im Leitstand?","What does an amber machine mean in the control room?","中控室里黄色的设备意味着什么？"),
+    opts:[L("Sie ist aus","It's off","它已关闭"),L("Wartung fällig","Maintenance due","待维护"),L("Sie produziert schneller","It runs faster","它运行得更快")], correct:1,
+    why:L("Gelb = Wartung fällig — handeln, bevor sie steht.","Amber = maintenance due — act before it stops.","黄色＝待维护——趁它还没停机就采取行动。"),
+    demo:{l:L("Leitstand","Control room","中控室"),h:`${b}/leitstand/`} },
+  { k:"qs", t:L("Qualität & Prüfung","Quality & inspection","质量与检验"), min:7,
+    lesson:L("Geprüft wird gegen Grenzwerte: Maßhaltigkeit, Oberfläche, Gewicht. Außerhalb der Grenze heißt n.i.O. — sperren und melden. Jede Charge bekommt ein Protokoll.","Inspection is against limits: dimensions, surface, weight. Outside the limit means fail — block and report. Every batch gets a record.","检验依据的是限值：尺寸精度、表面、重量。超出限值即为不合格——冻结并上报。每一批次都会留有记录。"),
+    q:L("Ein Maß liegt außerhalb der Grenze. Was nun?","A dimension is out of limits. What now?","某个尺寸超出了限值。接下来怎么办？"),
+    opts:[L("Trotzdem liefern","Ship anyway","照样发货"),L("Sperren und melden","Block and report","冻结并上报"),L("Grenze ändern","Change the limit","更改限值")], correct:1,
+    why:L("n.i.O. wird gesperrt und gemeldet — nie einfach durchwinken.","A fail is blocked and reported — never wave it through.","不合格品要冻结并上报——绝不能随便放行。"),
+    demo:{l:L("Analyse","Analysis","分析"),h:`${b}/analyse/`} },
+  { k:"rek", t:L("Reklamation & Service","Complaints & service","投诉与服务"), min:6,
+    lesson:L("Eine Reklamation wird als Fall erfasst, die Ursache strukturiert gesucht (8D), die Korrektur bis zur Wirksamkeit verfolgt. Die KI-Suche findet ähnliche Altfälle.","A complaint is logged as a case, the root cause found structurally (8D), the correction tracked to effect. The AI search finds similar past cases.","投诉以案例形式登记，通过结构化方法（8D）查找根本原因，跟踪纠正措施直至见效。AI 搜索可找到类似的历史案例。"),
+    q:L("Wozu dient die 8D-Methode?","What is the 8D method for?","8D 方法的用途是什么？"),
+    opts:[L("Schneller liefern","Ship faster","更快发货"),L("Ursache finden & Wiederholung verhindern","Find the cause & prevent recurrence","查找原因并防止再次发生"),L("Rabatt geben","Give a discount","给予折扣")], correct:1,
+    why:L("8D strukturiert die Ursachenanalyse und sichert die Wirksamkeit.","8D structures root-cause analysis and secures effectiveness.","8D 将根本原因分析结构化，并确保措施有效。"),
+    demo:{l:L("Frag die Firma","Ask the company","向公司提问"),h:`${b}/suche/`} },
+  { k:"sec", t:L("Datenschutz & Sicherheit","Privacy & security","数据保护与安全"), min:6,
+    lesson:L("Ein Login für alles (SSO), zweiter Faktor an, Bildschirm sperren beim Weggehen. Bei Phishing-Mails: nicht klicken, melden. Sicherheit ist Teil der täglichen Arbeit, nicht ein Extra.","One login for everything (SSO), second factor on, lock the screen when you leave. Phishing mails: don't click, report. Security is part of the daily work, not an extra.","一次登录访问一切（SSO），开启第二因素，离开时锁屏。遇到钓鱼邮件：不要点击，及时上报。安全是日常工作的一部分，而非额外任务。"),
+    q:L("Verdächtige E-Mail mit Link — was tust du?","Suspicious email with a link — what do you do?","收到带链接的可疑邮件——您怎么做？"),
+    opts:[L("Link öffnen, um zu prüfen","Open the link to check","打开链接查看"),L("Nicht klicken, melden","Don't click, report","不要点击，及时上报"),L("Weiterleiten an alle","Forward to everyone","转发给所有人")], correct:1,
+    why:L("Nie auf verdächtige Links klicken — melden, damit andere gewarnt sind.","Never click suspicious links — report so others are warned.","切勿点击可疑链接——及时上报，好让他人也提高警惕。"),
+    demo:{l:L("Compliance","Compliance","合规"),h:`${b}/compliance/`} },
+  { k:"kpi", t:L("Kennzahlen lesen","Reading the KPIs","读懂关键指标"), min:5,
+    lesson:L("Kennzahlen wie OEE, Termintreue und Ausschussquote zeigen, wie der Betrieb läuft. Wichtig ist der Trend, nicht der einzelne Tag. Jeder Stand wird eingefroren, damit man Entwicklungen ehrlich vergleichen kann.","KPIs like OEE, on-time delivery and scrap rate show how the operation runs. What matters is the trend, not a single day. Every state is frozen so you can compare developments honestly.","OEE、准时交付率和废品率等关键指标反映了运营状况。重要的是趋势，而非某一天的数值。每一版数据都会被冻结，以便如实比较发展变化。"),
+    q:L("Worauf kommt es bei Kennzahlen vor allem an?","What matters most with KPIs?","关键指标最重要的是什么？"),
+    opts:[L("Der einzelne Tageswert","The single day's value","某一天的单个数值"),L("Der Trend über die Zeit","The trend over time","一段时间内的趋势"),L("Möglichst große Zahlen","The biggest possible numbers","数字尽可能大")], correct:1,
+    why:L("Der Trend zählt — ein einzelner Tag schwankt immer.","The trend is what counts — a single day always fluctuates.","关键在于趋势——单独一天总会有波动。"),
+    demo:{l:L("Kennzahlen","KPIs","关键指标"),h:`${b}/kennzahlen/`} },
 ];
 const modsJ = mods.map((m) => ({ ...m, mono: META[m.k].mono, hue: META[m.k].hue }));
 const TT = {
-  badge: L("Werksausweis · Nordwerk","Worker pass · Nordwerk"), name: L("Dein Name","Your name"),
-  modules: L("Module","Modules"), status0: L("Neu im Werk","New here"), status1: L("In Einarbeitung","Onboarding"),
-  status2: L("Eingearbeitet","Onboarded"), remain: L("noch ~","~"), remainU: L(" min Lernzeit"," min to go"),
-  done: L("abgeschlossen","completed"), reset: L("Zurücksetzen","Reset"),
-  live: L("Dazu live","See it live"), retry: L("Nicht ganz — nochmal.","Not quite — try again."),
+  badge: L("Werksausweis · Nordwerk","Worker pass · Nordwerk","工厂工牌 · Nordwerk"), name: L("Dein Name","Your name","您的姓名"),
+  modules: L("Module","Modules","模块"), status0: L("Neu im Werk","New here","初入工厂"), status1: L("In Einarbeitung","Onboarding","入职引导中"),
+  status2: L("Eingearbeitet","Onboarded","已完成入职引导"), remain: L("noch ~","~","还剩约 "), remainU: L(" min Lernzeit"," min to go"," 分钟学习时间"),
+  done: L("abgeschlossen","completed","已完成"), reset: L("Zurücksetzen","Reset","重置"),
+  live: L("Dazu live","See it live","现场查看"), retry: L("Nicht ganz — nochmal.","Not quite — try again.","不太对——再试一次。"),
 };
 ---
 <section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Onboarding & Lernen","Onboarding & learning")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("In einer Woche drin.","Up to speed in a week.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:62ch; margin:0;">{L("Lektion, Quiz, Häkchen — pro Modul. Du sammelst XP, dein Werksausweis füllt sich, und am Ende stempelt sich das Abschluss-Siegel. Dein Fortschritt bleibt im Browser gespeichert.","Lesson, quiz, checkmark — per module. You collect XP, your worker pass fills up, and at the end the completion seal stamps in. Your progress is saved in the browser.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Onboarding & Lernen","Onboarding & learning","入职引导与学习")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("In einer Woche drin.","Up to speed in a week.","一周即可上手。")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:62ch; margin:0;">{L("Lektion, Quiz, Häkchen — pro Modul. Du sammelst XP, dein Werksausweis füllt sich, und am Ende stempelt sich das Abschluss-Siegel. Dein Fortschritt bleibt im Browser gespeichert.","Lesson, quiz, checkmark — per module. You collect XP, your worker pass fills up, and at the end the completion seal stamps in. Your progress is saved in the browser.","每个模块：一节课、一次测验、一个勾选。您积累经验值，工厂工牌逐渐充实，最后盖上完成印章。您的进度保存在浏览器中。")}</p>
   </div>
 </section>
 
@@ -124,9 +125,9 @@ const TT = {
 <!-- CTA -->
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(26px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 auto; max-width:22ch;">{L("Eingearbeitet — und alles griffbereit.","Onboarded — and everything at hand.")}</h2>
-    <p style="font-size:clamp(15px,1.6vw,19px); color:#C7D8D2; max-width:52ch; margin:18px auto 28px;">{L("Das ganze Wissen der Firma bleibt im Kiosk — durchsuchbar, immer aktuell.","The company's whole knowledge stays in the kiosk — searchable, always current.")}</p>
-    <a href={b + "/wissen/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Zum Wissens-Kiosk","To the knowledge kiosk")} →</a>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(26px,4.4vw,48px); line-height:1.05; letter-spacing:-0.03em; margin:0 auto; max-width:22ch;">{L("Eingearbeitet — und alles griffbereit.","Onboarded — and everything at hand.","完成入职引导——一切触手可及。")}</h2>
+    <p style="font-size:clamp(15px,1.6vw,19px); color:#C7D8D2; max-width:52ch; margin:18px auto 28px;">{L("Das ganze Wissen der Firma bleibt im Kiosk — durchsuchbar, immer aktuell.","The company's whole knowledge stays in the kiosk — searchable, always current.","公司的全部知识都留在知识终端里——可检索，始终最新。")}</p>
+    <a href={b + "/wissen/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Zum Wissens-Kiosk","To the knowledge kiosk","前往知识终端")} →</a>
   </div>
 </section>
 

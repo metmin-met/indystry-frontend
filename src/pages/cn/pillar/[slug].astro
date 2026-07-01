@@ -1,0 +1,18 @@
+---
+import Base from "../../../layouts/Base.astro";
+import PillarDetail from "../../../components/views/PillarDetail.astro";
+import { pillars, getPillar } from "../../../lib/content";
+
+export function getStaticPaths() {
+  return pillars.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const lang = "zh" as const;
+const pillar = getPillar(slug!)!;
+const c = pillar[lang] ?? pillar.en; // Fallback bis pillars.yaml zh trägt
+const altPaths = { de: `/saeule/${slug}/`, en: `/en/pillar/${slug}/`, zh: `/cn/pillar/${slug}/` };
+---
+<Base lang={lang} title={c.hook.headline} description={c.hook.subline} path={`/cn/pillar/${slug}/`} altPaths={altPaths}>
+  <PillarDetail pillar={pillar} lang={lang} />
+</Base>

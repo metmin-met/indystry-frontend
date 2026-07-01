@@ -1,0 +1,43 @@
+---
+import Base from "../../layouts/Base.astro";
+import { faqsFor } from "../../lib/faqs";
+import { t } from "../../lib/i18n";
+const lang = "zh" as const;
+const ui = t(lang);
+const faqs = faqsFor(lang);
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+<Base lang={lang} title={ui.faq_title} description={ui.faq_intro} path="/cn/faq/" altPath="/faq/">
+  <section style="background:#F8F9FA;">
+    <div style="max-width:48rem; margin:0 auto; padding:clamp(64px,8vw,112px) clamp(24px,5vw,56px) clamp(96px,12vw,168px);">
+      <p style="font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.14em; text-transform:uppercase; color:#92938F; margin:0 0 clamp(28px,4vw,40px);">FAQ</p>
+      <h1 data-reveal style="font-weight:600; font-size:clamp(40px,7vw,88px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px;">{ui.faq_title}</h1>
+      <p data-reveal style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; margin:0 0 clamp(40px,5vw,56px);">{ui.faq_intro}</p>
+      <div style="border-top:1px solid #1B1C1E;">
+        {faqs.map((f) => (
+          <details class="faq-item" style="border-bottom:1px solid #E2E8F0; padding:6px 0;">
+            <summary style="cursor:pointer; list-style:none; font-weight:600; font-size:clamp(18px,2vw,22px); letter-spacing:-0.015em; padding:18px 0; display:flex; align-items:center; justify-content:space-between; gap:16px;">{f.q}<span class="faq-plus" style="color:#16463E; font-weight:400; font-size:24px;">+</span></summary>
+            <p style="font-size:16px; line-height:1.7; color:#5C5E63; margin:0; padding:0 0 22px; max-width:60ch;">{f.a}</p>
+          </details>
+        ))}
+      </div>
+      <p style="margin-top:clamp(40px,5vw,56px);">
+        <a href="/cn/kontakt/" style="text-decoration:none; font-size:15px; font-weight:500; color:#1B1C1E; border-bottom:1.5px solid #16463E; padding-bottom:3px;">{ui.why_cta} →</a>
+      </p>
+    </div>
+  </section>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+</Base>
+
+<style>
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item[open] .faq-plus { transform: rotate(45deg); display: inline-block; }
+</style>

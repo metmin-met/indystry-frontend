@@ -4,34 +4,35 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const P = (path: string) => (de ? "" : "/en") + path;
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const P = (path: string) => (de ? "" : en ? "/en" : "/cn") + path;
 const leistungen = [
-  { t: L("Zerspanung", "Machining"), d: L("CNC-Fräsen & Drehen, Linie Nord", "CNC milling & turning, line North") },
-  { t: L("Zuschnitt", "Cutting"), d: L("Laserschneiden von Blechen, Linie West", "laser cutting of sheets, line West") },
-  { t: L("Umformung", "Forming"), d: L("Abkanten & Biegen, Linie West", "bending & forming, line West") },
-  { t: L("Montage & Prüfung", "Assembly & inspection"), d: L("Baugruppen + Endkontrolle, Linie Süd", "assemblies + final check, line South") },
+  { t: L("Zerspanung", "Machining", "切削加工"), d: L("CNC-Fräsen & Drehen, Linie Nord", "CNC milling & turning, line North", "CNC 铣削与车削，北线") },
+  { t: L("Zuschnitt", "Cutting", "下料切割"), d: L("Laserschneiden von Blechen, Linie West", "laser cutting of sheets, line West", "板材激光切割，西线") },
+  { t: L("Umformung", "Forming", "成形"), d: L("Abkanten & Biegen, Linie West", "bending & forming, line West", "折弯与成形，西线") },
+  { t: L("Montage & Prüfung", "Assembly & inspection", "装配与检验"), d: L("Baugruppen + Endkontrolle, Linie Süd", "assemblies + final check, line South", "组件装配 + 终检，南线") },
 ];
 const produkte = [
-  ["NW-1001", L("Lagerbock Typ A", "Bearing block A")], ["NW-2010", L("Flanschplatte 120", "Flange plate 120")],
-  ["NW-3006", L("Wellenadapter M", "Shaft adapter M")], ["NW-4002", L("Gehäusedeckel", "Housing cover")],
+  ["NW-1001", L("Lagerbock Typ A", "Bearing block A", "A 型轴承座")], ["NW-2010", L("Flanschplatte 120", "Flange plate 120", "法兰板 120")],
+  ["NW-3006", L("Wellenadapter M", "Shaft adapter M", "M 型轴适配器")], ["NW-4002", L("Gehäusedeckel", "Housing cover", "壳体盖")],
 ];
 ---
 <section style="background:#123A33; color:#F4F6F5;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(56px,8vw,110px) clamp(24px,5vw,56px);">
     <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">Nordwerk Manufacturing</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(38px,7vw,76px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Präzisionsteile aus Metall. In Serie.", "Precision metal parts. At scale.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0 0 28px;">{L("Zerspanung, Zuschnitt, Umformung, Montage — vom Erstmuster bis zur Serie, termintreu und dokumentiert. Familienbetrieb, drei Fertigungslinien, eine durchgängige Datenkette.", "Machining, cutting, forming, assembly — from first sample to series, on time and documented. Family-run, three production lines, one continuous data chain.")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(38px,7vw,76px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("Präzisionsteile aus Metall. In Serie.", "Precision metal parts. At scale.", "金属精密零件。规模化生产。")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0 0 28px;">{L("Zerspanung, Zuschnitt, Umformung, Montage — vom Erstmuster bis zur Serie, termintreu und dokumentiert. Familienbetrieb, drei Fertigungslinien, eine durchgängige Datenkette.", "Machining, cutting, forming, assembly — from first sample to series, on time and documented. Family-run, three production lines, one continuous data chain.", "切削、下料、成形、装配——从首件样品到批量生产，准时交付且全程记录。家族企业，三条生产线，一条贯通的数据链。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:12px;">
-      <a href={P("/portal/")} style="text-decoration:none; background:#E6B23A; color:#1B1C1E; font-weight:600; padding:13px 22px; border-radius:10px;">{L("Kundenportal", "Customer portal")} →</a>
-      <a href={P("/demos/")} style="text-decoration:none; border:1px solid #2E5A52; color:#F4F6F5; font-weight:600; padding:13px 22px; border-radius:10px;">{L("Betrieb ansehen", "See operations")}</a>
+      <a href={P("/portal/")} style="text-decoration:none; background:#E6B23A; color:#1B1C1E; font-weight:600; padding:13px 22px; border-radius:10px;">{L("Kundenportal", "Customer portal", "客户门户")} →</a>
+      <a href={P("/demos/")} style="text-decoration:none; border:1px solid #2E5A52; color:#F4F6F5; font-weight:600; padding:13px 22px; border-radius:10px;">{L("Betrieb ansehen", "See operations", "查看运营")}</a>
     </div>
   </div>
 </section>
 
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,90px) clamp(24px,5vw,56px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Was wir fertigen", "What we make")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Was wir fertigen", "What we make", "我们生产什么")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:clamp(40px,5vw,64px);">
       {leistungen.map((x) => (
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:20px;">
@@ -41,7 +42,7 @@ const produkte = [
       ))}
     </div>
 
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Produkte (Auszug)", "Products (excerpt)")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Produkte (Auszug)", "Products (excerpt)", "产品（节选）")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:clamp(40px,5vw,64px);">
       {produkte.map(([code, name]) => (
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px;">
@@ -53,21 +54,21 @@ const produkte = [
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;">
       <div style="border-left:3px solid #E6B23A; padding-left:18px;">
-        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; margin:0 0 6px;">{L("Qualität, lückenlos", "Quality, end to end")}</p>
-        <p style="font-size:14px; line-height:1.55; color:#5C5E63; margin:0;">{L("Maßhaltigkeit, Oberfläche, Gewicht — geprüft und protokolliert zu jeder Charge. Arbeitsweise nach ISO-9001-Logik.", "Dimensions, surface, weight — checked and recorded per batch. ISO-9001-style way of working.")}</p>
+        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; margin:0 0 6px;">{L("Qualität, lückenlos", "Quality, end to end", "质量，全程无缺口")}</p>
+        <p style="font-size:14px; line-height:1.55; color:#5C5E63; margin:0;">{L("Maßhaltigkeit, Oberfläche, Gewicht — geprüft und protokolliert zu jeder Charge. Arbeitsweise nach ISO-9001-Logik.", "Dimensions, surface, weight — checked and recorded per batch. ISO-9001-style way of working.", "尺寸精度、表面、重量——每个批次均检验并记录。工作方式遵循 ISO 9001 逻辑。")}</p>
       </div>
       <div style="border-left:3px solid #E6B23A; padding-left:18px;">
-        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; margin:0 0 6px;">{L("Transparent für Kunden", "Transparent for customers")}</p>
-        <p style="font-size:14px; line-height:1.55; color:#5C5E63; margin:0;">{L("Auftragsstatus, Rechnungen, Service und Reklamation jederzeit im ", "Order status, invoices, service and complaints anytime in the ")}<a href={P("/portal/")} style="color:#16463E;">{L("Kundenportal", "customer portal")}</a>.</p>
+        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; margin:0 0 6px;">{L("Transparent für Kunden", "Transparent for customers", "对客户透明")}</p>
+        <p style="font-size:14px; line-height:1.55; color:#5C5E63; margin:0;">{L("Auftragsstatus, Rechnungen, Service und Reklamation jederzeit im ", "Order status, invoices, service and complaints anytime in the ", "订单状态、发票、服务与投诉，随时可在")}<a href={P("/portal/")} style="color:#16463E;">{L("Kundenportal", "customer portal", "客户门户")}</a>.</p>
       </div>
     </div>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:16px; margin:clamp(40px,5vw,64px) 0 0;">
       {[
-        [L("Fertigungslinien","Production lines"), "3"],
-        [L("Termintreue","On-time rate"), "98,4 %"],
-        [L("Ø Durchlaufzeit","Avg lead time"), L("6,2 Tage","6.2 days")],
-        [L("Chargen / Jahr","Batches / year"), "4.100"],
+        [L("Fertigungslinien","Production lines","生产线"), "3"],
+        [L("Termintreue","On-time rate","准时率"), "98,4 %"],
+        [L("Ø Durchlaufzeit","Avg lead time","平均交付周期"), L("6,2 Tage","6.2 days","6.2 天")],
+        [L("Chargen / Jahr","Batches / year","批次 / 年"), "4.100"],
       ].map(([k, v]) => (
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px;">
           <p style="font-family:var(--font-mono); font-weight:600; font-size:clamp(24px,3vw,34px); color:#123A33; margin:0 0 4px;">{v}</p>
@@ -78,12 +79,12 @@ const produkte = [
 
     <div style="margin:clamp(40px,5vw,64px) 0 0; background:#123A33; border-radius:16px; padding:clamp(22px,3vw,32px); color:#F4F6F5; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
       <div style="max-width:54ch;">
-        <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#A6CFC5; margin:0 0 8px;">{L("Digital souverän","Digitally sovereign")}</p>
-        <p style="font-size:clamp(16px,1.6vw,19px); line-height:1.55; margin:0; color:#CADAD5;">{L("Diese Website, das Kundenportal, ERP, BI, Leitstand & KI — alles läuft auf offenen Bausteinen im eigenen Haus. Kein Konzern-Abo, kein Lock-in.","This website, the customer portal, ERP, BI, control room & AI — all run on open building blocks, in-house. No corporate subscription, no lock-in.")}</p>
+        <p style="font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#A6CFC5; margin:0 0 8px;">{L("Digital souverän","Digitally sovereign","数字自主可控")}</p>
+        <p style="font-size:clamp(16px,1.6vw,19px); line-height:1.55; margin:0; color:#CADAD5;">{L("Diese Website, das Kundenportal, ERP, BI, Leitstand & KI — alles läuft auf offenen Bausteinen im eigenen Haus. Kein Konzern-Abo, kein Lock-in.","This website, the customer portal, ERP, BI, control room & AI — all run on open building blocks, in-house. No corporate subscription, no lock-in.","本网站、客户门户、ERP、BI、中控室与人工智能——全部运行在自有场地内的开源模块上。没有集团订阅，没有厂商锁定。")}</p>
       </div>
-      <a href={P("/stack/")} style="text-decoration:none; background:#E6B23A; color:#1B1C1E; font-weight:600; padding:13px 22px; border-radius:10px; white-space:nowrap;">{L("Der Stack","The stack")} →</a>
+      <a href={P("/stack/")} style="text-decoration:none; background:#E6B23A; color:#1B1C1E; font-weight:600; padding:13px 22px; border-radius:10px; white-space:nowrap;">{L("Der Stack","The stack","技术栈")} →</a>
     </div>
 
-    <p style="font-family:var(--font-mono); font-size:11px; color:#92938F; margin:clamp(36px,5vw,56px) 0 0; border-top:1px solid #E2E8F0; padding-top:16px;">{L("Nordwerk Manufacturing ist eine fiktive Demo-Firma. Diese Website ist Teil der indystry-Demo und selbst gehostet — wie alles andere auch.", "Nordwerk Manufacturing is a fictional demo company. This website is part of the indystry demo and self-hosted — like everything else.")}</p>
+    <p style="font-family:var(--font-mono); font-size:11px; color:#92938F; margin:clamp(36px,5vw,56px) 0 0; border-top:1px solid #E2E8F0; padding-top:16px;">{L("Nordwerk Manufacturing ist eine fiktive Demo-Firma. Diese Website ist Teil der indystry-Demo und selbst gehostet — wie alles andere auch.", "Nordwerk Manufacturing is a fictional demo company. This website is part of the indystry demo and self-hosted — like everything else.", "Nordwerk Manufacturing 是一家虚构的演示企业。本网站是 indystry 演示的一部分，并自托管——与其他一切一样。")}</p>
   </div>
 </section>

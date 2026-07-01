@@ -5,15 +5,16 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const demos = [
-  { slug:"grafana-cockpit", mono:"CK", hue:"#d97a26", url:"https://grafana-demo.indystry.works", login:"", t:L("Werks-Cockpit","Factory cockpit"), s:L("Live-Monitoring","Live monitoring"), d:L("Echtzeit-Dashboards auf Maschinen- und Sensordaten — Temperatur, Vibration, Ausschuss.","Real-time dashboards on machine & sensor data — temperature, vibration, scrap.") },
-  { slug:"metabase-bi", mono:"BI", hue:"#1f8a73", url:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", login:"", t:L("BI-Cockpit","BI cockpit"), s:L("Auswertungen","Analytics"), d:L("Produktion, Qualität und Ausschussquote als interaktives Dashboard.","Production, quality and scrap rate as an interactive dashboard.") },
-  { slug:"app", mono:"AP", hue:"#2389b0", url:"https://app-demo.indystry.works", login:"", t:L("Werker-App","Shop-floor app"), s:L("Mobile","Mobile"), d:L("Anwesenheit, Zeiterfassung, Fertigung und Behälter — direkt im Browser.","Attendance, time tracking, manufacturing and containers — right in the browser.") },
-  { slug:"erp", mono:"ER", hue:"#9a4bb0", url:"https://erp-demo.indystry.works/web/login", login:"demo / demo", t:L("ERP","ERP"), s:L("Ein System für die Firma","One system for the company"), d:L("Aufträge, Qualität, Lager, Wartung — eine Demo-Instanz zum Durchklicken.","Orders, quality, stock, maintenance — a demo instance to click through.") },
-  { slug:"jupyter", mono:"DS", hue:"#3771b3", url:"https://lab-demo.indystry.works", login:"", t:L("Data-Science-Sandbox","Data-science sandbox"), s:L("Notebooks","Notebooks"), d:L("Notebooks auf den synthetischen Werksdaten — Computer-Vision, ML, Korrelationen.","Notebooks on the synthetic factory data — computer vision, ML, correlations.") },
-  { slug:"shiny", mono:"TW", hue:"#7b5cc4", url:"https://twin-demo.indystry.works", login:"", t:L("Digital Twin","Digital twin"), s:L("Interaktive Simulation","Interactive simulation"), d:L("What-if am Modell: Parameter schieben, Durchsatz und Qualität vorhersagen.","What-if on the model: shift parameters, predict throughput and quality.") },
+  { slug:"grafana-cockpit", mono:"CK", hue:"#d97a26", url:"https://grafana-demo.indystry.works", login:"", t:L("Werks-Cockpit","Factory cockpit","工厂驾驶舱"), s:L("Live-Monitoring","Live monitoring","实时监控"), d:L("Echtzeit-Dashboards auf Maschinen- und Sensordaten — Temperatur, Vibration, Ausschuss.","Real-time dashboards on machine & sensor data — temperature, vibration, scrap.","基于机器与传感器数据的实时仪表盘——温度、振动、废品。") },
+  { slug:"metabase-bi", mono:"BI", hue:"#1f8a73", url:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", login:"", t:L("BI-Cockpit","BI cockpit","BI 驾驶舱"), s:L("Auswertungen","Analytics","分析"), d:L("Produktion, Qualität und Ausschussquote als interaktives Dashboard.","Production, quality and scrap rate as an interactive dashboard.","生产、质量与废品率，以交互式仪表盘呈现。") },
+  { slug:"app", mono:"AP", hue:"#2389b0", url:"https://app-demo.indystry.works", login:"", t:L("Werker-App","Shop-floor app","车间应用"), s:L("Mobile","Mobile","移动端"), d:L("Anwesenheit, Zeiterfassung, Fertigung und Behälter — direkt im Browser.","Attendance, time tracking, manufacturing and containers — right in the browser.","考勤、工时记录、生产与料箱——直接在浏览器中操作。") },
+  { slug:"erp", mono:"ER", hue:"#9a4bb0", url:"https://erp-demo.indystry.works/web/login", login:"demo / demo", t:L("ERP","ERP","ERP"), s:L("Ein System für die Firma","One system for the company","一套系统管理整个公司"), d:L("Aufträge, Qualität, Lager, Wartung — eine Demo-Instanz zum Durchklicken.","Orders, quality, stock, maintenance — a demo instance to click through.","订单、质量、库存、维护——可自由点击体验的演示实例。") },
+  { slug:"jupyter", mono:"DS", hue:"#3771b3", url:"https://lab-demo.indystry.works", login:"", t:L("Data-Science-Sandbox","Data-science sandbox","数据科学沙盒"), s:L("Notebooks","Notebooks","Notebooks"), d:L("Notebooks auf den synthetischen Werksdaten — Computer-Vision, ML, Korrelationen.","Notebooks on the synthetic factory data — computer vision, ML, correlations.","基于合成工厂数据的 Notebooks——计算机视觉、机器学习、相关性分析。") },
+  { slug:"shiny", mono:"TW", hue:"#7b5cc4", url:"https://twin-demo.indystry.works", login:"", t:L("Digital Twin","Digital twin","数字孪生"), s:L("Interaktive Simulation","Interactive simulation","交互式仿真"), d:L("What-if am Modell: Parameter schieben, Durchsatz und Qualität vorhersagen.","What-if on the model: shift parameters, predict throughput and quality.","在模型上做 What-if 推演：调整参数，预测产量与质量。") },
 ];
 const cx=160, cy=160, R=116;
 const nodes = demos.map((dm,i)=>{ const a=(-90+i*60)*Math.PI/180; return { ...dm, x:+(cx+R*Math.cos(a)).toFixed(1), y:+(cy+R*Math.sin(a)).toFixed(1) }; });
@@ -23,12 +24,12 @@ const noLogin = demos.filter(d=>!d.login).length;
 <section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(28px,4vw,44px); display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(24px,4vw,48px); align-items:center;">
     <div>
-      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Demo-Firma · Nordwerk Manufacturing","Demo company · Nordwerk Manufacturing")}</p>
-      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Eine ganze Firma.","A whole company.")} <span style="color:#E6B23A;">{L("Zum Durchklicken.","To click through.")}</span></h1>
-      <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 24px;">{L("Nordwerk ist ein fiktiver Metallteile-Hersteller (Auftragsfertigung). Sechs echte, klickbare Systeme auf synthetischen Daten — vom Live-Cockpit bis zum digitalen Zwilling. Kein Login nötig (außer ERP: demo/demo).","Nordwerk is a fictional metal-parts maker (make-to-order). Six real, clickable systems on synthetic data — from the live cockpit to the digital twin. No login needed (except ERP: demo/demo).")}</p>
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Demo-Firma · Nordwerk Manufacturing","Demo company · Nordwerk Manufacturing","演示公司 · Nordwerk Manufacturing")}</p>
+      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Eine ganze Firma.","A whole company.","一整家公司。")} <span style="color:#E6B23A;">{L("Zum Durchklicken.","To click through.","可自由点击体验。")}</span></h1>
+      <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 24px;">{L("Nordwerk ist ein fiktiver Metallteile-Hersteller (Auftragsfertigung). Sechs echte, klickbare Systeme auf synthetischen Daten — vom Live-Cockpit bis zum digitalen Zwilling. Kein Login nötig (außer ERP: demo/demo).","Nordwerk is a fictional metal-parts maker (make-to-order). Six real, clickable systems on synthetic data — from the live cockpit to the digital twin. No login needed (except ERP: demo/demo).","Nordwerk 是一家虚构的金属零件制造商（按订单生产）。六套真实、可点击的系统运行在合成数据上——从实时驾驶舱到数字孪生。无需登录（ERP 除外：demo/demo）。")}</p>
       <div style="display:flex; flex-wrap:wrap; gap:12px;">
-        <a href={b + "/tour/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 22px; border-radius:10px;">{L("Geführte Tour","Guided tour")} →</a>
-        <a href="#demoliste" style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("↓ Alle Demos","↓ All demos")}</a>
+        <a href={b + "/tour/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 22px; border-radius:10px;">{L("Geführte Tour","Guided tour","引导式导览")} →</a>
+        <a href="#demoliste" style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("↓ Alle Demos","↓ All demos","↓ 全部演示")}</a>
       </div>
     </div>
     <div style="justify-self:center; width:100%; max-width:380px;">
@@ -50,7 +51,7 @@ const noLogin = demos.filter(d=>!d.login).length;
   <!-- KPI-Band -->
   <div style="position:relative; border-top:1px solid rgba(166,207,197,.16);">
     <div style="max-width:1120px; margin:0 auto; padding:18px clamp(24px,5vw,56px); display:grid; grid-template-columns:repeat(4,1fr); gap:16px;" class="dm-kpis">
-      {[[String(demos.length),L("Live-Systeme","live systems")],["8",L("Maschinen","machines")],[String(noLogin),L("ohne Login","no login")],["100%",L("synthetisch","synthetic")]].map(([v,k])=>(
+      {[[String(demos.length),L("Live-Systeme","live systems","实时系统")],["8",L("Maschinen","machines","台机器")],[String(noLogin),L("ohne Login","no login","无需登录")],["100%",L("synthetisch","synthetic","合成数据")]].map(([v,k])=>(
         <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:14px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(22px,3vw,32px); line-height:1; color:#F4F8F6;">{v}</div><div style="font-family:var(--font-mono); font-size:10px; color:#8FB0A8; margin-top:5px; letter-spacing:.04em; text-transform:uppercase;">{k}</div></div>
       ))}
     </div>
@@ -77,7 +78,7 @@ const noLogin = demos.filter(d=>!d.login).length;
               {["Stempeln","Auftrag 1042","Behälter NW-23"].map((r,i)=>(<div class="dm-phrow"><span class="dm-phdot" style={`background:${["#3FBF7F","#E6B23A","#3FBF7F"][i]};`}></span>{r}</div>))}
             </div>)}
             {dm.slug==="erp" && (<div class="dm-kanban">
-              {[[L("Angebot","Quote"),6],[L("Auftrag","Order"),22],[L("Fertig","Done"),18]].map(([t,n],ci)=>(<div class="dm-col"><span class="dm-coltt">{t} · {n}</span>{[0,1,2].map((r)=>(<span class={`dm-kc${ci===1&&r===0?" dm-pulse":""}`}></span>))}</div>))}
+              {[[L("Angebot","Quote","报价"),6],[L("Auftrag","Order","订单"),22],[L("Fertig","Done","完成"),18]].map(([t,n],ci)=>(<div class="dm-col"><span class="dm-coltt">{t} · {n}</span>{[0,1,2].map((r)=>(<span class={`dm-kc${ci===1&&r===0?" dm-pulse":""}`}></span>))}</div>))}
             </div>)}
             {dm.slug==="jupyter" && (<div class="dm-jup">
               <div class="dm-code"><span style="color:#7b9">df</span>.<span style="color:#d9a">plot</span>(x,y)</div>
@@ -91,13 +92,13 @@ const noLogin = demos.filter(d=>!d.login).length;
           <div class="dm-head"><span class="dm-dot" style={`background:${dm.hue};`}></span><b>{dm.t}</b><span class="dm-sub">{dm.s}</span></div>
           <p class="dm-d">{dm.d}</p>
           <div class="dm-foot">
-            <span class="dm-login">{dm.login ? L("Login ","Login ")+dm.login : L("ohne Login","no login")}</span>
-            <a href={dm.url} target="_blank" rel="noopener" class="dm-open" style={`color:${dm.hue}; border-color:${dm.hue}55;`}>{L("Demo öffnen","Open demo")} ↗</a>
+            <span class="dm-login">{dm.login ? L("Login ","Login ","登录 ")+dm.login : L("ohne Login","no login","无需登录")}</span>
+            <a href={dm.url} target="_blank" rel="noopener" class="dm-open" style={`color:${dm.hue}; border-color:${dm.hue}55;`}>{L("Demo öffnen","Open demo","打开演示")} ↗</a>
           </div>
         </div>
       ))}
     </div>
-    <p style="font-family:var(--font-mono); font-size:12.5px; color:#92938F; margin-top:22px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12.5px; color:#92938F; margin-top:22px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.","所有演示均在新标签页中打开——本页面保持不变。")}</p>
   </div>
 </section>
 

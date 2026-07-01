@@ -5,7 +5,8 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const charges = [
   { id:"CH-2401", prod:"NW-1001 · Lagerbock Typ A" }, { id:"CH-2402", prod:"NW-1002 · Lagerbock Typ B" },
   { id:"CH-2403", prod:"NW-2010 · Flanschplatte 120" }, { id:"CH-2404", prod:"NW-2011 · Flanschplatte 160" },
@@ -14,14 +15,14 @@ const charges = [
   { id:"CH-2409", prod:"NW-2010 · Flanschplatte 120" },
 ];
 const classes = [
-  ["all", L("Alle","All")], ["surface", L("Oberfläche","Surface")], ["section", L("Schliff","Cross-section")], ["micro", L("Mikroskopie","Microscopy")],
+  ["all", L("Alle","All","全部")], ["surface", L("Oberfläche","Surface","表面")], ["section", L("Schliff","Cross-section","金相截面")], ["micro", L("Mikroskopie","Microscopy","显微观察")],
 ];
 ---
 <section style="background:#0E2522; color:#F4F6F5;">
   <div style="max-width:1180px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Werkstoff-Analyse · read-only","Material analysis · read-only")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,66px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:16ch;">{L("Bis ins Gefüge.","Down to the grain.")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Zu jeder Charge: Oberfläche, Schliffbild und Mikroskopie plus die Messwerte — rückverfolgbar bis zum Auftrag. Klick ein Bild für die Großansicht.","For every batch: surface, cross-section and microscopy plus the measurements — traceable to the order. Click an image to enlarge.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Werkstoff-Analyse · read-only","Material analysis · read-only","材料分析 · 只读")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,66px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:16ch;">{L("Bis ins Gefüge.","Down to the grain.","深入到金相组织。")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Zu jeder Charge: Oberfläche, Schliffbild und Mikroskopie plus die Messwerte — rückverfolgbar bis zum Auftrag. Klick ein Bild für die Großansicht.","For every batch: surface, cross-section and microscopy plus the measurements — traceable to the order. Click an image to enlarge.","每一个批次都配有：表面、金相截面和显微图像，外加测量值——可一路追溯到订单。点击图片可放大查看。")}</p>
   </div>
 </section>
 
@@ -45,19 +46,22 @@ const classes = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1180px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Vom Bild zur Zahl","From image to number")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Vom Bild zur Zahl","From image to number","从图像到数字")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
-    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("Bilder, die rechnen.","Images that compute.")}</h2>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;"><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Partikelgröße (PSD)","Particle size (PSD)")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Korngrößen-Verteilung automatisch ausgewertet — D10/D50/D90 und Spannweite je Charge.","Particle size distribution auto-evaluated — D10/D50/D90 and span per batch.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Oberfläche & Gefüge","Surface & microstructure")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Aus Bildern werden messbare Größen: Rauheit, Poren, Strukturmerkmale.","Images become measurable values: roughness, pores, structural features.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Korrelation & ML","Correlation & ML")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Zusammenhänge zwischen Prozessparametern und Ergebnis im Notebook sichtbar machen.","Surface links between process parameters and outcome in the notebook.")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Auto-Report je Charge","Auto report per batch")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Charge-Dossier auf Knopfdruck — Bilder, Messwerte, Bewertung in einem Dokument.","Batch dossier at a click — images, values, assessment in one document.")}</p></div></div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Gerechnet wird in offenen Notebooks auf den echten Werksdaten.","The computing happens in open notebooks on the real factory data.")} <a href={(de?"":"/en")+"/historian/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Historian","To the historian")} →</a></p>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 24px; max-width:22ch;">{L("Bilder, die rechnen.","Images that compute.","会计算的图像。")}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;"><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Partikelgröße (PSD)","Particle size (PSD)","粒度分布（PSD）")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Korngrößen-Verteilung automatisch ausgewertet — D10/D50/D90 und Spannweite je Charge.","Particle size distribution auto-evaluated — D10/D50/D90 and span per batch.","粒度分布自动评估——每个批次的 D10/D50/D90 及跨度。")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Oberfläche & Gefüge","Surface & microstructure","表面与显微组织")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Aus Bildern werden messbare Größen: Rauheit, Poren, Strukturmerkmale.","Images become measurable values: roughness, pores, structural features.","图像转化为可测量的量值：粗糙度、孔隙、结构特征。")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Korrelation & ML","Correlation & ML","相关性分析与机器学习")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Zusammenhänge zwischen Prozessparametern und Ergebnis im Notebook sichtbar machen.","Surface links between process parameters and outcome in the notebook.","在 Notebook 中揭示工艺参数与结果之间的关联。")}</p></div><div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;"><p style="font-weight:600; font-size:15px; color:#1B1C1E; margin:0 0 5px;">{L("Auto-Report je Charge","Auto report per batch","每批次自动报告")}</p><p style="font-size:13px; line-height:1.5; color:#5C5E63; margin:0;">{L("Charge-Dossier auf Knopfdruck — Bilder, Messwerte, Bewertung in einem Dokument.","Batch dossier at a click — images, values, assessment in one document.","一键生成批次档案——图像、测量值、评估合于一份文档。")}</p></div></div>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Gerechnet wird in offenen Notebooks auf den echten Werksdaten.","The computing happens in open notebooks on the real factory data.","计算在开放的 Notebook 中、基于真实的工厂数据进行。")} <a href={(de?"":en?"/en":"/cn")+"/historian/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum Historian","To the historian","前往历史数据库")} →</a></p>
   </div>
 </section>
 <script type="application/json" id="an-data" is:inline set:html={JSON.stringify(charges)}></script>
 <script>
-  const DE = document.documentElement.lang !== "en";
+  const LANG = document.documentElement.lang;
+  const CN = LANG === "cn" || LANG === "zh";
+  const DE = LANG !== "en" && !CN;
+  const PFX = DE ? "" : CN ? "/cn" : "/en";
   const CH = JSON.parse(document.getElementById("an-data").textContent);
-  const CLS = { surface: DE?"Oberfläche":"Surface", section: DE?"Schliff":"Cross-section", micro: DE?"Mikroskopie":"Microscopy" };
+  const CLS = { surface: DE?"Oberfläche":CN?"表面":"Surface", section: DE?"Schliff":CN?"金相截面":"Cross-section", micro: DE?"Mikroskopie":CN?"显微观察":"Microscopy" };
   function rng(seed){ let h=1779033703^seed.length; for(let i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19;} return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return ((h^=h>>>16)>>>0)/4294967296; }; }
   function svg(inner,bg){ return `<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;background:${bg};">${inner}</svg>`; }
   function imgSurface(r){ let s=""; for(let i=0;i<46;i++){ const y=r()*150, w=20+r()*180, x=r()*40, o=(0.05+r()*0.22).toFixed(2); s+=`<line x1="${x}" y1="${y}" x2="${x+w}" y2="${y+(r()-0.5)*3}" stroke="#cfd6d3" stroke-width="${(0.4+r()*0.8).toFixed(1)}" opacity="${o}"/>`; } for(let i=0;i<70;i++){ s+=`<circle cx="${r()*200}" cy="${r()*150}" r="${(0.3+r()*0.9).toFixed(1)}" fill="#aeb8b4" opacity="${(0.1+r()*0.3).toFixed(2)}"/>`; } return svg(s,"#6b7672"); }
@@ -71,17 +75,17 @@ const classes = [
   const grid = document.getElementById("an-grid");
   const box = document.getElementById("an-box");
   function thumb(id, cls){ const r=rng(id+cls); return `<button class="an-th" data-id="${id}" data-cls="${cls}" title="${CLS[cls]}" style="aspect-ratio:4/3;">${GEN[cls](r)}<span class="an-th-lbl">${CLS[cls]}</span></button>`; }
-  function card(c){ const m=meas(c.id); const okC=m.ok?"#16794a":"#b4232a"; const okT=m.ok?(DE?"i.O.":"pass"):(DE?"n.i.O.":"fail");
+  function card(c){ const m=meas(c.id); const okC=m.ok?"#16794a":"#b4232a"; const okT=m.ok?(DE?"i.O.":CN?"合格":"pass"):(DE?"n.i.O.":CN?"不合格":"fail");
     return `<article class="an-card" id="${c.id}" data-id="${c.id}">
       <div class="an-card-h"><div><p class="an-id">${c.id}</p><p class="an-prod">${c.prod}</p></div><span class="an-badge" style="color:${okC};border-color:${okC}55;">● ${okT}</span></div>
       <div class="an-thumbs">${["surface","section","micro"].map((k)=>thumb(c.id,k)).join("")}</div>
       <div class="an-meas">
-        <span>${DE?"Maßhalt.":"Dimension"} <b>${m.masz.toFixed(2)} mm</b></span>
+        <span>${DE?"Maßhalt.":CN?"尺寸":"Dimension"} <b>${m.masz.toFixed(2)} mm</b></span>
         <span>Ra <b>${m.ra.toFixed(2)} µm</b></span>
-        <span>${DE?"Härte":"Hardness"} <b>${m.hv} HV</b></span>
-        <span>${DE?"Gewicht":"Weight"} <b>${m.g} g</b></span>
+        <span>${DE?"Härte":CN?"硬度":"Hardness"} <b>${m.hv} HV</b></span>
+        <span>${DE?"Gewicht":CN?"重量":"Weight"} <b>${m.g} g</b></span>
       </div>
-      <div class="an-links"><a href="${(DE?"":"/en")+"/historian/"}">Historian →</a><a href="${(DE?"":"/en")+"/graph/"}">${DE?"im Graph":"in graph"} →</a></div>
+      <div class="an-links"><a href="${PFX+"/historian/"}">Historian →</a><a href="${PFX+"/graph/"}">${DE?"im Graph":CN?"在图谱中":"in graph"} →</a></div>
     </article>`; }
   grid.innerHTML = CH.map(card).join("");
 

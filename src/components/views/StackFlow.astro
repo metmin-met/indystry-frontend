@@ -5,25 +5,26 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 // Knoten: x,y (viewBox 0 0 1160 560), Label, Pillar-Farbe, optional href
 const N = (id: string, x: number, y: number, t: string, c: string, href?: string, ext?: boolean) => ({ id, x, y, t, c, href, ext });
 const C = { src: "#7b5cc4", file: "#b03f93", web: "#c2506f", edge: "#2a86a8", kafka: "#4a6fa5", ts: "#3d4fc0", lake: "#5a8a98", erp: "#c4673f", bi: "#c08a2e", twin: "#7b5cc4", ai: "#b03f93", out: "#c2506f", bak: "#16794a" };
 const nodes = [
-  N("src", 30, 60,  L("Maschinen · SPS/OPC-UA", "Machines · PLC/OPC-UA"), C.src, "/anlage/"),
-  N("file", 30, 150, L("Dateien · Excel/ETL", "Files · Excel/ETL"), C.file, "/suche/"),
-  N("webin", 30, 240, L("Web · Anfrage/Portal", "Web · inquiry/portal"), C.web, "/portal/"),
-  N("edge", 270, 105, L("Gateway / Edge", "Gateway / edge"), C.edge),
-  N("kafka", 270, 210, L("Streaming-Puffer · Kafka", "Streaming buffer · Kafka"), C.kafka, "/rechner/"),
-  N("ts", 520, 60,  L("Zeitreihen-DB · Timescale", "Time-series DB · Timescale"), C.ts, "/historian/"),
-  N("lake", 520, 150, L("Object-Store · Data-Lake", "Object store · data lake"), C.lake, "/analyse/"),
-  N("erp", 520, 240, L("ERP · PostgreSQL", "ERP · PostgreSQL"), C.erp, "https://erp-demo.indystry.works", true),
-  N("bi", 780, 45,  L("BI & Analytics", "BI & analytics"), C.bi, "https://bi-demo.indystry.works", true),
-  N("twin", 780, 130, L("Digital Twin", "Digital twin"), C.twin, "https://twin-demo.indystry.works", true),
-  N("ai", 780, 215, L("KI & Suche", "AI & search"), C.ai, "/suche/"),
-  N("out", 1010, 130, L("Web · Portal · App", "Web · portal · app"), C.out, "/portal/"),
-  N("bak", 520, 360, L("Backups & Offsite (PBS)", "Backups & offsite (PBS)"), C.bak, "/status/"),
+  N("src", 30, 60,  L("Maschinen · SPS/OPC-UA", "Machines · PLC/OPC-UA", "设备 · SPS/OPC-UA"), C.src, "/anlage/"),
+  N("file", 30, 150, L("Dateien · Excel/ETL", "Files · Excel/ETL", "文件 · Excel/ETL"), C.file, "/suche/"),
+  N("webin", 30, 240, L("Web · Anfrage/Portal", "Web · inquiry/portal", "网络 · 询单/门户"), C.web, "/portal/"),
+  N("edge", 270, 105, L("Gateway / Edge", "Gateway / edge", "网关 / 边缘"), C.edge),
+  N("kafka", 270, 210, L("Streaming-Puffer · Kafka", "Streaming buffer · Kafka", "流式缓冲 · Kafka"), C.kafka, "/rechner/"),
+  N("ts", 520, 60,  L("Zeitreihen-DB · Timescale", "Time-series DB · Timescale", "时序数据库 · Timescale"), C.ts, "/historian/"),
+  N("lake", 520, 150, L("Object-Store · Data-Lake", "Object store · data lake", "对象存储 · 数据湖"), C.lake, "/analyse/"),
+  N("erp", 520, 240, L("ERP · PostgreSQL", "ERP · PostgreSQL", "ERP · PostgreSQL"), C.erp, "https://erp-demo.indystry.works", true),
+  N("bi", 780, 45,  L("BI & Analytics", "BI & analytics", "BI 与分析"), C.bi, "https://bi-demo.indystry.works", true),
+  N("twin", 780, 130, L("Digital Twin", "Digital twin", "数字孪生"), C.twin, "https://twin-demo.indystry.works", true),
+  N("ai", 780, 215, L("KI & Suche", "AI & search", "AI 与搜索"), C.ai, "/suche/"),
+  N("out", 1010, 130, L("Web · Portal · App", "Web · portal · app", "网络 · 门户 · 应用"), C.out, "/portal/"),
+  N("bak", 520, 360, L("Backups & Offsite (PBS)", "Backups & offsite (PBS)", "备份与异地存储（PBS）"), C.bak, "/status/"),
 ];
 const NM = Object.fromEntries(nodes.map((n) => [n.id, n]));
 const edges = [["src","edge"],["file","edge"],["webin","edge"],["edge","kafka"],["edge","ts"],["kafka","ts"],["kafka","lake"],["edge","erp"],["ts","bi"],["ts","twin"],["lake","ai"],["erp","bi"],["erp","ai"],["bi","out"],["twin","out"],["ai","out"]];
@@ -31,7 +32,7 @@ const W = 150, H = 46;
 const cx = (n: any) => n.x + W / 2, cy = (n: any) => n.y + H / 2;
 ---
 <div class="sf-wrap">
-  <svg viewBox="0 0 1160 430" class="sf-svg" role="img" aria-label={L("Architektur: Datenfluss durch den Stack", "Architecture: data flow through the stack")}>
+  <svg viewBox="0 0 1160 430" class="sf-svg" role="img" aria-label={L("Architektur: Datenfluss durch den Stack", "Architecture: data flow through the stack", "架构：数据流经技术栈")}>
     <g class="sf-edges">
       {edges.map(([a, c]) => {
         const A = NM[a], B = NM[c];
@@ -49,14 +50,14 @@ const cx = (n: any) => n.x + W / 2, cy = (n: any) => n.y + H / 2;
       ))}
     </g>
     <g class="sf-cols" font-family="var(--font-mono,monospace)">
-      <text x="105" y="335">{L("Quellen", "Sources")}</text>
-      <text x="345" y="335">{L("Ingest & Puffer", "Ingest & buffer")}</text>
-      <text x="595" y="335">{L("Backbone", "Backbone")}</text>
-      <text x="855" y="20">{L("Auswertung", "Analysis")}</text>
-      <text x="1085" y="335">{L("Außen", "Edge-out")}</text>
+      <text x="105" y="335">{L("Quellen", "Sources", "数据源")}</text>
+      <text x="345" y="335">{L("Ingest & Puffer", "Ingest & buffer", "采集与缓冲")}</text>
+      <text x="595" y="335">{L("Backbone", "Backbone", "骨干层")}</text>
+      <text x="855" y="20">{L("Auswertung", "Analysis", "分析")}</text>
+      <text x="1085" y="335">{L("Außen", "Edge-out", "对外输出")}</text>
     </g>
   </svg>
-  <p class="sf-cap">{L("Daten fließen von links (Maschinen, Dateien, Web) über Gateway & Streaming-Puffer in das Rückgrat — Zeitreihen-DB, Data-Lake, ERP — und von dort in BI, Twin & KI bis zum Außenauftritt. Alles unten abgesichert durch Backups & Offsite.", "Data flows from the left (machines, files, web) via gateway & streaming buffer into the backbone — time-series DB, data lake, ERP — and on into BI, twin & AI up to the public face. All secured underneath by backups & offsite.")}</p>
+  <p class="sf-cap">{L("Daten fließen von links (Maschinen, Dateien, Web) über Gateway & Streaming-Puffer in das Rückgrat — Zeitreihen-DB, Data-Lake, ERP — und von dort in BI, Twin & KI bis zum Außenauftritt. Alles unten abgesichert durch Backups & Offsite.", "Data flows from the left (machines, files, web) via gateway & streaming buffer into the backbone — time-series DB, data lake, ERP — and on into BI, twin & AI up to the public face. All secured underneath by backups & offsite.", "数据从左侧（设备、文件、网络）经网关与流式缓冲进入骨干层——时序数据库、数据湖、ERP——再流向 BI、数字孪生与 AI，直至对外呈现。底层全部由备份与异地存储保障。")}</p>
 </div>
 
 <style>

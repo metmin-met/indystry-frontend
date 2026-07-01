@@ -11,7 +11,8 @@ const { slug } = Astro.params;
 const lang = "en" as const;
 const pillar = getPillar(slug!)!;
 const c = pillar[lang];
+const altPaths = { de: `/saeule/${slug}/`, en: `/en/pillar/${slug}/`, zh: `/cn/pillar/${slug}/` };
 ---
-<Base lang={lang} title={c.hook.headline} description={c.hook.subline} path={`/en/pillar/${slug}/`} altPath={`/saeule/${slug}/`}>
+<Base lang={lang} title={c.hook.headline} description={c.hook.subline} path={`/en/pillar/${slug}/`} altPaths={altPaths}>
   <PillarDetail pillar={pillar} lang={lang} />
 </Base>

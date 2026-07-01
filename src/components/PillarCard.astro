@@ -4,7 +4,7 @@ import { pillarColor } from "../lib/pillarColors";
 interface Props { pillar: Pillar; lang: Lang; index: number }
 const { pillar, lang, index } = Astro.props;
 const c = pillar[lang];
-const href = lang === "de" ? `/saeule/${pillar.slug}/` : `/en/pillar/${pillar.slug}/`;
+const href = lang === "de" ? `/saeule/${pillar.slug}/` : lang === "en" ? `/en/pillar/${pillar.slug}/` : `/cn/pillar/${pillar.slug}/`;
 const sig = pillarColor(pillar.slug);
 ---
 <a href={href} class="card" data-reveal style={`display:flex;flex-direction:column;gap:.85rem;text-decoration:none;border-top:3px solid ${sig};`}>

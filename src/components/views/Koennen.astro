@@ -5,51 +5,52 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const P = (path: string) => (de ? "" : "/en") + path;
-const b = de ? "" : "/en";
-const inUseLabel = L("im Einsatz", "in use");
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const P = (path: string) => (de ? "" : en ? "/en" : "/cn") + path;
+const b = de ? "" : en ? "/en" : "/cn";
+const inUseLabel = L("im Einsatz", "in use", "已投入使用");
 
 type Item = { t: string; d: string; mono: string; href?: string; inUse?: boolean };
 type Group = { key: string; name: string; short: string; color: string; gl: string; items: Item[] };
 const groupsMeta: Group[] = [
-  { key: "daten", name: L("Daten & Digitaler Zwilling", "Data & digital twin"), short: L("Daten & Twin", "Data & twin"), color: "#7b5cc4", gl: "D", items: [
-    { t: L("Edge-Konnektor", "Edge connector"), mono: "EK", inUse: true, d: L("Signale direkt an Maschine/SPS abgreifen — passiv, ohne Eingriff in die Steuerung.", "Tap signals right at the machine/PLC — passively, without touching the controller.") },
-    { t: L("Digital Twin aufsetzen", "Set up a digital twin"), mono: "DT", href: P("/twin/"), d: L("Live-Abbild der Anlage: zusehen, übersteuern, Ausfälle vorhersagen.", "Live image of the plant: watch, override, predict failures.") },
-    { t: L("Historian / Data-Lake", "Historian / data lake"), mono: "HL", href: P("/historian/"), d: L("Jeder Mess- und Betriebswert sicher gespeichert und abrufbar.", "Every measurement and operating value stored safely and queryable.") },
-    { t: L("ETL & Daten-Integration", "ETL & data integration"), mono: "ET", inUse: true, d: L("Verteilte Quellen sauber zusammenführen — eine Wahrheit statt Insel-Tabellen.", "Bring scattered sources together cleanly — one truth instead of silo spreadsheets.") },
-    { t: L("Unternehmenssuche", "Company-wide search"), mono: "US", href: P("/suche/"), d: L("Volltext + KI-Antwort über alle Daten, Dokumente und Historie.", "Full text + AI answer across all data, documents and history.") },
+  { key: "daten", name: L("Daten & Digitaler Zwilling", "Data & digital twin", "数据与数字孪生"), short: L("Daten & Twin", "Data & twin", "数据与孪生"), color: "#7b5cc4", gl: "D", items: [
+    { t: L("Edge-Konnektor", "Edge connector", "边缘连接器"), mono: "EK", inUse: true, d: L("Signale direkt an Maschine/SPS abgreifen — passiv, ohne Eingriff in die Steuerung.", "Tap signals right at the machine/PLC — passively, without touching the controller.", "直接在设备／SPS 处采集信号——被动读取，不干预控制系统。") },
+    { t: L("Digital Twin aufsetzen", "Set up a digital twin", "搭建数字孪生"), mono: "DT", href: P("/twin/"), d: L("Live-Abbild der Anlage: zusehen, übersteuern, Ausfälle vorhersagen.", "Live image of the plant: watch, override, predict failures.", "设备的实时映像：观察、手动干预、预测故障。") },
+    { t: L("Historian / Data-Lake", "Historian / data lake", "历史数据库／数据湖"), mono: "HL", href: P("/historian/"), d: L("Jeder Mess- und Betriebswert sicher gespeichert und abrufbar.", "Every measurement and operating value stored safely and queryable.", "每一个测量值和运行值都安全存储，随时可查。") },
+    { t: L("ETL & Daten-Integration", "ETL & data integration", "ETL 与数据集成"), mono: "ET", inUse: true, d: L("Verteilte Quellen sauber zusammenführen — eine Wahrheit statt Insel-Tabellen.", "Bring scattered sources together cleanly — one truth instead of silo spreadsheets.", "把分散的数据源干净地汇聚起来——一份事实，而非孤岛表格。") },
+    { t: L("Unternehmenssuche", "Company-wide search", "企业级搜索"), mono: "US", href: P("/suche/"), d: L("Volltext + KI-Antwort über alle Daten, Dokumente und Historie.", "Full text + AI answer across all data, documents and history.", "覆盖全部数据、文档和历史记录的全文检索与 AI 回答。") },
   ]},
-  { key: "finanzen", name: L("Finanzen & Buchhaltung", "Finance & accounting"), short: L("Finanzen", "Finance"), color: "#c4673f", gl: "F", items: [
-    { t: L("Buchhaltung & Bilanz", "Accounting & balance sheet"), mono: "BB", d: L("Von der Buchung bis zum Abschluss — durchgängig, ohne Medienbruch.", "From posting to closing — end to end, no media breaks.") },
-    { t: L("Forecast & Controlling", "Forecast & controlling"), mono: "FC", href: P("/kosten/"), d: L("Liquidität, Marge, Nachkalkulation — auf einer Datenbasis.", "Liquidity, margin, post-calculation — on one data base.") },
-    { t: L("Lot-Kostenrechnung", "Lot-level costing"), mono: "LK", href: P("/kosten/"), inUse: true, d: L("Selbstkosten je Charge — IFRS/HGB, NRV, Plan-Ist, nachvollziehbar bis zum Beleg.", "Cost per batch — IFRS/HGB, NRV, plan vs. actual, traceable to the document.") },
-    { t: L("E-Rechnung (PEPPOL)", "E-invoicing (PEPPOL)"), mono: "ER", d: L("Rechnungen normkonform elektronisch senden und empfangen.", "Send and receive invoices electronically, standard-compliant.") },
-    { t: L("Steuer / UVA", "Tax / VAT return"), mono: "UV", d: L("Umsatzsteuer-Voranmeldung und Meldungen direkt aus dem System.", "VAT advance returns and filings straight from the system.") },
-    { t: L("Schnittstellen: BMD · DATEV", "Interfaces: BMD · DATEV"), mono: "BD", d: L("Sauberer Export zum Steuerberater — gängige Buchhaltungsformate.", "Clean export to the tax advisor — common accounting formats.") },
+  { key: "finanzen", name: L("Finanzen & Buchhaltung", "Finance & accounting", "财务与会计"), short: L("Finanzen", "Finance", "财务"), color: "#c4673f", gl: "F", items: [
+    { t: L("Buchhaltung & Bilanz", "Accounting & balance sheet", "会计与资产负债表"), mono: "BB", d: L("Von der Buchung bis zum Abschluss — durchgängig, ohne Medienbruch.", "From posting to closing — end to end, no media breaks.", "从记账到结账——全程贯通，无介质中断。") },
+    { t: L("Forecast & Controlling", "Forecast & controlling", "预测与控制"), mono: "FC", href: P("/kosten/"), d: L("Liquidität, Marge, Nachkalkulation — auf einer Datenbasis.", "Liquidity, margin, post-calculation — on one data base.", "流动性、利润率、成本复核——基于同一数据底座。") },
+    { t: L("Lot-Kostenrechnung", "Lot-level costing", "批次成本核算"), mono: "LK", href: P("/kosten/"), inUse: true, d: L("Selbstkosten je Charge — IFRS/HGB, NRV, Plan-Ist, nachvollziehbar bis zum Beleg.", "Cost per batch — IFRS/HGB, NRV, plan vs. actual, traceable to the document.", "每批次的自制成本——IFRS/HGB、NRV、计划对实际，可追溯到凭证。") },
+    { t: L("E-Rechnung (PEPPOL)", "E-invoicing (PEPPOL)", "电子发票（PEPPOL）"), mono: "ER", d: L("Rechnungen normkonform elektronisch senden und empfangen.", "Send and receive invoices electronically, standard-compliant.", "以符合规范的方式电子化收发发票。") },
+    { t: L("Steuer / UVA", "Tax / VAT return", "税务／增值税申报"), mono: "UV", d: L("Umsatzsteuer-Voranmeldung und Meldungen direkt aus dem System.", "VAT advance returns and filings straight from the system.", "直接从系统生成增值税预申报和各类申报。") },
+    { t: L("Schnittstellen: BMD · DATEV", "Interfaces: BMD · DATEV", "接口：BMD · DATEV"), mono: "BD", d: L("Sauberer Export zum Steuerberater — gängige Buchhaltungsformate.", "Clean export to the tax advisor — common accounting formats.", "干净地导出给税务顾问——常用会计格式。") },
   ]},
-  { key: "betrieb", name: L("Betrieb & Instandhaltung", "Operations & maintenance"), short: L("Betrieb", "Operations"), color: "#2a86a8", gl: "B", items: [
-    { t: L("Instandhaltung & Anlagendoku", "Maintenance & asset docs"), mono: "BM", href: P("/instandhaltung/"), inUse: true, d: L("Holistische Sicht: Anlage, Komponenten, Wartung und Pläne an einem Objekt.", "Holistic view: plant, components, maintenance and plans on one object.") },
-    { t: L("Tages-Digests & Reports", "Daily digests & reports"), mono: "TD", d: L("Automatische Tageszusammenfassung — was lief, was offen ist, was auffällt.", "Automatic daily summary — what ran, what's open, what stands out.") },
-    { t: L("Monitoring & Status", "Monitoring & status"), mono: "MO", href: P("/status/"), d: L("Dienste, Backups, Uptime — der Betrieb auf einen Blick.", "Services, backups, uptime — operations at a glance.") },
-    { t: L("Kennzahlen & Review", "KPIs & review"), mono: "KN", href: P("/kennzahlen/"), inUse: true, d: L("27 Management-Review-KPIs, snapshot-auditiert, aus echten Daten.", "27 management-review KPIs, snapshot-audited, from real data.") },
+  { key: "betrieb", name: L("Betrieb & Instandhaltung", "Operations & maintenance", "运营与维护"), short: L("Betrieb", "Operations", "运营"), color: "#2a86a8", gl: "B", items: [
+    { t: L("Instandhaltung & Anlagendoku", "Maintenance & asset docs", "维护与设备文档"), mono: "BM", href: P("/instandhaltung/"), inUse: true, d: L("Holistische Sicht: Anlage, Komponenten, Wartung und Pläne an einem Objekt.", "Holistic view: plant, components, maintenance and plans on one object.", "整体视图：设备、部件、维护和图纸集中于同一对象。") },
+    { t: L("Tages-Digests & Reports", "Daily digests & reports", "每日摘要与报表"), mono: "TD", d: L("Automatische Tageszusammenfassung — was lief, was offen ist, was auffällt.", "Automatic daily summary — what ran, what's open, what stands out.", "自动生成每日总结——运行了什么、还有什么未完成、有什么异常。") },
+    { t: L("Monitoring & Status", "Monitoring & status", "监控与状态"), mono: "MO", href: P("/status/"), d: L("Dienste, Backups, Uptime — der Betrieb auf einen Blick.", "Services, backups, uptime — operations at a glance.", "服务、备份、在线时长——一眼掌握运营全貌。") },
+    { t: L("Kennzahlen & Review", "KPIs & review", "关键指标与评审"), mono: "KN", href: P("/kennzahlen/"), inUse: true, d: L("27 Management-Review-KPIs, snapshot-auditiert, aus echten Daten.", "27 management-review KPIs, snapshot-audited, from real data.", "27 项管理评审 KPI，快照可审计，源自真实数据。") },
   ]},
-  { key: "menschen", name: L("Menschen & Wissen", "People & knowledge"), short: L("Menschen & Wissen", "People & knowledge"), color: "#3f9a52", gl: "M", items: [
-    { t: L("Onboarding", "Onboarding"), mono: "OB", d: L("Neue Mitarbeiter strukturiert einarbeiten — Zugänge, Schritte, Ansprechpartner.", "Bring new staff on board in a structured way — access, steps, contacts.") },
-    { t: L("Schulungsunterlagen", "Training materials"), mono: "SU", d: L("Wissen aufbauen und aktuell halten, an einem Ort für alle.", "Build and maintain knowledge, one place for everyone.") },
-    { t: L("Security-Awareness", "Security awareness"), mono: "SA", href: P("/compliance/"), d: L("Phishing & Co. erkennen — Schulung und Nachweis als Teil des ISMS.", "Spot phishing & co. — training and evidence as part of the ISMS.") },
-    { t: L("QM-System (ISO 9001)", "QM system (ISO 9001)"), mono: "QM", href: P("/compliance/"), inUse: true, d: L("Dokumentenlenkung, interne Audits, Maßnahmen (CAPA), Abweichungen — im selben System.", "Document control, internal audits, actions (CAPA), non-conformities — in the same system.") },
-    { t: L("Umfragen / Surveys", "Surveys"), mono: "UM", d: L("Feedback strukturiert einholen und auswerten.", "Collect and evaluate feedback in a structured way.") },
-    { t: L("Handbuch & Wissens-Kiosk", "Handbook & knowledge kiosk"), mono: "HK", href: P("/wissen/"), d: L("Handbuch, Compliance und App-Launcher für alle.", "Handbook, compliance and app launcher for everyone.") },
+  { key: "menschen", name: L("Menschen & Wissen", "People & knowledge", "人员与知识"), short: L("Menschen & Wissen", "People & knowledge", "人员与知识"), color: "#3f9a52", gl: "M", items: [
+    { t: L("Onboarding", "Onboarding", "入职引导"), mono: "OB", d: L("Neue Mitarbeiter strukturiert einarbeiten — Zugänge, Schritte, Ansprechpartner.", "Bring new staff on board in a structured way — access, steps, contacts.", "有条理地培训新员工——权限、步骤、联系人。") },
+    { t: L("Schulungsunterlagen", "Training materials", "培训资料"), mono: "SU", d: L("Wissen aufbauen und aktuell halten, an einem Ort für alle.", "Build and maintain knowledge, one place for everyone.", "构建并保持知识常新，人人共享同一处。") },
+    { t: L("Security-Awareness", "Security awareness", "安全意识"), mono: "SA", href: P("/compliance/"), d: L("Phishing & Co. erkennen — Schulung und Nachweis als Teil des ISMS.", "Spot phishing & co. — training and evidence as part of the ISMS.", "识别钓鱼等威胁——培训与记录作为 ISMS 的一部分。") },
+    { t: L("QM-System (ISO 9001)", "QM system (ISO 9001)", "质量管理体系（ISO 9001）"), mono: "QM", href: P("/compliance/"), inUse: true, d: L("Dokumentenlenkung, interne Audits, Maßnahmen (CAPA), Abweichungen — im selben System.", "Document control, internal audits, actions (CAPA), non-conformities — in the same system.", "文件控制、内部审核、纠正预防措施（CAPA）、不符合项——同在一个系统中。") },
+    { t: L("Umfragen / Surveys", "Surveys", "问卷调查"), mono: "UM", d: L("Feedback strukturiert einholen und auswerten.", "Collect and evaluate feedback in a structured way.", "有条理地收集并分析反馈。") },
+    { t: L("Handbuch & Wissens-Kiosk", "Handbook & knowledge kiosk", "手册与知识自助台"), mono: "HK", href: P("/wissen/"), d: L("Handbuch, Compliance und App-Launcher für alle.", "Handbook, compliance and app launcher for everyone.", "面向所有人的手册、合规与应用启动台。") },
   ]},
-  { key: "it", name: L("IT, Geräte & Software", "IT, devices & software"), short: L("IT & Geräte", "IT & devices"), color: "#4a6fa5", gl: "I", items: [
-    { t: L("Automatisiertes Software-Rollout", "Automated software rollout"), mono: "SR", inUse: true, href: P("/software-rollout/"), d: L("Software auf die Flotte ausrollen — serverseitig, ohne Vor-Ort, ohne Admin-Prompt.", "Roll out software to the fleet — server-side, no on-site visit, no admin prompt.") },
-    { t: L("App-Kiosk (Self-Service)", "App kiosk (self-service)"), mono: "AK", href: P("/software-rollout/"), d: L("Mitarbeiter installieren freigegebene Software selbst — sicher.", "Staff install approved software themselves — safely.") },
-    { t: L("Geräteverwaltung (MDM)", "Device management (MDM)"), mono: "MD", inUse: true, href: P("/software-rollout/"), d: L("Mobile Geräte und Apps zentral verwalten und absichern.", "Manage and secure mobile devices and apps centrally.") },
-    { t: L("Eigene App-Entwicklung", "Custom app development"), mono: "AE", href: P("/app/"), inUse: true, d: L("Wo Standard nicht passt: eigene Web-/Mobile-Apps auf demselben Stack.", "Where standard doesn't fit: custom web/mobile apps on the same stack.") },
-    { t: L("SSO & Souveränität", "SSO & sovereignty"), mono: "SS", href: P("/stack/"), d: L("Ein Login, alles selbst gehostet, Daten im Haus — kein Lock-in.", "One login, all self-hosted, data in-house — no lock-in.") },
-    { t: L("ISMS & Compliance", "ISMS & compliance"), mono: "IS", href: P("/compliance/"), inUse: true, d: L("ISO 27001:2022, Risikoregister, NIS2/BSI/NIST — ein Control, viele Normen.", "ISO 27001:2022, risk register, NIS2/BSI/NIST — one control, many standards.") },
-    { t: L("Netz-Dokumentation (CMDB)", "Network docs (CMDB)"), mono: "CM", d: L("Standorte, Geräte, VLANs und Verkabelung als lebendes Modell — kein veraltetes Visio.", "Sites, devices, VLANs and cabling as a living model — no stale Visio.") },
+  { key: "it", name: L("IT, Geräte & Software", "IT, devices & software", "IT、设备与软件"), short: L("IT & Geräte", "IT & devices", "IT 与设备"), color: "#4a6fa5", gl: "I", items: [
+    { t: L("Automatisiertes Software-Rollout", "Automated software rollout", "自动化软件部署"), mono: "SR", inUse: true, href: P("/software-rollout/"), d: L("Software auf die Flotte ausrollen — serverseitig, ohne Vor-Ort, ohne Admin-Prompt.", "Roll out software to the fleet — server-side, no on-site visit, no admin prompt.", "把软件部署到整批设备——服务器端完成，无需现场，无需管理员弹窗。") },
+    { t: L("App-Kiosk (Self-Service)", "App kiosk (self-service)", "应用自助台（自助服务）"), mono: "AK", href: P("/software-rollout/"), d: L("Mitarbeiter installieren freigegebene Software selbst — sicher.", "Staff install approved software themselves — safely.", "员工自行安装已获批准的软件——安全可控。") },
+    { t: L("Geräteverwaltung (MDM)", "Device management (MDM)", "设备管理（MDM）"), mono: "MD", inUse: true, href: P("/software-rollout/"), d: L("Mobile Geräte und Apps zentral verwalten und absichern.", "Manage and secure mobile devices and apps centrally.", "集中管理并保护移动设备和应用。") },
+    { t: L("Eigene App-Entwicklung", "Custom app development", "定制应用开发"), mono: "AE", href: P("/app/"), inUse: true, d: L("Wo Standard nicht passt: eigene Web-/Mobile-Apps auf demselben Stack.", "Where standard doesn't fit: custom web/mobile apps on the same stack.", "当标准方案不适用时：在同一技术栈上开发自有 Web／移动应用。") },
+    { t: L("SSO & Souveränität", "SSO & sovereignty", "SSO 与自主可控（数据主权）"), mono: "SS", href: P("/stack/"), d: L("Ein Login, alles selbst gehostet, Daten im Haus — kein Lock-in.", "One login, all self-hosted, data in-house — no lock-in.", "一次登录，全部自托管，数据留在本地——无厂商锁定。") },
+    { t: L("ISMS & Compliance", "ISMS & compliance", "ISMS 与合规"), mono: "IS", href: P("/compliance/"), inUse: true, d: L("ISO 27001:2022, Risikoregister, NIS2/BSI/NIST — ein Control, viele Normen.", "ISO 27001:2022, risk register, NIS2/BSI/NIST — one control, many standards.", "ISO 27001:2022、风险登记册、NIS2/BSI/NIST——一项控制，对应多项标准。") },
+    { t: L("Netz-Dokumentation (CMDB)", "Network docs (CMDB)", "网络文档（CMDB）"), mono: "CM", d: L("Standorte, Geräte, VLANs und Verkabelung als lebendes Modell — kein veraltetes Visio.", "Sites, devices, VLANs and cabling as a living model — no stale Visio.", "站点、设备、VLAN 和布线作为动态模型——告别过时的 Visio。") },
   ]},
 ];
 
@@ -62,7 +63,7 @@ const inUseN = all.filter((x) => x.inUse).length;
 const demoN = all.filter((x) => x.href).length;
 const half = Math.ceil(all.length / 2);
 const rowA = all.slice(0, half), rowB = all.slice(half);
-const filterDefs: [string, string, string][] = [["all", L("Alle", "All"), "#123A33"], ...groupsMeta.map((g) => [g.key, g.short, g.color] as [string, string, string])];
+const filterDefs: [string, string, string][] = [["all", L("Alle", "All", "全部"), "#123A33"], ...groupsMeta.map((g) => [g.key, g.short, g.color] as [string, string, string])];
 const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name, color: g.color }]));
 ---
 <!-- HERO -->
@@ -70,10 +71,10 @@ const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name
   <div style="position:absolute; top:-12%; right:-6%; width:44%; height:74%; background:radial-gradient(circle at 60% 40%,rgba(230,178,58,.16),transparent 62%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(46px,7vw,92px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
     <div style="display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#A6CFC5; margin-bottom:20px;">
-      <span style="width:7px; height:7px; background:#E6B23A; display:inline-block;"></span>{L("Was wir können · Aus Erfahrung", "What we can do · from experience")}
+      <span style="width:7px; height:7px; background:#E6B23A; display:inline-block;"></span>{L("Was wir können · Aus Erfahrung", "What we can do · from experience", "我们的能力 · 源自实践")}
     </div>
-    <h1 style="font-family:var(--font-head); font-weight:800; font-size:clamp(38px,6.4vw,80px); line-height:0.98; letter-spacing:-0.04em; margin:0; max-width:16ch;">{L("Aus Erfahrung gebaut.", "Built from experience.")} <span style="color:#E6B23A;">{L("Nicht aus Slides.", "Not from slides.")}</span></h1>
-    <p style="font-size:clamp(17px,1.7vw,22px); line-height:1.6; color:#C7D8D2; max-width:60ch; margin:24px 0 0;">{L("Vieles läuft schon — in echten Werken, im Tagesbetrieb. Generisch, ohne Kundennamen. Wo es eine Demo gibt, klick direkt rein.", "A lot is already running — in real plants, in daily operation. Generic, no customer names. Where there's a demo, click straight in.")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:800; font-size:clamp(38px,6.4vw,80px); line-height:0.98; letter-spacing:-0.04em; margin:0; max-width:16ch;">{L("Aus Erfahrung gebaut.", "Built from experience.", "源自实践打造。")} <span style="color:#E6B23A;">{L("Nicht aus Slides.", "Not from slides.", "而非源自 PPT。")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,22px); line-height:1.6; color:#C7D8D2; max-width:60ch; margin:24px 0 0;">{L("Vieles läuft schon — in echten Werken, im Tagesbetrieb. Generisch, ohne Kundennamen. Wo es eine Demo gibt, klick direkt rein.", "A lot is already running — in real plants, in daily operation. Generic, no customer names. Where there's a demo, click straight in.", "许多能力已在运行——在真实工厂的日常运营中。以通用形式呈现，不含客户名称。凡有演示之处，点击即可直接体验。")}</p>
   </div>
   <!-- MARQUEE -->
   <div style="position:relative; border-top:1px solid rgba(166,207,197,.16); border-bottom:1px solid rgba(166,207,197,.16); padding:16px 0; display:flex; flex-direction:column; gap:9px;">
@@ -91,9 +92,9 @@ const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name
   <!-- STATS -->
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:22px clamp(24px,5vw,56px);">
     <div class="kn-stats">
-      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#F4F8F6;"><span class="kn-count" data-to={total}>{total}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("BAUSTEINE", "BUILDING BLOCKS")}</div></div>
-      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#3FB57E;"><span class="kn-count" data-to={inUseN}>{inUseN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("IM EINSATZ", "IN USE")}</div></div>
-      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#E6B23A;"><span class="kn-count" data-to={demoN}>{demoN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("MIT DEMO / SEITE", "WITH DEMO / PAGE")}</div></div>
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#F4F8F6;"><span class="kn-count" data-to={total}>{total}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("BAUSTEINE", "BUILDING BLOCKS", "模块")}</div></div>
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#3FB57E;"><span class="kn-count" data-to={inUseN}>{inUseN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("IM EINSATZ", "IN USE", "已投入使用")}</div></div>
+      <div style="border-left:1px solid rgba(166,207,197,.25); padding-left:16px;"><div style="font-family:var(--font-head); font-weight:800; font-size:clamp(27px,3.4vw,40px); line-height:1; color:#E6B23A;"><span class="kn-count" data-to={demoN}>{demoN}</span></div><div style="font-family:var(--font-mono); font-size:10.5px; color:#8FB0A8; margin-top:6px; letter-spacing:0.04em;">{L("MIT DEMO / SEITE", "WITH DEMO / PAGE", "含演示／页面")}</div></div>
     </div>
   </div>
 </section>
@@ -106,7 +107,7 @@ const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name
         <span class="kn-fdot" style={`background:${color};`}></span>{label} <span style="opacity:.6; font-size:11px;">{k === "all" ? total : groupsMeta.find((g) => g.key === k)!.items.length}</span>
       </button>
     ))}
-    <button type="button" class="kn-filt kn-inuse" data-inuse aria-pressed="false"><span class="kn-led" style="width:7px; height:7px; border-radius:50%; background:#16794a; display:inline-block;"></span> {L("nur im Einsatz", "in use only")}</button>
+    <button type="button" class="kn-filt kn-inuse" data-inuse aria-pressed="false"><span class="kn-led" style="width:7px; height:7px; border-radius:50%; background:#16794a; display:inline-block;"></span> {L("nur im Einsatz", "in use only", "仅显示已投入使用")}</button>
     <span style="margin-left:auto; font-family:var(--font-mono); font-size:12px; color:#5C5E63;"><b id="kn-vis">{total}</b> / {total}</span>
   </div>
 </div>
@@ -147,8 +148,8 @@ const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name
           : <div class={cls} data-group={it.gkey} data-inuse={it.inUse ? "1" : ""} style={card}>{inner}</div>;
       })}
     </div>
-    <p id="kn-empty" style="display:none; font-size:15px; color:#92938F; padding:32px 0;">{L("Keine Bausteine in dieser Auswahl.", "No building blocks in this selection.")}</p>
-    <p style="font-size:15px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:22px; margin-top:32px; max-width:70ch;">{L("Nicht alles braucht jeder. Der Punkt: es greift ineinander, läuft im eigenen Haus und wächst mit — Schritt für Schritt statt Big-Bang.", "Not everyone needs all of it. The point: it interlocks, runs in your own house and grows with you — step by step, not big bang.")}</p>
+    <p id="kn-empty" style="display:none; font-size:15px; color:#92938F; padding:32px 0;">{L("Keine Bausteine in dieser Auswahl.", "No building blocks in this selection.", "此筛选下暂无模块。")}</p>
+    <p style="font-size:15px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; padding-top:22px; margin-top:32px; max-width:70ch;">{L("Nicht alles braucht jeder. Der Punkt: es greift ineinander, läuft im eigenen Haus und wächst mit — Schritt für Schritt statt Big-Bang.", "Not everyone needs all of it. The point: it interlocks, runs in your own house and grows with you — step by step, not big bang.", "并非人人都需要全部。关键在于：它们相互衔接、在贵厂本地运行，并随您一同成长——循序渐进，而非一蹴而就。")}</p>
   </div>
 </section>
 
@@ -156,11 +157,11 @@ const gheadMap = Object.fromEntries(groupsMeta.map((g) => [g.key, { name: g.name
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1120px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,56px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:20ch;">{L("Was davon klemmt bei euch gerade?", "Which of these is pinching you right now?")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Schreib's roh in eine Pain-List — wir sagen dir, welche Bausteine greifen.", "Jot it raw into a pain list — we'll tell you which building blocks fit.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,56px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:20ch;">{L("Was davon klemmt bei euch gerade?", "Which of these is pinching you right now?", "眼下这些当中，哪一项正让贵厂头疼？")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Schreib's roh in eine Pain-List — wir sagen dir, welche Bausteine greifen.", "Jot it raw into a pain list — we'll tell you which building blocks fit.", "把它随手写进一份痛点清单——我们会告诉您哪些模块能对症。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
-      <a href={b + "/stack/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("So ist der Stack gebaut", "How the stack is built")} ↗</a>
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list", "发送痛点清单")} →</a>
+      <a href={b + "/stack/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("So ist der Stack gebaut", "How the stack is built", "技术栈是如何构建的")} ↗</a>
     </div>
   </div>
 </section>

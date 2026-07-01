@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import ErpPage from "../../components/views/ErpPage.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Self-hosted ERP" description="Open-source, self-hosted ERP on an Odoo foundation — your data, your server, OPC-UA/MQTT-ready. Refined for industry." path="/cn/erp/" altPath="/erp/">
+  <ErpPage lang={lang} />
+</Base>

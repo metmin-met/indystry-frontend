@@ -21,7 +21,7 @@ function chip(label: string, href: string, color: string, ext: boolean): string 
 }
 
 export function linkifyDemos(html: string, lang: Lang): string {
-  const b = lang === "de" ? "" : "/en";
+  const b = lang === "de" ? "" : lang === "en" ? "/en" : "/cn";
   return html.replace(/<code>([^<]+)<\/code>/g, (m, raw) => {
     const inner = String(raw).trim();
     for (const [frag, key] of HOSTS) {

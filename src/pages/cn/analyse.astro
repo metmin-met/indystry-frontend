@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Analyse from "../../components/views/Analyse.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Material analysis · Nordwerk" description="Surface, cross-section and microscopy plus measurements per batch — traceable, read-only." path="/cn/analyse/" altPath="/analyse/" noindex={true}>
+  <Analyse lang={lang} />
+</Base>

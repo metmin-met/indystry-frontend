@@ -4,33 +4,34 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const AC = "#E6B23A";
 const ways = [
-  { k: L("Konzern-System", "Corporate suite"), d: L("Teuer, Jahr für Jahr steigende Lizenzen, abhängig von einem einzigen Anbieter.", "Expensive, licences rising year after year, locked to a single vendor."), good: false },
-  { k: L("Selber basteln", "Do it yourself"), d: L("Insellösungen und Excel — nichts spricht miteinander, niemand betreibt es verlässlich.", "Island tools and Excel — nothing connects, nobody runs it reliably."), good: false },
-  { k: "indystry", d: L("Ein erprobtes, fertig betriebenes Rückgrat aus offenen Bausteinen — auf eurer eigenen Hardware.", "A proven, fully operated backbone of open building blocks — on your own hardware."), good: true },
+  { k: L("Konzern-System", "Corporate suite", "大型集团套件"), d: L("Teuer, Jahr für Jahr steigende Lizenzen, abhängig von einem einzigen Anbieter.", "Expensive, licences rising year after year, locked to a single vendor.", "费用高昂，授权费逐年上涨，且被单一供应商牢牢锁定。"), good: false },
+  { k: L("Selber basteln", "Do it yourself", "自行拼凑"), d: L("Insellösungen und Excel — nichts spricht miteinander, niemand betreibt es verlässlich.", "Island tools and Excel — nothing connects, nobody runs it reliably.", "各种孤岛工具加 Excel——彼此互不相通，也没人能可靠地维护运行。"), good: false },
+  { k: "indystry", d: L("Ein erprobtes, fertig betriebenes Rückgrat aus offenen Bausteinen — auf eurer eigenen Hardware.", "A proven, fully operated backbone of open building blocks — on your own hardware.", "一套经过验证、开箱即用的中枢系统，由开源模块构建——运行在您自己的硬件上。"), good: true },
 ];
 const funds = [
-  { n: "KMU.DIGITAL", q: L("bis 80 % Beratung · bis 30 % Umsetzung", "up to 80% advisory · up to 30% rollout"), d: L("Der niederschwellige Einstieg, bundesweit.", "The low-threshold entry, nationwide.") },
-  { n: "SFG Ideen!Reich", q: L("bis 60 % · bis 75.000 €", "up to 60% · up to €75,000"), d: L("Steiermark — ideal für das erste Digitalisierungsprojekt.", "Styria — ideal for the first digitalisation project.") },
-  { n: "SFG Cyber!Sicher", q: L("bis 30 % · bis 15.000 €", "up to 30% · up to €15,000"), d: L("Für IT-Sicherheit — der direkte NIS-2-Hebel.", "For IT security — the direct NIS-2 lever.") },
+  { n: "KMU.DIGITAL", q: L("bis 80 % Beratung · bis 30 % Umsetzung", "up to 80% advisory · up to 30% rollout", "咨询最高 80% · 实施最高 30%"), d: L("Der niederschwellige Einstieg, bundesweit.", "The low-threshold entry, nationwide.", "门槛最低的入门方式，覆盖全国。") },
+  { n: "SFG Ideen!Reich", q: L("bis 60 % · bis 75.000 €", "up to 60% · up to €75,000", "最高 60% · 最高 75,000 欧元"), d: L("Steiermark — ideal für das erste Digitalisierungsprojekt.", "Styria — ideal for the first digitalisation project.", "施泰尔马克州——非常适合首个数字化项目。") },
+  { n: "SFG Cyber!Sicher", q: L("bis 30 % · bis 15.000 €", "up to 30% · up to €15,000", "最高 30% · 最高 15,000 欧元"), d: L("Für IT-Sicherheit — der direkte NIS-2-Hebel.", "For IT security — the direct NIS-2 lever.", "用于 IT 安全——直接对接 NIS2 的资助杠杆。") },
 ];
 const steps = [
-  { n: "1", t: L("Live-Demo, 30 Minuten", "Live demo, 30 minutes"), d: L("Wir zeigen die laufende Beispiel-Fabrik. Kein Verkaufstermin.", "We show the running example factory. No sales pitch.") },
-  { n: "2", t: L("Architektur-Check vor Ort", "On-site architecture check"), d: L("Ein halber Tag, kostenlos. Wir hören zu, wo es klemmt.", "Half a day, free of charge. We listen to where it hurts.") },
-  { n: "3", t: L("Geförderter Pilot", "Funded pilot"), d: L("Ein konkreter Schmerz, sichtbar gelöst — gegenfinanziert.", "One concrete pain, visibly solved — co-funded.") },
-  { n: "4", t: L("Ausbau in eurem Tempo", "Grow at your pace"), d: L("Baustein für Baustein. Ihr behaltet Daten und Kontrolle.", "Block by block. You keep your data and control.") },
+  { n: "1", t: L("Live-Demo, 30 Minuten", "Live demo, 30 minutes", "30 分钟现场演示"), d: L("Wir zeigen die laufende Beispiel-Fabrik. Kein Verkaufstermin.", "We show the running example factory. No sales pitch.", "我们展示实际运行的示例工厂，绝非推销会。") },
+  { n: "2", t: L("Architektur-Check vor Ort", "On-site architecture check", "现场架构评估"), d: L("Ein halber Tag, kostenlos. Wir hören zu, wo es klemmt.", "Half a day, free of charge. We listen to where it hurts.", "半天时间，免费提供。我们倾听贵厂的痛点所在。") },
+  { n: "3", t: L("Geförderter Pilot", "Funded pilot", "获补贴的试点项目"), d: L("Ein konkreter Schmerz, sichtbar gelöst — gegenfinanziert.", "One concrete pain, visibly solved — co-funded.", "针对一个具体痛点，看得见地解决——并有资金补贴。") },
+  { n: "4", t: L("Ausbau in eurem Tempo", "Grow at your pace", "按您的节奏扩展"), d: L("Baustein für Baustein. Ihr behaltet Daten und Kontrolle.", "Block by block. You keep your data and control.", "一个模块接一个模块。数据与控制权始终在您手中。") },
 ];
 ---
 <!-- HERO -->
 <section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(230,178,58,.18),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Einstieg & Förderung", "Getting started & funding")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{L("Eigene Daten.", "Your own data.")} <span style="color:#E6B23A;">{L("Geförderter Einstieg.", "A funded start.")}</span></h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Weg zur souveränen Fabrik beginnt nicht mit einem Millionenprojekt, sondern mit einem klar umrissenen ersten Schritt — der zu 60 bis 80 Prozent förderbar ist.", "The road to a sovereign factory does not start with a million-euro project, but with a clearly scoped first step — funded by 60 to 80 percent.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Einstieg & Förderung", "Getting started & funding", "入门与资助")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{L("Eigene Daten.", "Your own data.", "自己的数据。")} <span style="color:#E6B23A;">{L("Geförderter Einstieg.", "A funded start.", "有补贴的起步。")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Weg zur souveränen Fabrik beginnt nicht mit einem Millionenprojekt, sondern mit einem klar umrissenen ersten Schritt — der zu 60 bis 80 Prozent förderbar ist.", "The road to a sovereign factory does not start with a million-euro project, but with a clearly scoped first step — funded by 60 to 80 percent.", "通往自主可控工厂之路，无需从百万级大项目起步，而是从一个界定清晰的第一步开始——这一步可获得 60% 到 80% 的补贴。")}</p>
   </div>
 </section>
 
@@ -38,7 +39,7 @@ const steps = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(40px,5vw,64px) clamp(24px,5vw,56px) clamp(20px,3vw,32px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Der dritte Weg", "The third way")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Der dritte Weg", "The third way", "第三条路")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px;">
@@ -58,8 +59,8 @@ const steps = [
     <div style="display:flex; gap:16px; align-items:flex-start; max-width:84ch;">
       <span style="font-family:var(--font-mono); font-size:17px; color:#16463E; flex:none; margin-top:4px;">★</span>
       <div>
-        <p style="margin:0; font-size:clamp(18px,2vw,26px); line-height:1.45; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Ein produzierender Industriebetrieb aus der Steiermark führt seine gesamte Fertigung auf diesem Stack — von der Auftragsabwicklung über Maschinendaten und Qualität bis zur Auswertung.", "A manufacturing company in Styria runs its entire production on this stack — from order handling through machine data and quality to analysis.")}</p>
-        <p style="margin:14px 0 0; font-size:14px; line-height:1.6; color:#5C5E63; max-width:70ch;">{L("Was ihr in der Demo seht, ist keine Schauumgebung, sondern gelebte Praxis: ein Betrieb wie eurer, der seine Datenhoheit zurückgewonnen hat — und sie nicht mehr hergeben möchte.", "What you see in the demo is not a showroom but lived practice: a company like yours that regained its data sovereignty — and would not give it back.")}</p>
+        <p style="margin:0; font-size:clamp(18px,2vw,26px); line-height:1.45; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Ein produzierender Industriebetrieb aus der Steiermark führt seine gesamte Fertigung auf diesem Stack — von der Auftragsabwicklung über Maschinendaten und Qualität bis zur Auswertung.", "A manufacturing company in Styria runs its entire production on this stack — from order handling through machine data and quality to analysis.", "施泰尔马克州一家生产型工业企业，将其全部生产运行在这套技术栈上——从订单处理，到机器数据与质量，再到分析。")}</p>
+        <p style="margin:14px 0 0; font-size:14px; line-height:1.6; color:#5C5E63; max-width:70ch;">{L("Was ihr in der Demo seht, ist keine Schauumgebung, sondern gelebte Praxis: ein Betrieb wie eurer, der seine Datenhoheit zurückgewonnen hat — und sie nicht mehr hergeben möchte.", "What you see in the demo is not a showroom but lived practice: a company like yours that regained its data sovereignty — and would not give it back.", "您在演示中看到的并非展示环境，而是真实的日常实践：一家与贵厂类似的企业，重新夺回了自己的数据主权——并且再也不愿交出去。")}</p>
       </div>
     </div>
   </div>
@@ -69,10 +70,10 @@ const steps = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px) clamp(20px,3vw,28px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Förder-Hebel", "Funding levers")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Förder-Hebel", "Funding levers", "资助杠杆")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
-    <p style="font-size:16px; line-height:1.7; color:#3C3E42; margin:0 0 22px; max-width:70ch;">{L("Das Pilotprojekt lässt sich mit-finanzieren. Wir begleiten euch bei Auswahl und Antragstellung.", "The pilot project can be co-financed. We support you with selection and application.")}</p>
+    <p style="font-size:16px; line-height:1.7; color:#3C3E42; margin:0 0 22px; max-width:70ch;">{L("Das Pilotprojekt lässt sich mit-finanzieren. Wir begleiten euch bei Auswahl und Antragstellung.", "The pilot project can be co-financed. We support you with selection and application.", "试点项目可申请配套资助。我们协助您完成资助项目的选择与申报。")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px;">
       {funds.map((f) => (
         <div style={`border:1px solid #E2E8F0; border-left:3px solid ${AC}; border-radius:12px; background:#fff; padding:18px 20px;`}>
@@ -82,7 +83,7 @@ const steps = [
         </div>
       ))}
     </div>
-    <p style="font-size:12px; line-height:1.6; color:#92938F; margin:18px 0 0;">{L("Förderhinweise für Österreich, Stand 2026 — Konditionen vor Antragstellung bestätigen. Antrag immer vor Projektbeginn.", "Funding notes for Austria, as of 2026 — confirm conditions before applying. Always apply before the project starts.")}</p>
+    <p style="font-size:12px; line-height:1.6; color:#92938F; margin:18px 0 0;">{L("Förderhinweise für Österreich, Stand 2026 — Konditionen vor Antragstellung bestätigen. Antrag immer vor Projektbeginn.", "Funding notes for Austria, as of 2026 — confirm conditions before applying. Always apply before the project starts.", "以上为奥地利资助信息，截至 2026 年——申报前请确认具体条件。务必在项目启动前提交申请。")}</p>
   </div>
 </section>
 
@@ -90,7 +91,7 @@ const steps = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(20px,3vw,28px) clamp(24px,5vw,56px) clamp(48px,6vw,80px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("So starten wir — schlank, ohne Risiko", "How we start — lean, no risk")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("So starten wir — schlank, ohne Risiko", "How we start — lean, no risk", "我们如何起步——精简、无风险")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(228px,1fr)); gap:14px;">
@@ -102,7 +103,7 @@ const steps = [
         </div>
       ))}
     </div>
-    <p style="font-size:14px; line-height:1.7; color:#3C3E42; margin:22px 0 0; max-width:70ch;">{L("Kein Big-Bang, kein Lock-in: ihr behaltet jederzeit die Kontrolle über Daten und System.", "No big bang, no lock-in: you keep control over data and system at all times.")} <a href={b + "/rechner/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Wie das System mitwächst", "How the system scales")} →</a></p>
+    <p style="font-size:14px; line-height:1.7; color:#3C3E42; margin:22px 0 0; max-width:70ch;">{L("Kein Big-Bang, kein Lock-in: ihr behaltet jederzeit die Kontrolle über Daten und System.", "No big bang, no lock-in: you keep control over data and system at all times.", "不搞一步到位的大爆炸，也没有厂商锁定：您始终掌控数据与系统。")} <a href={b + "/rechner/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Wie das System mitwächst", "How the system scales", "系统如何随您一起成长")} →</a></p>
   </div>
 </section>
 
@@ -110,11 +111,11 @@ const steps = [
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Schauen wir gemeinsam über den Zaun.", "Let us look over the fence together.")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Kein Verkaufstermin — ein Gespräch unter Produktionsleuten.", "No sales pitch — a conversation between production people.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Schauen wir gemeinsam über den Zaun.", "Let us look over the fence together.", "让我们一起越过围墙看看。")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Kein Verkaufstermin — ein Gespräch unter Produktionsleuten.", "No sales pitch — a conversation between production people.", "不是推销会——而是生产同行之间的一次交流。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send your pain list")} →</a>
-      <a href={b + "/demos/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Erst die Demo ansehen", "See the demo first")} ↗</a>
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send your pain list", "发送您的痛点清单")} →</a>
+      <a href={b + "/demos/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Erst die Demo ansehen", "See the demo first", "先看看演示")} ↗</a>
     </div>
   </div>
 </section>

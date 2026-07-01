@@ -1,25 +1,28 @@
 {
-  "generated_at": "2026-06-19T08:18:13.257Z",
+  "generated_at": "2026-07-01T15:23:20.713Z",
   "brand": {
     "codename": "indystry",
     "name": "Indystry",
     "domain": "indystry.works",
     "url": "https://indystry.works",
     "tagline": {
-      "de": "Die souveräne Smart Factory — selbst gehostet, offen, deins.",
-      "en": "The sovereign smart factory — self-hosted, open, yours."
+      "de": "Raus aus dem Tabellen-Chaos. Selbstbestimmt.",
+      "en": "Out of spreadsheet chaos. Self-determined.",
+      "zh": "告别表格混乱，自主掌控。"
     },
     "claim": {
-      "de": "Industrie 4.0 ohne Cloud-Abhängigkeit. Vom Sensor bis zur Auswertung läuft alles auf deinem eigenen Stack.",
-      "en": "Industry 4.0 without cloud lock-in. From sensor to insight, everything runs on your own stack."
+      "de": "Fertige Software fürs Werk — ab Tag eins angelernt, an euch angepasst. Wir migrieren euch sauber rein (Tabellen, Alt-DB, Altsystem) — ihr startet bei 80 %, nicht bei null.",
+      "en": "Ready-made software for your plant — trained from day one, adapted to you. We migrate you in cleanly (spreadsheets, legacy DB, old systems) — you start at 80 %, not zero.",
+      "zh": "为工厂量身打造的成品软件——从第一天起即可上手，并按贵厂需求定制。我们帮您干净利落地完成数据迁移（电子表格、旧数据库、老系统），让您从 80% 起步，而非从零开始。"
     }
   },
   "meta": {
     "pillars": 10,
-    "demos": 6,
+    "demos": 7,
     "locales": [
       "de",
-      "en"
+      "en",
+      "zh"
     ],
     "default_locale": "de"
   },
@@ -30,9 +33,9 @@
       "icon": "server",
       "color": 211,
       "demo": {
-        "url": "https://status-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "url": "/status/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -81,6 +84,30 @@
             "monitoring (metrics · SIEM · logs)"
           ]
         }
+      },
+      "zh": {
+        "hook": {
+          "headline": "在后台默默为您运转的技术。",
+          "subline": "全部备份、随时可用——而且能自我照看。",
+          "body": "您的程序和数据全天候运行。系统有自动备份和受保护的登录入口。监控会在任何东西出故障\n之前就发出告警。您什么都不用操心——它就是一直在那里。\n"
+        },
+        "story": {
+          "title": "当夜里一块硬盘损坏时——您却只从报告里才得知",
+          "body": "设想一下，夜里一块硬盘损坏了。系统自己就察觉到，在后台启用第二块硬盘并继续运行。\n第二天早上报告里只多了一行字——没有停机、没有紧急电话、没有数据丢失。这正是这套基础\n设施的意义所在。\n"
+        },
+        "deep": {
+          "body": "一层自托管的虚拟化承载着所有服务，每个服务都是隔离的容器或虚拟机。一张加密网状网络\n连接各个站点，对互联网不开放任何端口；单点登录（SSO）汇聚所有登录，而三层监控（指标、\n安全事件、日志）能在问题显现之前就把它们暴露出来。关键之处在于：整套设施都以代码方式\n描述并保存在 Git 中——服务器、服务、访问权限皆然。变更通过流水线执行，干净地做版本管理，\n一键即可重现；加密的异地备份自动保障一切安全。一旦出现故障，您可以从代码仓库重建它——\n不依赖藏在少数人脑子里的经验，也没有云端的厂商锁定。就连这个网站本身也是这样运行的。\n",
+          "components": [
+            "Proxmox VE",
+            "Git / GitLab",
+            "CI/CD 流水线",
+            "Ansible (IaC)",
+            "WireGuard 网状网络",
+            "SSO/IdP",
+            "异地备份 (PBS)",
+            "监控（指标 · SIEM · 日志）"
+          ]
+        }
       }
     },
     {
@@ -89,9 +116,9 @@
       "icon": "cpu",
       "color": 8,
       "demo": {
-        "url": "https://scada-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "url": "https://indystry.works/anlage/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -134,6 +161,27 @@
             "alarm management"
           ]
         }
+      },
+      "zh": {
+        "hook": {
+          "headline": "实时掌握您的产线一举一动。",
+          "subline": "看清机器此刻在做什么。在任何环节卡壳之前就介入。",
+          "body": "在一块屏幕上您就能看到当前正在运行的一切：哪台机器在工作、哪里卡住了、哪个数值超出了\n范围。您不必走到产线旁去查看——一旦有异常，它会自己发出提示。\n"
+        },
+        "story": {
+          "title": "一个数值开始失控——而您在废品产生之前就发现了它",
+          "body": "一处温度缓慢爬升，超出了绿色区间。此刻还没有任何东西损坏，但中控室已把这一趋势显示为\n黄色。稍作校正，数值就稳定下来——接下来数小时的生产依旧良好，而不是沦为废品。\n"
+        },
+        "deep": {
+          "body": "控制层（SCADA/HMI）将设备状态可视化，并引导操作人员完成流程与告警处理。其下，可编程\n逻辑控制器（PLC）通过专用现场网络驱动机器与驱动装置。一套开放的机器标准（OPC UA）把\n专有的控制世界与开放的数据世界干净地分隔开来：每一个测量值都被周期性采集，并向上流式\n传输到数据存储中——完全不给控制器增加负担。\n",
+          "components": [
+            "SCADA/HMI",
+            "PLC / 驱动装置",
+            "现场总线 (PROFINET)",
+            "OPC UA",
+            "告警管理"
+          ]
+        }
       }
     },
     {
@@ -143,8 +191,8 @@
       "color": 268,
       "demo": {
         "url": "https://twin-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -185,6 +233,26 @@
             "what-if simulation"
           ]
         }
+      },
+      "zh": {
+        "hook": {
+          "headline": "先试一试，再切换。",
+          "subline": "在屏幕上做假设推演——先于您动真正的产线。",
+          "body": "您想跑得更快，或改一个配方？先在数字孪生上试一试。您能看到会发生什么，而不必浪费物料\n或停下生产。只有当一切合适时，才用到真正的产线上。\n"
+        },
+        "story": {
+          "title": "测试一项新设置，却不冒险损失任何一个批次",
+          "body": "在这个班次尝试更快的运行方式之前，孪生先把它推演一遍：产出提升，某个工位上的瓶颈被\n清晰地显示出来。该工位事先得到了减负——真正的切换第一次就顺利完成。\n"
+        },
+        "deep": {
+          "body": "产线的数字副本由历史工艺数据驱动，并支持假设推演场景：调整参数、预测产量与质量、发现\n瓶颈。交互式模型以基于浏览器的应用形式运行——从简单的关键指标计算器，到数据驱动的预测\n模型。这样，采集到的数据就变成了用于决策的工具，而不只是一份归档。\n",
+          "components": [
+            "数字孪生",
+            "R Shiny",
+            "Python 模型 (scikit-learn)",
+            "假设推演仿真"
+          ]
+        }
       }
     },
     {
@@ -193,9 +261,9 @@
       "icon": "database",
       "color": 168,
       "demo": {
-        "url": "https://stream-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "url": "/historian/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -234,6 +302,26 @@
             "S3 object store (SeaweedFS)",
             "ETL / watcher",
             "analytics views"
+          ]
+        }
+      },
+      "zh": {
+        "hook": {
+          "headline": "什么都不会丢失。",
+          "subline": "每一个测量值——都被妥善保存，几秒内即可重新调出。",
+          "body": "所有测量和传感器数据都会自动落到一个安全的地方。无需任何手工复制。您随时都能取到旧\n数据——哪怕是几年之后，而且只要几秒，而不是几小时。\n"
+        },
+        "story": {
+          "title": "客户询问两年前的数据——而您一分钟内就能拿出来",
+          "body": "针对某个旧批次的投诉。过去这意味着：翻文件夹、找表格。如今您只需输入批次号，立刻就能\n看到完整的历程——每一次测量、每一个参数，毫无缺漏。客户当天就能得到答复。\n"
+        },
+        "deep": {
+          "body": "一个时序数据库（历史数据库）就是唯一可信数据源：来自产线的每一个数值都带时间戳以\nhypertable 形式存储、压缩并长期保留。原始文件和文档则并行迁入一个兼容 S3 的对象归档。\nWatcher 与 ETL 让一切保持最新，现成的分析视图会解析原始引用——于是每一项分析都读取\n自同一份真相，而不是各种副本。\n",
+          "components": [
+            "TimescaleDB (hypertables)",
+            "S3 对象归档 (SeaweedFS)",
+            "ETL / Watcher",
+            "分析视图"
           ]
         }
       }
@@ -287,6 +375,26 @@
             "R Shiny"
           ]
         }
+      },
+      "zh": {
+        "hook": {
+          "headline": "一眼就能看懂的数字。",
+          "subline": "看清运行状况——用图，而不是表格。",
+          "body": "清晰的概览让您一眼就能看到生产和质量的状况。您能在趋势变成问题之前就发现它。不必在\nExcel 里翻找，也不必凭空猜测。\n"
+        },
+        "story": {
+          "title": "从 60 分钟缩短到 15 分钟的周一例会",
+          "body": "过去，每个人各自汇总自己的数字，一半时间都花在对账上。如今屏幕上摆着一块驾驶舱看板，\n所有人看到的都是同一份数值，实时更新。讨论围绕着决策展开，而不再是谁的表格才对。\n"
+        },
+        "deep": {
+          "body": "三种工具按用途各取所需，读取自同一个主数据库：一个 BI 工具用于反复使用的驾驶舱看板与\n钻取，一个监控工具用于实时数据流与漂移检测，还有一个数据科学环境用于计算机视觉、机器\n学习和临时分析。因为数据源相同，各项分析之间从不会自相矛盾。\n",
+          "components": [
+            "Metabase (BI)",
+            "Grafana (监控)",
+            "JupyterLab (数据科学)",
+            "R Shiny"
+          ]
+        }
       }
     },
     {
@@ -303,19 +411,21 @@
         "hook": {
           "headline": "Ein Programm für die ganze Firma.",
           "subline": "Von der Schicht bis zur Rechnung — alles arbeitet zusammen.",
-          "body": "Aufträge, Qualität, Lager, Arbeitszeit und Rechnungen liegen an einem Ort. Du gibst\netwas einmal ein, und alle sehen es sofort. Kein Hin und Her mit Listen, kein doppeltes\nTippen. Geht auch vom Handy.\n"
+          "body": "Aufträge, Qualität, Lager, Arbeitszeit und Rechnungen liegen an einem Ort. Du gibst\netwas einmal ein, und alle sehen es sofort. Kein Hin und Her mit Listen, kein doppeltes\nTippen — den Wareneingang scannst du, statt ihn abzutippen. Geht auch vom Handy.\n"
         },
         "story": {
           "title": "Ein Auftrag, der ohne ein einziges Zuruf-Telefonat durchs Haus läuft",
           "body": "Der Auftrag kommt rein, die Planung sieht ihn sofort, die Fertigung bekommt die\nArbeitsschritte aufs Tablet, die Qualität hängt ihre Prüfung dran, und die Rechnung\nzieht sich die Daten von allein. Niemand muss irgendwo anrufen, um den Stand zu erfahren.\n"
         },
         "deep": {
-          "body": "Ein quelloffenes ERP trägt die Betriebsprozesse in einem System: Produktion, Planung mit\nGantt, Chargen-Rückverfolgung, Qualitätsprüfung, Wartung, Kostenrechnung und Fakturierung.\nEigene Module bilden Branchenspezifika ab. Eine mobile App bringt Anwesenheit,\nZeiterfassung und Behälter-Tracking per NFC direkt an die Maschine. Ein Datenmodell,\nkein Daten-Hin-und-Her.\n",
+          "body": "Ein quelloffenes ERP trägt die Betriebsprozesse in einem System: Produktion, Planung mit\nGantt, Chargen-Rückverfolgung, Qualitätsprüfung, Wartung, Kostenrechnung und Fakturierung.\nEigene Module bilden Branchenspezifika ab. Eine mobile App bringt Anwesenheit,\nZeiterfassung und Behälter-Tracking per NFC direkt an die Maschine. Der Wareneingang läuft per Barcode/QR,\nDatenblätter liest die Software per OCR direkt ein. Ein Datenmodell,\nkein Daten-Hin-und-Her.\n",
           "components": [
             "Odoo 18",
             "eigene Module",
             "Mobile-App (Flutter)",
-            "NFC-Tracking"
+            "NFC-Tracking",
+            "Barcode-/QR-Scan",
+            "Datenblatt-OCR"
           ]
         }
       },
@@ -323,19 +433,43 @@
         "hook": {
           "headline": "One program for the whole company.",
           "subline": "From shift to invoice — everything works together.",
-          "body": "Orders, quality, stock, working hours and invoices all in one place. You enter something\nonce and everyone sees it right away. No juggling lists, no typing things twice. Works on\nyour phone, too.\n"
+          "body": "Orders, quality, stock, working hours and invoices all in one place. You enter something\nonce and everyone sees it right away. No juggling lists, no typing things twice — you scan goods-in instead of keying it in. Works on\nyour phone, too.\n"
         },
         "story": {
           "title": "An order that flows through the company without a single shouted phone call",
           "body": "The order comes in, planning sees it instantly, production gets the work steps on a tablet,\nquality attaches its inspection, and the invoice pulls its data on its own. Nobody has to\ncall anyone to find out the status.\n"
         },
         "deep": {
-          "body": "An open-source ERP carries the operational processes in one system: production, planning\nwith Gantt, lot traceability, quality control, maintenance, costing and invoicing. Custom\nmodules cover industry specifics. A mobile app brings attendance, time tracking and NFC\ncontainer tracking right to the machine. One data model, no data shuffling.\n",
+          "body": "An open-source ERP carries the operational processes in one system: production, planning\nwith Gantt, lot traceability, quality control, maintenance, costing and invoicing. Custom\nmodules cover industry specifics. A mobile app brings attendance, time tracking and NFC\ncontainer tracking right to the machine. Goods-in runs via barcode/QR, and the software\nreads datasheets via OCR. One data model, no data shuffling.\n",
           "components": [
             "Odoo 18",
             "custom modules",
             "mobile app (Flutter)",
-            "NFC tracking"
+            "NFC tracking",
+            "barcode/QR scan",
+            "datasheet OCR"
+          ]
+        }
+      },
+      "zh": {
+        "hook": {
+          "headline": "一套程序，管起整个公司。",
+          "subline": "从班次到发票——一切都协同运作。",
+          "body": "订单、质量、库存、工时和发票都集中在一处。您只需录入一次，所有人立刻就能看到。不必在\n各种清单之间来回折腾，也不必重复录入——收货时您扫码即可，无需逐条敲入。用手机也行。\n"
+        },
+        "story": {
+          "title": "一张订单，不用打一个吆喝电话就贯穿全厂",
+          "body": "订单进来，计划部门立刻看到，生产把工序发到平板上，质量把检验挂上去，发票则自动拉取\n数据。没有人需要给谁打电话去问进度。\n"
+        },
+        "deep": {
+          "body": "一套开源 ERP 把运营流程承载在同一个系统里：生产、带甘特图的计划、批次追溯、质量检验、\n维护、成本核算与开票。自研模块覆盖行业特有需求。一款移动应用把考勤、工时记录和基于\nNFC 的料箱追踪直接带到机器旁。收货通过条码/二维码完成，软件还能通过 OCR 直接读入数据表。\n一个数据模型，不再有数据来回搬运。\n",
+          "components": [
+            "Odoo 18",
+            "自研模块",
+            "移动应用 (Flutter)",
+            "NFC 追踪",
+            "条码/二维码扫描",
+            "数据表 OCR"
           ]
         }
       }
@@ -346,9 +480,9 @@
       "icon": "messages-square",
       "color": 158,
       "demo": {
-        "url": "https://chat-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "url": "/zusammenarbeit/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -365,7 +499,7 @@
           "components": [
             "Matrix / Element (Chat + Video)",
             "Nextcloud (Files + Kalender)",
-            "Collabora / OnlyOffice",
+            "OnlyOffice",
             "drawio / Mermaid",
             "Ende-zu-Ende-Verschlüsselung"
           ]
@@ -386,9 +520,30 @@
           "components": [
             "Matrix / Element (chat + video)",
             "Nextcloud (files + calendar)",
-            "Collabora / OnlyOffice",
+            "OnlyOffice",
             "drawio / Mermaid",
             "end-to-end encryption"
+          ]
+        }
+      },
+      "zh": {
+        "hook": {
+          "headline": "协同办公——不必依赖别人的云。",
+          "subline": "聊天、视频通话、文件与办公文档：全部在厂内，全都属于您自己。",
+          "body": "给同事发消息、发起视频通话、共享一份文件、两个人一起编辑一份文档——全都在您自己的\n程序里完成。没有任何东西放在外部供应商那里，没有人在旁窥看。而且用起来就像您早已熟悉\n的那些工具。\n"
+        },
+        "story": {
+          "title": "不会落到某家外国巨头手里的车间聊天群",
+          "body": "早班在群聊里报告了一处故障，附上一张照片，技术人员用语音消息回复——而到了下午，同一份\n报价就在浏览器文档里两个人一起完成录入。全都在自己的服务器上。没有按人头计费的许可证，\n没有数据流向海外。\n"
+        },
+        "deep": {
+          "body": "一个联邦式（federated）即时通讯，具备端到端加密、群组、视频通话以及通往其他系统的桥接。\n文件、日历和联系人通过您自有的文件云管理，支持桌面端与手机端同步。文档、表格和演示文稿\n可以在浏览器里多人同时协同编辑。图表和草图就在旁边随手生成。联邦意味着：你们对外依然\n可被触达，却无需把自己拴死在某一家供应商身上。\n",
+          "components": [
+            "Matrix / Element (聊天 + 视频)",
+            "Nextcloud (文件 + 日历)",
+            "OnlyOffice",
+            "drawio / Mermaid",
+            "端到端加密"
           ]
         }
       }
@@ -399,9 +554,9 @@
       "icon": "sparkles",
       "color": 322,
       "demo": {
-        "url": "https://search.indystry.works",
-        "login": "offen / kein Login",
-        "status": "planned"
+        "url": "/suche/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -411,15 +566,16 @@
         },
         "story": {
           "title": "\"Welche Aufträge sind diese Woche offen?\" — und die Antwort kommt sofort",
-          "body": "Statt drei Programme zu öffnen und zu filtern, fragst du einfach im Chat. Die Antwort\nkommt aus euren eigenen Daten, mit Quellenangabe, in einem Satz. Wer mehr will, klickt\nsich in die Details — wer nur die Zahl braucht, hat sie schon.\n"
+          "body": "Statt drei Programme zu öffnen und zu filtern, fragst du einfach im Chat. Die Antwort\nkommt aus euren eigenen Daten, mit Quellenangabe, in einem Satz. Der Assistent ist auf euer Haus angelernt — er kennt eure Begriffe und Abläufe, nicht bloß allgemeine Floskeln. Wer mehr will, klickt\nsich in die Details — wer nur die Zahl braucht, hat sie schon.\n"
         },
         "deep": {
-          "body": "Eine föderierte Suche indexiert alle Quellen und filtert pro Dokument nach Berechtigung —\nniemand sieht, was er nicht darf. Darauf sitzt ein Assistent, der in natürlicher Sprache\nantwortet (RAG über die eigene Doku) und Belege lesen kann. Alle Bausteine sind zugleich\nals MCP-Server für KI-Agenten verfügbar. Die Sprachmodelle laufen on-prem über einen\nProxy — Daten bleiben im Haus, DSGVO-fest.\n",
+          "body": "Eine föderierte Suche indexiert alle Quellen und filtert pro Dokument nach Berechtigung —\nniemand sieht, was er nicht darf. Darauf sitzt ein Assistent, der in natürlicher Sprache\nantwortet (RAG über die eigene Doku) und Belege lesen kann. Alle Bausteine sind zugleich\nals MCP-Server für KI-Agenten verfügbar. Die Sprachmodelle laufen on-prem über einen\nProxy — Daten bleiben im Haus, DSGVO-fest. Wiederkehrende Abläufe — Benachrichtigungen,\nDatenübergaben, Eskalationen — orchestriert eine visuelle Automatisierung (n8n), die\ndieselben Bausteine als Werkzeuge einbindet: aus „fragen\" wird „automatisch erledigen\".\n",
           "components": [
             "Meilisearch (föderiert)",
             "RAG-Assistent",
             "MCP-Server",
-            "On-Prem-LLM (LiteLLM)"
+            "On-Prem-LLM (LiteLLM)",
+            "n8n (Workflow-Automation)"
           ]
         }
       },
@@ -431,15 +587,37 @@
         },
         "story": {
           "title": "\"Which orders are open this week?\" — and the answer comes right away",
-          "body": "Instead of opening three programs and filtering, you just ask in chat. The answer comes\nfrom your own data, with sources, in one sentence. Anyone who wants more clicks into the\ndetails — anyone who just needs the number already has it.\n"
+          "body": "Instead of opening three programs and filtering, you just ask in chat. The answer comes\nfrom your own data, with sources, in one sentence. The assistant is trained on your own world — it knows your terms and workflows, not just generic phrases. Anyone who wants more clicks into the\ndetails — anyone who just needs the number already has it.\n"
         },
         "deep": {
-          "body": "A federated search indexes every source and filters per document by permission — nobody\nsees what they shouldn't. On top sits an assistant that answers in natural language (RAG\nover your own docs) and can read documents. Every building block is also available as an\nMCP server for AI agents. The language models run on-prem behind a proxy — data stays\nin-house, GDPR-safe.\n",
+          "body": "A federated search indexes every source and filters per document by permission — nobody\nsees what they shouldn't. On top sits an assistant that answers in natural language (RAG\nover your own docs) and can read documents. Every building block is also available as an\nMCP server for AI agents. The language models run on-prem behind a proxy — data stays\nin-house, GDPR-safe. Recurring flows — notifications, hand-offs, escalations — are\norchestrated by a visual automation (n8n) that wires in the same building blocks as\ntools: \"ask\" turns into \"done automatically\".\n",
           "components": [
             "Meilisearch (federated)",
             "RAG assistant",
             "MCP servers",
-            "on-prem LLM (LiteLLM)"
+            "on-prem LLM (LiteLLM)",
+            "n8n (workflow automation)"
+          ]
+        }
+      },
+      "zh": {
+        "hook": {
+          "headline": "用提问代替搜索。",
+          "subline": "一个能找到一切的搜索——而且只显示您有权查看的内容。",
+          "body": "用最普通的语言输入您需要的东西。搜索会同时查遍各处：文档、笔记、邮件、文件。您只会\n得到自己有访问权限的内容。不必再在十个程序里翻找。\n"
+        },
+        "story": {
+          "title": "「本周有哪些订单尚未完成？」——答案立刻就到",
+          "body": "您不必打开三个程序再逐一筛选，只需在聊天里直接发问。答案来自你们自己的数据，附带\n出处，一句话说清。这个助手是针对贵厂调校过的——它熟悉你们的术语和流程，而不只是一些\n泛泛的套话。想了解更多的人可以点进细节——只需要那个数字的人，已经拿到手了。\n"
+        },
+        "deep": {
+          "body": "一个联合搜索为所有数据源建立索引，并按权限逐份文档过滤——谁也看不到不该看的内容。在\n其之上是一个助手，它用自然语言作答（对自有文档做 RAG），并能读取凭证材料。所有模块同时\n也以 MCP 服务器的形式提供给 AI 智能体使用。语言模型经由一个代理在本地（on-prem）运行——\n数据留在厂内，符合数据保护要求。反复出现的流程——通知、数据交接、升级处理——则由一套\n可视化自动化（n8n）来编排，它把同样的模块当作工具接入：从「提问」变成「自动办好」。\n",
+          "components": [
+            "Meilisearch (联合搜索)",
+            "RAG 助手",
+            "MCP 服务器",
+            "本地 LLM (LiteLLM)",
+            "n8n (工作流自动化)"
           ]
         }
       }
@@ -450,9 +628,9 @@
       "icon": "shield-check",
       "color": 142,
       "demo": {
-        "url": "https://kiosk-demo.indystry.works",
-        "login": "demo / demo",
-        "status": "planned"
+        "url": "/wissen/",
+        "login": "",
+        "status": "live"
       },
       "de": {
         "hook": {
@@ -492,6 +670,27 @@
             "living handbook",
             "wiki",
             "app kiosk (launcher)",
+            "MDM"
+          ]
+        }
+      },
+      "zh": {
+        "hook": {
+          "headline": "随时迎接审核——而且一切都触手可及。",
+          "subline": "规则、凭证和操作指引，保持最新且集中一处。",
+          "body": "所有规章和凭证都整整齐齐地放在一起。您甚至可以用普通语言向它们发问。操作指引会自己\n保持最新。而在车间的屏幕上，您只需一点即可启动每一个程序。\n"
+        },
+        "story": {
+          "title": "审核员索要一份凭证——十秒钟就摆到桌上",
+          "body": "在审核中，速度和无遗漏至关重要。您不必翻文件夹，只需用普通语言向系统询问相关规则和\n对应凭证——两者都会连同日期和出处一起出现。审核员点头，你们就进入了下一个问题。\n"
+        },
+        "deep": {
+          "body": "一套合规技术栈（ISMS、QMS、行业规范）以可审计的方式保存规则与凭证，并通过 RAG 在数百页\n规范之上回答问题。一部「活文档」手册自动保持操作指引最新（源 → 截图 → wiki），并辅以\n工具提示、用户故事和引导式漫游。在生产现场，一块 kiosk/启动器主屏汇聚了所有应用；受管\n设备则来自一套 MDM。\n",
+          "components": [
+            "ISMS / QMS",
+            "活文档手册",
+            "wiki",
+            "应用商店/启动器 (Kiosk)",
             "MDM"
           ]
         }
@@ -548,6 +747,27 @@
             "cookieless analytics"
           ]
         }
+      },
+      "zh": {
+        "hook": {
+          "headline": "您对外的门面——运行在您自己的技术栈上。",
+          "subline": "快速、安全、自行维护。这个网站本身就是最好的例子。",
+          "body": "您的网站不放在外部供应商那里，而是运行在您自己的系统上。文案由您自己维护，询价直接\n进入公司系统——不绕弯路。是的：您此刻正在阅读的这个页面，就是这样搭建的。\n"
+        },
+        "story": {
+          "title": "一个会在夜里自我重建的网站——不用代理商，也没有账单",
+          "body": "您在编辑器里改一段文案。夜里网站会自我重新构建，对照防泄漏规则自检，到早上就已上线。\n没有代理商，没有月度订阅，也没有一朵外国的云在替您的访客数据窥看。\n"
+        },
+        "deep": {
+          "body": "一个静态网站（预渲染，攻击面极小）由一个 headless CMS 供给内容，并且支持多语言。它为可\n发现性做了优化：既面向传统搜索引擎（结构化数据、站点地图），也面向 AI 答案引擎（机器可读\n的内容地图）。一个站内搜索直接根据已发布的内容回答问题。自托管、无 cookie 统计——完全\n的数据主权。\n",
+          "components": [
+            "Astro (SSG)",
+            "Directus (headless CMS)",
+            "JSON-LD / sitemap / llms.txt",
+            "站内 RAG 搜索",
+            "无 cookie 统计"
+          ]
+        }
       }
     }
   ],
@@ -561,11 +781,13 @@
       "login": "",
       "title": {
         "de": "Werks-Cockpit · Live-Monitoring",
-        "en": "Factory cockpit · live monitoring"
+        "en": "Factory cockpit · live monitoring",
+        "zh": "工厂驾驶舱 · 实时监控"
       },
       "desc": {
         "de": "Echtzeit-Dashboards auf synthetischen Maschinen- und Sensordaten. Temperatur, Vibration, Ausschuss. Ohne Login.",
-        "en": "Real-time dashboards on synthetic machine & sensor data. Temperature, vibration, scrap. No login."
+        "en": "Real-time dashboards on synthetic machine & sensor data. Temperature, vibration, scrap. No login.",
+        "zh": "基于合成的机器与传感器数据的实时仪表盘。温度、振动、废品率。无需登录。"
       }
     },
     {
@@ -577,11 +799,13 @@
       "login": "",
       "title": {
         "de": "BI-Cockpit · Auswertungen",
-        "en": "BI cockpit · analytics"
+        "en": "BI cockpit · analytics",
+        "zh": "BI 驾驶舱 · 分析"
       },
       "desc": {
         "de": "Produktion, Qualität und Ausschussquote als interaktives Dashboard. Ohne Login.",
-        "en": "Production, quality and scrap rate as an interactive dashboard. No login."
+        "en": "Production, quality and scrap rate as an interactive dashboard. No login.",
+        "zh": "生产、质量与废品率的交互式仪表盘。无需登录。"
       }
     },
     {
@@ -593,11 +817,13 @@
       "login": "",
       "title": {
         "de": "Mobile App · Werker-App",
-        "en": "Mobile app · shop-floor app"
+        "en": "Mobile app · shop-floor app",
+        "zh": "移动应用 · 车间应用"
       },
       "desc": {
         "de": "Anwesenheit, Zeiterfassung, Fertigung und Behälter — die Werker-App direkt im Browser. Ohne Login, einfach durchtippen.",
-        "en": "Attendance, time tracking, manufacturing and containers — the shop-floor app right in your browser. No login, just tap through."
+        "en": "Attendance, time tracking, manufacturing and containers — the shop-floor app right in your browser. No login, just tap through.",
+        "zh": "考勤、工时记录、生产与料箱——车间应用直接在浏览器中运行。无需登录，点几下即可体验。"
       }
     },
     {
@@ -609,11 +835,31 @@
       "login": "demo / demo",
       "title": {
         "de": "ERP · ein System für die Firma",
-        "en": "ERP · one system for the company"
+        "en": "ERP · one system for the company",
+        "zh": "ERP · 一套系统管全厂"
       },
       "desc": {
         "de": "Aufträge, Qualität, Lager, Wartung — eine Demo-Instanz zum Durchklicken.",
-        "en": "Orders, quality, stock, maintenance — a demo instance to click through."
+        "en": "Orders, quality, stock, maintenance — a demo instance to click through.",
+        "zh": "订单、质量、库存、维护——一个可点击体验的演示实例。"
+      }
+    },
+    {
+      "slug": "collab",
+      "sequence": 35,
+      "color": 158,
+      "status": "planned",
+      "url": "",
+      "login": "",
+      "title": {
+        "de": "Zusammenarbeit · Nextcloud",
+        "en": "Collaboration · Nextcloud",
+        "zh": "协作 · Nextcloud"
+      },
+      "desc": {
+        "de": "Dateien, Dokumente und Office gemeinsam bearbeiten — selbst gehostet auf Nextcloud. Demo in Vorbereitung.",
+        "en": "Edit files, documents and office together — self-hosted on Nextcloud. Demo in preparation.",
+        "zh": "共同编辑文件、文档与办公套件——自托管于 Nextcloud。演示正在准备中。"
       }
     },
     {
@@ -625,11 +871,13 @@
       "login": "",
       "title": {
         "de": "Data-Science-Sandbox",
-        "en": "Data-science sandbox"
+        "en": "Data-science sandbox",
+        "zh": "数据科学沙盒"
       },
       "desc": {
         "de": "Notebooks auf den synthetischen Werksdaten — Computer-Vision, ML, Korrelationen.",
-        "en": "Notebooks on the synthetic factory data — computer vision, ML, correlations."
+        "en": "Notebooks on the synthetic factory data — computer vision, ML, correlations.",
+        "zh": "基于合成工厂数据的 Notebook——计算机视觉、机器学习、相关性分析。"
       }
     },
     {
@@ -641,11 +889,13 @@
       "login": "",
       "title": {
         "de": "Digital-Twin · interaktive Simulation",
-        "en": "Digital twin · interactive simulation"
+        "en": "Digital twin · interactive simulation",
+        "zh": "数字孪生 · 交互式仿真"
       },
       "desc": {
         "de": "What-if am Modell: Parameter schieben, Durchsatz und Qualität vorhersagen.",
-        "en": "What-if on the model: shift parameters, predict throughput and quality."
+        "en": "What-if on the model: shift parameters, predict throughput and quality.",
+        "zh": "在模型上做 What-if：调整参数，预测产量与质量。"
       }
     }
   ]

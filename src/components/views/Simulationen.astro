@@ -6,16 +6,17 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const DEMO = "https://twin-demo.indystry.works";
 ---
 <section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-25%; left:60%; width:55%; height:90%; background:radial-gradient(circle,rgba(230,178,58,.14),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1180px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(36px,5vw,52px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Dreh an den Parametern. Sieh zu, was passiert.", "Turn the parameters. Watch what happens.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#A6CFC5; max-width:64ch; margin:0;">{L("Jeder Fertigungsschritt als bedienbares Modell — schieb die Regler, und Naht, Schnitt, Werkzeug und Presse reagieren live. Das Modell rechnet mit, bewertet die Qualität und warnt vor dem Grenzfall. Probier den Grenzfall ruhig aus — hier kostet er nichts.", "Every production step as an operable model — move the sliders and the weld, cut, tool and press react live. The model computes along, rates the quality and warns at the edge. Push it to the edge — here it costs nothing.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive", "工艺仿真 · 可交互")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:17ch;">{L("Dreh an den Parametern. Sieh zu, was passiert.", "Turn the parameters. Watch what happens.", "调节参数，看看会发生什么。")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#A6CFC5; max-width:64ch; margin:0;">{L("Jeder Fertigungsschritt als bedienbares Modell — schieb die Regler, und Naht, Schnitt, Werkzeug und Presse reagieren live. Das Modell rechnet mit, bewertet die Qualität und warnt vor dem Grenzfall. Probier den Grenzfall ruhig aus — hier kostet er nichts.", "Every production step as an operable model — move the sliders and the weld, cut, tool and press react live. The model computes along, rates the quality and warns at the edge. Push it to the edge — here it costs nothing.", "每一道生产工序都是一个可操作的模型 — 拖动滑块，焊缝、切口、刀具和压机即时响应。模型同步计算，评估质量并在临界状态下发出警告。放心把它推到临界 — 在这里不会有任何代价。")}</p>
   </div>
 </section>
 
@@ -25,7 +26,7 @@ const DEMO = "https://twin-demo.indystry.works";
 
       <!-- 1 · LICHTBOGENSCHWEISSEN -->
       <div class="sm-card sm-feat" data-sim="weld">
-        <div class="sm-head"><span class="sm-dot" style="background:#E6B23A;"></span>{L("Lichtbogenschweißen", "Arc welding")}<span class="sm-tag">MIG/MAG</span></div>
+        <div class="sm-head"><span class="sm-dot" style="background:#E6B23A;"></span>{L("Lichtbogenschweißen", "Arc welding", "电弧焊")}<span class="sm-tag">MIG/MAG</span></div>
         <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
         <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
           <defs>
@@ -42,17 +43,17 @@ const DEMO = "https://twin-demo.indystry.works";
           <g class="sm-sparks" fill="#ffd27a"><circle class="sm-sp sm-sp1" cx="180" cy="114" r="1.8"/><circle class="sm-sp sm-sp2" cx="180" cy="114" r="1.4"/><circle class="sm-sp sm-sp3" cx="180" cy="114" r="2"/><circle class="sm-sp sm-sp4" cx="180" cy="114" r="1.3"/><circle class="sm-sp sm-sp5" cx="180" cy="114" r="1.6"/><circle class="sm-sp sm-sp6" cx="180" cy="114" r="1.5"/></g>
         </svg>
         <div class="sm-ctrl">
-          <label><span class="lab">{L("Strom","Current")}</span><input type="range" data-k="strom" data-u=" A" min="140" max="320" step="5" value="220"><b class="sv" data-k="strom"></b></label>
-          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" mm/s" data-dec="1" min="3" max="12" step="0.5" value="6.5"><b class="sv" data-k="feed"></b></label>
-          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"strom":220,"feed":6.5}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"strom":310,"feed":4}'>{L("Grenzfall","Edge case")}</button></div>
+          <label><span class="lab">{L("Strom","Current","电流")}</span><input type="range" data-k="strom" data-u=" A" min="140" max="320" step="5" value="220"><b class="sv" data-k="strom"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed","进给速度")}</span><input type="range" data-k="feed" data-u=" mm/s" data-dec="1" min="3" max="12" step="0.5" value="6.5"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"strom":220,"feed":6.5}'>{L("Optimal","Optimal","最佳")}</button><button class="sm-chip" type="button" data-preset='{"strom":310,"feed":4}'>{L("Grenzfall","Edge case","临界工况")}</button></div>
         </div>
         <div class="sm-reads"></div>
-        <p class="sm-note">{L("Zu heiß heißt Verzug und Durchbrand, zu kalt heißt Bindefehler — das Modell hält den Energieeintrag im Fenster.", "Too hot means distortion and burn-through, too cold means lack of fusion — the model keeps the heat input in the window.")}</p>
+        <p class="sm-note">{L("Zu heiß heißt Verzug und Durchbrand, zu kalt heißt Bindefehler — das Modell hält den Energieeintrag im Fenster.", "Too hot means distortion and burn-through, too cold means lack of fusion — the model keeps the heat input in the window.", "过热会导致变形和烧穿，过冷会导致未熔合 — 模型将热输入控制在合理区间内。")}</p>
       </div>
 
       <!-- 2 · LASERSCHNEIDEN -->
       <div class="sm-card" data-sim="laser">
-        <div class="sm-head"><span class="sm-dot" style="background:#ff5a4d;"></span>{L("Laserschneiden", "Laser cutting")}<span class="sm-tag">{L("Faser","Fibre")}</span></div>
+        <div class="sm-head"><span class="sm-dot" style="background:#ff5a4d;"></span>{L("Laserschneiden", "Laser cutting", "激光切割")}<span class="sm-tag">{L("Faser","Fibre","光纤")}</span></div>
         <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
         <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
           <rect x="30" y="118" width="300" height="38" fill="#22443d" stroke="#3a554e"/>
@@ -60,17 +61,17 @@ const DEMO = "https://twin-demo.indystry.works";
           <g class="sm-laser"><rect x="-12" y="40" width="24" height="42" rx="4" fill="#13322D" stroke="#3FBF7F"/><rect x="-3" y="82" width="6" height="36" fill="#ff5a4d"/><line x1="0" y1="116" x2="0" y2="122" stroke="#fff" stroke-width="3"/><g fill="#ffd27a"><circle class="sm-sp sm-sp1" cx="0" cy="120" r="1.6"/><circle class="sm-sp sm-sp3" cx="0" cy="120" r="1.3"/><circle class="sm-sp sm-sp5" cx="0" cy="120" r="1.8"/><circle class="sm-sp sm-sp2" cx="0" cy="120" r="1.2"/></g></g>
         </svg>
         <div class="sm-ctrl">
-          <label><span class="lab">{L("Leistung","Power")}</span><input type="range" data-k="power" data-u=" W" min="1000" max="6000" step="100" value="4000"><b class="sv" data-k="power"></b></label>
-          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" mm/s" min="10" max="80" step="2" value="38"><b class="sv" data-k="feed"></b></label>
-          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"power":4000,"feed":38}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"power":1500,"feed":74}'>{L("Grenzfall","Edge case")}</button></div>
+          <label><span class="lab">{L("Leistung","Power","功率")}</span><input type="range" data-k="power" data-u=" W" min="1000" max="6000" step="100" value="4000"><b class="sv" data-k="power"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed","进给速度")}</span><input type="range" data-k="feed" data-u=" mm/s" min="10" max="80" step="2" value="38"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"power":4000,"feed":38}'>{L("Optimal","Optimal","最佳")}</button><button class="sm-chip" type="button" data-preset='{"power":1500,"feed":74}'>{L("Grenzfall","Edge case","临界工况")}</button></div>
         </div>
         <div class="sm-reads"></div>
-        <p class="sm-note">{L("Zu schnell für die Leistung — der Schnitt trennt nicht durch. Zu langsam — Grat und Verbrand. Das Optimum liegt dazwischen.", "Too fast for the power — the cut won't sever. Too slow — burr and burn. The optimum is in between.")}</p>
+        <p class="sm-note">{L("Zu schnell für die Leistung — der Schnitt trennt nicht durch. Zu langsam — Grat und Verbrand. Das Optimum liegt dazwischen.", "Too fast for the power — the cut won't sever. Too slow — burr and burn. The optimum is in between.", "相对功率速度过快 — 切口无法切透。过慢 — 产生毛刺和烧蚀。最佳值介于两者之间。")}</p>
       </div>
 
       <!-- 3 · CNC-ZERSPANUNG -->
       <div class="sm-card" data-sim="cnc">
-        <div class="sm-head"><span class="sm-dot" style="background:#3FBF7F;"></span>{L("CNC-Zerspanung", "CNC machining")}<span class="sm-tag">{L("3-Achs","3-axis")}</span></div>
+        <div class="sm-head"><span class="sm-dot" style="background:#3FBF7F;"></span>{L("CNC-Zerspanung", "CNC machining", "CNC 切削加工")}<span class="sm-tag">{L("3-Achs","3-axis","3 轴")}</span></div>
         <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
         <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
           <rect x="110" y="126" width="140" height="34" rx="3" fill="#22443d" stroke="#3a554e"/>
@@ -81,17 +82,17 @@ const DEMO = "https://twin-demo.indystry.works";
           <g class="sm-sparks" fill="#ffd27a"><circle class="sm-sp sm-sp2" cx="180" cy="128" r="1.4"/><circle class="sm-sp sm-sp4" cx="180" cy="128" r="1.6"/><circle class="sm-sp sm-sp6" cx="180" cy="128" r="1.2"/></g>
         </svg>
         <div class="sm-ctrl">
-          <label><span class="lab">{L("Drehzahl","Speed")}</span><input type="range" data-k="rpm" data-u=" rpm" min="4000" max="14000" step="100" value="9000"><b class="sv" data-k="rpm"></b></label>
-          <label><span class="lab">{L("Vorschub","Feed")}</span><input type="range" data-k="feed" data-u=" %" min="40" max="110" step="1" value="82"><b class="sv" data-k="feed"></b></label>
-          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":9000,"feed":82}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"rpm":13500,"feed":108}'>{L("Grenzfall","Edge case")}</button></div>
+          <label><span class="lab">{L("Drehzahl","Speed","转速")}</span><input type="range" data-k="rpm" data-u=" rpm" min="4000" max="14000" step="100" value="9000"><b class="sv" data-k="rpm"></b></label>
+          <label><span class="lab">{L("Vorschub","Feed","进给速度")}</span><input type="range" data-k="feed" data-u=" %" min="40" max="110" step="1" value="82"><b class="sv" data-k="feed"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":9000,"feed":82}'>{L("Optimal","Optimal","最佳")}</button><button class="sm-chip" type="button" data-preset='{"rpm":13500,"feed":108}'>{L("Grenzfall","Edge case","临界工况")}</button></div>
         </div>
         <div class="sm-reads"></div>
-        <p class="sm-note">{L("Aus Vibration und Temperatur leitet das Modell Werkzeugverschleiß und Restlebensdauer ab — Rattern frisst Standzeit.", "From vibration and temperature the model derives tool wear and remaining life — chatter eats tool life.")}</p>
+        <p class="sm-note">{L("Aus Vibration und Temperatur leitet das Modell Werkzeugverschleiß und Restlebensdauer ab — Rattern frisst Standzeit.", "From vibration and temperature the model derives tool wear and remaining life — chatter eats tool life.", "模型根据振动和温度推算刀具磨损和剩余寿命 — 颤振会大量消耗刀具寿命。")}</p>
       </div>
 
       <!-- 4 · ABKANTEN -->
       <div class="sm-card" data-sim="press">
-        <div class="sm-head"><span class="sm-dot" style="background:#4a9fd0;"></span>{L("Abkanten / Umformung", "Press brake / forming")}<span class="sm-tag">{L("Gesenkbiegen","Air bending")}</span></div>
+        <div class="sm-head"><span class="sm-dot" style="background:#4a9fd0;"></span>{L("Abkanten / Umformung", "Press brake / forming", "折弯 / 成形")}<span class="sm-tag">{L("Gesenkbiegen","Air bending","空气折弯")}</span></div>
         <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
         <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
           <path d="M120 146 L175 146 L180 161 L185 146 L240 146 L240 164 L120 164 Z" fill="#22443d" stroke="#3a554e"/>
@@ -99,17 +100,17 @@ const DEMO = "https://twin-demo.indystry.works";
           <g class="sm-punch"><path d="M170 38 L190 38 L182 116 L178 116 Z" fill="#13322D" stroke="#3FBF7F"/></g>
         </svg>
         <div class="sm-ctrl">
-          <label><span class="lab">{L("Presskraft","Force")}</span><input type="range" data-k="force" data-u=" kN" min="200" max="1000" step="20" value="640"><b class="sv" data-k="force"></b></label>
-          <label><span class="lab">{L("Zielwinkel","Target angle")}</span><input type="range" data-k="angle" data-u=" °" min="45" max="120" step="1" value="90"><b class="sv" data-k="angle"></b></label>
-          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"force":760,"angle":90}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"force":280,"angle":90}'>{L("Grenzfall","Edge case")}</button></div>
+          <label><span class="lab">{L("Presskraft","Force","压力")}</span><input type="range" data-k="force" data-u=" kN" min="200" max="1000" step="20" value="640"><b class="sv" data-k="force"></b></label>
+          <label><span class="lab">{L("Zielwinkel","Target angle","目标角度")}</span><input type="range" data-k="angle" data-u=" °" min="45" max="120" step="1" value="90"><b class="sv" data-k="angle"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"force":760,"angle":90}'>{L("Optimal","Optimal","最佳")}</button><button class="sm-chip" type="button" data-preset='{"force":280,"angle":90}'>{L("Grenzfall","Edge case","临界工况")}</button></div>
         </div>
         <div class="sm-reads"></div>
-        <p class="sm-note">{L("Das Modell sagt die Rückfederung voraus und rechnet den Istwinkel — zu wenig Kraft, und das Blech federt zurück.", "The model predicts springback and computes the actual angle — too little force, and the sheet springs back.")}</p>
+        <p class="sm-note">{L("Das Modell sagt die Rückfederung voraus und rechnet den Istwinkel — zu wenig Kraft, und das Blech federt zurück.", "The model predicts springback and computes the actual angle — too little force, and the sheet springs back.", "模型预测回弹并计算实际角度 — 压力不足，板材就会回弹。")}</p>
       </div>
 
       <!-- 5 · MISCHER / RÜHRWERK -->
       <div class="sm-card" data-sim="mix">
-        <div class="sm-head"><span class="sm-dot" style="background:#c98bdd;"></span>{L("Mischer / Rührwerk", "Mixer / agitator")}<span class="sm-tag">{L("Chargenbetrieb","Batch")}</span></div>
+        <div class="sm-head"><span class="sm-dot" style="background:#c98bdd;"></span>{L("Mischer / Rührwerk", "Mixer / agitator", "搅拌机 / 搅拌器")}<span class="sm-tag">{L("Chargenbetrieb","Batch","批次运行")}</span></div>
         <div class="sm-status"><span class="sm-stled"></span><span class="sm-stt"></span><span class="sm-verdict"></span></div>
         <svg class="sm-stage" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
           <path d="M118 44 L118 150 Q118 158 126 158 L234 158 Q242 158 242 150 L242 44" fill="none" stroke="#3a554e" stroke-width="3"/>
@@ -122,20 +123,20 @@ const DEMO = "https://twin-demo.indystry.works";
           <g transform="translate(180 136)"><g class="sm-mix"><rect x="-27" y="-3" width="54" height="6" rx="2" fill="#E6B23A"/><rect x="-3" y="-16" width="6" height="32" rx="2" fill="#d98f2a"/></g></g>
         </svg>
         <div class="sm-ctrl">
-          <label><span class="lab">{L("Drehzahl","Speed")}</span><input type="range" data-k="rpm" data-u=" rpm" min="20" max="200" step="5" value="90"><b class="sv" data-k="rpm"></b></label>
-          <label><span class="lab">{L("Füllgrad","Fill level")}</span><input type="range" data-k="fill" data-u=" %" min="30" max="100" step="1" value="80"><b class="sv" data-k="fill"></b></label>
-          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":90,"fill":80}'>{L("Optimal","Optimal")}</button><button class="sm-chip" type="button" data-preset='{"rpm":185,"fill":45}'>{L("Grenzfall","Edge case")}</button></div>
+          <label><span class="lab">{L("Drehzahl","Speed","转速")}</span><input type="range" data-k="rpm" data-u=" rpm" min="20" max="200" step="5" value="90"><b class="sv" data-k="rpm"></b></label>
+          <label><span class="lab">{L("Füllgrad","Fill level","填充度")}</span><input type="range" data-k="fill" data-u=" %" min="30" max="100" step="1" value="80"><b class="sv" data-k="fill"></b></label>
+          <div class="sm-btns"><button class="sm-run" type="button">Pause</button><button class="sm-chip" type="button" data-preset='{"rpm":90,"fill":80}'>{L("Optimal","Optimal","最佳")}</button><button class="sm-chip" type="button" data-preset='{"rpm":185,"fill":45}'>{L("Grenzfall","Edge case","临界工况")}</button></div>
         </div>
         <div class="sm-reads"></div>
-        <p class="sm-note">{L("Zu langsam bleibt es inhomogen mit Totzonen, zu schnell zieht die Trombe Luft ein — das Modell hält die Mischgüte im Fenster.", "Too slow stays inhomogeneous with dead zones, too fast the vortex draws in air — the model keeps blend quality in the window.")}</p>
+        <p class="sm-note">{L("Zu langsam bleibt es inhomogen mit Totzonen, zu schnell zieht die Trombe Luft ein — das Modell hält die Mischgüte im Fenster.", "Too slow stays inhomogeneous with dead zones, too fast the vortex draws in air — the model keeps blend quality in the window.", "过慢会留有死区、混合不均匀，过快漩涡会卷入空气 — 模型将混合质量控制在合理区间内。")}</p>
       </div>
 
     </div>
 
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:clamp(28px,3.5vw,40px); padding-top:18px; max-width:74ch;">{L("Vereinfachte, bedienbare Modelle zur Veranschaulichung — die vollständige, parametrierbare Simulation läuft in der Demo, gespeist aus dem Historian.", "Simplified, operable models for illustration — the full, parametric simulation runs in the demo, fed from the historian.")}</p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:clamp(28px,3.5vw,40px); padding-top:18px; max-width:74ch;">{L("Vereinfachte, bedienbare Modelle zur Veranschaulichung — die vollständige, parametrierbare Simulation läuft in der Demo, gespeist aus dem Historian.", "Simplified, operable models for illustration — the full, parametric simulation runs in the demo, fed from the historian.", "用于演示的简化可操作模型 — 完整、可参数化的仿真在演示环境中运行，数据来自历史数据库。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:20px;">
-      <a href={DEMO} target="_blank" rel="noopener" style="background:#123A33; color:#F8F9FA; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation")} ↗</a>
-      <a href={b + "/twin/"} style="font-family:var(--font-mono); font-size:13px; color:#16463E; display:inline-flex; align-items:center; border-bottom:1.5px solid #16463E; padding-bottom:3px; text-decoration:none;">{L("Wie der digitale Zwilling arbeitet", "How the digital twin works")} →</a>
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#123A33; color:#F8F9FA; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:14px 24px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation", "查看完整仿真")} ↗</a>
+      <a href={b + "/twin/"} style="font-family:var(--font-mono); font-size:13px; color:#16463E; display:inline-flex; align-items:center; border-bottom:1.5px solid #16463E; padding-bottom:3px; text-decoration:none;">{L("Wie der digitale Zwilling arbeitet", "How the digital twin works", "数字孪生如何工作")} →</a>
     </div>
   </div>
 </section>

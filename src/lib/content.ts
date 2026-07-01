@@ -1,6 +1,27 @@
 import data from "../data/content.json";
 
-export type Lang = "de" | "en";
+export type Lang = "de" | "en" | "zh";
+
+// Reihenfolge = Anzeige-Reihenfolge im Sprachumschalter.
+export const LANGS: Lang[] = ["de", "en", "zh"];
+
+// Interner Lang-Code → URL-Präfix. de = kein Präfix, zh nutzt /cn (China-freundliche URL).
+export function langPrefix(lang: Lang): string {
+  return lang === "de" ? "" : lang === "en" ? "/en" : "/cn";
+}
+// Interner Lang-Code → hreflang / og:locale (zh = Simplified/Mainland).
+export function hreflangCode(lang: Lang): string {
+  return lang === "de" ? "de" : lang === "en" ? "en" : "zh-Hans";
+}
+export function ogLocale(lang: Lang): string {
+  return lang === "de" ? "de_DE" : lang === "en" ? "en_US" : "zh_CN";
+}
+// Beschriftung im Sprachumschalter.
+export const LANG_LABEL: Record<Lang, string> = { de: "DE", en: "EN", zh: "中文" };
+// Kanonischen (DE-)Pfad aus einem beliebigen lokalisierten Pfad ableiten (Präfix strippen).
+export function stripLangPrefix(path: string): string {
+  return path.replace(/^\/(en|cn)(?=\/|$)/, "") || "/";
+}
 
 export interface Hook { headline: string; subline: string; body: string }
 export interface Story { title: string; body: string }
@@ -15,6 +36,7 @@ export interface Pillar {
   demo: Demo;
   de: PillarLang;
   en: PillarLang;
+  zh?: PillarLang; // optional bis pillars.yaml vollständig zh trägt (Fallback → en)
 }
 export interface Brand {
   codename: string;

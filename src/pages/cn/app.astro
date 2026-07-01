@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import App from "../../components/views/App.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Shop-floor app" description="The mobile shop-floor app: attendance, time tracking, manufacturing/QC, NFC container tracking — offline-first, encrypted, SSO. Self-hosted, demo in the browser." path="/cn/app/" altPath="/app/">
+  <App lang={lang} />
+</Base>

@@ -4,86 +4,87 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const P = (path: string) => (de ? "" : "/en") + path;
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const P = (path: string) => (de ? "" : en ? "/en" : "/cn") + path;
 import { tagHref, tagForLabel } from "../../lib/tags";
 const ERP = "https://erp-demo.indystry.works/odoo";
 const TWIN = "https://twin-demo.indystry.works";
 const BI = "https://bi-demo.indystry.works";
 type T = { k: string; d: string; href: string; ext?: boolean };
 const groups: { name: string; terms: T[] }[] = [
-  { name: L("Fertigung & Anlage", "Production & plant"), terms: [
-    { k: L("Leitstand / SCADA", "Control room / SCADA"), d: L("Live-Sicht aller Maschinen mit Zustand und Messwerten.", "Live view of all machines with state and readings."), href: P("/leitstand/") },
-    { k: L("Anlagen-Twin", "Plant twin"), d: L("Klickbarer 3D-Drilldown Werk → Maschine → Schaltschrank → Plan.", "Clickable 3D drilldown plant → machine → cabinet → plan."), href: P("/anlage/") },
-    { k: L("Schaltschrank", "Control cabinet"), d: L("Gehäuse mit SPS, Antrieben, Klemmen und Sicherungen.", "Enclosure with PLC, drives, terminals and fuses."), href: P("/anlage/") },
-    { k: "SPS / CPU", d: L("Speicherprogrammierbare Steuerung — verarbeitet Eingänge zu Ausgängen.", "Programmable logic controller — turns inputs into outputs."), href: P("/anlage/") },
-    { k: L("Frequenzumrichter (FU)", "Variable-frequency drive (VFD)"), d: L("Stellt die Drehzahl der Servo- und Spindelmotoren.", "Sets the speed of servo and spindle motors."), href: P("/anlage/") },
-    { k: L("Stromlaufplan", "Wiring plan"), d: L("Schaltplan einer Komponente — bis hierhin geht der Drilldown.", "Schematic of a component — the drilldown goes this far."), href: P("/anlage/") },
-    { k: L("Digital Twin", "Digital twin"), d: L("Simulation der Linie: Durchsatz, Ausschuss, Kosten als What-if.", "Line simulation: throughput, scrap, cost as what-if."), href: TWIN, ext: true },
-    { k: L("Vorausschauende Wartung", "Predictive maintenance"), d: L("Aus Vibration/Temperatur die Wartung ableiten, bevor es kracht.", "Derive maintenance from vibration/temperature before failure."), href: P("/historian/") },
+  { name: L("Fertigung & Anlage", "Production & plant", "生产与设备"), terms: [
+    { k: L("Leitstand / SCADA", "Control room / SCADA", "中控室 / SCADA"), d: L("Live-Sicht aller Maschinen mit Zustand und Messwerten.", "Live view of all machines with state and readings.", "所有机器的实时视图，含状态与测量值。"), href: P("/leitstand/") },
+    { k: L("Anlagen-Twin", "Plant twin", "设备孪生"), d: L("Klickbarer 3D-Drilldown Werk → Maschine → Schaltschrank → Plan.", "Clickable 3D drilldown plant → machine → cabinet → plan.", "可点击的 3D 逐层钻取：工厂 → 机器 → 控制柜 → 图纸。"), href: P("/anlage/") },
+    { k: L("Schaltschrank", "Control cabinet", "控制柜"), d: L("Gehäuse mit SPS, Antrieben, Klemmen und Sicherungen.", "Enclosure with PLC, drives, terminals and fuses.", "内含 PLC、驱动器、端子与保险丝的机柜。"), href: P("/anlage/") },
+    { k: "SPS / CPU", d: L("Speicherprogrammierbare Steuerung — verarbeitet Eingänge zu Ausgängen.", "Programmable logic controller — turns inputs into outputs.", "可编程逻辑控制器——把输入处理为输出。"), href: P("/anlage/") },
+    { k: L("Frequenzumrichter (FU)", "Variable-frequency drive (VFD)", "变频器（VFD）"), d: L("Stellt die Drehzahl der Servo- und Spindelmotoren.", "Sets the speed of servo and spindle motors.", "调节伺服电机和主轴电机的转速。"), href: P("/anlage/") },
+    { k: L("Stromlaufplan", "Wiring plan", "电气原理图"), d: L("Schaltplan einer Komponente — bis hierhin geht der Drilldown.", "Schematic of a component — the drilldown goes this far.", "某个元件的电路图——钻取到此为止。"), href: P("/anlage/") },
+    { k: L("Digital Twin", "Digital twin", "数字孪生"), d: L("Simulation der Linie: Durchsatz, Ausschuss, Kosten als What-if.", "Line simulation: throughput, scrap, cost as what-if.", "产线仿真：以假设推演产量、废品与成本。"), href: TWIN, ext: true },
+    { k: L("Vorausschauende Wartung", "Predictive maintenance", "预测性维护"), d: L("Aus Vibration/Temperatur die Wartung ableiten, bevor es kracht.", "Derive maintenance from vibration/temperature before failure.", "在故障发生前，根据振动/温度推导出维护需求。"), href: P("/historian/") },
   ]},
-  { name: L("Daten, BI & Historian", "Data, BI & historian"), terms: [
-    { k: "Historian", d: L("Zeitreihen-Speicher jeder Maschine — Temperatur, Vibration.", "Time-series store per machine — temperature, vibration."), href: P("/historian/") },
-    { k: L("Zeitreihe", "Time series"), d: L("Messwert über die Zeit, Grundlage für Trend und Alarm.", "A measurement over time, the basis for trend and alert."), href: P("/historian/") },
-    { k: "OEE", d: L("Gesamtanlageneffektivität = Verfügbarkeit × Leistung × Qualität.", "Overall equipment effectiveness = availability × performance × quality."), href: BI, ext: true },
-    { k: "Process-Drift", d: L("Schleichende Abweichung — die BI sieht sie vor der Endprüfung.", "Slow deviation — BI sees it before final inspection."), href: BI, ext: true },
-    { k: L("Massenbilanz", "Mass balance"), d: L("Wo Material und Ausbeute verloren gehen.", "Where material and yield are lost."), href: BI, ext: true },
+  { name: L("Daten, BI & Historian", "Data, BI & historian", "数据、BI 与历史数据库"), terms: [
+    { k: "Historian", d: L("Zeitreihen-Speicher jeder Maschine — Temperatur, Vibration.", "Time-series store per machine — temperature, vibration.", "每台机器的时序数据存储——温度、振动。"), href: P("/historian/") },
+    { k: L("Zeitreihe", "Time series", "时间序列"), d: L("Messwert über die Zeit, Grundlage für Trend und Alarm.", "A measurement over time, the basis for trend and alert.", "随时间变化的测量值，是趋势与报警的基础。"), href: P("/historian/") },
+    { k: "OEE", d: L("Gesamtanlageneffektivität = Verfügbarkeit × Leistung × Qualität.", "Overall equipment effectiveness = availability × performance × quality.", "设备综合效率 = 可用率 × 性能 × 质量。"), href: BI, ext: true },
+    { k: "Process-Drift", d: L("Schleichende Abweichung — die BI sieht sie vor der Endprüfung.", "Slow deviation — BI sees it before final inspection.", "缓慢偏移——BI 在终检之前就能发现。"), href: BI, ext: true },
+    { k: L("Massenbilanz", "Mass balance", "物料平衡"), d: L("Wo Material und Ausbeute verloren gehen.", "Where material and yield are lost.", "物料和产出在哪里损失掉了。"), href: BI, ext: true },
   ]},
-  { name: L("ERP & Prozess", "ERP & process"), terms: [
-    { k: L("Make-to-order", "Make-to-order"), d: L("Auf Bestellung fertigen statt auf Lager — Nordwerks Modell.", "Build to order rather than to stock — Nordwerk's model."), href: P("/werk/") },
-    { k: "MRP", d: L("Materialbedarfsplanung: errechnet Bedarfe + Fertigungsaufträge.", "Material requirements planning: computes demand + production orders."), href: ERP, ext: true },
-    { k: L("Stückliste (BOM)", "Bill of materials (BOM)"), d: L("Welche Rohstoffe in ein Produkt gehen.", "Which raw materials go into a product."), href: ERP, ext: true },
-    { k: L("Charge / Los", "Batch / lot"), d: L("Eine rückverfolgbare Fertigungsmenge.", "A traceable production quantity."), href: P("/historian/") },
-    { k: L("Kommissionierung (Picking)", "Picking"), d: L("Fertigware für den Versand zusammenstellen.", "Assembling finished goods for shipment."), href: ERP, ext: true },
-    { k: L("Lead / Opportunity", "Lead / opportunity"), d: L("Eine Anfrage auf dem Weg zum Auftrag (CRM).", "An inquiry on its way to becoming an order (CRM)."), href: ERP, ext: true },
-    { k: L("Servicevertrag / SLA", "Service contract / SLA"), d: L("Zugesicherte Wartung + Reaktionszeit für den Kunden.", "Committed maintenance + response time for the customer."), href: P("/portal/") },
-    { k: L("Reklamation / 8D", "Complaint / 8D"), d: L("Schadensfall strukturiert lösen + Wiederholung verhindern.", "Resolve a damage case structurally + prevent recurrence."), href: P("/suche/") },
+  { name: L("ERP & Prozess", "ERP & process", "ERP 与流程"), terms: [
+    { k: L("Make-to-order", "Make-to-order", "按单生产"), d: L("Auf Bestellung fertigen statt auf Lager — Nordwerks Modell.", "Build to order rather than to stock — Nordwerk's model.", "按订单生产而非按库存——Nordwerk 的模式。"), href: P("/werk/") },
+    { k: "MRP", d: L("Materialbedarfsplanung: errechnet Bedarfe + Fertigungsaufträge.", "Material requirements planning: computes demand + production orders.", "物料需求计划：计算需求并生成生产订单。"), href: ERP, ext: true },
+    { k: L("Stückliste (BOM)", "Bill of materials (BOM)", "物料清单（BOM）"), d: L("Welche Rohstoffe in ein Produkt gehen.", "Which raw materials go into a product.", "一件产品由哪些原材料构成。"), href: ERP, ext: true },
+    { k: L("Charge / Los", "Batch / lot", "批次"), d: L("Eine rückverfolgbare Fertigungsmenge.", "A traceable production quantity.", "一个可追溯的生产数量。"), href: P("/historian/") },
+    { k: L("Kommissionierung (Picking)", "Picking", "拣货"), d: L("Fertigware für den Versand zusammenstellen.", "Assembling finished goods for shipment.", "为发运集齐成品。"), href: ERP, ext: true },
+    { k: L("Lead / Opportunity", "Lead / opportunity", "线索 / 商机"), d: L("Eine Anfrage auf dem Weg zum Auftrag (CRM).", "An inquiry on its way to becoming an order (CRM).", "正在转化为订单的一条询盘（CRM）。"), href: ERP, ext: true },
+    { k: L("Servicevertrag / SLA", "Service contract / SLA", "服务合同 / SLA"), d: L("Zugesicherte Wartung + Reaktionszeit für den Kunden.", "Committed maintenance + response time for the customer.", "向客户承诺的维护与响应时间。"), href: P("/portal/") },
+    { k: L("Reklamation / 8D", "Complaint / 8D", "投诉 / 8D"), d: L("Schadensfall strukturiert lösen + Wiederholung verhindern.", "Resolve a damage case structurally + prevent recurrence.", "结构化地解决问题案例并防止再次发生。"), href: P("/suche/") },
   ]},
-  { name: L("KI, Betrieb & Souveränität", "AI, operations & sovereignty"), terms: [
-    { k: L("KI-Antwort (RAG)", "AI answer (RAG)"), d: L("Sprachmodell antwortet nur auf Basis der eigenen Firmendaten, mit Quellen.", "A language model answers only from the company's own data, with sources."), href: P("/suche/") },
-    { k: L("KI & Mensch", "AI & humans"), d: L("Was die KI übernimmt — und wofür es Menschen braucht.", "What the AI takes on — and what still needs humans."), href: P("/ki-mensch/") },
-    { k: "Read-only", d: L("Ansehen, nichts kann kaputtgehen — alle Demos sind nur lesend.", "Look around, nothing can break — all demos are read-only."), href: P("/demos/") },
-    { k: "Lock-in", d: L("Abhängigkeit von einem Anbieter — genau das vermeidet der Stack.", "Dependence on one vendor — exactly what the stack avoids."), href: P("/stack/") },
-    { k: L("Souveränität", "Sovereignty"), d: L("Alles selbst gehostet, Daten bleiben im Haus.", "All self-hosted, data stays in-house."), href: P("/stack/") },
+  { name: L("KI, Betrieb & Souveränität", "AI, operations & sovereignty", "AI、运营与自主可控（数据主权）"), terms: [
+    { k: L("KI-Antwort (RAG)", "AI answer (RAG)", "AI 回答（RAG）"), d: L("Sprachmodell antwortet nur auf Basis der eigenen Firmendaten, mit Quellen.", "A language model answers only from the company's own data, with sources.", "语言模型仅基于企业自有数据作答，并附出处。"), href: P("/suche/") },
+    { k: L("KI & Mensch", "AI & humans", "AI 与人"), d: L("Was die KI übernimmt — und wofür es Menschen braucht.", "What the AI takes on — and what still needs humans.", "AI 承担哪些工作——以及哪些仍需要人。"), href: P("/ki-mensch/") },
+    { k: "Read-only", d: L("Ansehen, nichts kann kaputtgehen — alle Demos sind nur lesend.", "Look around, nothing can break — all demos are read-only.", "随便看，什么都弄不坏——所有演示都是只读的。"), href: P("/demos/") },
+    { k: "Lock-in", d: L("Abhängigkeit von einem Anbieter — genau das vermeidet der Stack.", "Dependence on one vendor — exactly what the stack avoids.", "对单一供应商的依赖——正是这套技术栈所要避免的。"), href: P("/stack/") },
+    { k: L("Souveränität", "Sovereignty", "自主可控（数据主权）"), d: L("Alles selbst gehostet, Daten bleiben im Haus.", "All self-hosted, data stays in-house.", "全部自托管，数据留在自家。"), href: P("/stack/") },
   ]},
-  { name: L("Sicherheit & Compliance", "Security & compliance"), terms: [
-    { k: "ISMS", d: L("Informationssicherheits-Managementsystem: Regeln, Risiken und Nachweise an einem Ort.", "Information security management system: rules, risks and evidence in one place."), href: P("/compliance/") },
-    { k: "ISO 27001:2022", d: L("Der Standard für Informationssicherheit — 93 Controls in vier Themen (Annex A).", "The standard for information security — 93 controls in four themes (Annex A)."), href: P("/compliance/") },
-    { k: "NIS2", d: L("EU-Richtlinie für kritische & wichtige Einrichtungen — Pflicht zur Risikovorsorge.", "EU directive for essential & important entities — duty of risk preparedness."), href: P("/compliance/") },
-    { k: L("Risiko-Heatmap", "Risk heatmap"), d: L("Wahrscheinlichkeit × Auswirkung je Risiko, mit hinterlegter Maßnahme.", "Likelihood × impact per risk, with the measure attached."), href: P("/compliance/") },
-    { k: "SIEM", d: L("Angriffserkennung: auffälliges Verhalten auf Servern und Clients wird alarmiert.", "Intrusion detection: suspicious behaviour on servers and clients is alerted."), href: P("/compliance/") },
-    { k: "SSO / MFA", d: L("Ein Login per offenem Standard, zweiter Faktor als Schutz.", "One login via open standard, a second factor as protection."), href: P("/software-rollout/") },
-    { k: L("Audit-Trail", "Audit trail"), d: L("Wer hat wann was getan — nachvollziehbar und manipulationssicher.", "Who did what when — traceable and tamper-evident."), href: P("/compliance/") },
+  { name: L("Sicherheit & Compliance", "Security & compliance", "安全与合规"), terms: [
+    { k: "ISMS", d: L("Informationssicherheits-Managementsystem: Regeln, Risiken und Nachweise an einem Ort.", "Information security management system: rules, risks and evidence in one place.", "信息安全管理体系：规则、风险与证据集中于一处。"), href: P("/compliance/") },
+    { k: "ISO 27001:2022", d: L("Der Standard für Informationssicherheit — 93 Controls in vier Themen (Annex A).", "The standard for information security — 93 controls in four themes (Annex A).", "信息安全标准——四大主题下的 93 项控制措施（附录 A）。"), href: P("/compliance/") },
+    { k: "NIS2", d: L("EU-Richtlinie für kritische & wichtige Einrichtungen — Pflicht zur Risikovorsorge.", "EU directive for essential & important entities — duty of risk preparedness.", "面向关键与重要机构的欧盟指令——须履行风险防范义务。"), href: P("/compliance/") },
+    { k: L("Risiko-Heatmap", "Risk heatmap", "风险热力图"), d: L("Wahrscheinlichkeit × Auswirkung je Risiko, mit hinterlegter Maßnahme.", "Likelihood × impact per risk, with the measure attached.", "每项风险的可能性 × 影响，并附对应措施。"), href: P("/compliance/") },
+    { k: "SIEM", d: L("Angriffserkennung: auffälliges Verhalten auf Servern und Clients wird alarmiert.", "Intrusion detection: suspicious behaviour on servers and clients is alerted.", "入侵检测：对服务器和客户端上的可疑行为发出告警。"), href: P("/compliance/") },
+    { k: "SSO / MFA", d: L("Ein Login per offenem Standard, zweiter Faktor als Schutz.", "One login via open standard, a second factor as protection.", "通过开放标准的单点登录，第二因素作为防护。"), href: P("/software-rollout/") },
+    { k: L("Audit-Trail", "Audit trail", "审计追踪"), d: L("Wer hat wann was getan — nachvollziehbar und manipulationssicher.", "Who did what when — traceable and tamper-evident.", "谁在何时做了什么——可追溯且防篡改。"), href: P("/compliance/") },
   ]},
-  { name: L("Betrieb & Resilienz", "Operations & resilience"), terms: [
-    { k: L("Out-of-Band (OOB)", "Out-of-band (OOB)"), d: L("Zugang zur Maschine, auch wenn Netz oder Betriebssystem tot sind — eigener Mobilfunk.", "Access to the machine even when network or OS is dead — its own cellular link."), href: P("/resilienz/") },
-    { k: L("Backup 3-2-1", "Backup 3-2-1"), d: L("Drei Kopien, zwei Medien, eine außer Haus.", "Three copies, two media, one off-site."), href: P("/resilienz/") },
-    { k: L("Restore-Test", "Restore test"), d: L("Ein Backup zählt erst, wenn der Restore bewiesen ist.", "A backup only counts once the restore is proven."), href: P("/resilienz/") },
-    { k: L("App-Kiosk", "App kiosk"), d: L("Self-Service-Software ohne Adminrechte für den Nutzer.", "Self-service software with no admin rights for the user."), href: P("/software-rollout/") },
-    { k: "LAPS", d: L("Rotierendes lokales Admin-Passwort je Gerät — kein Domain-Admin nötig.", "A rotating local admin password per device — no domain admin needed."), href: P("/software-rollout/") },
-    { k: "MDM", d: L("Mobile Geräte zentral verwalten: Enrollment, Kiosk-Modus, Apps, Sperren.", "Manage mobile devices centrally: enrollment, kiosk mode, apps, locking."), href: P("/software-rollout/") },
-    { k: L("CMDB / Netz-BIM", "CMDB / network BIM"), d: L("Standorte, Geräte, VLANs und Verkabelung als lebendes Modell.", "Sites, devices, VLANs and cabling as a living model."), href: P("/koennen/") },
-    { k: "Mesh-VPN", d: L("Verschlüsseltes Netz zwischen Standorten mit alternativen Wegen.", "An encrypted network between sites with alternative paths."), href: P("/stack/") },
+  { name: L("Betrieb & Resilienz", "Operations & resilience", "运营与韧性"), terms: [
+    { k: L("Out-of-Band (OOB)", "Out-of-band (OOB)", "带外访问（OOB）"), d: L("Zugang zur Maschine, auch wenn Netz oder Betriebssystem tot sind — eigener Mobilfunk.", "Access to the machine even when network or OS is dead — its own cellular link.", "即使网络或操作系统失效也能访问机器——独立的蜂窝链路。"), href: P("/resilienz/") },
+    { k: L("Backup 3-2-1", "Backup 3-2-1", "3-2-1 备份"), d: L("Drei Kopien, zwei Medien, eine außer Haus.", "Three copies, two media, one off-site.", "三份副本、两种介质、一份异地。"), href: P("/resilienz/") },
+    { k: L("Restore-Test", "Restore test", "恢复测试"), d: L("Ein Backup zählt erst, wenn der Restore bewiesen ist.", "A backup only counts once the restore is proven.", "只有恢复被验证过，备份才算数。"), href: P("/resilienz/") },
+    { k: L("App-Kiosk", "App kiosk", "应用自助终端"), d: L("Self-Service-Software ohne Adminrechte für den Nutzer.", "Self-service software with no admin rights for the user.", "用户无需管理员权限即可自助安装软件。"), href: P("/software-rollout/") },
+    { k: "LAPS", d: L("Rotierendes lokales Admin-Passwort je Gerät — kein Domain-Admin nötig.", "A rotating local admin password per device — no domain admin needed.", "每台设备轮换的本地管理员密码——无需域管理员。"), href: P("/software-rollout/") },
+    { k: "MDM", d: L("Mobile Geräte zentral verwalten: Enrollment, Kiosk-Modus, Apps, Sperren.", "Manage mobile devices centrally: enrollment, kiosk mode, apps, locking.", "集中管理移动设备：注册、自助终端模式、应用、锁定。"), href: P("/software-rollout/") },
+    { k: L("CMDB / Netz-BIM", "CMDB / network BIM", "CMDB / 网络 BIM"), d: L("Standorte, Geräte, VLANs und Verkabelung als lebendes Modell.", "Sites, devices, VLANs and cabling as a living model.", "把站点、设备、VLAN 和布线作为一个动态模型。"), href: P("/koennen/") },
+    { k: "Mesh-VPN", d: L("Verschlüsseltes Netz zwischen Standorten mit alternativen Wegen.", "An encrypted network between sites with alternative paths.", "站点之间的加密网络，具备多条备选路径。"), href: P("/stack/") },
   ]},
-  { name: L("Kosten, Kennzahlen & Anlagen", "Costing, KPIs & assets"), terms: [
-    { k: L("Lot-Costing", "Lot costing"), d: L("Selbstkosten je Charge, nachvollziehbar bis zum Beleg.", "Cost per batch, traceable down to the document."), href: P("/kosten/") },
-    { k: L("Niederstwert (NRV)", "Net realisable value (NRV)"), d: L("Bestände zum niedrigeren Wert bewerten — automatisch, prüfsicher.", "Value inventory at the lower amount — automatic, audit-proof."), href: P("/kosten/") },
-    { k: "Landed-Cost", d: L("Fracht, Zoll und Versicherung in die Materialkosten einrechnen.", "Roll freight, duty and insurance into material cost."), href: P("/kosten/") },
-    { k: L("Management-Review", "Management review"), d: L("Regelmäßiger Review der Kennzahlen mit Maßnahmen und Verantwortlichen.", "Regular review of the KPIs with actions and owners."), href: P("/kennzahlen/") },
-    { k: L("KPI-Snapshot", "KPI snapshot"), d: L("Jeder Monatsstand wird eingefroren — revisionssicher, keine Schönung.", "Every monthly state is frozen — audit-proof, no polishing."), href: P("/kennzahlen/") },
-    { k: L("Instandhaltung (Asset)", "Maintenance (asset)"), d: L("Anlage, Norm, Prüffrist und Doku an einem Objekt.", "Asset, standard, inspection interval and docs on one object."), href: P("/instandhaltung/") },
-    { k: "PED", d: L("EU-Druckgeräte-Richtlinie für Kessel, Behälter und Leitungen.", "EU Pressure Equipment Directive for vessels, tanks and lines."), href: P("/instandhaltung/") },
-    { k: "MCP", d: L("Protokoll, über das die KI rechtegeprüft auf die Suche zugreift.", "Protocol through which the AI accesses search, permission-checked."), href: P("/suche/") },
-    { k: L("NFC-Tracking", "NFC tracking"), d: L("Behälter per Funk-Chip scannen, Standort und Foto festhalten.", "Scan containers by radio chip, record location and photo."), href: P("/app/") },
+  { name: L("Kosten, Kennzahlen & Anlagen", "Costing, KPIs & assets", "成本、关键指标（KPI）与设备"), terms: [
+    { k: L("Lot-Costing", "Lot costing", "批次成本核算"), d: L("Selbstkosten je Charge, nachvollziehbar bis zum Beleg.", "Cost per batch, traceable down to the document.", "每个批次的自有成本，可追溯到凭证。"), href: P("/kosten/") },
+    { k: L("Niederstwert (NRV)", "Net realisable value (NRV)", "可变现净值（NRV）"), d: L("Bestände zum niedrigeren Wert bewerten — automatisch, prüfsicher.", "Value inventory at the lower amount — automatic, audit-proof.", "按较低金额对库存计价——自动、可审计。"), href: P("/kosten/") },
+    { k: "Landed-Cost", d: L("Fracht, Zoll und Versicherung in die Materialkosten einrechnen.", "Roll freight, duty and insurance into material cost.", "把运费、关税和保险计入物料成本。"), href: P("/kosten/") },
+    { k: L("Management-Review", "Management review", "管理评审"), d: L("Regelmäßiger Review der Kennzahlen mit Maßnahmen und Verantwortlichen.", "Regular review of the KPIs with actions and owners.", "对关键指标进行定期评审，明确措施与负责人。"), href: P("/kennzahlen/") },
+    { k: L("KPI-Snapshot", "KPI snapshot", "KPI 快照"), d: L("Jeder Monatsstand wird eingefroren — revisionssicher, keine Schönung.", "Every monthly state is frozen — audit-proof, no polishing.", "每月状态都会冻结——可审计、不加粉饰。"), href: P("/kennzahlen/") },
+    { k: L("Instandhaltung (Asset)", "Maintenance (asset)", "维护（设备）"), d: L("Anlage, Norm, Prüffrist und Doku an einem Objekt.", "Asset, standard, inspection interval and docs on one object.", "设备、标准、检验周期与文档集中在一个对象上。"), href: P("/instandhaltung/") },
+    { k: "PED", d: L("EU-Druckgeräte-Richtlinie für Kessel, Behälter und Leitungen.", "EU Pressure Equipment Directive for vessels, tanks and lines.", "针对锅炉、容器和管道的欧盟承压设备指令。"), href: P("/instandhaltung/") },
+    { k: "MCP", d: L("Protokoll, über das die KI rechtegeprüft auf die Suche zugreift.", "Protocol through which the AI accesses search, permission-checked.", "AI 经权限校验访问搜索所用的协议。"), href: P("/suche/") },
+    { k: L("NFC-Tracking", "NFC tracking", "NFC 追踪"), d: L("Behälter per Funk-Chip scannen, Standort und Foto festhalten.", "Scan containers by radio chip, record location and photo.", "用无线芯片扫描料箱，记录位置和照片。"), href: P("/app/") },
   ]},
 ];
 const total = groups.reduce((a, g) => a + g.terms.length, 0);
 ---
 <section style="background:#F8F9FA;">
   <div style="max-width:1000px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Glossar", "Glossary")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Die Begriffe, kurz erklärt.", "The terms, briefly explained.")}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(32px,4vw,48px);">{L(`Von SPS bis Souveränität — ${total} Begriffe aus dieser Demo. Jeder verlinkt direkt dorthin, wo er live vorkommt.`, `From PLC to sovereignty — ${total} terms from this demo. Each links straight to where it shows up live.`)}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Glossar", "Glossary", "术语表")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Die Begriffe, kurz erklärt.", "The terms, briefly explained.", "术语，简明解释。")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(32px,4vw,48px);">{L(`Von SPS bis Souveränität — ${total} Begriffe aus dieser Demo. Jeder verlinkt direkt dorthin, wo er live vorkommt.`, `From PLC to sovereignty — ${total} terms from this demo. Each links straight to where it shows up live.`, `从 SPS/PLC 到自主可控（数据主权）——本演示中的 ${total} 个术语。每个都直接链接到它在实际中出现的位置。`)}</p>
 
     {groups.map((g) => (
       <div style="margin-bottom:clamp(28px,3.5vw,40px);">
@@ -97,7 +98,7 @@ const total = groups.reduce((a, g) => a + g.terms.length, 0);
               style="text-decoration:none; color:#1B1C1E; border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:14px 16px; display:block;">
               <span style="display:flex; align-items:center; gap:8px;">
                 <span style="font-weight:600; font-size:15px;">{t.k}</span>
-                <span style="margin-left:auto; color:#92938F; font-size:13px;">{sl ? (de ? "suchen" : "search") + " ⌕" : (t.ext ? "↗" : "→")}</span>
+                <span style="margin-left:auto; color:#92938F; font-size:13px;">{sl ? (de ? "suchen" : en ? "search" : "搜索") + " ⌕" : (t.ext ? "↗" : "→")}</span>
               </span>
               <span style="display:block; font-size:14px; line-height:1.5; color:#5C5E63; margin-top:4px;">{t.d}</span>
             </a>

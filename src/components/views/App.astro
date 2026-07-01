@@ -4,29 +4,30 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const AC = "#2a86a8";
 const DEMO = "https://app-demo.indystry.works";
 const tabs = [
-  { t: L("Anwesenheit", "Attendance"), d: L("Kommt & geht — sicher gestempelt, auch ohne Stechuhr an der Wand.", "Clock in & out — securely stamped, no wall terminal needed.") },
-  { t: L("Zeiterfassung", "Time tracking"), d: L("Zeit auf Auftrag und Projekt buchen, direkt an der Maschine.", "Book time to order and project, right at the machine.") },
-  { t: L("Fertigung & QC", "Manufacturing & QC"), d: L("Arbeitsschritte abhaken, Prüfwerte erfassen, n.i.O. melden.", "Tick off steps, capture inspection values, flag rejects.") },
-  { t: L("Behälter-Tracking", "Container tracking"), d: L("Behälter per NFC scannen, Standort und Foto festhalten.", "Scan containers by NFC, record location and photo.") },
-  { t: L("Einstellungen", "Settings"), d: L("Sprache, Konto, Gerät — ein Login per SSO, fertig.", "Language, account, device — one SSO login, done.") },
+  { t: L("Anwesenheit", "Attendance", "考勤"), d: L("Kommt & geht — sicher gestempelt, auch ohne Stechuhr an der Wand.", "Clock in & out — securely stamped, no wall terminal needed.", "上下班——安全打卡，无需墙上的考勤机。") },
+  { t: L("Zeiterfassung", "Time tracking", "工时记录"), d: L("Zeit auf Auftrag und Projekt buchen, direkt an der Maschine.", "Book time to order and project, right at the machine.", "在机台旁即可将工时记入订单和项目。") },
+  { t: L("Fertigung & QC", "Manufacturing & QC", "生产与质检"), d: L("Arbeitsschritte abhaken, Prüfwerte erfassen, n.i.O. melden.", "Tick off steps, capture inspection values, flag rejects.", "勾选工序、录入检验数据、上报不合格品。") },
+  { t: L("Behälter-Tracking", "Container tracking", "料箱追踪"), d: L("Behälter per NFC scannen, Standort und Foto festhalten.", "Scan containers by NFC, record location and photo.", "用 NFC 扫描料箱，记录位置与照片。") },
+  { t: L("Einstellungen", "Settings", "设置"), d: L("Sprache, Konto, Gerät — ein Login per SSO, fertig.", "Language, account, device — one SSO login, done.", "语言、账户、设备——一次 SSO 登录，搞定。") },
 ];
 const feats = [
-  { t: L("Offline-first", "Offline-first"), d: L("Kein Empfang in der Halle? Macht nichts — alles wird lokal gespeichert und synchronisiert, sobald wieder Netz da ist.", "No signal in the hall? No problem — everything is stored locally and syncs as soon as the network is back.") },
-  { t: L("Verschlüsselt am Gerät", "Encrypted on device"), d: L("Die lokale Datenbank ist verschlüsselt — geht das Handy verloren, sind die Daten geschützt.", "The local database is encrypted — if the phone is lost, the data is protected.") },
-  { t: L("Ein Login (SSO)", "One login (SSO)"), d: L("Anmeldung per offenem Standard gegen dasselbe Konto wie alle anderen Werkzeuge.", "Sign in via open standard against the same account as every other tool.") },
-  { t: L("Push-Hinweise", "Push notifications"), d: L("Wichtiges kommt aufs Handy — Freigaben, Störungen, Schichtwechsel.", "What matters reaches the phone — approvals, faults, shift changes.") },
-  { t: L("Fotos & Belege", "Photos & evidence"), d: L("Foto direkt aus der App, sicher abgelegt am Objekt — nicht in der Kamerarolle.", "Photo straight from the app, stored safely on the object — not in the camera roll.") },
-  { t: L("Quelloffen & self-hosted", "Open & self-hosted"), d: L("Läuft gegen euren eigenen Server — keine fremde Cloud, kein App-Store-Zwang.", "Runs against your own server — no foreign cloud, no app-store lock-in.") },
+  { t: L("Offline-first", "Offline-first", "离线优先"), d: L("Kein Empfang in der Halle? Macht nichts — alles wird lokal gespeichert und synchronisiert, sobald wieder Netz da ist.", "No signal in the hall? No problem — everything is stored locally and syncs as soon as the network is back.", "车间没信号？没关系——所有数据先存本地，网络恢复后自动同步。") },
+  { t: L("Verschlüsselt am Gerät", "Encrypted on device", "设备端加密"), d: L("Die lokale Datenbank ist verschlüsselt — geht das Handy verloren, sind die Daten geschützt.", "The local database is encrypted — if the phone is lost, the data is protected.", "本地数据库已加密——即使手机丢失，数据也受保护。") },
+  { t: L("Ein Login (SSO)", "One login (SSO)", "统一登录（SSO）"), d: L("Anmeldung per offenem Standard gegen dasselbe Konto wie alle anderen Werkzeuge.", "Sign in via open standard against the same account as every other tool.", "通过开放标准登录，与其他所有工具共用同一账户。") },
+  { t: L("Push-Hinweise", "Push notifications", "推送提醒"), d: L("Wichtiges kommt aufs Handy — Freigaben, Störungen, Schichtwechsel.", "What matters reaches the phone — approvals, faults, shift changes.", "重要事项直达手机——审批、故障、换班。") },
+  { t: L("Fotos & Belege", "Photos & evidence", "照片与凭证"), d: L("Foto direkt aus der App, sicher abgelegt am Objekt — nicht in der Kamerarolle.", "Photo straight from the app, stored safely on the object — not in the camera roll.", "直接在应用内拍照，安全归档到对象上——不进相册。") },
+  { t: L("Quelloffen & self-hosted", "Open & self-hosted", "开源且自托管"), d: L("Läuft gegen euren eigenen Server — keine fremde Cloud, kein App-Store-Zwang.", "Runs against your own server — no foreign cloud, no app-store lock-in.", "运行在您自己的服务器上——无外部云，无应用商店强制绑定。") },
 ];
 const factors = [
-  { t: L("Standort", "Location"), d: L("Stempeln nur am Werk — per Geofence geprüft.", "Stamp only at the plant — geofence-checked.") },
-  { t: L("Touch / Biometrie", "Touch / biometrics"), d: L("Es ist wirklich die Person — Fingerabdruck statt geteilter Karte.", "It really is the person — fingerprint instead of a shared card.") },
-  { t: L("Scan", "Scan"), d: L("QR/NFC am Arbeitsplatz bestätigt: hier, jetzt, an dieser Station.", "QR/NFC at the workplace confirms: here, now, at this station.") },
+  { t: L("Standort", "Location", "位置"), d: L("Stempeln nur am Werk — per Geofence geprüft.", "Stamp only at the plant — geofence-checked.", "仅在工厂内可打卡——通过地理围栏校验。") },
+  { t: L("Touch / Biometrie", "Touch / biometrics", "触控／生物识别"), d: L("Es ist wirklich die Person — Fingerabdruck statt geteilter Karte.", "It really is the person — fingerprint instead of a shared card.", "确保确实是本人——用指纹取代可共用的卡片。") },
+  { t: L("Scan", "Scan", "扫码"), d: L("QR/NFC am Arbeitsplatz bestätigt: hier, jetzt, an dieser Station.", "QR/NFC at the workplace confirms: here, now, at this station.", "工位上的二维码／NFC 确认：此地、此刻、此工位。") },
 ];
 ---
 <!-- HERO -->
@@ -34,10 +35,10 @@ const factors = [
   <div style="position:absolute; bottom:-25%; left:60%; width:55%; height:90%; background:radial-gradient(circle,rgba(42,134,168,.20),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px); display:grid; grid-template-columns:1.3fr 0.7fr; gap:32px; align-items:center;">
     <div>
-      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Werker-App · Mobil", "Shop-floor app · mobile")}</p>
-      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Die Werkstatt in der", "The shop floor in your")} <span style="color:#E6B23A;">{L("Hosentasche.", "pocket.")}</span></h1>
-      <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 26px;">{L("Stempeln, Zeit buchen, Fertigung quittieren, Behälter scannen — direkt an der Maschine, auch ohne Empfang. Eine App auf eurem eigenen Server, kein fremder Cloud-Dienst.", "Clock in, book time, sign off manufacturing, scan containers — right at the machine, even without signal. One app on your own server, no foreign cloud service.")}</p>
-      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px; display:inline-block;">{L("App-Demo im Browser", "App demo in the browser")} ↗</a>
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Werker-App · Mobil", "Shop-floor app · mobile", "车间应用 · 移动端")}</p>
+      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Die Werkstatt in der", "The shop floor in your", "把车间装进")} <span style="color:#E6B23A;">{L("Hosentasche.", "pocket.", "口袋里。")}</span></h1>
+      <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:54ch; margin:0 0 26px;">{L("Stempeln, Zeit buchen, Fertigung quittieren, Behälter scannen — direkt an der Maschine, auch ohne Empfang. Eine App auf eurem eigenen Server, kein fremder Cloud-Dienst.", "Clock in, book time, sign off manufacturing, scan containers — right at the machine, even without signal. One app on your own server, no foreign cloud service.", "打卡、记工时、确认生产、扫描料箱——就在机台旁，即使没信号也行。一款运行在您自己服务器上的应用，无外部云服务。")}</p>
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px; display:inline-block;">{L("App-Demo im Browser", "App demo in the browser", "在浏览器中体验应用演示")} ↗</a>
     </div>
     <!-- Phone-Mockup -->
     <div style="justify-self:center;">
@@ -58,7 +59,7 @@ const factors = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px) clamp(24px,3vw,40px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Fünf Tabs, ein Arbeitstag", "Five tabs, one working day")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Fünf Tabs, ein Arbeitstag", "Five tabs, one working day", "五个标签页，一个工作日")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px;">
@@ -76,10 +77,10 @@ const factors = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Stempeln, dem man trauen kann", "Clocking you can trust")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Stempeln, dem man trauen kann", "Clocking you can trust", "值得信赖的打卡")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
-    <p style="font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 24px; max-width:62ch;">{L("Drei Faktoren zusammen — damit die Zeiterfassung stimmt und keine Karte mehr für den Kollegen mitstempelt.", "Three factors together — so the time record is correct and no card stamps in for a colleague anymore.")}</p>
+    <p style="font-size:15px; line-height:1.6; color:#3C3E42; margin:0 0 24px; max-width:62ch;">{L("Drei Faktoren zusammen — damit die Zeiterfassung stimmt und keine Karte mehr für den Kollegen mitstempelt.", "Three factors together — so the time record is correct and no card stamps in for a colleague anymore.", "三重要素叠加——确保工时记录准确，杜绝代打卡。")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
       {factors.map((f, i) => (
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:18px 20px;">
@@ -96,7 +97,7 @@ const factors = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,72px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Gebaut für die Halle", "Built for the floor")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§03 · {L("Gebaut für die Halle", "Built for the floor", "为车间而生")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
@@ -107,7 +108,7 @@ const factors = [
         </div>
       ))}
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Die App ist die mobile Hand des ERP — dieselben Daten, dasselbe Konto.", "The app is the mobile hand of the ERP — same data, same account.")} <a href={b + "/erp/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum ERP-System", "To the ERP system")} →</a></p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; border-top:1px solid #E2E8F0; margin-top:24px; padding-top:18px; max-width:70ch;">{L("Die App ist die mobile Hand des ERP — dieselben Daten, dasselbe Konto.", "The app is the mobile hand of the ERP — same data, same account.", "这款应用是 ERP 的移动之手——同一份数据，同一个账户。")} <a href={b + "/erp/"} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zum ERP-System", "To the ERP system", "前往 ERP 系统")} →</a></p>
   </div>
 </section>
 
@@ -115,11 +116,11 @@ const factors = [
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Noch immer Zettel und Stechuhr?", "Still paper and a punch clock?")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Probier die App im Browser — ohne Installation, einfach durchtippen.", "Try the app in the browser — no install, just tap through.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Noch immer Zettel und Stechuhr?", "Still paper and a punch clock?", "还在用纸单和打卡机吗？")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Probier die App im Browser — ohne Installation, einfach durchtippen.", "Try the app in the browser — no install, just tap through.", "在浏览器里试用这款应用——无需安装，动动手指即可体验。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("App-Demo öffnen", "Open the app demo")} ↗</a>
-      <a href={b + "/kontakt/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Pain-List schicken", "Send pain list")} →</a>
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("App-Demo öffnen", "Open the app demo", "打开应用演示")} ↗</a>
+      <a href={b + "/kontakt/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Pain-List schicken", "Send pain list", "发送痛点清单")} →</a>
     </div>
   </div>
 </section>

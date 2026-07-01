@@ -5,13 +5,14 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 ---
 <section style="background:#123A33; color:#F4F6F5;">
   <div style="max-width:1040px; margin:0 auto; padding:clamp(48px,7vw,90px) clamp(24px,5vw,56px) clamp(28px,4vw,40px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Der dritte Weg · Skalierung","The third way · scaling")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("So skaliert das System","How the system scales")}</h1>
-    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Core bleibt gleich — dieselbe Software vom ersten Tag an. Du wächst über Hardware, nicht über Lizenzen pro Kopf. Und erst wenn richtig viele Maschinen gleichzeitig Daten liefern, lohnt sich ein Streaming-Puffer (Kafka). Schieb die Regler.","The core stays the same — the same software from day one. You grow through hardware, not per-seat licences. And only once a lot of machines stream data at once does a streaming buffer (Kafka) pay off. Move the sliders.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Der dritte Weg · Skalierung","The third way · scaling","第三条道路 · 扩展")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 14px; max-width:16ch;">{L("So skaliert das System","How the system scales","系统如何扩展")}</h1>
+    <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Der Core bleibt gleich — dieselbe Software vom ersten Tag an. Du wächst über Hardware, nicht über Lizenzen pro Kopf. Und erst wenn richtig viele Maschinen gleichzeitig Daten liefern, lohnt sich ein Streaming-Puffer (Kafka). Schieb die Regler.","The core stays the same — the same software from day one. You grow through hardware, not per-seat licences. And only once a lot of machines stream data at once does a streaming buffer (Kafka) pay off. Move the sliders.","内核始终不变 —— 从第一天起就是同一套软件。您通过硬件扩容，而不是按人头买许可。只有当大量机台同时输送数据时，加一个流式缓冲（Kafka）才划算。拖动下面的滑块试试。")}</p>
     <div id="rc-readout" style="margin-top:22px; display:flex; flex-wrap:wrap; gap:10px 20px; font-family:var(--font-mono); font-size:13px; color:#A6CFC5;"></div>
   </div>
 </section>
@@ -20,43 +21,43 @@ const L = (d: string, e: string) => (de ? d : e);
   <div style="max-width:1040px; margin:0 auto; padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
 
     <div class="rc-card">
-      <p class="rc-h">{L("Dein Betrieb","Your operation")}</p>
+      <p class="rc-h">{L("Dein Betrieb","Your operation","您的工厂")}</p>
       <div id="rc-presets" style="display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px;"></div>
       <div id="rc-sliders"></div>
-      <p style="font-family:var(--font-mono); font-size:10.5px; color:#92938F; margin:14px 0 0;">{L("Illustrative Sizing-Heuristik, keine Angebote. Der Software-Core ist konstant — was wächst, ist die Hardware darunter.","Illustrative sizing heuristic, not a quote. The software core is constant — what grows is the hardware beneath it.")}</p>
+      <p style="font-family:var(--font-mono); font-size:10.5px; color:#92938F; margin:14px 0 0;">{L("Illustrative Sizing-Heuristik, keine Angebote. Der Software-Core ist konstant — was wächst, ist die Hardware darunter.","Illustrative sizing heuristic, not a quote. The software core is constant — what grows is the hardware beneath it.","仅为示意性的容量估算，并非报价。软件内核恒定不变 —— 增长的是其下的硬件。")}</p>
     </div>
 
     <div class="rc-grid">
       <div class="rc-card rc-core">
-        <p class="rc-h">{L("Core · unverändert","Core · unchanged")}</p>
-        <p class="rc-sub">{L("Dieselben Bausteine — egal ob 5 oder 500 Maschinen.","The same building blocks — whether 5 or 500 machines.")}</p>
+        <p class="rc-h">{L("Core · unverändert","Core · unchanged","内核 · 不变")}</p>
+        <p class="rc-sub">{L("Dieselben Bausteine — egal ob 5 oder 500 Maschinen.","The same building blocks — whether 5 or 500 machines.","相同的模块 —— 无论是 5 台还是 500 台机器。")}</p>
         <div class="rc-chips" id="rc-core-chips"></div>
-        <div class="rc-flat">{L("0 € pro zusätzlichem Nutzer","€0 per additional user")}</div>
+        <div class="rc-flat">{L("0 € pro zusätzlichem Nutzer","€0 per additional user","每增加一名用户 0 €")}</div>
       </div>
 
       <div class="rc-card rc-hw">
-        <p class="rc-h">{L("Hardware · wächst","Hardware · grows")}</p>
+        <p class="rc-h">{L("Hardware · wächst","Hardware · grows","硬件 · 增长")}</p>
         <div id="rc-tier" class="rc-tier"></div>
         <div class="rc-metrics" id="rc-hw"></div>
       </div>
 
       <div class="rc-card rc-stream">
-        <p class="rc-h">{L("Datenstrom · Kafka?","Data stream · Kafka?")}</p>
+        <p class="rc-h">{L("Datenstrom · Kafka?","Data stream · Kafka?","数据流 · 需要 Kafka 吗？")}</p>
         <div id="rc-stream-val" class="rc-streamval"></div>
         <div class="rc-gauge"><div class="rc-gauge-fill" id="rc-gauge"></div><div class="rc-gauge-mark"></div></div>
-        <p class="rc-gauge-lbl"><span>0</span><span>{L("Break-even","break-even")}</span></p>
+        <p class="rc-gauge-lbl"><span>0</span><span>{L("Break-even","break-even","盈亏平衡点")}</span></p>
         <div id="rc-verdict" class="rc-verdict"></div>
       </div>
     </div>
 
     <div class="rc-card" style="margin-top:20px;">
-      <p class="rc-h">{L("Wachstumskurve","Growth curve")}</p>
-      <p class="rc-sub">{L("Mehr Maschinen → mehr Hardware (Stufen). Der Core bleibt flach. Ab dem Kafka-Break-even kommt ein Streaming-Layer dazu.","More machines → more hardware (steps). The core stays flat. Beyond the Kafka break-even a streaming layer is added.")}</p>
+      <p class="rc-h">{L("Wachstumskurve","Growth curve","增长曲线")}</p>
+      <p class="rc-sub">{L("Mehr Maschinen → mehr Hardware (Stufen). Der Core bleibt flach. Ab dem Kafka-Break-even kommt ein Streaming-Layer dazu.","More machines → more hardware (steps). The core stays flat. Beyond the Kafka break-even a streaming layer is added.","机器越多 → 硬件越多（阶梯式）。内核保持平稳。越过 Kafka 盈亏平衡点后，再加一层流式处理。")}</p>
       <div id="rc-chart" class="rc-chart"></div>
       <div class="rc-legend">
-        <span><span class="rc-sw" style="background:#16794a"></span>{L("Hardware (vCPU)","Hardware (vCPU)")}</span>
-        <span><span class="rc-sw" style="background:#9AA7A2"></span>{L("Core (Software) — gleich","Core (software) — same")}</span>
-        <span><span class="rc-sw" style="background:#E6B23A"></span>{L("Kafka-Break-even","Kafka break-even")}</span>
+        <span><span class="rc-sw" style="background:#16794a"></span>{L("Hardware (vCPU)","Hardware (vCPU)","硬件（vCPU）")}</span>
+        <span><span class="rc-sw" style="background:#9AA7A2"></span>{L("Core (Software) — gleich","Core (software) — same","内核（软件）—— 不变")}</span>
+        <span><span class="rc-sw" style="background:#E6B23A"></span>{L("Kafka-Break-even","Kafka break-even","Kafka 盈亏平衡点")}</span>
       </div>
     </div>
 

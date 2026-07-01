@@ -4,40 +4,41 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const P = (path: string) => (de ? "" : "/en") + path;
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const P = (path: string) => (de ? "" : en ? "/en" : "/cn") + path;
 const handbuch = [
-  { t: L("Maschine rüsten","Set up a machine"), b: L("Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen.","Change tooling, set zero point, load program, check first part.") },
-  { t: L("Qualitätsprüfung","Quality inspection"), b: L("Maßhaltigkeit, Oberflächenrauheit, Gewicht — Grenzwerte, Prüfprotokoll, Sperre bei Abweichung.","Dimensions, surface roughness, weight — limits, inspection record, block on deviation.") },
-  { t: L("Reklamation bearbeiten","Handle a complaint"), b: L("Schaden aufnehmen, Reparaturauftrag anlegen, Ursache (8D) dokumentieren, Kunde informieren.","Record damage, open a repair order, document root cause (8D), inform customer.") },
-  { t: L("Wartungsplan","Maintenance plan"), b: L("Präventive Intervalle je Maschine, Checklisten, korrektive Einsätze bei Störung.","Preventive intervals per machine, checklists, corrective work on faults.") },
-  { t: L("Onboarding","Onboarding"), b: L("Erste Woche, Sicherheitsunterweisung, Zugänge, Ansprechpartner, Rundgang.","First week, safety briefing, access, contacts, plant tour.") },
-  { t: L("Notfall & Sicherheit","Emergency & safety"), b: L("Not-Aus, Brandschutz, Erste Hilfe, Meldewege.","E-stop, fire safety, first aid, reporting paths.") },
+  { t: L("Maschine rüsten","Set up a machine","设备调机"), b: L("Werkzeug wechseln, Nullpunkt setzen, Programm laden, Erststück prüfen.","Change tooling, set zero point, load program, check first part.","更换刀具、设定零点、加载程序、检验首件。") },
+  { t: L("Qualitätsprüfung","Quality inspection","质量检验"), b: L("Maßhaltigkeit, Oberflächenrauheit, Gewicht — Grenzwerte, Prüfprotokoll, Sperre bei Abweichung.","Dimensions, surface roughness, weight — limits, inspection record, block on deviation.","尺寸精度、表面粗糙度、重量——限值、检验记录、偏差时封锁。") },
+  { t: L("Reklamation bearbeiten","Handle a complaint","处理投诉"), b: L("Schaden aufnehmen, Reparaturauftrag anlegen, Ursache (8D) dokumentieren, Kunde informieren.","Record damage, open a repair order, document root cause (8D), inform customer.","记录损坏、创建维修订单、记录根因（8D）、通知客户。") },
+  { t: L("Wartungsplan","Maintenance plan","维护计划"), b: L("Präventive Intervalle je Maschine, Checklisten, korrektive Einsätze bei Störung.","Preventive intervals per machine, checklists, corrective work on faults.","按设备设定预防性周期、检查清单、故障时的纠正性作业。") },
+  { t: L("Onboarding","Onboarding","入职引导"), b: L("Erste Woche, Sicherheitsunterweisung, Zugänge, Ansprechpartner, Rundgang.","First week, safety briefing, access, contacts, plant tour.","第一周、安全培训、权限、联系人、厂区参观。") },
+  { t: L("Notfall & Sicherheit","Emergency & safety","应急与安全"), b: L("Not-Aus, Brandschutz, Erste Hilfe, Meldewege.","E-stop, fire safety, first aid, reporting paths.","急停、消防、急救、上报途径。") },
 ];
 const risiken = [
-  { r: L("Maschinenausfall Linie Nord","Machine outage line North"), w: L("mittel","medium"), i: L("hoch","high"), c: "#E6B23A" },
-  { r: L("Lieferengpass Rohstahl","Raw steel supply gap"), w: L("niedrig","low"), i: L("hoch","high"), c: "#16794a" },
-  { r: L("Qualitätsabweichung Charge","Batch quality deviation"), w: L("mittel","medium"), i: L("mittel","medium"), c: "#E6B23A" },
-  { r: L("Datenverlust / IT","Data loss / IT"), w: L("niedrig","low"), i: L("hoch","high"), c: "#16794a" },
-  { r: L("Arbeitsunfall","Workplace accident"), w: L("niedrig","low"), i: L("kritisch","critical"), c: "#E6B23A" },
+  { r: L("Maschinenausfall Linie Nord","Machine outage line North","北线设备停机"), w: L("mittel","medium","中"), i: L("hoch","high","高"), c: "#E6B23A" },
+  { r: L("Lieferengpass Rohstahl","Raw steel supply gap","原钢供应短缺"), w: L("niedrig","low","低"), i: L("hoch","high","高"), c: "#16794a" },
+  { r: L("Qualitätsabweichung Charge","Batch quality deviation","批次质量偏差"), w: L("mittel","medium","中"), i: L("mittel","medium","中"), c: "#E6B23A" },
+  { r: L("Datenverlust / IT","Data loss / IT","数据丢失 / IT"), w: L("niedrig","low","低"), i: L("hoch","high","高"), c: "#16794a" },
+  { r: L("Arbeitsunfall","Workplace accident","工伤事故"), w: L("niedrig","low","低"), i: L("kritisch","critical","严重"), c: "#E6B23A" },
 ];
 const apps = [
-  { t: "ERP", d: L("Aufträge, Lager, Fertigung","Orders, stock, production"), href: "https://erp-demo.indystry.works/odoo", ext: true },
-  { t: "BI", d: L("Dashboards & Reports","Dashboards & reports"), href: "https://bi-demo.indystry.works", ext: true },
-  { t: L("Leitstand","Control room"), d: L("Maschinen live","Machines live"), href: P("/leitstand/"), ext: false },
-  { t: "Historian", d: L("Zeitreihen","Time series"), href: P("/historian/"), ext: false },
-  { t: L("Anlage","Plant"), d: L("3D bis zum Plan","3D to the plan"), href: P("/anlage/"), ext: false },
-  { t: L("Suche","Search"), d: L("Frag die Firma","Ask the company"), href: P("/suche/"), ext: false },
-  { t: "Status", d: L("Betrieb & Backups","Ops & backups"), href: P("/status/"), ext: false },
+  { t: "ERP", d: L("Aufträge, Lager, Fertigung","Orders, stock, production","订单、库存、生产"), href: "https://erp-demo.indystry.works/odoo", ext: true },
+  { t: "BI", d: L("Dashboards & Reports","Dashboards & reports","仪表盘与报表"), href: "https://bi-demo.indystry.works", ext: true },
+  { t: L("Leitstand","Control room","中控室"), d: L("Maschinen live","Machines live","设备实时"), href: P("/leitstand/"), ext: false },
+  { t: "Historian", d: L("Zeitreihen","Time series","时序数据"), href: P("/historian/"), ext: false },
+  { t: L("Anlage","Plant","设备"), d: L("3D bis zum Plan","3D to the plan","从 3D 到图纸"), href: P("/anlage/"), ext: false },
+  { t: L("Suche","Search","搜索"), d: L("Frag die Firma","Ask the company","向贵公司提问"), href: P("/suche/"), ext: false },
+  { t: "Status", d: L("Betrieb & Backups","Ops & backups","运行与备份"), href: P("/status/"), ext: false },
 ];
 ---
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Wissen & Kiosk · read-only","Knowledge & kiosk · read-only")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Das Wissen der Firma.","The company's knowledge.")}</h1>
-    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(36px,5vw,52px);">{L("Handbuch, Compliance und der Kiosk, von dem aus jeder seine Werkzeuge erreicht — an einem Ort, für alle, immer aktuell.","Handbook, compliance and the kiosk from which everyone reaches their tools — one place, for everyone, always current.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 16px;">{L("Wissen & Kiosk · read-only","Knowledge & kiosk · read-only","知识与一体机 · 只读")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,64px); line-height:1.0; letter-spacing:-0.03em; margin:0 0 14px;">{L("Das Wissen der Firma.","The company's knowledge.","贵公司的知识。")}</h1>
+    <p style="font-size:clamp(17px,1.6vw,20px); line-height:1.6; color:#5C5E63; max-width:62ch; margin:0 0 clamp(36px,5vw,52px);">{L("Handbuch, Compliance und der Kiosk, von dem aus jeder seine Werkzeuge erreicht — an einem Ort, für alle, immer aktuell.","Handbook, compliance and the kiosk from which everyone reaches their tools — one place, for everyone, always current.","手册、合规，以及供每个人取用各自工具的一体机——集中一处，人人可用，始终最新。")}</p>
 
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Handbuch","Handbook")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Handbuch","Handbook","手册")}</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-bottom:clamp(40px,5vw,60px);">
       {handbuch.map((h) => (
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; padding:16px 18px;">
@@ -49,10 +50,10 @@ const apps = [
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; margin-bottom:clamp(40px,5vw,60px);">
       <div>
-        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Compliance · Risikoregister","Compliance · risk register")}</p>
+        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Compliance · Risikoregister","Compliance · risk register","合规 · 风险登记册")}</p>
         <div style="border:1px solid #E2E8F0; border-radius:12px; background:#fff; overflow:hidden;">
           <div style="display:grid; grid-template-columns:1fr auto auto; gap:10px; padding:10px 16px; border-bottom:1px solid #EFEAE0; font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#92938F;">
-            <span>{L("Risiko","Risk")}</span><span>{L("Eintritt","Likelihood")}</span><span>{L("Wirkung","Impact")}</span>
+            <span>{L("Risiko","Risk","风险")}</span><span>{L("Eintritt","Likelihood","发生概率")}</span><span>{L("Wirkung","Impact","影响")}</span>
           </div>
           {risiken.map((x, i) => (
             <div style={`display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center; padding:11px 16px; ${i ? "border-top:1px solid #F1F3F2;" : ""}`}>
@@ -62,10 +63,10 @@ const apps = [
             </div>
           ))}
         </div>
-        <p style="font-size:12px; color:#92938F; margin:10px 0 0;">{L("ISO 9001 / IEC 62443-Logik — gepflegt, nachvollziehbar, read-only.","ISO 9001 / IEC 62443 logic — maintained, traceable, read-only.")}</p>
+        <p style="font-size:12px; color:#92938F; margin:10px 0 0;">{L("ISO 9001 / IEC 62443-Logik — gepflegt, nachvollziehbar, read-only.","ISO 9001 / IEC 62443 logic — maintained, traceable, read-only.","ISO 9001 / IEC 62443 逻辑——持续维护、可追溯、只读。")}</p>
       </div>
       <div>
-        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Kiosk · App-Launcher","Kiosk · app launcher")}</p>
+        <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#16463E; margin:0 0 14px;">{L("Kiosk · App-Launcher","Kiosk · app launcher","一体机 · 应用启动台")}</p>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           {apps.map((a) => (
             <a href={a.href} target={a.ext ? "_blank" : undefined} rel={a.ext ? "noopener" : undefined}
@@ -87,21 +88,21 @@ const apps = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wie das Wissen aktuell bleibt","How the knowledge stays current")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wie das Wissen aktuell bleibt","How the knowledge stays current","知识如何保持最新")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;">
       <div style="border:1px solid #E2E8F0; border-top:3px solid #16463E; border-radius:14px; background:#fff; padding:22px 24px;">
-        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Handbuch als Code","Handbook as code")}</p>
-        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Eine Quelle, überall aktuell","One source, current everywhere")}</h3>
-        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Das Handbuch wird einmal versioniert gepflegt — und fließt automatisch ins ERP, ins Wiki und in die KI-Suche. Kein Copy-Paste, keine drei Stände, die auseinanderlaufen. Jede Änderung ist nachvollziehbar wie ein Commit.","The handbook is maintained once, under version control — and flows automatically into the ERP, the wiki and the AI search. No copy-paste, no three versions drifting apart. Every change is traceable like a commit.")}</p>
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Handbuch als Code","Handbook as code","手册即代码")}</p>
+        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Eine Quelle, überall aktuell","One source, current everywhere","单一来源，处处最新")}</h3>
+        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Das Handbuch wird einmal versioniert gepflegt — und fließt automatisch ins ERP, ins Wiki und in die KI-Suche. Kein Copy-Paste, keine drei Stände, die auseinanderlaufen. Jede Änderung ist nachvollziehbar wie ein Commit.","The handbook is maintained once, under version control — and flows automatically into the ERP, the wiki and the AI search. No copy-paste, no three versions drifting apart. Every change is traceable like a commit.","手册只需在版本控制下维护一次——便自动流入 ERP、Wiki 与 AI 搜索。无需复制粘贴，也不会出现三个互相偏离的版本。每次改动都像一次提交那样可追溯。")}</p>
       </div>
       <div style="border:1px solid #E2E8F0; border-top:3px solid #E6B23A; border-radius:14px; background:#fff; padding:22px 24px;">
-        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("E-Mail-Archiv","Email archive")}</p>
-        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Nichts geht verloren, alles auffindbar","Nothing lost, everything findable")}</h3>
-        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Ein- und ausgehende E-Mails landen revisionssicher in einem durchsuchbaren Archiv — auch nach Jahren auffindbar, manipulationssicher, Teil der Unternehmenssuche. Wichtig für Audit und Nachweispflichten.","Inbound and outbound emails land tamper-evident in a searchable archive — findable even after years, manipulation-proof, part of the company-wide search. Important for audits and retention duties.")}</p>
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("E-Mail-Archiv","Email archive","邮件归档")}</p>
+        <h3 style="font-family:var(--font-head); font-weight:700; font-size:20px; color:#1B1C1E; margin:0 0 8px;">{L("Nichts geht verloren, alles auffindbar","Nothing lost, everything findable","不遗漏任何内容，一切皆可查")}</h3>
+        <p style="font-size:14.5px; line-height:1.6; color:#5C5E63; margin:0;">{L("Ein- und ausgehende E-Mails landen revisionssicher in einem durchsuchbaren Archiv — auch nach Jahren auffindbar, manipulationssicher, Teil der Unternehmenssuche. Wichtig für Audit und Nachweispflichten.","Inbound and outbound emails land tamper-evident in a searchable archive — findable even after years, manipulation-proof, part of the company-wide search. Important for audits and retention duties.","收发邮件均以防篡改方式进入可检索的归档——即便多年之后仍可查找，防篡改，并纳入全公司搜索。对审计与留存义务至关重要。")}</p>
       </div>
     </div>
-    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Beides fließt in die eine Suche.","Both feed into the one search.")} <a href={P("/suche/")} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Unternehmenssuche","To company-wide search")} →</a></p>
+    <p style="font-size:14px; line-height:1.6; color:#5C5E63; margin-top:24px; max-width:70ch;">{L("Beides fließt in die eine Suche.","Both feed into the one search.","两者都汇入同一个搜索。")} <a href={P("/suche/")} style="color:#16463E; font-weight:600; text-decoration:none;">{L("Zur Unternehmenssuche","To company-wide search","前往全公司搜索")} →</a></p>
   </div>
 </section>

@@ -4,8 +4,9 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const KI = "#16794a"; const MENSCH = "#E6B23A";
 // 24er Line-Icons (stroke=currentColor)
 const I: Record<string,string> = {
@@ -28,48 +29,48 @@ const I: Record<string,string> = {
 const kiIc = ["search","doc","wave","broom","bulb"];
 const meIc = ["pen","scale","wrench","hands","shield"];
 const ki = [
-  L("Findet in Sekunden über alle Systeme — Produkte, Maschinen, Aufträge, Handbuch.", "Finds in seconds across all systems — products, machines, orders, handbook."),
-  L("Fasst zusammen und antwortet in ganzen Sätzen — nur auf Basis der eigenen Firmendaten, mit Quellen.", "Summarises and answers in full sentences — only from the company's own data, with sources."),
-  L("Erkennt Muster und Drift früher als das Auge — etwa eine schleichende Maßabweichung.", "Spots patterns and drift earlier than the eye — e.g. a slow dimensional deviation."),
-  L("Nimmt die Routine ab: Tabellen pflegen, suchen, abtippen, Vorschläge vorbereiten.", "Takes the routine off your plate: maintaining spreadsheets, searching, retyping, drafting suggestions."),
-  L("Schlägt vor — Bestellmengen, ähnliche Altfälle, den nächsten sinnvollen Schritt.", "Suggests — order quantities, similar past cases, the next sensible step."),
+  L("Findet in Sekunden über alle Systeme — Produkte, Maschinen, Aufträge, Handbuch.", "Finds in seconds across all systems — products, machines, orders, handbook.", "数秒内跨所有系统检索——产品、机器、订单、手册。"),
+  L("Fasst zusammen und antwortet in ganzen Sätzen — nur auf Basis der eigenen Firmendaten, mit Quellen.", "Summarises and answers in full sentences — only from the company's own data, with sources.", "以完整句子归纳并作答——仅基于贵厂自有数据，并附来源。"),
+  L("Erkennt Muster und Drift früher als das Auge — etwa eine schleichende Maßabweichung.", "Spots patterns and drift earlier than the eye — e.g. a slow dimensional deviation.", "比肉眼更早识别模式与漂移——例如缓慢的尺寸偏差。"),
+  L("Nimmt die Routine ab: Tabellen pflegen, suchen, abtippen, Vorschläge vorbereiten.", "Takes the routine off your plate: maintaining spreadsheets, searching, retyping, drafting suggestions.", "承担日常琐事：维护表格、检索、誊录、起草建议。"),
+  L("Schlägt vor — Bestellmengen, ähnliche Altfälle, den nächsten sinnvollen Schritt.", "Suggests — order quantities, similar past cases, the next sensible step.", "给出建议——订购数量、相似的历史案例、下一步合理动作。"),
 ];
 const mensch = [
-  L("Entscheidet und verantwortet — die KI schlägt vor, unterschreiben tut ein Mensch.", "Decides and owns it — the AI suggests, a human signs off."),
-  L("Urteilt im Grenzfall, mit Kontext, den keine Datenbank kennt.", "Judges the edge case, with context no database holds."),
-  L("Legt Hand an: rüstet die Maschine, behebt die Störung, prüft das Teil in der Hand.", "Gets hands-on: sets up the machine, fixes the fault, checks the part by hand."),
-  L("Hält die Kundenbeziehung — Vertrauen entsteht zwischen Menschen, nicht aus einem Modell.", "Holds the customer relationship — trust grows between people, not from a model."),
-  L("Trägt Verantwortung, Haftung und das Warum — setzt Prioritäten und Grenzen.", "Carries responsibility, liability and the why — sets priorities and limits."),
+  L("Entscheidet und verantwortet — die KI schlägt vor, unterschreiben tut ein Mensch.", "Decides and owns it — the AI suggests, a human signs off.", "作出决策并承担责任——AI 提出建议，签字确认的是人。"),
+  L("Urteilt im Grenzfall, mit Kontext, den keine Datenbank kennt.", "Judges the edge case, with context no database holds.", "在临界情形下作出判断，依据的是任何数据库都无法掌握的上下文。"),
+  L("Legt Hand an: rüstet die Maschine, behebt die Störung, prüft das Teil in der Hand.", "Gets hands-on: sets up the machine, fixes the fault, checks the part by hand.", "亲自动手：装调机器、排除故障、上手检验零件。"),
+  L("Hält die Kundenbeziehung — Vertrauen entsteht zwischen Menschen, nicht aus einem Modell.", "Holds the customer relationship — trust grows between people, not from a model.", "维系客户关系——信任源于人与人之间，而非某个模型。"),
+  L("Trägt Verantwortung, Haftung und das Warum — setzt Prioritäten und Grenzen.", "Carries responsibility, liability and the why — sets priorities and limits.", "承担责任、担负法律义务并把握缘由——设定优先级与边界。"),
 ];
 const steps = [
-  { n:"01", who:"ki", t:L("KI erkennt","AI detects"), d:L("Eine schleichende Maßabweichung über mehrere Chargen — früher als das Auge.","A slow dimensional drift across batches — earlier than the eye.") },
-  { n:"02", who:"ki", t:L("KI schlägt vor","AI suggests"), d:L("Nachjustieren, mit Beleg aus den Messdaten — read-only, kein Eingriff.","Re-adjust, with evidence from the measurements — read-only, no action.") },
-  { n:"03", who:"me", t:L("Mensch urteilt","Human judges"), d:L("Im Kontext: Werkstoffcharge, Werkzeugstand, Kundentoleranz — was die DB nicht weiß.","In context: material batch, tool state, customer tolerance — what the DB doesn't know.") },
-  { n:"04", who:"me", t:L("Mensch entscheidet & zeichnet","Human decides & signs"), d:L("Setzt die Korrektur um und verantwortet sie. Kein Schritt ohne Freigabe.","Applies the correction and owns it. No step without sign-off.") },
+  { n:"01", who:"ki", t:L("KI erkennt","AI detects","AI 识别"), d:L("Eine schleichende Maßabweichung über mehrere Chargen — früher als das Auge.","A slow dimensional drift across batches — earlier than the eye.","跨多个批次的缓慢尺寸漂移——比肉眼更早发现。") },
+  { n:"02", who:"ki", t:L("KI schlägt vor","AI suggests","AI 建议"), d:L("Nachjustieren, mit Beleg aus den Messdaten — read-only, kein Eingriff.","Re-adjust, with evidence from the measurements — read-only, no action.","进行再校准，附测量数据佐证——只读，不作任何介入。") },
+  { n:"03", who:"me", t:L("Mensch urteilt","Human judges","人来判断"), d:L("Im Kontext: Werkstoffcharge, Werkzeugstand, Kundentoleranz — was die DB nicht weiß.","In context: material batch, tool state, customer tolerance — what the DB doesn't know.","结合上下文：材料批次、刀具状态、客户公差——这些是数据库不掌握的。") },
+  { n:"04", who:"me", t:L("Mensch entscheidet & zeichnet","Human decides & signs","人来决策并签字"), d:L("Setzt die Korrektur um und verantwortet sie. Kein Schritt ohne Freigabe.","Applies the correction and owns it. No step without sign-off.","实施该修正并承担责任。任何一步都需经批准。") },
 ];
 const guards = [
-  { k:"eye", t:L("Read-only","Read-only"), d:L("Die KI liest, sie verändert nichts von selbst.","The AI reads, it changes nothing on its own.") },
-  { k:"link", t:L("Mit Quellen","With sources"), d:L("Jede Antwort mit Beleg — nachprüfbar.","Every answer with evidence — verifiable.") },
-  { k:"box", t:L("Keine Blackbox","No black box"), d:L("Nachvollziehbar, warum etwas vorgeschlagen wird.","Traceable why something is suggested.") },
-  { k:"server", t:L("Selbst gehostet","Self-hosted"), d:L("Modell und Daten im eigenen Haus.","Model and data in your own house.") },
-  { k:"lock", t:L("Kein Konzern liest mit","No corporation reading along"), d:L("Keine Prompts in fremde Clouds.","No prompts into foreign clouds.") },
+  { k:"eye", t:L("Read-only","Read-only","只读"), d:L("Die KI liest, sie verändert nichts von selbst.","The AI reads, it changes nothing on its own.","AI 只读取，绝不自行更改任何内容。") },
+  { k:"link", t:L("Mit Quellen","With sources","附来源"), d:L("Jede Antwort mit Beleg — nachprüfbar.","Every answer with evidence — verifiable.","每条回答都有佐证——可核查。") },
+  { k:"box", t:L("Keine Blackbox","No black box","非黑箱"), d:L("Nachvollziehbar, warum etwas vorgeschlagen wird.","Traceable why something is suggested.","为何给出某项建议，可追溯可理解。") },
+  { k:"server", t:L("Selbst gehostet","Self-hosted","自托管"), d:L("Modell und Daten im eigenen Haus.","Model and data in your own house.","模型与数据都留在自己家里。") },
+  { k:"lock", t:L("Kein Konzern liest mit","No corporation reading along","无大厂窥探"), d:L("Keine Prompts in fremde Clouds.","No prompts into foreign clouds.","不向外部云端发送任何提示词。") },
 ];
 const loop = [
-  { n:"1", who:"ki", t:L("KI bereitet vor","AI prepares") },
-  { n:"2", who:"ki", t:L("KI schlägt vor","AI suggests") },
-  { n:"3", who:"me", t:L("Mensch prüft & urteilt","Human reviews & judges") },
-  { n:"4", who:"me", t:L("Mensch entscheidet","Human decides") },
+  { n:"1", who:"ki", t:L("KI bereitet vor","AI prepares","AI 准备") },
+  { n:"2", who:"ki", t:L("KI schlägt vor","AI suggests","AI 建议") },
+  { n:"3", who:"me", t:L("Mensch prüft & urteilt","Human reviews & judges","人来审阅并判断") },
+  { n:"4", who:"me", t:L("Mensch entscheidet","Human decides","人来决策") },
 ];
 ---
 <!-- HERO -->
 <section style="position:relative; background:#0E2522; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(40px,6vw,64px); display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(24px,4vw,48px); align-items:center;">
     <div>
-      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("KI & Mensch", "AI & humans")}</p>
-      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Die KI hilft. Entscheiden tun", "AI helps. Decisions are made by")} <span style="color:#E6B23A;">{L("Menschen.", "people.")}</span></h1>
-      <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:56ch; margin:0 0 20px;">{L("Die KI arbeitet auf den eigenen Firmendaten — read-only, mit Quellen, keine Blackbox. Sie beschleunigt und entlastet. Aber sie ersetzt kein Urteil, keine Hand an der Maschine und keine Verantwortung.", "The AI works on the company's own data — read-only, with sources, no black box. It speeds things up and takes load off. But it replaces no judgement, no hand at the machine and no responsibility.")}</p>
+      <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("KI & Mensch", "AI & humans", "AI 与人")}</p>
+      <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(32px,6vw,64px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:15ch;">{L("Die KI hilft. Entscheiden tun", "AI helps. Decisions are made by", "AI 提供协助。作出决策的是")} <span style="color:#E6B23A;">{L("Menschen.", "people.", "人。")}</span></h1>
+      <p style="font-size:clamp(16px,1.6vw,20px); line-height:1.6; color:#CADAD5; max-width:56ch; margin:0 0 20px;">{L("Die KI arbeitet auf den eigenen Firmendaten — read-only, mit Quellen, keine Blackbox. Sie beschleunigt und entlastet. Aber sie ersetzt kein Urteil, keine Hand an der Maschine und keine Verantwortung.", "The AI works on the company's own data — read-only, with sources, no black box. It speeds things up and takes load off. But it replaces no judgement, no hand at the machine and no responsibility.", "AI 在贵厂自有数据上运行——只读、附来源、非黑箱。它加快节奏、减轻负担。但它无法替代判断、无法替代机器旁的双手，也无法替代责任。")}</p>
       <div style="display:flex; flex-wrap:wrap; gap:8px;">
-        {[L("read-only","read-only"),L("mit Quellen","with sources"),L("keine Blackbox","no black box"),L("selbst gehostet","self-hosted")].map((c)=>(
+        {[L("read-only","read-only","只读"),L("mit Quellen","with sources","附来源"),L("keine Blackbox","no black box","非黑箱"),L("selbst gehostet","self-hosted","自托管")].map((c)=>(
           <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.05em; color:#A6CFC5; border:1px solid #2E5A52; border-radius:999px; padding:5px 11px;">{c}</span>))}
       </div>
     </div>
@@ -78,8 +79,8 @@ const loop = [
         <path d="M40,50 C40,28 72,28 95,50 C118,72 150,72 150,50 C150,28 118,28 95,50 C72,72 40,72 40,50 Z" fill="none" stroke="#214740" stroke-width="6"/>
         <path class="km-flow" d="M40,50 C40,28 72,28 95,50 C118,72 150,72 150,50 C150,28 118,28 95,50 C72,72 40,72 40,50 Z" fill="none" stroke="#E6B23A" stroke-width="2.4" stroke-dasharray="6 12" stroke-linecap="round"/>
         <circle cx="40" cy="50" r="9" fill="#16794a"/><circle cx="150" cy="50" r="9" fill="#E6B23A"/><circle cx="95" cy="50" r="5" fill="#A6CFC5"/>
-        <text x="40" y="84" text-anchor="middle" font-family="var(--font-mono),monospace" font-size="8" fill="#8FB3AA">{L("KI · schlägt vor","AI · suggests")}</text>
-        <text x="150" y="84" text-anchor="middle" font-family="var(--font-mono),monospace" font-size="8" fill="#d9b15a">{L("Du · entscheidest","You · decide")}</text>
+        <text x="40" y="84" text-anchor="middle" font-family="var(--font-mono),monospace" font-size="8" fill="#8FB3AA">{L("KI · schlägt vor","AI · suggests","AI · 建议")}</text>
+        <text x="150" y="84" text-anchor="middle" font-family="var(--font-mono),monospace" font-size="8" fill="#d9b15a">{L("Du · entscheidest","You · decide","您 · 决策")}</text>
       </svg>
     </div>
   </div>
@@ -89,19 +90,19 @@ const loop = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Zwei Kräfte, eine Schleife","Two forces, one loop")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Zwei Kräfte, eine Schleife","Two forces, one loop","两种力量，一个闭环")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div class="km-dual">
       <div class="km-panel" style="border-top:3px solid #16794a;">
-        <p class="km-pt" style="color:#16794a;">{L("Tempo & Fleißarbeit","Speed & legwork")}</p>
-        <p class="km-ph">{L("Was die KI übernimmt","What the AI takes on")}</p>
+        <p class="km-pt" style="color:#16794a;">{L("Tempo & Fleißarbeit","Speed & legwork","速度与琐碎工作")}</p>
+        <p class="km-ph">{L("Was die KI übernimmt","What the AI takes on","AI 所承担的")}</p>
         {ki.map((x,i)=>(<div class="km-row"><span class="km-ic" style="color:#16794a; border-color:#16794a44;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={I[kiIc[i]]}></svg></span><span>{x}</span></div>))}
       </div>
-      <div class="km-bridge" aria-hidden="true"><span class="km-bnode">⇄</span><span class="km-blbl">{L("Mensch in der Schleife","Human in the loop")}</span></div>
+      <div class="km-bridge" aria-hidden="true"><span class="km-bnode">⇄</span><span class="km-blbl">{L("Mensch in der Schleife","Human in the loop","人在闭环之中")}</span></div>
       <div class="km-panel" style="border-top:3px solid #E6B23A;">
-        <p class="km-pt" style="color:#b5851a;">{L("Urteil & Verantwortung","Judgement & responsibility")}</p>
-        <p class="km-ph">{L("Wofür es Menschen braucht","What still needs humans")}</p>
+        <p class="km-pt" style="color:#b5851a;">{L("Urteil & Verantwortung","Judgement & responsibility","判断与责任")}</p>
+        <p class="km-ph">{L("Wofür es Menschen braucht","What still needs humans","仍需要人的地方")}</p>
         {mensch.map((x,i)=>(<div class="km-row"><span class="km-ic" style="color:#b5851a; border-color:#E6B23A55;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={I[meIc[i]]}></svg></span><span>{x}</span></div>))}
       </div>
     </div>
@@ -111,7 +112,7 @@ const loop = [
 <!-- KREISLAUF -->
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
-    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(24px,3.6vw,40px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 28px; max-width:24ch;">{L("Die KI bereitet vor. Der Mensch entscheidet.", "The AI prepares. The human decides.")}</h2>
+    <h2 style="font-family:var(--font-head); font-weight:700; font-size:clamp(24px,3.6vw,40px); line-height:1.05; letter-spacing:-0.03em; margin:0 0 28px; max-width:24ch;">{L("Die KI bereitet vor. Der Mensch entscheidet.", "The AI prepares. The human decides.", "AI 做准备。人来决策。")}</h2>
     <div class="km-loop">
       {loop.map((s,i)=>(<>
         {i>0 && <span class="km-arr" style="color:#E6B23A;">→</span>}
@@ -119,7 +120,7 @@ const loop = [
       </>))}
       <span class="km-arr" style="color:#E6B23A;">↺</span>
     </div>
-    <p style="font-family:var(--font-mono); font-size:12px; color:#8FB0A8; margin:20px 0 0;">{L("Kein Schritt ohne menschliche Freigabe.","No step without human sign-off.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; color:#8FB0A8; margin:20px 0 0;">{L("Kein Schritt ohne menschliche Freigabe.","No step without human sign-off.","任何一步都需人工批准。")}</p>
   </div>
 </section>
 
@@ -127,7 +128,7 @@ const loop = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Ein Beispiel · schleichende Maßabweichung","An example · slow dimensional drift")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Ein Beispiel · schleichende Maßabweichung","An example · slow dimensional drift","一个例子 · 缓慢的尺寸漂移")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;">
@@ -144,7 +145,7 @@ const loop = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Die Leitplanken","The guardrails")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§ {L("Die Leitplanken","The guardrails","护栏机制")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:28px;">
@@ -156,10 +157,10 @@ const loop = [
         </div>))}
     </div>
     <div style="background:#0E2E29; color:#EAF1EE; border-radius:16px; padding:clamp(22px,3vw,32px); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px;">
-      <p style="font-size:clamp(16px,1.7vw,20px); line-height:1.5; margin:0; max-width:48ch; font-family:var(--font-head); font-weight:600;">{L("Daten und Modellwahl bleiben im eigenen Haus. Kein Konzern liest mit.","Data and model choice stay in your own house. No corporation reading along.")}</p>
+      <p style="font-size:clamp(16px,1.7vw,20px); line-height:1.5; margin:0; max-width:48ch; font-family:var(--font-head); font-weight:600;">{L("Daten und Modellwahl bleiben im eigenen Haus. Kein Konzern liest mit.","Data and model choice stay in your own house. No corporation reading along.","数据与模型选择都留在自己家里。没有大厂窥探。")}</p>
       <div style="display:flex; flex-wrap:wrap; gap:12px;">
-        <a href={b + "/suche/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 22px; border-radius:10px;">{L("KI live ausprobieren","Try the AI live")} →</a>
-        <a href={b + "/stack/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Womit (der Stack)","With what (the stack)")} ↗</a>
+        <a href={b + "/suche/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:15px; padding:13px 22px; border-radius:10px;">{L("KI live ausprobieren","Try the AI live","在线体验 AI")} →</a>
+        <a href={b + "/stack/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Womit (der Stack)","With what (the stack)","用什么（技术栈）")} ↗</a>
       </div>
     </div>
   </div>

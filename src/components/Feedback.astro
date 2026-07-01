@@ -6,10 +6,12 @@
 import type { Lang } from "../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const contactHref = lang === "de" ? "/kontakt/" : "/en/kontakt/";
+const contactHref = lang === "de" ? "/kontakt/" : lang === "en" ? "/en/kontakt/" : "/cn/kontakt/";
 const tx = lang === "de"
   ? { cta: "Pain-List", open: "Feedback", title: "Sag's uns — direkt hier.", sub: "Was fehlt, stört oder gefällt? Wir kümmern uns dort, wo's passiert.", ph: "Dein Feedback zu dieser Seite …", email: "E-Mail (optional, für Rückfragen)", send: "Senden", ok: "Danke! Ist angekommen.", err: "Hat nicht geklappt — später nochmal?", close: "Schließen" }
-  : { cta: "Pain list", open: "Feedback", title: "Tell us — right here.", sub: "What's missing, off or good? We take care where it happens.", ph: "Your feedback on this page …", email: "Email (optional, for follow-up)", send: "Send", ok: "Thanks! Got it.", err: "Didn't work — try again later?", close: "Close" };
+  : lang === "en"
+  ? { cta: "Pain list", open: "Feedback", title: "Tell us — right here.", sub: "What's missing, off or good? We take care where it happens.", ph: "Your feedback on this page …", email: "Email (optional, for follow-up)", send: "Send", ok: "Thanks! Got it.", err: "Didn't work — try again later?", close: "Close" }
+  : { cta: "痛点清单", open: "反馈", title: "直接在这里告诉我们。", sub: "缺什么、哪里不顺手、哪里做得好？我们在问题发生的地方解决它。", ph: "您对本页的反馈 …", email: "邮箱（选填，方便回访）", send: "发送", ok: "谢谢！已收到。", err: "没能发送成功——稍后再试一次？", close: "关闭" };
 ---
 <div class="fcta" data-fcta hidden>
   <a class="fcta-cta" href={contactHref}>{tx.cta}</a>

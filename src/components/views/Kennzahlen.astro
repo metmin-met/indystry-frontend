@@ -5,39 +5,40 @@ import type { Lang } from "../../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
 const AC = "#3d4fc0"; // Domänen-Akzent (Kennzahlen/Daten)
 
 // Beispiel-KPIs (synthetisch). to = Zielwert, suf = Suffix, pre = Präfix.
 const kpis = [
-  { k: "V", n: L("Termintreue", "On-time delivery"), to: 96, suf: "%", c: "#16794a" },
-  { k: "V", n: L("Ausschussquote", "Scrap rate"), to: 2, suf: "%", c: "#c4673f", dec: 1, val: 2.3 },
-  { k: "V", n: L("Anlagen-Effektivität (OEE)", "Overall equipment effectiveness"), to: 84, suf: "%", c: "#2a86a8" },
-  { k: "M", n: L("Rohertragsmarge", "Gross margin"), to: 38, suf: "%", c: "#3d4fc0" },
-  { k: "M", n: L("Liquiditätsreichweite", "Cash runway"), to: 11, suf: L(" Mon.", " mo"), c: "#7b5cc4" },
-  { k: "V", n: L("Reklamationen / Quartal", "Complaints / quarter"), to: 4, suf: "", c: "#16794a" },
+  { k: "V", n: L("Termintreue", "On-time delivery", "准时交付率"), to: 96, suf: "%", c: "#16794a" },
+  { k: "V", n: L("Ausschussquote", "Scrap rate", "废品率"), to: 2, suf: "%", c: "#c4673f", dec: 1, val: 2.3 },
+  { k: "V", n: L("Anlagen-Effektivität (OEE)", "Overall equipment effectiveness", "设备综合效率（OEE）"), to: 84, suf: "%", c: "#2a86a8" },
+  { k: "M", n: L("Rohertragsmarge", "Gross margin", "毛利率"), to: 38, suf: "%", c: "#3d4fc0" },
+  { k: "M", n: L("Liquiditätsreichweite", "Cash runway", "现金可维持时长"), to: 11, suf: L(" Mon.", " mo", " 个月"), c: "#7b5cc4" },
+  { k: "V", n: L("Reklamationen / Quartal", "Complaints / quarter", "每季度投诉数"), to: 4, suf: "", c: "#16794a" },
 ];
 const cats = [
-  { code: "M1–M14", t: L("Finanzkennzahlen", "Financial KPIs"), d: L("Umsatz, Rohertrag, Marge, Liquidität, Forderungen, Investitionen — der kaufmännische Puls.", "Revenue, gross profit, margin, liquidity, receivables, capex — the commercial pulse.") },
-  { code: "V1–V13", t: L("Operative Kennzahlen", "Operational KPIs"), d: L("Durchsatz, Ausbeute, Ausschuss, Termintreue, OEE, Reklamationen — was in der Halle zählt.", "Throughput, yield, scrap, on-time delivery, OEE, complaints — what counts on the floor.") },
+  { code: "M1–M14", t: L("Finanzkennzahlen", "Financial KPIs", "财务关键指标"), d: L("Umsatz, Rohertrag, Marge, Liquidität, Forderungen, Investitionen — der kaufmännische Puls.", "Revenue, gross profit, margin, liquidity, receivables, capex — the commercial pulse.", "营收、毛利、利润率、流动性、应收账款、资本支出——企业经营的脉搏。") },
+  { code: "V1–V13", t: L("Operative Kennzahlen", "Operational KPIs", "运营关键指标"), d: L("Durchsatz, Ausbeute, Ausschuss, Termintreue, OEE, Reklamationen — was in der Halle zählt.", "Throughput, yield, scrap, on-time delivery, OEE, complaints — what counts on the floor.", "产量、良率、废品、准时交付、OEE、投诉——车间里真正重要的东西。") },
 ];
 const feats = [
-  { t: L("Snapshot-Audit", "Snapshot audit"), d: L("Jeder Monatsstand wird eingefroren — revisionssicher, keine nachträgliche Schönung.", "Every monthly state is frozen — audit-proof, no retroactive polishing.") },
-  { t: L("Zeitreihe statt Momentaufnahme", "Time series, not a snapshot"), d: L("Trends über Monate und Jahre, weil jeder Stand erhalten bleibt.", "Trends across months and years, because every state is kept.") },
-  { t: L("Management-Review", "Management review"), d: L("Strukturierter Review nach ISO-9001-Logik: Kennzahl → Bewertung → Maßnahme → Verantwortlicher.", "Structured review in ISO-9001 logic: metric → assessment → action → owner.") },
-  { t: L("Eigenes Cockpit", "Own cockpit"), d: L("Dashboards direkt im ERP, gebaut mit offenen Chart-Bibliotheken — keine Vendor-Lizenz.", "Dashboards right in the ERP, built with open chart libraries — no vendor licence.") },
-  { t: L("Aus echten Daten", "From real data"), d: L("Die Kennzahlen ziehen sich aus Produktion, Lager und Buchhaltung — kein manuelles Sammeln.", "KPIs pull from production, stock and accounting — no manual gathering.") },
-  { t: L("Persönliche Sicht", "Personal view"), d: L("Jede Rolle sieht ihre relevanten Kennzahlen — nicht alle 27 auf einmal.", "Each role sees its relevant KPIs — not all 27 at once.") },
+  { t: L("Snapshot-Audit", "Snapshot audit", "快照审计"), d: L("Jeder Monatsstand wird eingefroren — revisionssicher, keine nachträgliche Schönung.", "Every monthly state is frozen — audit-proof, no retroactive polishing.", "每个月度状态都会被冻结——可审计、防篡改，杜绝事后粉饰。") },
+  { t: L("Zeitreihe statt Momentaufnahme", "Time series, not a snapshot", "时间序列而非单点快照"), d: L("Trends über Monate und Jahre, weil jeder Stand erhalten bleibt.", "Trends across months and years, because every state is kept.", "跨越数月乃至数年的趋势，因为每一个状态都被保留下来。") },
+  { t: L("Management-Review", "Management review", "管理评审"), d: L("Strukturierter Review nach ISO-9001-Logik: Kennzahl → Bewertung → Maßnahme → Verantwortlicher.", "Structured review in ISO-9001 logic: metric → assessment → action → owner.", "遵循 ISO 9001 逻辑的结构化评审：指标 → 评估 → 措施 → 责任人。") },
+  { t: L("Eigenes Cockpit", "Own cockpit", "自有驾驶舱"), d: L("Dashboards direkt im ERP, gebaut mit offenen Chart-Bibliotheken — keine Vendor-Lizenz.", "Dashboards right in the ERP, built with open chart libraries — no vendor licence.", "仪表盘直接内置于 ERP，采用开源图表库构建——无需厂商授权。") },
+  { t: L("Aus echten Daten", "From real data", "源自真实数据"), d: L("Die Kennzahlen ziehen sich aus Produktion, Lager und Buchhaltung — kein manuelles Sammeln.", "KPIs pull from production, stock and accounting — no manual gathering.", "关键指标自动取自生产、库存与账务——无需人工汇总。") },
+  { t: L("Persönliche Sicht", "Personal view", "个性化视图"), d: L("Jede Rolle sieht ihre relevanten Kennzahlen — nicht alle 27 auf einmal.", "Each role sees its relevant KPIs — not all 27 at once.", "每个角色只看到与自己相关的关键指标——而非一次性看到全部 27 项。") },
 ];
 ---
 <!-- HERO -->
 <section style="position:relative; background:#123A33; color:#F4F6F5; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-25%; left:58%; width:55%; height:90%; background:radial-gradient(circle,rgba(61,79,192,.20),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,6vw,64px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Kennzahlen & Management-Review", "KPIs & management review")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("27 Kennzahlen. Eine Wahrheit.", "27 KPIs. One truth.")} <span style="color:#E6B23A;">{L("Auf Knopfdruck.", "At a click.")}</span></h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Das Management-Review zieht sich die Zahlen selbst — aus Produktion, Lager und Buchhaltung. Jeder Stand wird eingefroren, also lässt sich nichts schönrechnen. Demozahlen synthetisch.", "The management review pulls the numbers itself — from production, stock and accounting. Every state is frozen, so nothing can be massaged. Demo figures are synthetic.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Kennzahlen & Management-Review", "KPIs & management review", "关键指标与管理评审")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:700; font-size:clamp(34px,6.5vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 18px; max-width:16ch;">{L("27 Kennzahlen. Eine Wahrheit.", "27 KPIs. One truth.", "27 项关键指标。唯一的真相。")} <span style="color:#E6B23A;">{L("Auf Knopfdruck.", "At a click.", "一键即得。")}</span></h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:64ch; margin:0;">{L("Das Management-Review zieht sich die Zahlen selbst — aus Produktion, Lager und Buchhaltung. Jeder Stand wird eingefroren, also lässt sich nichts schönrechnen. Demozahlen synthetisch.", "The management review pulls the numbers itself — from production, stock and accounting. Every state is frozen, so nothing can be massaged. Demo figures are synthetic.", "管理评审自动获取数据——来自生产、库存与账务。每一个状态都会被冻结，因此无法粉饰任何数字。演示数据为合成数据。")}</p>
   </div>
 </section>
 
@@ -63,7 +64,7 @@ const feats = [
 <section style="background:#F8F9FA;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(24px,3vw,40px) clamp(24px,5vw,56px) clamp(44px,6vw,72px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Zwei Familien, 27 Kennzahlen", "Two families, 27 KPIs")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§01 · {L("Zwei Familien, 27 Kennzahlen", "Two families, 27 KPIs", "两大类，共 27 项关键指标")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px;">
@@ -82,7 +83,7 @@ const feats = [
 <section style="background:#EFEAE0;">
   <div style="max-width:1080px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Warum man den Zahlen trauen kann", "Why you can trust the numbers")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">§02 · {L("Warum man den Zahlen trauen kann", "Why you can trust the numbers", "为什么这些数字值得信赖")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:12px;">
@@ -100,11 +101,11 @@ const feats = [
 <section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:absolute; bottom:-20%; left:50%; transform:translateX(-50%); width:60%; height:80%; background:radial-gradient(circle,rgba(230,178,58,.13),transparent 60%); pointer-events:none;"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:clamp(48px,7vw,96px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Wie lange dauert euer Monatsbericht?", "How long does your monthly report take?")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Wenn die Antwort in Tagen gemessen wird, liegt hier die Abkürzung.", "If the answer is measured in days, here's the shortcut.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Wie lange dauert euer Monatsbericht?", "How long does your monthly report take?", "贵厂的月度报表要做多久？")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:52ch; margin:20px auto 30px;">{L("Wenn die Antwort in Tagen gemessen wird, liegt hier die Abkürzung.", "If the answer is measured in days, here's the shortcut.", "如果答案要用天来计量，那么这里就是捷径。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list")} →</a>
-      <a href={b + "/demos/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("BI-Cockpit live ansehen", "See the BI cockpit live")} ↗</a>
+      <a href={b + "/kontakt/"} style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Pain-List schicken", "Send pain list", "发送痛点清单")} →</a>
+      <a href={b + "/demos/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("BI-Cockpit live ansehen", "See the BI cockpit live", "在线观看 BI 驾驶舱")} ↗</a>
     </div>
   </div>
 </section>

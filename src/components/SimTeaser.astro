@@ -5,16 +5,17 @@ import type { Lang } from "../lib/content";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const b = de ? "" : "/en";
-const L = (d: string, e: string) => (de ? d : e);
+const en = lang === "en";
+const b = de ? "" : en ? "/en" : "/cn";
+const L = (d: string, e: string, c: string) => (de ? d : en ? e : c);
 ---
 <section class="ht-wrap">
   <div class="ht-inner">
     <div class="ht-txt">
-      <p class="ht-kick">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive")}</p>
-      <h2 class="ht-h">{L("Prozesse, die arbeiten — nicht nur Bilder.", "Processes that work — not just pictures.")}</h2>
-      <p class="ht-lead">{L("Schweißnaht, Laserschnitt, Zerspanung, Umformung, Mischer — als bedienbare Modelle. Dreh an den Reglern, das Modell rechnet mit und warnt vor dem Grenzfall.", "Weld, laser cut, machining, forming, mixer — as operable models. Turn the sliders, the model computes along and warns at the edge.")}</p>
-      <a class="ht-cta" href={b + "/simulationen/"}>{L("Live ausprobieren", "Try it live")} →</a>
+      <p class="ht-kick">{L("Prozess-Simulationen · interaktiv", "Process simulations · interactive", "工艺仿真 · 可交互")}</p>
+      <h2 class="ht-h">{L("Prozesse, die arbeiten — nicht nur Bilder.", "Processes that work — not just pictures.", "会运转的工艺——不只是图片。")}</h2>
+      <p class="ht-lead">{L("Schweißnaht, Laserschnitt, Zerspanung, Umformung, Mischer — als bedienbare Modelle. Dreh an den Reglern, das Modell rechnet mit und warnt vor dem Grenzfall.", "Weld, laser cut, machining, forming, mixer — as operable models. Turn the sliders, the model computes along and warns at the edge.", "焊缝、激光切割、切削、成形、搅拌——皆为可操作的模型。拨动滑块，模型即刻同步计算，并在临界工况前发出预警。")}</p>
+      <a class="ht-cta" href={b + "/simulationen/"}>{L("Live ausprobieren", "Try it live", "立即在线体验")} →</a>
     </div>
     <div class="ht-art">
       <svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -31,7 +32,7 @@ const L = (d: string, e: string) => (de ? d : e);
         <circle class="ht-arccore" cx="180" cy="124" r="4" fill="#fff"/>
         <g fill="#ffd27a"><circle class="ht-sp ht-s1" cx="180" cy="124" r="1.9"/><circle class="ht-sp ht-s2" cx="180" cy="124" r="1.5"/><circle class="ht-sp ht-s3" cx="180" cy="124" r="2.1"/><circle class="ht-sp ht-s4" cx="180" cy="124" r="1.4"/><circle class="ht-sp ht-s5" cx="180" cy="124" r="1.7"/></g>
       </svg>
-      <span class="ht-badge">{L("Lichtbogenschweißen · live", "Arc welding · live")}</span>
+      <span class="ht-badge">{L("Lichtbogenschweißen · live", "Arc welding · live", "电弧焊 · 实时")}</span>
     </div>
   </div>
 </section>

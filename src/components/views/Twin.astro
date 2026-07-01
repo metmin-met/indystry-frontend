@@ -4,34 +4,35 @@
 interface Props { lang: "de" | "en"; embed?: boolean }
 const { lang, embed = false } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const DEMO = "https://twin-demo.indystry.works";
 const badges = ["OPC-UA", "Beckhoff TwinCAT", "TimescaleDB", "Soft-PLC", "Python · scikit-learn", "R Shiny"];
 const ebenen = [
-  { n: L("1 · Spiegel", "1 · Mirror"), d: L("Live-Abbild aus dem Historian — Millionen Messpunkte, jede Maschine in Echtzeit gespiegelt. Der Zwilling weiß, was die echte Anlage gerade tut.", "Live image from the historian — millions of data points, every machine mirrored in real time. The twin knows what the real plant is doing right now.") },
-  { n: L("2 · Simulation", "2 · Simulation"), d: L("Läuft auf den echten Strukturen und Tags eurer Steuerung (Soft-PLC) — Struktur real, Werte simuliert. So lassen sich Parameter gefahrlos durchspielen, ohne ein Werkstück zu riskieren.", "Runs on the real structures and tags of your controller (soft PLC) — structure real, values simulated. Parameters can be tried safely, without risking a single part.") },
-  { n: L("3 · Optimierung", "3 · Optimisation"), d: L("What-if-Rechnung und ML schlagen bessere Parameter vor und erkennen Drift, bevor Ausschuss entsteht — Vorhersage statt Reaktion.", "What-if computation and ML suggest better parameters and detect drift before scrap occurs — prediction instead of reaction.") },
+  { n: L("1 · Spiegel", "1 · Mirror", "1 · 镜像"), d: L("Live-Abbild aus dem Historian — Millionen Messpunkte, jede Maschine in Echtzeit gespiegelt. Der Zwilling weiß, was die echte Anlage gerade tut.", "Live image from the historian — millions of data points, every machine mirrored in real time. The twin knows what the real plant is doing right now.", "来自历史数据库的实时映像——数百万个测量点，每台机器实时镜像。孪生体清楚地知道真实设备此刻的运行状态。") },
+  { n: L("2 · Simulation", "2 · Simulation", "2 · 仿真"), d: L("Läuft auf den echten Strukturen und Tags eurer Steuerung (Soft-PLC) — Struktur real, Werte simuliert. So lassen sich Parameter gefahrlos durchspielen, ohne ein Werkstück zu riskieren.", "Runs on the real structures and tags of your controller (soft PLC) — structure real, values simulated. Parameters can be tried safely, without risking a single part.", "运行在贵厂控制器（Soft-PLC）的真实结构与变量之上——结构真实，数值仿真。这样即可安全试验参数，而不必冒损坏任何工件的风险。") },
+  { n: L("3 · Optimierung", "3 · Optimisation", "3 · 优化"), d: L("What-if-Rechnung und ML schlagen bessere Parameter vor und erkennen Drift, bevor Ausschuss entsteht — Vorhersage statt Reaktion.", "What-if computation and ML suggest better parameters and detect drift before scrap occurs — prediction instead of reaction.", "假设推演与机器学习给出更优参数，并在产生废品前识别漂移——以预测取代被动响应。") },
 ];
 const backbone = [
-  { t: L("Historian (TimescaleDB)", "Historian (TimescaleDB)"), d: L("Millionen Messpunkte als Faktenbasis — der Zwilling rät nicht, er rechnet auf echten Verläufen.", "Millions of data points as the factual base — the twin doesn't guess, it computes on real histories.") },
-  { t: L("OPC-UA (bidirektional)", "OPC-UA (bidirectional)"), d: L("Herstellerneutrale Kopplung an SPS und Leittechnik — lesen und, wo freigegeben, zurückschreiben.", "Vendor-neutral coupling to PLC and control system — read and, where authorised, write back.") },
-  { t: L("Soft-PLC-Sandkasten", "Soft-PLC sandbox"), d: L("Ein Klon der Steuerungslogik mit echten Strukturen und Tag-Namen — experimentieren, ohne die Linie anzufassen.", "A clone of the control logic with real structures and tag names — experiment without touching the line.") },
-  { t: L("Beckhoff TwinCAT", "Beckhoff TwinCAT"), d: L("PC-basierte Steuerung als offene Zielplattform — anschlussfähig statt proprietäre Insel.", "PC-based control as an open target platform — connectable instead of a proprietary island.") },
-  { t: L("ML & R/Python", "ML & R/Python"), d: L("scikit-learn und R Shiny für What-if, Korrelation und Restlebensdauer-Vorhersage.", "scikit-learn and R Shiny for what-if, correlation and remaining-life prediction.") },
+  { t: L("Historian (TimescaleDB)", "Historian (TimescaleDB)", "历史数据库（TimescaleDB）"), d: L("Millionen Messpunkte als Faktenbasis — der Zwilling rät nicht, er rechnet auf echten Verläufen.", "Millions of data points as the factual base — the twin doesn't guess, it computes on real histories.", "数百万个测量点作为事实基础——孪生体不靠猜测，而是基于真实历史曲线进行计算。") },
+  { t: L("OPC-UA (bidirektional)", "OPC-UA (bidirectional)", "OPC-UA（双向）"), d: L("Herstellerneutrale Kopplung an SPS und Leittechnik — lesen und, wo freigegeben, zurückschreiben.", "Vendor-neutral coupling to PLC and control system — read and, where authorised, write back.", "与 SPS/PLC 及控制系统的厂商中立耦合——可读取，并在获得授权处回写。") },
+  { t: L("Soft-PLC-Sandkasten", "Soft-PLC sandbox", "Soft-PLC 沙盒"), d: L("Ein Klon der Steuerungslogik mit echten Strukturen und Tag-Namen — experimentieren, ohne die Linie anzufassen.", "A clone of the control logic with real structures and tag names — experiment without touching the line.", "控制逻辑的克隆副本，带有真实结构与变量名——无需触碰产线即可试验。") },
+  { t: L("Beckhoff TwinCAT", "Beckhoff TwinCAT", "Beckhoff TwinCAT"), d: L("PC-basierte Steuerung als offene Zielplattform — anschlussfähig statt proprietäre Insel.", "PC-based control as an open target platform — connectable instead of a proprietary island.", "基于 PC 的控制作为开放目标平台——可对接，而非封闭孤岛。") },
+  { t: L("ML & R/Python", "ML & R/Python", "机器学习与 R/Python"), d: L("scikit-learn und R Shiny für What-if, Korrelation und Restlebensdauer-Vorhersage.", "scikit-learn and R Shiny for what-if, correlation and remaining-life prediction.", "scikit-learn 与 R Shiny 用于假设推演、相关性分析与剩余寿命预测。") },
 ];
 const usecases = [
-  { t: L("Virtuelle Inbetriebnahme", "Virtual commissioning"), d: L("Steuerungslogik gegen das Modell testen, bevor die Hardware steht — Inbetriebnahmen verkürzen, Fehler vorab finden.", "Test control logic against the model before the hardware exists — shorten commissioning, find errors up front.") },
-  { t: L("Durchsatz & Energie", "Throughput & energy"), d: L("Parameter am Modell optimieren statt an der laufenden Produktion — kein Ausschuss beim Suchen des Optimums.", "Optimise parameters on the model instead of on live production — no scrap while searching for the optimum.") },
-  { t: L("Vorausschauende Wartung", "Predictive maintenance"), d: L("Restlebensdauer aus Vibration und Temperatur — eingreifen, bevor ein Lager die Linie stoppt.", "Remaining life from vibration and temperature — act before a bearing stops the line.") },
-  { t: L("Schulung ohne Risiko", "Risk-free training"), d: L("Bediener üben am Zwilling Grenzfälle, die man an der echten Anlage nie provozieren würde.", "Operators practise edge cases on the twin that you'd never provoke on the real plant.") },
+  { t: L("Virtuelle Inbetriebnahme", "Virtual commissioning", "虚拟调试"), d: L("Steuerungslogik gegen das Modell testen, bevor die Hardware steht — Inbetriebnahmen verkürzen, Fehler vorab finden.", "Test control logic against the model before the hardware exists — shorten commissioning, find errors up front.", "在硬件到位之前就对着模型测试控制逻辑——缩短调试周期，提前发现错误。") },
+  { t: L("Durchsatz & Energie", "Throughput & energy", "产能与能耗"), d: L("Parameter am Modell optimieren statt an der laufenden Produktion — kein Ausschuss beim Suchen des Optimums.", "Optimise parameters on the model instead of on live production — no scrap while searching for the optimum.", "在模型上优化参数，而非在运行中的生产上——寻找最优值时不产生废品。") },
+  { t: L("Vorausschauende Wartung", "Predictive maintenance", "预测性维护"), d: L("Restlebensdauer aus Vibration und Temperatur — eingreifen, bevor ein Lager die Linie stoppt.", "Remaining life from vibration and temperature — act before a bearing stops the line.", "依据振动与温度推算剩余寿命——在某个轴承使产线停机之前及时介入。") },
+  { t: L("Schulung ohne Risiko", "Risk-free training", "无风险培训"), d: L("Bediener üben am Zwilling Grenzfälle, die man an der echten Anlage nie provozieren würde.", "Operators practise edge cases on the twin that you'd never provoke on the real plant.", "操作人员可在孪生体上演练那些绝不会在真实设备上刻意制造的极端工况。") },
 ];
 ---
 {!embed && (<section style="background:#0E2522; color:#F4F6F5;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(52px,8vw,100px) clamp(24px,5vw,56px) clamp(40px,5vw,56px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Digitaler Zwilling · Engineering", "Digital twin · engineering")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Die Anlage als Modell — bevor ihr sie anfasst.", "The plant as a model — before you touch it.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Ein digitaler Zwilling ist kein Schaubild, sondern ein rechnendes Abbild eurer Anlage: gespeist aus dem Historian, simuliert auf den echten Strukturen eurer Steuerung, gekoppelt über OPC-UA. Damit testet ihr Parameter, sagt Verschleiß voraus und fahrt Inbetriebnahmen virtuell — ohne ein echtes Werkstück zu riskieren.", "A digital twin is not a diagram but a computing model of your plant: fed from the historian, simulated on the real structures of your controller, coupled via OPC-UA. You test parameters, predict wear and run commissioning virtually — without risking a single real part.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 16px;">{L("Digitaler Zwilling · Engineering", "Digital twin · engineering", "数字孪生 · 工程")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(34px,6vw,68px); line-height:0.99; letter-spacing:-0.03em; margin:0 0 16px; max-width:18ch;">{L("Die Anlage als Modell — bevor ihr sie anfasst.", "The plant as a model — before you touch it.", "先有设备的模型——再动真设备。")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,20px); line-height:1.6; color:#A6CFC5; max-width:62ch; margin:0;">{L("Ein digitaler Zwilling ist kein Schaubild, sondern ein rechnendes Abbild eurer Anlage: gespeist aus dem Historian, simuliert auf den echten Strukturen eurer Steuerung, gekoppelt über OPC-UA. Damit testet ihr Parameter, sagt Verschleiß voraus und fahrt Inbetriebnahmen virtuell — ohne ein echtes Werkstück zu riskieren.", "A digital twin is not a diagram but a computing model of your plant: fed from the historian, simulated on the real structures of your controller, coupled via OPC-UA. You test parameters, predict wear and run commissioning virtually — without risking a single real part.", "数字孪生不是示意图，而是贵厂设备的可计算映像：由历史数据库供数，在贵厂控制器的真实结构上仿真，并通过 OPC-UA 耦合。您可借此测试参数、预测磨损并进行虚拟调试——而无需冒损坏任何真实工件的风险。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;">
       {badges.map((x) => (<span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:#A6CFC5; border:1px solid #2E5A52; border-radius:999px; padding:5px 12px;">{x}</span>))}
     </div>
@@ -52,35 +53,35 @@ const usecases = [
 
 <section style="background:#F8F9FA;" data-de={String(de)} data-embed={String(embed)}>
   <div style="max-width:1100px; margin:0 auto; padding:clamp(32px,4vw,56px) clamp(24px,5vw,56px) clamp(72px,9vw,120px);">
-    {embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Ebene 3 · Digitaler Zwilling — der Maschine beim Arbeiten zusehen", "Level 3 · Digital twin — watch the machine work")}</p>}
-    {!embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 6px;">{L("Interaktive Live-Simulation", "Interactive live simulation")}</p>}
-    {!embed && <p style="font-size:13px; color:#92938F; margin:0 0 18px;">{L("Vereinfachtes Modell einer CNC-Fräse zur Veranschaulichung — die vollständige Simulation läuft in der Demo.", "Simplified model of a CNC mill for illustration — the full simulation runs in the demo.")}</p>}
+    {embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 18px;">{L("Ebene 3 · Digitaler Zwilling — der Maschine beim Arbeiten zusehen", "Level 3 · Digital twin — watch the machine work", "第 3 层 · 数字孪生——实时观察机器运转")}</p>}
+    {!embed && <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#16463E; margin:0 0 6px;">{L("Interaktive Live-Simulation", "Interactive live simulation", "交互式实时仿真")}</p>}
+    {!embed && <p style="font-size:13px; color:#92938F; margin:0 0 18px;">{L("Vereinfachtes Modell einer CNC-Fräse zur Veranschaulichung — die vollständige Simulation läuft in der Demo.", "Simplified model of a CNC mill for illustration — the full simulation runs in the demo.", "此处为一台 CNC 铣床的简化模型，仅供演示——完整仿真在 Demo 中运行。")}</p>}
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; align-items:start;">
 
       <!-- Echtbetrieb -->
       <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(18px,2.5vw,26px);">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
           <span id="tw-led" style="width:11px;height:11px;border-radius:50%;background:#16794a;box-shadow:0 0 8px #16794a;"></span>
-          <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Echtbetrieb", "Real operation")}</span>
-          <span id="tw-state" style="margin-left:auto; font-family:var(--font-mono); font-size:11px; color:#16794a;">{L("stabil", "stable")}</span>
+          <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Echtbetrieb", "Real operation", "实际运行")}</span>
+          <span id="tw-state" style="margin-left:auto; font-family:var(--font-mono); font-size:11px; color:#16794a;">{L("stabil", "stable", "稳定")}</span>
         </div>
         <div id="tw-metrics"></div>
-        <button id="tw-xray" class="tw-btn" type="button" style="margin-top:16px;">{L("Röntgenblick", "X-ray view")}</button>
+        <button id="tw-xray" class="tw-btn" type="button" style="margin-top:16px;">{L("Röntgenblick", "X-ray view", "透视图")}</button>
         <div id="tw-inside" hidden style="margin-top:14px; border-top:1px dashed #C0C8C5; padding-top:14px;">
-          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Innenansicht", "Inside view")}</p>
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#92938F; margin:0 0 10px;">{L("Innenansicht", "Inside view", "内部视图")}</p>
           <div id="tw-internals"></div>
         </div>
       </div>
 
       <!-- Übersteuern -->
       <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(18px,2.5vw,26px);">
-        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E; margin:0 0 4px;">{L("Übersteuern", "Override")}</p>
-        <p style="font-size:13px; color:#5C5E63; margin:0 0 18px;">{L("Schieb die Parameter — die Anlage reagiert live.", "Move the parameters — the plant reacts live.")}</p>
+        <p style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E; margin:0 0 4px;">{L("Übersteuern", "Override", "手动干预")}</p>
+        <p style="font-size:13px; color:#5C5E63; margin:0 0 18px;">{L("Schieb die Parameter — die Anlage reagiert live.", "Move the parameters — the plant reacts live.", "拖动参数——设备实时响应。")}</p>
         <div id="tw-sliders"></div>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-          <button class="tw-chip" data-preset="eco" type="button">{L("Schonend", "Gentle")}</button>
-          <button class="tw-chip" data-preset="max" type="button">{L("Max. Durchsatz", "Max throughput")}</button>
-          <button class="tw-chip" data-preset="reset" type="button">{L("Zurücksetzen", "Reset")}</button>
+          <button class="tw-chip" data-preset="eco" type="button">{L("Schonend", "Gentle", "温和")}</button>
+          <button class="tw-chip" data-preset="max" type="button">{L("Max. Durchsatz", "Max throughput", "最大产能")}</button>
+          <button class="tw-chip" data-preset="reset" type="button">{L("Zurücksetzen", "Reset", "重置")}</button>
         </div>
       </div>
     </div>
@@ -88,11 +89,11 @@ const usecases = [
     <!-- Prozess-Röntgenblick + Ghost-Vergleich -->
     <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; align-items:start;">
       <div style="border:1px solid #214740; border-radius:14px; background:#0E2522; padding:clamp(16px,2vw,22px);">
-        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#A6CFC5; margin:0 0 12px;">{L("Prozess-Röntgenblick", "Process X-ray")}</p>
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#A6CFC5; margin:0 0 12px;">{L("Prozess-Röntgenblick", "Process X-ray", "工艺透视")}</p>
         <svg id="tw-proc" viewBox="0 0 400 300" style="width:100%; height:auto; display:block;">
           <defs><radialGradient id="tw-hg"><stop offset="0" stop-color="#ff8a3c"/><stop offset="1" stop-color="#ff8a3c" stop-opacity="0"/></radialGradient></defs>
           <rect x="110" y="205" width="180" height="55" rx="3" fill="#22443d" stroke="#3a554e"/>
-          <text x="200" y="282" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Werkstück NW-1001","Workpiece NW-1001")}</text>
+          <text x="200" y="282" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Werkstück NW-1001","Workpiece NW-1001","工件 NW-1001")}</text>
           <circle id="tw-heat" cx="200" cy="206" r="44" fill="url(#tw-hg)" opacity="0"/>
           <g id="tw-cool" opacity="0">
             <line class="tw-coolL" x1="118" y1="150" x2="186" y2="198" stroke="#7ba3e0" stroke-width="2" stroke-dasharray="2 6"/>
@@ -104,30 +105,30 @@ const usecases = [
             <g transform="translate(200 196)"><g id="tw-tool"><line x1="-15" y1="0" x2="15" y2="0" stroke="#E6B23A" stroke-width="3"/><line x1="0" y1="-15" x2="0" y2="15" stroke="#E6B23A" stroke-width="3"/></g></g>
           </g>
           <circle id="tw-bear" cx="348" cy="92" r="20" fill="#16794a" stroke="#0E2522" stroke-width="3"/>
-          <text x="348" y="128" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Lager Y","Bearing Y")}</text>
+          <text x="348" y="128" text-anchor="middle" font-family="monospace" font-size="10" fill="#8FB3AA">{L("Lager Y","Bearing Y","轴承 Y")}</text>
           <text id="tw-rpmlbl" x="200" y="16" text-anchor="middle" font-family="monospace" font-size="11" fill="#A6CFC5"></text>
         </svg>
       </div>
       <div style="border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2vw,22px);">
         <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
-          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0;">{L("Ghost-Vergleich · Vibration","Ghost compare · vibration")}</p>
+          <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0;">{L("Ghost-Vergleich · Vibration","Ghost compare · vibration","基准对比 · 振动")}</p>
           <span id="tw-dev" style="font-family:var(--font-mono); font-size:12px; color:#16794a;"></span>
         </div>
         <svg id="tw-ghost" viewBox="0 0 400 140" preserveAspectRatio="none" style="width:100%; height:140px; display:block; background:#F8F9FA; border-radius:8px;"></svg>
-        <p style="font-size:12px; line-height:1.5; color:#92938F; margin:8px 0 0;">{L("Ghost = idealer Referenzlauf. Weicht die Live-Kurve ab, erkennt der Zwilling das früh — bevor Ausschuss entsteht.","Ghost = ideal reference run. When the live curve drifts, the twin sees it early — before scrap happens.")}</p>
+        <p style="font-size:12px; line-height:1.5; color:#92938F; margin:8px 0 0;">{L("Ghost = idealer Referenzlauf. Weicht die Live-Kurve ab, erkennt der Zwilling das früh — bevor Ausschuss entsteht.","Ghost = ideal reference run. When the live curve drifts, the twin sees it early — before scrap happens.","基准 = 理想参考运行。当实时曲线偏离时，孪生体会及早发现——早在产生废品之前。")}</p>
       </div>
     </div>
     <div style="margin-top:20px; border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(16px,2vw,22px);">
-      <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0 0 10px;">{L("Schichtbuch · Ereignisse","Shift log · events")}</p>
+      <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16463E; margin:0 0 10px;">{L("Schichtbuch · Ereignisse","Shift log · events","交接班日志 · 事件")}</p>
       <div id="tw-log" style="font-family:var(--font-mono); font-size:12px; line-height:1.8; color:#3C3E42;"></div>
     </div>
 
     <!-- Optimizer -->
     <div style="margin-top:20px; border:1px solid #E2E8F0; border-left:3px solid #123A33; border-radius:0 14px 14px 0; background:#fff; padding:clamp(20px,2.5vw,28px);">
       <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
-        <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Optimizer fragen", "Ask the optimizer")}</span>
-        <span style="font-size:13px; color:#5C5E63;">{L("KI bewertet den aktuellen Zustand — Verbesserungen & Risiken.", "AI assesses the current state — improvements & risks.")}</span>
-        <button id="tw-ask" class="tw-btn primary" type="button" style="margin-left:auto;">{L("Analysieren", "Analyse")}</button>
+        <span style="font-family:var(--font-head); font-weight:600; font-size:18px; color:#1B1C1E;">{L("Optimizer fragen", "Ask the optimizer", "咨询优化器")}</span>
+        <span style="font-size:13px; color:#5C5E63;">{L("KI bewertet den aktuellen Zustand — Verbesserungen & Risiken.", "AI assesses the current state — improvements & risks.", "AI 评估当前状态——改进空间与风险。")}</span>
+        <button id="tw-ask" class="tw-btn primary" type="button" style="margin-left:auto;">{L("Analysieren", "Analyse", "分析")}</button>
       </div>
       <div id="tw-answer" hidden style="margin-top:16px; font-size:15px; line-height:1.6; color:#1B1C1E; white-space:pre-wrap;"></div>
     </div>
@@ -137,7 +138,7 @@ const usecases = [
 {!embed && (<section style="background:#F8F9FA;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Worauf der Zwilling läuft", "What the twin runs on")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Worauf der Zwilling läuft", "What the twin runs on", "孪生体的运行基础")}</span>
       <span style="flex:1; height:1px; background:#E2E8F0;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;">
@@ -154,7 +155,7 @@ const usecases = [
 {!embed && (<section style="background:#EFEAE0;">
   <div style="max-width:1100px; margin:0 auto; padding:clamp(44px,6vw,80px) clamp(24px,5vw,56px);">
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wofür man ihn einsetzt", "What it's used for")}</span>
+      <span style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#16463E; white-space:nowrap;">{L("Wofür man ihn einsetzt", "What it's used for", "应用场景")}</span>
       <span style="flex:1; height:1px; background:#C0C8C5;"></span>
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px;">
@@ -170,12 +171,12 @@ const usecases = [
 
 {!embed && (<section style="position:relative; background:#0E2E29; color:#EAF1EE; overflow:hidden; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:46px 46px;">
   <div style="position:relative; max-width:1100px; margin:0 auto; padding:clamp(48px,7vw,92px) clamp(24px,5vw,56px); text-align:center;">
-    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Erst im Modell. Dann in echt.", "First in the model. Then for real.")}</h2>
-    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Jede Parameteränderung, jede Umrüstung, jede neue Logik — zuerst gefahrlos am Zwilling. Das spart Ausschuss, Stillstand und Risiko.", "Every parameter change, every changeover, every new logic — first safely on the twin. That saves scrap, downtime and risk.")}</p>
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:clamp(28px,5vw,52px); line-height:1.02; letter-spacing:-0.035em; margin:0 auto; max-width:22ch;">{L("Erst im Modell. Dann in echt.", "First in the model. Then for real.", "先在模型里，再到现实中。")}</h2>
+    <p style="font-size:clamp(16px,1.7vw,20px); color:#C7D8D2; max-width:54ch; margin:20px auto 30px;">{L("Jede Parameteränderung, jede Umrüstung, jede neue Logik — zuerst gefahrlos am Zwilling. Das spart Ausschuss, Stillstand und Risiko.", "Every parameter change, every changeover, every new logic — first safely on the twin. That saves scrap, downtime and risk.", "每一次参数调整、每一次换型、每一段新逻辑——都先在孪生体上安全试运行。这样可减少废品、停机与风险。")}</p>
     <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center;">
-      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation")} ↗</a>
-      <a href={b + "/historian/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Die Datenbasis dahinter", "The data base behind it")} →</a>
-      <a href={b + "/simulationen/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Mehr Prozess-Simulationen", "More process simulations")} →</a>
+      <a href={DEMO} target="_blank" rel="noopener" style="background:#E6B23A; color:#123A33; text-decoration:none; font-family:var(--font-head); font-weight:700; font-size:16px; padding:15px 26px; border-radius:10px;">{L("Vollständige Simulation ansehen", "See the full simulation", "查看完整仿真")} ↗</a>
+      <a href={b + "/historian/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Die Datenbasis dahinter", "The data base behind it", "背后的数据基础")} →</a>
+      <a href={b + "/simulationen/"} style="font-family:var(--font-mono); font-size:13px; color:#A6CFC5; display:inline-flex; align-items:center;">{L("Mehr Prozess-Simulationen", "More process simulations", "更多工艺仿真")} →</a>
     </div>
   </div>
 </section>)}

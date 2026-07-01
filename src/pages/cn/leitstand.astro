@@ -1,0 +1,8 @@
+---
+import Base from "../../layouts/Base.astro";
+import Leitstand from "../../components/views/Leitstand.astro";
+const lang = "zh" as const;
+---
+<Base lang={lang} title="Control room · Nordwerk" description="SCADA control room: live view of all machines with temperature and vibration — Nordwerk demo, read-only." path="/cn/leitstand/" altPath="/leitstand/" noindex={true}>
+  <Leitstand lang={lang} />
+</Base>

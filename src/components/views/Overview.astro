@@ -8,130 +8,133 @@ import { tagHref } from "../../lib/tags";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const S = "https://indystry.works";
 
 const baust = [
-  { nr:"01", slug:"basis-betrieb",               bk:"betrieb",    color:"#4a6fa5", n:L("Betrieb & Infrastruktur","Ops & infrastructure"), bl:L("Betrieb","Ops"),       d:L("Die Technik im Hintergrund — gesichert, immer erreichbar, passt auf sich selbst auf.","The tech in the background — secured, always reachable, looks after itself."), kw:["server","backup","infrastruktur","betrieb","ausfall","hosting","self-host"] },
-  { nr:"02", slug:"automatisierung-leittechnik", bk:"produktion", color:"#2a86a8", n:L("Automatisierung & Leittechnik","Automation & control"), bl:L("Produktion","Production"), d:L("Deine Anlage in Echtzeit. Eingreifen, bevor etwas stockt.","Your plant in real time. Step in before anything stalls."), kw:["maschine","maschinen","echtzeit","anlage","leitstand","überwachen","sieht","stillstand","stockt"] },
-  { nr:"03", slug:"digital-twin-simulation",     bk:"produktion", color:"#7b5cc4", n:L("Digital Twin & Simulation","Digital twin & simulation"), bl:L("Produktion","Production"), d:L("Erst simulieren, dann umstellen — bevor du an der echten Anlage drehst.","Simulate first, switch later — before touching the real plant."), kw:["simulation","twin","simulieren","test","umstellen","probieren"] },
-  { nr:"04", slug:"historian-datalake",          bk:"daten",      color:"#3d4fc0", n:L("Historian & Data-Lake","Historian & data lake"), bl:L("Daten","Data"), d:L("Nichts geht verloren. Jeder Messwert in Sekunden wieder da.","Nothing is lost. Every reading back in seconds."), kw:["messdaten","messwert","historie","verlieren","daten","sensor","aufzeichnen"] },
-  { nr:"05", slug:"bi-analytics",                bk:"daten",      color:"#c08a2e", n:L("BI & Analytics","BI & analytics"), bl:L("Daten","Data"), d:L("Zahlen in Bildern statt Tabellen — sofort verständlich.","Numbers as pictures, not spreadsheets — instantly clear."), kw:["auswertung","auswertungen","zahlen","report","dashboard","kpi","analyse","tage"] },
-  { nr:"06", slug:"erp-betrieb",                 bk:"betrieb",    color:"#c4673f", n:L("ERP & Betrieb","ERP & operations"), bl:L("Betrieb","Ops"), d:L("Ein Programm für die ganze Firma — von der Schicht bis zur Rechnung.","One program for the whole company — from shift to invoice."), kw:["erp","auftrag","rechnung","schicht","bestellung","lager","programm"] },
-  { nr:"07", slug:"zusammenarbeit",              bk:"team",       color:"#3f9a52", n:L("Zusammenarbeit","Collaboration"), bl:L("Team","Team"), d:L("Chat, Call, Dateien, Office — alles im Haus, alles deins.","Chat, call, files, office — all in-house, all yours."), kw:["chat","office","dateien","zusammenarbeit","call","team","cloud"] },
-  { nr:"08", slug:"ki-suche-nlp",                bk:"ki",         color:"#b03f93", n:L("KI-Suche & NLP","AI search & NLP"), bl:L("KI","AI"), d:L("Fragen statt suchen. Findet alles — zeigt nur, was du darfst.","Ask, don't search. Finds everything — shows only what you may see."), kw:["suche","suchen","finden","auffindbar","frage","fragen","ki","semantisch"] },
-  { nr:"09", slug:"wissen-compliance-kiosk",     bk:"wissen",     color:"#5a8a98", n:L("Wissen, Compliance & Kiosk","Knowledge, compliance & kiosk"), bl:L("Wissen","Knowledge"), d:L("Immer audit-bereit. Regeln und Nachweise an einem Ort.","Always audit-ready. Rules and proof in one place."), kw:["audit","compliance","wissen","handbuch","nachweis","dsgvo","regel","kiosk"] },
-  { nr:"10", slug:"web-aussenauftritt",          bk:"betrieb",    color:"#c2506f", n:L("Web & Außenauftritt","Web & presence"), bl:L("Betrieb","Ops"), d:L("Dein Auftritt nach außen — auf eigenem Stack. Diese Seite ist der Beweis.","Your public face — on your own stack. This site is the proof."), kw:["web","website","auftritt","außen","seite"] },
+  { nr:"01", slug:"basis-betrieb",               bk:"betrieb",    color:"#4a6fa5", n:L("Betrieb & Infrastruktur","Ops & infrastructure","运维与基础设施"), bl:L("Betrieb","Ops","运维"),       d:L("Die Technik im Hintergrund — gesichert, immer erreichbar, passt auf sich selbst auf.","The tech in the background — secured, always reachable, looks after itself.","后台技术支撑——安全可靠、随时可达、自我守护。"), kw:["server","backup","infrastruktur","betrieb","ausfall","hosting","self-host"] },
+  { nr:"02", slug:"automatisierung-leittechnik", bk:"produktion", color:"#2a86a8", n:L("Automatisierung & Leittechnik","Automation & control","自动化与控制"), bl:L("Produktion","Production","生产"), d:L("Deine Anlage in Echtzeit. Eingreifen, bevor etwas stockt.","Your plant in real time. Step in before anything stalls.","实时掌控您的设备，在停机之前及时介入。"), kw:["maschine","maschinen","echtzeit","anlage","leitstand","überwachen","sieht","stillstand","stockt"] },
+  { nr:"03", slug:"digital-twin-simulation",     bk:"produktion", color:"#7b5cc4", n:L("Digital Twin & Simulation","Digital twin & simulation","数字孪生与仿真"), bl:L("Produktion","Production","生产"), d:L("Erst simulieren, dann umstellen — bevor du an der echten Anlage drehst.","Simulate first, switch later — before touching the real plant.","先仿真，再切换——动真实设备之前先在模型里试。"), kw:["simulation","twin","simulieren","test","umstellen","probieren"] },
+  { nr:"04", slug:"historian-datalake",          bk:"daten",      color:"#3d4fc0", n:L("Historian & Data-Lake","Historian & data lake","历史数据库与数据湖"), bl:L("Daten","Data","数据"), d:L("Nichts geht verloren. Jeder Messwert in Sekunden wieder da.","Nothing is lost. Every reading back in seconds.","数据不丢失，任一测量值几秒内即可重现。"), kw:["messdaten","messwert","historie","verlieren","daten","sensor","aufzeichnen"] },
+  { nr:"05", slug:"bi-analytics",                bk:"daten",      color:"#c08a2e", n:L("BI & Analytics","BI & analytics","BI 与分析"), bl:L("Daten","Data","数据"), d:L("Zahlen in Bildern statt Tabellen — sofort verständlich.","Numbers as pictures, not spreadsheets — instantly clear.","以图代表，一目了然，告别表格。"), kw:["auswertung","auswertungen","zahlen","report","dashboard","kpi","analyse","tage"] },
+  { nr:"06", slug:"erp-betrieb",                 bk:"betrieb",    color:"#c4673f", n:L("ERP & Betrieb","ERP & operations","ERP 与运营"), bl:L("Betrieb","Ops","运维"), d:L("Ein Programm für die ganze Firma — von der Schicht bis zur Rechnung.","One program for the whole company — from shift to invoice.","一套系统贯穿全公司——从排班到开票。"), kw:["erp","auftrag","rechnung","schicht","bestellung","lager","programm"] },
+  { nr:"07", slug:"zusammenarbeit",              bk:"team",       color:"#3f9a52", n:L("Zusammenarbeit","Collaboration","协作"), bl:L("Team","Team","团队"), d:L("Chat, Call, Dateien, Office — alles im Haus, alles deins.","Chat, call, files, office — all in-house, all yours.","聊天、通话、文件、办公——全部自托管，尽归贵厂所有。"), kw:["chat","office","dateien","zusammenarbeit","call","team","cloud"] },
+  { nr:"08", slug:"ki-suche-nlp",                bk:"ki",         color:"#b03f93", n:L("KI-Suche & NLP","AI search & NLP","AI 搜索与 NLP"), bl:L("KI","AI","AI"), d:L("Fragen statt suchen. Findet alles — zeigt nur, was du darfst.","Ask, don't search. Finds everything — shows only what you may see.","提问即可，无需翻找。检索全部内容——只展示您有权查看的部分。"), kw:["suche","suchen","finden","auffindbar","frage","fragen","ki","semantisch"] },
+  { nr:"09", slug:"wissen-compliance-kiosk",     bk:"wissen",     color:"#5a8a98", n:L("Wissen, Compliance & Kiosk","Knowledge, compliance & kiosk","知识、合规与自助终端"), bl:L("Wissen","Knowledge","知识"), d:L("Immer audit-bereit. Regeln und Nachweise an einem Ort.","Always audit-ready. Rules and proof in one place.","随时通过审计。规章与证据集中一处。"), kw:["audit","compliance","wissen","handbuch","nachweis","dsgvo","regel","kiosk"] },
+  { nr:"10", slug:"web-aussenauftritt",          bk:"betrieb",    color:"#c2506f", n:L("Web & Außenauftritt","Web & presence","网站与对外形象"), bl:L("Betrieb","Ops","运维"), d:L("Dein Auftritt nach außen — auf eigenem Stack. Diese Seite ist der Beweis.","Your public face — on your own stack. This site is the proof.","您的对外门面——运行在自己的技术栈上。本网站便是明证。"), kw:["web","website","auftritt","außen","seite"] },
 ];
 const strip = baust.map((x) => ({ nr:x.nr, color:x.color, slug:x.slug, name:x.n.split(" & ")[0].split(" ")[0] }));
-const filters = [["all",L("Alle","All")],["betrieb",L("Betrieb","Ops")],["produktion",L("Produktion","Production")],["daten",L("Daten","Data")],["ki","KI"],["wissen",L("Wissen","Knowledge")],["team","Team"]];
+const filters = [["all",L("Alle","All","全部")],["betrieb",L("Betrieb","Ops","运维")],["produktion",L("Produktion","Production","生产")],["daten",L("Daten","Data","数据")],["ki","KI"],["wissen",L("Wissen","Knowledge","知识")],["team","Team"]];
 const fcount = (k:string) => k==="all" ? baust.length : baust.filter((x)=>x.bk===k).length;
 
 const angebot = [
-  { nr:"01", t:L("Ab Werk angelernt","Trained ex-works"), d:L("Kommt mit echten Abläufen, die in Fabriken schon laufen — Schichten, Chargen-Rückverfolgung, Wartung. Keine leere Hülle.","Comes with real workflows already running in factories — shifts, batch tracing, maintenance. Not an empty shell.") },
-  { nr:"02", t:L("An euch angepasst","Adapted to you"), d:L("Kundenspezifisch verfeinert, wächst mit euch. Ihr passt euch nicht der Software an — sie passt sich euch an.","Refined to your needs, grows with you. You don't bend to the software — it bends to you.") },
-  { nr:"03", t:L("Euer Stack, eure Daten","Your stack, your data"), d:L("Läuft bei euch, offenes Fundament, keine Lizenz-Geisel. Souverän, nicht gemietet.","Runs on your premises, open foundation, no licence hostage. Sovereign, not rented.") },
+  { nr:"01", t:L("Ab Werk angelernt","Trained ex-works","出厂即调教到位"), d:L("Kommt mit echten Abläufen, die in Fabriken schon laufen — Schichten, Chargen-Rückverfolgung, Wartung. Keine leere Hülle.","Comes with real workflows already running in factories — shifts, batch tracing, maintenance. Not an empty shell.","内置工厂中已在运行的真实流程——排班、批次追溯、维护。绝非空壳。") },
+  { nr:"02", t:L("An euch angepasst","Adapted to you","为贵厂量身适配"), d:L("Kundenspezifisch verfeinert, wächst mit euch. Ihr passt euch nicht der Software an — sie passt sich euch an.","Refined to your needs, grows with you. You don't bend to the software — it bends to you.","按需精细打磨，随贵厂共同成长。不是您去迁就软件——而是软件适配您。") },
+  { nr:"03", t:L("Euer Stack, eure Daten","Your stack, your data","您的技术栈，您的数据"), d:L("Läuft bei euch, offenes Fundament, keine Lizenz-Geisel. Souverän, nicht gemietet.","Runs on your premises, open foundation, no licence hostage. Sovereign, not rented.","在贵厂本地运行，开源根基，绝无授权绑架。自主可控，而非租用。") },
 ];
 const souv = [
-  { nr:"01", t:L("Souveränität als Vorteil","Sovereignty as an edge"), d:L("Eigenständig handeln statt von fremden Plattformen abhängig zu sein.","Act independently instead of depending on someone else's platform.") },
-  { nr:"02", t:L("Hosting im eigenen Haus","In-house hosting"), d:L("Alles auf eurer Infrastruktur. Verschlüsseltes Backup im EU-Rechenzentrum.","Everything on your infrastructure. Encrypted backup in an EU data centre.") },
-  { nr:"03", t:L("Eine Datenquelle","One data source"), d:L("Maschinen-, Betriebs- und Qualitätsdaten in einem Verbund statt verstreut.","Machine, operations and quality data in one fabric instead of scattered.") },
-  { nr:"04", t:L("Datenschutz by design","Privacy by design"), d:L("DSGVO erfüllt, geringeres Risiko durch fremde Zugriffe wie den US CLOUD Act.","GDPR met, less exposure to foreign access like the US CLOUD Act.") },
-  { nr:"05", t:L("Sicherheit & Audit","Security & audit"), d:L("Nachvollziehbare Infrastruktur, schnelle Wiederherstellung — NIS2-konform.","Traceable infrastructure, fast recovery — NIS2-aligned.") },
-  { nr:"06", t:L("Unabhängigkeit","Independence"), d:L("Quelloffen, in eurem Eigentum. Redundante Microservices statt Vendor Lock-in.","Open source, your property. Redundant microservices instead of vendor lock-in.") },
+  { nr:"01", t:L("Souveränität als Vorteil","Sovereignty as an edge","自主可控即优势"), d:L("Eigenständig handeln statt von fremden Plattformen abhängig zu sein.","Act independently instead of depending on someone else's platform.","自主行事，不受制于他人平台。") },
+  { nr:"02", t:L("Hosting im eigenen Haus","In-house hosting","本地自托管"), d:L("Alles auf eurer Infrastruktur. Verschlüsseltes Backup im EU-Rechenzentrum.","Everything on your infrastructure. Encrypted backup in an EU data centre.","一切运行在贵厂自有基础设施上，并在欧盟数据中心进行加密备份。") },
+  { nr:"03", t:L("Eine Datenquelle","One data source","统一数据源"), d:L("Maschinen-, Betriebs- und Qualitätsdaten in einem Verbund statt verstreut.","Machine, operations and quality data in one fabric instead of scattered.","将机器、运营与质量数据汇聚于一体，不再各自分散。") },
+  { nr:"04", t:L("Datenschutz by design","Privacy by design","隐私优先设计"), d:L("DSGVO erfüllt, geringeres Risiko durch fremde Zugriffe wie den US CLOUD Act.","GDPR met, less exposure to foreign access like the US CLOUD Act.","满足 GDPR 要求，降低如美国 CLOUD Act 等外部访问带来的风险。") },
+  { nr:"05", t:L("Sicherheit & Audit","Security & audit","安全与审计"), d:L("Nachvollziehbare Infrastruktur, schnelle Wiederherstellung — NIS2-konform.","Traceable infrastructure, fast recovery — NIS2-aligned.","基础设施可追溯，恢复迅速——符合 NIS2 要求。") },
+  { nr:"06", t:L("Unabhängigkeit","Independence","独立自主"), d:L("Quelloffen, in eurem Eigentum. Redundante Microservices statt Vendor Lock-in.","Open source, your property. Redundant microservices instead of vendor lock-in.","开源且归贵厂所有。采用冗余微服务，杜绝厂商锁定。") },
 ];
 const caseSteps = [
-  { nr:"01", t:L("Ausgangslage","Starting point"), d:L("Wissen verstreut über Dutzende Tabellen und Insel-Programme. Jede Zahl woanders.","Knowledge scattered across dozens of spreadsheets and island apps. Every number elsewhere.") },
-  { nr:"02", t:L("Was wir gebaut haben","What we built"), d:L("Alle Altdaten maschinenunterstützt migriert — von der Maschine bis zur Auswertung, auf offenen Bausteinen.","All legacy data machine-assisted migrated — from machine to analysis, on open building blocks.") },
-  { nr:"03", t:L("Ergebnis","Result"), d:L("Eine Quelle statt Dutzender Tabellen. Auswertungen, die sich selbst aktualisieren.","One source instead of dozens of spreadsheets. Reports that update themselves.") },
+  { nr:"01", t:L("Ausgangslage","Starting point","起点"), d:L("Wissen verstreut über Dutzende Tabellen und Insel-Programme. Jede Zahl woanders.","Knowledge scattered across dozens of spreadsheets and island apps. Every number elsewhere.","知识散落在数十张表格和孤岛程序里，每个数字都在不同地方。") },
+  { nr:"02", t:L("Was wir gebaut haben","What we built","我们做了什么"), d:L("Alle Altdaten maschinenunterstützt migriert — von der Maschine bis zur Auswertung, auf offenen Bausteinen.","All legacy data machine-assisted migrated — from machine to analysis, on open building blocks.","借助机器迁移全部历史数据——从机器到分析，全部基于开源模块。") },
+  { nr:"03", t:L("Ergebnis","Result","成果"), d:L("Eine Quelle statt Dutzender Tabellen. Auswertungen, die sich selbst aktualisieren.","One source instead of dozens of spreadsheets. Reports that update themselves.","一个数据源取代数十张表格，分析报表自动更新。") },
 ];
 const stats = [
-  { to:"370000", group:"1", suffix:"+", disp:"370.000+", label:L("Tabellen-Zeilen maschinenunterstützt migriert","spreadsheet rows machine-assisted migrated") },
-  { special:"73 → 1", label:L("verstreute Tabellen zu einem System","scattered spreadsheets into one system") },
-  { to:"50000", group:"1", suffix:"+", disp:"50.000+", label:L("Datenpunkte live ausgewertet","data points analysed live") },
-  { to:"49", group:"0", suffix:"", disp:"49", label:L("fertige Auswertungen aus einer Quelle","ready reports from one source") },
+  { to:"370000", group:"1", suffix:"+", disp:"370.000+", label:L("Tabellen-Zeilen maschinenunterstützt migriert","spreadsheet rows machine-assisted migrated","借助机器迁移的表格行数") },
+  { special:"73 → 1", label:L("verstreute Tabellen zu einem System","scattered spreadsheets into one system","分散的表格整合为一套系统") },
+  { to:"50000", group:"1", suffix:"+", disp:"50.000+", label:L("Datenpunkte live ausgewertet","data points analysed live","实时分析的数据点") },
+  { to:"49", group:"0", suffix:"", disp:"49", label:L("fertige Auswertungen aus einer Quelle","ready reports from one source","源自单一数据源的现成分析报表") },
 ];
 const machines = [ "DREHZENTRUM B1", "CNC-FRÄSE A1", "MONTAGEZELLE M2" ];
 const demos = [
-  { t:L("Werks-Cockpit (Live-Monitoring)","Factory cockpit (live monitoring)"), d:L("Echtzeit-Dashboards auf Maschinendaten. Ohne Login.","Real-time dashboards on machine data. No login."), href:"https://grafana-demo.indystry.works", color:"#c08a2e" },
-  { t:L("BI-Cockpit (Auswertungen)","BI cockpit (analytics)"), d:L("Produktion, Qualität, Ausschuss als Dashboard.","Production, quality, scrap as a dashboard."), href:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", color:"#2a86a8" },
-  { t:L("Digital Twin (Simulation)","Digital twin (simulation)"), d:L("Parameter schieben, Optimum finden — erst im Modell.","Move parameters, find the optimum — first in the model."), href:"https://twin-demo.indystry.works", color:"#7b5cc4" },
-  { t:L("Data-Science-Sandbox","Data-science sandbox"), d:L("Notebooks auf den Werksdaten — CV, ML, Korrelationen.","Notebooks on factory data — CV, ML, correlations."), href:"https://lab-demo.indystry.works", color:"#2f6df6" },
-  { t:L("ERP & Betrieb","ERP & operations"), d:L("Ein System für die ganze Firma. Login demo/demo.","One system for the whole company. Login demo/demo."), href:"https://erp-demo.indystry.works/web/login", color:"#c4673f" },
-  { t:L("Werker-App (mobil)","Shop-floor app (mobile)"), d:L("Stempeln, Zeit, Fertigung, NFC — im Browser.","Clocking, time, manufacturing, NFC — in the browser."), href:"https://app-demo.indystry.works", color:"#16794a" },
+  { t:L("Werks-Cockpit (Live-Monitoring)","Factory cockpit (live monitoring)","工厂驾驶舱（实时监控）"), d:L("Echtzeit-Dashboards auf Maschinendaten. Ohne Login.","Real-time dashboards on machine data. No login.","基于机器数据的实时看板，无需登录。"), href:"https://grafana-demo.indystry.works", color:"#c08a2e" },
+  { t:L("BI-Cockpit (Auswertungen)","BI cockpit (analytics)","BI 驾驶舱（分析）"), d:L("Produktion, Qualität, Ausschuss als Dashboard.","Production, quality, scrap as a dashboard.","以看板呈现生产、质量与废品。"), href:"https://bi-demo.indystry.works/public/dashboard/42b0c02d-6228-496e-b774-cf244e98259c", color:"#2a86a8" },
+  { t:L("Digital Twin (Simulation)","Digital twin (simulation)","数字孪生（仿真）"), d:L("Parameter schieben, Optimum finden — erst im Modell.","Move parameters, find the optimum — first in the model.","调整参数、寻找最优——先在模型中验证。"), href:"https://twin-demo.indystry.works", color:"#7b5cc4" },
+  { t:L("Data-Science-Sandbox","Data-science sandbox","数据科学沙箱"), d:L("Notebooks auf den Werksdaten — CV, ML, Korrelationen.","Notebooks on factory data — CV, ML, correlations.","在工厂数据上运行 Notebook——机器视觉、机器学习、相关性分析。"), href:"https://lab-demo.indystry.works", color:"#2f6df6" },
+  { t:L("ERP & Betrieb","ERP & operations","ERP 与运营"), d:L("Ein System für die ganze Firma. Login demo/demo.","One system for the whole company. Login demo/demo.","一套系统贯穿全公司。登录 demo/demo。"), href:"https://erp-demo.indystry.works/web/login", color:"#c4673f" },
+  { t:L("Werker-App (mobil)","Shop-floor app (mobile)","车间应用（移动端）"), d:L("Stempeln, Zeit, Fertigung, NFC — im Browser.","Clocking, time, manufacturing, NFC — in the browser.","打卡、工时、生产、NFC——皆在浏览器中完成。"), href:"https://app-demo.indystry.works", color:"#16794a" },
 ];
 const explore = [
-  { t:L("Werks-Landkarte","Factory map"), d:L("Jede Phase, jedes Tool, jede Live-Demo — klickbar.","Every phase, tool & live demo — clickable."), p:"/landkarte/" },
-  { t:L("Daily Industrie 4.0","Daily Industry 4.0"), d:L("Selbst gehosteter KI-News-Digest zur vernetzten Fabrik.","Self-hosted AI news digest on the connected factory."), p:"/daily/" },
-  { t:L("Geführte Tour","Guided tour"), d:L("Ein Auftrag — der rote Faden durch die ganze Firma.","One order — the thread through the whole company."), p:"/tour/" },
-  { t:L("Ich bin…","I am…"), d:L("Finde deine Rolle und sieh deinen Arbeitstag.","Find your role and see your working day."), p:"/ich-bin/" },
-  { t:L("Schnittstellen","Interfaces"), d:L("Womit reden wir? SPS, OPC-UA, API, MCP, PEPPOL …","What we talk to: PLC, OPC-UA, API, MCP, PEPPOL …"), p:"/schnittstellen/" },
-  { t:L("Datenschutz & KI-Souveränität","Privacy & AI sovereignty"), d:L("Von Cloud-KI bis zum eigenen On-Prem-Modell.","From cloud AI to your own on-prem model."), p:"/datenhoheit/" },
-  { t:L("So skaliert das System","How the system scales"), d:L("Core bleibt, Hardware wächst — Kafka-Break-even.","Core stays, hardware grows — Kafka break-even."), p:"/rechner/" },
-  { t:L("Werks-Check","Factory check"), d:L("7 Fragen → eure Diagnose + passende Demos.","7 questions → your diagnosis + matching demos."), p:"/check/" },
+  { t:L("Werks-Landkarte","Factory map","工厂全景图"), d:L("Jede Phase, jedes Tool, jede Live-Demo — klickbar.","Every phase, tool & live demo — clickable.","每个阶段、每个工具、每个在线演示——皆可点击。"), p:"/landkarte/" },
+  { t:L("Daily Industrie 4.0","Daily Industry 4.0","每日工业 4.0"), d:L("Selbst gehosteter KI-News-Digest zur vernetzten Fabrik.","Self-hosted AI news digest on the connected factory.","自托管的 AI 新闻摘要，聚焦互联工厂。"), p:"/daily/" },
+  { t:L("Geführte Tour","Guided tour","导览之旅"), d:L("Ein Auftrag — der rote Faden durch die ganze Firma.","One order — the thread through the whole company.","一张订单——贯穿全公司的主线。"), p:"/tour/" },
+  { t:L("Ich bin…","I am…","我是……"), d:L("Finde deine Rolle und sieh deinen Arbeitstag.","Find your role and see your working day.","找到您的角色，看看您的一天。"), p:"/ich-bin/" },
+  { t:L("Schnittstellen","Interfaces","接口"), d:L("Womit reden wir? SPS, OPC-UA, API, MCP, PEPPOL …","What we talk to: PLC, OPC-UA, API, MCP, PEPPOL …","我们对接什么：PLC、OPC-UA、API、MCP、PEPPOL……"), p:"/schnittstellen/" },
+  { t:L("Datenschutz & KI-Souveränität","Privacy & AI sovereignty","隐私与 AI 自主可控"), d:L("Von Cloud-KI bis zum eigenen On-Prem-Modell.","From cloud AI to your own on-prem model.","从云端 AI 到您自己的本地部署模型。"), p:"/datenhoheit/" },
+  { t:L("So skaliert das System","How the system scales","系统如何扩展"), d:L("Core bleibt, Hardware wächst — Kafka-Break-even.","Core stays, hardware grows — Kafka break-even.","核心不变，硬件随需扩容——Kafka 的收支平衡点。"), p:"/rechner/" },
+  { t:L("Werks-Check","Factory check","工厂自检"), d:L("7 Fragen → eure Diagnose + passende Demos.","7 questions → your diagnosis + matching demos.","7 个问题 → 生成贵厂诊断 + 匹配的演示。"), p:"/check/" },
 ];
 const vergleich = [
-  { good:false, tag:L("Sackgasse A","Dead end A"), t:L("Tabellen-Wildwuchs","Spreadsheet sprawl"), d:L("Billig und vertraut … aber keiner stimmt, nichts hängt zusammen, wächst nicht mit.","Cheap and familiar … but none reconcile, nothing connects, it doesn't grow.") },
-  { good:true,  tag:L("Der dritte Weg","The third way"), t:"Indystry", d:L("Fertig und angelernt, an euch angepasst — euer Stack, Start bei 80 %.","Ready and trained, adapted to you — your stack, start at 80%.") },
-  { good:false, tag:L("Sackgasse B","Dead end B"), t:L("Konzern-Schwergewicht","Enterprise heavyweight"), d:L("Mächtig … aber zu groß, zu teuer, zu starr — ihr passt euch an.","Powerful … but too big, too costly, too rigid — you bend to it.") },
+  { good:false, tag:L("Sackgasse A","Dead end A","死胡同 A"), t:L("Tabellen-Wildwuchs","Spreadsheet sprawl","表格泛滥"), d:L("Billig und vertraut … aber keiner stimmt, nichts hängt zusammen, wächst nicht mit.","Cheap and familiar … but none reconcile, nothing connects, it doesn't grow.","便宜又熟悉……但数据对不上、彼此不关联、无法随之成长。") },
+  { good:true,  tag:L("Der dritte Weg","The third way","第三条路"), t:"Indystry", d:L("Fertig und angelernt, an euch angepasst — euer Stack, Start bei 80 %.","Ready and trained, adapted to you — your stack, start at 80%.","开箱即用且已调教，为贵厂量身适配——您的技术栈，起点即 80 %。") },
+  { good:false, tag:L("Sackgasse B","Dead end B","死胡同 B"), t:L("Konzern-Schwergewicht","Enterprise heavyweight","巨型集团级方案"), d:L("Mächtig … aber zu groß, zu teuer, zu starr — ihr passt euch an.","Powerful … but too big, too costly, too rigid — you bend to it.","功能强大……但过于庞大、昂贵、僵化——只能您去迁就它。") },
 ];
 const mitmachen = [
-  { k:"A", t:L("Software ohne Admin","Software without admin"), d:L("Jeder holt sich selbst, was er braucht — kein Ticket, kein Warten.","Everyone self-serves what they need — no ticket, no waiting.") },
-  { k:"B", t:L("Anleitungen, die aktuell bleiben","Guides that stay current"), d:L("Das Handbuch wächst mit dem System statt zu veralten.","The handbook grows with the system instead of going stale.") },
-  { k:"C", t:L("Mitreden per Knopfdruck","Have a say at the push of a button"), d:L("Umfragen und Feedback direkt im System — wer den Schuh trägt, sagt wo er drückt.","Surveys and feedback right in the system — those who wear the shoe say where it pinches.") },
-  { k:"D", t:L("Hilfe, wo es passiert","Help where it happens"), d:L("Ein Assistent im Tool beantwortet Fragen im Kontext — statt Hotline.","An in-tool assistant answers questions in context — instead of a hotline.") },
+  { k:"A", t:L("Software ohne Admin","Software without admin","无需管理员的软件"), d:L("Jeder holt sich selbst, was er braucht — kein Ticket, kein Warten.","Everyone self-serves what they need — no ticket, no waiting.","人人自助获取所需——无需工单，无需等待。") },
+  { k:"B", t:L("Anleitungen, die aktuell bleiben","Guides that stay current","始终最新的操作指南"), d:L("Das Handbuch wächst mit dem System statt zu veralten.","The handbook grows with the system instead of going stale.","手册随系统一同更新，而非日渐过时。") },
+  { k:"C", t:L("Mitreden per Knopfdruck","Have a say at the push of a button","一键即可发声"), d:L("Umfragen und Feedback direkt im System — wer den Schuh trägt, sagt wo er drückt.","Surveys and feedback right in the system — those who wear the shoe say where it pinches.","问卷与反馈直接嵌入系统——谁穿鞋谁知哪里夹脚。") },
+  { k:"D", t:L("Hilfe, wo es passiert","Help where it happens","随需即得的帮助"), d:L("Ein Assistent im Tool beantwortet Fragen im Kontext — statt Hotline.","An in-tool assistant answers questions in context — instead of a hotline.","工具内的助手结合上下文答疑——无需再打热线。") },
 ];
 const team = [
-  { t:L("Ein eingespieltes Team","A tight-knit team"), d:L("Menschen, die zusammen schon viel gebaut haben — kurze Wege, verlässlich.","People who've built a lot together — short paths, reliable.") },
-  { t:L("KI als Mitarbeiter","AI as a co-worker"), d:L("Routine, Recherche und Code laufen Hand in Hand mit Assistenten.","Routine, research and code run hand in hand with assistants.") },
-  { t:L("Open-Source-Crowd","Open-source crowd"), d:L("Hinter jedem Baustein stehen tausende Entwickler weltweit — gebündelt für euch.","Behind each block stand thousands of developers worldwide — bundled for you.") },
+  { t:L("Ein eingespieltes Team","A tight-knit team","默契十足的团队"), d:L("Menschen, die zusammen schon viel gebaut haben — kurze Wege, verlässlich.","People who've built a lot together — short paths, reliable.","一群共同打造过许多项目的人——沟通直接，值得信赖。") },
+  { t:L("KI als Mitarbeiter","AI as a co-worker","AI 作为同事"), d:L("Routine, Recherche und Code laufen Hand in Hand mit Assistenten.","Routine, research and code run hand in hand with assistants.","日常事务、调研与编码，与助手携手并进。") },
+  { t:L("Open-Source-Crowd","Open-source crowd","开源社区力量"), d:L("Hinter jedem Baustein stehen tausende Entwickler weltweit — gebündelt für euch.","Behind each block stand thousands of developers worldwide — bundled for you.","每个模块背后都有全球数千名开发者——为贵厂集众力于一处。") },
 ];
 const ablauf = [
-  { nr:"01", t:"Pain-List", d:L("Du schickst uns, wo es klemmt — roh, unsortiert.","You send us where it hurts — raw, unsorted.") },
-  { nr:"02", t:L("Gespräch","Conversation"), d:L("Wir hören zu und stellen Fragen. Kein Sales-Pitch.","We listen and ask questions. No sales pitch.") },
-  { nr:"03", t:L("Lösungsskizze","Solution sketch"), d:L("Konkreter Vorschlag: was zuerst, was es bringt, was es kostet.","A concrete proposal: what first, what it brings, what it costs.") },
-  { nr:"04", t:"Pilot", d:L("Ein Baustein geht live — auf euren echten Daten.","One block goes live — on your real data.") },
-  { nr:"05", t:"Rollout", d:L("Schritt für Schritt wächst das System. Ihr behaltet die Kontrolle.","Step by step the system grows. You keep control.") },
+  { nr:"01", t:"Pain-List", d:L("Du schickst uns, wo es klemmt — roh, unsortiert.","You send us where it hurts — raw, unsorted.","把卡壳之处发给我们——原始、未整理即可。") },
+  { nr:"02", t:L("Gespräch","Conversation","对话"), d:L("Wir hören zu und stellen Fragen. Kein Sales-Pitch.","We listen and ask questions. No sales pitch.","我们倾听并提问，绝无推销说辞。") },
+  { nr:"03", t:L("Lösungsskizze","Solution sketch","解决方案草案"), d:L("Konkreter Vorschlag: was zuerst, was es bringt, was es kostet.","A concrete proposal: what first, what it brings, what it costs.","给出具体方案：先做什么、带来什么、花费多少。") },
+  { nr:"04", t:"Pilot", d:L("Ein Baustein geht live — auf euren echten Daten.","One block goes live — on your real data.","一个模块上线——在贵厂的真实数据上运行。") },
+  { nr:"05", t:"Rollout", d:L("Schritt für Schritt wächst das System. Ihr behaltet die Kontrolle.","Step by step the system grows. You keep control.","系统逐步成长，主导权始终在您手中。") },
 ];
 const aufwand = [
-  { nr:"01", t:L("Kein Abo-Zwang","No subscription lock"), d:L("Open-Source-Fundament. Ihr zahlt Aufbau und Wissen, keine ewige Lizenz-Miete.","Open-source foundation. You pay for build and know-how, no perpetual licence rent.") },
-  { nr:"02", t:L("Pilot in Wochen","Pilot in weeks"), d:L("Der erste Baustein geht in Wochen live — auf euren echten Daten.","The first block goes live in weeks — on your real data.") },
-  { nr:"03", t:L("Schritt für Schritt","Step by step"), d:L("Ihr wachst Baustein für Baustein, wenn es trägt — kein Big-Bang.","You grow block by block as it holds — no big bang.") },
+  { nr:"01", t:L("Kein Abo-Zwang","No subscription lock","无订阅绑定"), d:L("Open-Source-Fundament. Ihr zahlt Aufbau und Wissen, keine ewige Lizenz-Miete.","Open-source foundation. You pay for build and know-how, no perpetual licence rent.","开源根基。您为搭建与专业知识付费，而非无休止的授权租金。") },
+  { nr:"02", t:L("Pilot in Wochen","Pilot in weeks","数周即可试点"), d:L("Der erste Baustein geht in Wochen live — auf euren echten Daten.","The first block goes live in weeks — on your real data.","首个模块数周内上线——在贵厂的真实数据上运行。") },
+  { nr:"03", t:L("Schritt für Schritt","Step by step","循序渐进"), d:L("Ihr wachst Baustein für Baustein, wenn es trägt — kein Big-Bang.","You grow block by block as it holds — no big bang.","一个模块站稳了再上下一个——绝非一步到位的豪赌。") },
 ];
 const diag = [
-  { tag:"OPT 01", label:"1–3",   v:L("Überschaubar — aber jede Tabelle ist ein Single Point of Failure.","Manageable — but every spreadsheet is a single point of failure.") },
-  { tag:"OPT 02", label:"4–10",  v:L("Es wuchert. Der Abgleich frisst schon spürbar Zeit.","It's sprawling. Reconciling already eats noticeable time.") },
-  { tag:"OPT 03", label:"11–25", v:L("Tiefes Chaos. Keiner kennt mehr die eine Wahrheit.","Deep chaos. Nobody knows the single truth anymore.") },
-  { tag:"OPT 04", label:"25+",   v:L("Tabellen-Hölle. Höchste Zeit für ein System.","Spreadsheet hell. High time for a system.") },
+  { tag:"OPT 01", label:"1–3",   v:L("Überschaubar — aber jede Tabelle ist ein Single Point of Failure.","Manageable — but every spreadsheet is a single point of failure.","尚可掌控——但每张表格都是一个单点故障。") },
+  { tag:"OPT 02", label:"4–10",  v:L("Es wuchert. Der Abgleich frisst schon spürbar Zeit.","It's sprawling. Reconciling already eats noticeable time.","开始泛滥。数据核对已明显耗费时间。") },
+  { tag:"OPT 03", label:"11–25", v:L("Tiefes Chaos. Keiner kennt mehr die eine Wahrheit.","Deep chaos. Nobody knows the single truth anymore.","深度混乱。谁都说不清哪份数据才是准的。") },
+  { tag:"OPT 04", label:"25+",   v:L("Tabellen-Hölle. Höchste Zeit für ein System.","Spreadsheet hell. High time for a system.","表格地狱。是时候上一套系统了。") },
 ];
 const interfaces = [
-  { tag:"peppol", l:"PEPPOL", d:L("Standard für strukturierte E-Rechnungen — rein und raus, ohne PDF-Abtippen.","Standard for structured e-invoices — in and out, no PDF re-typing.") },
-  { tag:"datev", l:L("Buchhaltung","Accounting"), d:L("Export zu DATEV, BMD & Co. — Belege landen direkt beim Steuerberater.","Export to DATEV, BMD & co. — records land straight with the tax advisor.") },
-  { tag:"rest-api", l:L("Versand-API","Shipping API"), d:L("Anbindung an Versanddienstleister: Etiketten und Tracking automatisch.","Connects to carriers: labels and tracking automatically.") },
-  { tag:"rest-api", l:L("Lieferanten","Suppliers"), d:L("Bestellungen, Preise und Wareneingänge digital mit Lieferanten austauschen.","Exchange orders, prices and receipts with suppliers digitally.") },
-  { tag:"opc-ua", l:"OPC-UA", d:L("Herstellerneutrale Maschinensprache — Sensor- und Maschinendaten standardisiert herein.","Vendor-neutral machine language — sensor and machine data in, standardised.") },
-  { tag:"sps", l:"SPS", d:L("Speicherprogrammierbare Steuerung — direkt an die Maschinensteuerung angebunden.","PLC — connected straight to the machine controller.") },
-  { tag:"mcp", l:"MCP", d:L("Model-Context-Protocol — gibt der KI rechtegeprüften Zugriff auf Daten und Tools.","Model Context Protocol — gives the AI permission-checked access to data and tools.") },
+  { tag:"peppol", l:"PEPPOL", d:L("Standard für strukturierte E-Rechnungen — rein und raus, ohne PDF-Abtippen.","Standard for structured e-invoices — in and out, no PDF re-typing.","结构化电子发票标准——收发双向，无需手动誊录 PDF。") },
+  { tag:"datev", l:L("Buchhaltung","Accounting","会计核算"), d:L("Export zu DATEV, BMD & Co. — Belege landen direkt beim Steuerberater.","Export to DATEV, BMD & co. — records land straight with the tax advisor.","导出至 DATEV、BMD 等——凭证直达税务顾问。") },
+  { tag:"rest-api", l:L("Versand-API","Shipping API","物流 API"), d:L("Anbindung an Versanddienstleister: Etiketten und Tracking automatisch.","Connects to carriers: labels and tracking automatically.","对接物流服务商：标签与追踪自动生成。") },
+  { tag:"rest-api", l:L("Lieferanten","Suppliers","供应商"), d:L("Bestellungen, Preise und Wareneingänge digital mit Lieferanten austauschen.","Exchange orders, prices and receipts with suppliers digitally.","与供应商数字化交换订单、价格与收货信息。") },
+  { tag:"opc-ua", l:"OPC-UA", d:L("Herstellerneutrale Maschinensprache — Sensor- und Maschinendaten standardisiert herein.","Vendor-neutral machine language — sensor and machine data in, standardised.","厂商中立的机器语言——将传感器与机器数据标准化接入。") },
+  { tag:"sps", l:"SPS", d:L("Speicherprogrammierbare Steuerung — direkt an die Maschinensteuerung angebunden.","PLC — connected straight to the machine controller.","可编程逻辑控制器（PLC）——直接接入机器控制系统。") },
+  { tag:"mcp", l:"MCP", d:L("Model-Context-Protocol — gibt der KI rechtegeprüften Zugriff auf Daten und Tools.","Model Context Protocol — gives the AI permission-checked access to data and tools.","Model Context Protocol——让 AI 在权限校验下访问数据与工具。") },
 ];
 const fxExamples = de
   ? ["Niemand sieht, was die Maschinen machen","Wir verlieren ständig Messdaten","Auswertungen kosten jeden Monat Tage","Audit steht an, nichts ist auffindbar"]
-  : ["Nobody sees what the machines do","We keep losing measurement data","Reports cost days every month","An audit is due, nothing is findable"];
+  : en
+  ? ["Nobody sees what the machines do","We keep losing measurement data","Reports cost days every month","An audit is due, nothing is findable"]
+  : ["没人看得到机器在做什么","我们总是丢失测量数据","每月分析都要耗费好几天","审计将至，却什么都找不到"];
 // Daten für Finder-Island
 const finderData = baust.map((x) => ({ nr:x.nr, name:x.n, desc:x.d, color:x.color, href:`${S}/saeule/${x.slug}/`, kw:x.kw }));
 const kick = (n:string) => n; // helper noop
 const branchen = [
-  { tag:"zerspanung", n:L("Zerspanung & Metallbearbeitung","Machining & metalworking"), d:L("CNC-Fräsen, Drehen, viele Varianten, enge Toleranzen.","CNC milling, turning, many variants, tight tolerances."), c:"#c4673f" },
-  { tag:"maschinenbau", n:L("Anlagen- & Maschinenbau","Plant & machine building"), d:L("Einzel- und Sondermaschinen, Projektfertigung, lange Stücklisten.","One-off and special machines, project builds, long BOMs."), c:"#2a86a8" },
-  { tag:"serienfertigung", n:L("Serien- & Variantenfertigung","Series & variant production"), d:L("Wiederkehrende Aufträge, Chargen, lückenlose Rückverfolgung.","Recurring orders, batches, seamless traceability."), c:"#3d4fc0" },
-  { tag:"prozesstechnik", n:L("Verfahrens- & Prozesstechnik","Process technology"), d:L("Misch-, Reaktions- und Chargenprozesse mit vielen Messwerten.","Mixing, reaction and batch processes with lots of readings."), c:"#7b5cc4" },
-  { tag:"blech-schweiss", n:L("Blech, Schweiß & Metallbau","Sheet, welding & metal fab"), d:L("Zuschnitt, Umformung, Baugruppen, Endkontrolle.","Cutting, forming, assemblies, final inspection."), c:"#4a6fa5" },
-  { tag:"kunststoff", n:L("Kunststoff & Spritzguss","Plastics & injection moulding"), d:L("Werkzeuge, Zyklen, Qualität pro Schuss.","Tools, cycles, quality per shot."), c:"#c08a2e" },
-  { tag:"elektronik", n:L("Elektronik & Baugruppen","Electronics & assembly"), d:L("Bestückung, Prüfung, Seriennummern.","Placement, testing, serial numbers."), c:"#b03f93" },
-  { tag:"lohnfertigung", n:L("Lohnfertigung & Job-Shop","Contract & job-shop"), d:L("Viele Kunden, viele Teile, knappe Termine.","Many customers, many parts, tight dates."), c:"#5a8a98" },
-  { tag:"lebensmittel", n:L("Lebensmittel & Getränke","Food & beverage"), d:L("Chargen, Rückverfolgbarkeit, Hygiene- und Qualitätsnachweise.","Batches, traceability, hygiene and quality records."), c:"#3f9a52" },
-  { tag:"holz-papier", n:L("Holz & Papier","Wood & paper"), d:L("Zuschnitt, Serien, Materialfluss — durchgängige Daten statt Zettel.","Cutting, series, material flow — continuous data instead of paper."), c:"#b5852a" },
-  { tag:"automotive", n:L("Automotive-Zulieferer","Automotive suppliers"), d:L("Serien, enge Toleranzen, lückenlose Rückverfolgung (IATF).","Series, tight tolerances, seamless traceability (IATF)."), c:"#6b54b0" },
+  { tag:"zerspanung", n:L("Zerspanung & Metallbearbeitung","Machining & metalworking","切削加工与金属加工"), d:L("CNC-Fräsen, Drehen, viele Varianten, enge Toleranzen.","CNC milling, turning, many variants, tight tolerances.","CNC 铣削、车削，多品种，公差严格。"), c:"#c4673f" },
+  { tag:"maschinenbau", n:L("Anlagen- & Maschinenbau","Plant & machine building","成套设备与机械制造"), d:L("Einzel- und Sondermaschinen, Projektfertigung, lange Stücklisten.","One-off and special machines, project builds, long BOMs.","单件与非标机器、项目制生产、超长物料清单。"), c:"#2a86a8" },
+  { tag:"serienfertigung", n:L("Serien- & Variantenfertigung","Series & variant production","批量与多品种生产"), d:L("Wiederkehrende Aufträge, Chargen, lückenlose Rückverfolgung.","Recurring orders, batches, seamless traceability.","重复订单、批次、全程可追溯。"), c:"#3d4fc0" },
+  { tag:"prozesstechnik", n:L("Verfahrens- & Prozesstechnik","Process technology","工艺与过程技术"), d:L("Misch-, Reaktions- und Chargenprozesse mit vielen Messwerten.","Mixing, reaction and batch processes with lots of readings.","混合、反应与批次工艺，测量值众多。"), c:"#7b5cc4" },
+  { tag:"blech-schweiss", n:L("Blech, Schweiß & Metallbau","Sheet, welding & metal fab","钣金、焊接与金属结构"), d:L("Zuschnitt, Umformung, Baugruppen, Endkontrolle.","Cutting, forming, assemblies, final inspection.","下料、成形、组件装配、终检。"), c:"#4a6fa5" },
+  { tag:"kunststoff", n:L("Kunststoff & Spritzguss","Plastics & injection moulding","塑料与注塑成型"), d:L("Werkzeuge, Zyklen, Qualität pro Schuss.","Tools, cycles, quality per shot.","模具、周期、逐模次质量。"), c:"#c08a2e" },
+  { tag:"elektronik", n:L("Elektronik & Baugruppen","Electronics & assembly","电子与组件装配"), d:L("Bestückung, Prüfung, Seriennummern.","Placement, testing, serial numbers.","贴片、测试、序列号管理。"), c:"#b03f93" },
+  { tag:"lohnfertigung", n:L("Lohnfertigung & Job-Shop","Contract & job-shop","代工与单件车间"), d:L("Viele Kunden, viele Teile, knappe Termine.","Many customers, many parts, tight dates.","客户多、零件多、交期紧。"), c:"#5a8a98" },
+  { tag:"lebensmittel", n:L("Lebensmittel & Getränke","Food & beverage","食品与饮料"), d:L("Chargen, Rückverfolgbarkeit, Hygiene- und Qualitätsnachweise.","Batches, traceability, hygiene and quality records.","批次、可追溯性、卫生与质量凭证。"), c:"#3f9a52" },
+  { tag:"holz-papier", n:L("Holz & Papier","Wood & paper","木材与纸业"), d:L("Zuschnitt, Serien, Materialfluss — durchgängige Daten statt Zettel.","Cutting, series, material flow — continuous data instead of paper.","下料、批量、物料流转——用连贯数据取代纸单。"), c:"#b5852a" },
+  { tag:"automotive", n:L("Automotive-Zulieferer","Automotive suppliers","汽车零部件供应商"), d:L("Serien, enge Toleranzen, lückenlose Rückverfolgung (IATF).","Series, tight tolerances, seamless traceability (IATF).","批量、严公差、全程可追溯（IATF）。"), c:"#6b54b0" },
 ];
 ---
 <!-- Fortschrittsbalken + Readout -->
@@ -142,29 +145,29 @@ const branchen = [
 <section class="ov-hero">
   <div class="glow ov-glow"></div>
   <div class="ov-wrap ov-hero-kick">
-    <span class="ov-tk-sq"></span><span class="ov-mono ov-hk">{L("Der dritte Weg","The third way")}<span class="ov-dot">·</span>{L("Industriesoftware fürs Werk","Industrial software for the works")}</span>
+    <span class="ov-tk-sq"></span><span class="ov-mono ov-hk">{L("Der dritte Weg","The third way","第三条路")}<span class="ov-dot">·</span>{L("Industriesoftware fürs Werk","Industrial software for the works","为工厂打造的工业软件")}</span>
   </div>
   <div class="ov-wrap ov-hsplit">
     <div>
-      <h1 class="ov-h1" set:html={L("Raus aus dem<br>Tabellen-Chaos.<br><span class='gold'>Selbstbestimmt.</span>","Out of the<br>spreadsheet chaos.<br><span class='gold'>Self-determined.</span>")}></h1>
-      <p class="ov-hlead">{L("Fertige Software fürs Werk — ab Tag eins angelernt, an euch angepasst. Ein System statt zehn Tabellen.","Ready software for the works — trained from day one, adapted to you. One system instead of ten spreadsheets.")}</p>
-      <p class="ov-mono ov-hsub">{L("Eure Daten. Euer Server. Euer System. Start bei 80 %, nicht bei null.","Your data. Your server. Your system. Start at 80%, not zero.")}</p>
+      <h1 class="ov-h1" set:html={L("Raus aus dem<br>Tabellen-Chaos.<br><span class='gold'>Selbstbestimmt.</span>","Out of the<br>spreadsheet chaos.<br><span class='gold'>Self-determined.</span>","告别<br>表格乱局。<br><span class='gold'>自主可控。</span>")}></h1>
+      <p class="ov-hlead">{L("Fertige Software fürs Werk — ab Tag eins angelernt, an euch angepasst. Ein System statt zehn Tabellen.","Ready software for the works — trained from day one, adapted to you. One system instead of ten spreadsheets.","为工厂打造的成品软件——第一天即调教到位，为贵厂适配。一套系统取代十张表格。")}</p>
+      <p class="ov-mono ov-hsub">{L("Eure Daten. Euer Server. Euer System. Start bei 80 %, nicht bei null.","Your data. Your server. Your system. Start at 80%, not zero.","您的数据。您的服务器。您的系统。起点即 80 %，而非从零开始。")}</p>
       <div class="ov-cta-row">
-        <a class="ctagold ov-cta-gold" href="#saeulen">{L("Den Stack ansehen","See the stack")} →</a>
-        <a class="ctaghost ov-cta-ghost" href="#demos">{L("Live ausprobieren","Try it live")} ↗</a>
-        <a class="ctaghost ov-cta-ghost" href={`${b}/einstieg/`}>{L("Einstieg & Förderung","Getting started & funding")} ↗</a>
+        <a class="ctagold ov-cta-gold" href="#saeulen">{L("Den Stack ansehen","See the stack","查看技术栈")} →</a>
+        <a class="ctaghost ov-cta-ghost" href="#demos">{L("Live ausprobieren","Try it live","在线体验")} ↗</a>
+        <a class="ctaghost ov-cta-ghost" href={`${b}/einstieg/`}>{L("Einstieg & Förderung","Getting started & funding","入门与补贴资助")} ↗</a>
       </div>
     </div>
     <div class="ov-dash-wrap">
       <div class="tk ov-dash">
         <div class="scanline ov-scan"></div>
         <div class="ov-dash-top"><span>DASH_BOARD_01</span><span class="ioled ov-rec">● LIVE</span></div>
-        <div class="ov-dash-lab">{L("Status Gesamtproduktion","Total production status")}</div>
+        <div class="ov-dash-lab">{L("Status Gesamtproduktion","Total production status","总体生产状态")}</div>
         <div class="ov-dash-big"><span id="m-prod">84,2 %</span><span class="ov-delta">▲ <span id="m-delta">2,4</span></span></div>
         <div class="ov-bars"><i style="height:42%"></i><i style="height:58%"></i><i style="height:50%"></i><i class="g" style="height:74%"></i><i style="height:66%"></i><i class="y" style="height:88%"></i><i class="g" style="height:79%"></i></div>
         <div class="ov-dash-grid">
-          <div class="ov-dash-cell"><div class="ov-dash-k">{L("Effizienz","Efficiency")}</div><div class="ov-dash-v green">+<span id="m-eff">24,8</span> %</div></div>
-          <div class="ov-dash-cell"><div class="ov-dash-k">{L("Sicherheit","Security")}</div><div class="ov-dash-v">Self-Host</div></div>
+          <div class="ov-dash-cell"><div class="ov-dash-k">{L("Effizienz","Efficiency","效率")}</div><div class="ov-dash-v green">+<span id="m-eff">24,8</span> %</div></div>
+          <div class="ov-dash-cell"><div class="ov-dash-k">{L("Sicherheit","Security","安全")}</div><div class="ov-dash-v">Self-Host</div></div>
         </div>
         <div class="ov-dash-foot"><span class="led ov-led-sm"></span><span id="hero-ticker">SERVER · 100% ON-PREMISE</span></div>
       </div>
@@ -172,7 +175,7 @@ const branchen = [
   </div>
   <div class="ov-strip-wrap">
     <div class="ov-wrap ov-strip">
-      <span class="ov-strip-lab">{L("10 BAUSTEINE","10 BUILDING BLOCKS")} —</span>
+      <span class="ov-strip-lab">{L("10 BAUSTEINE","10 BUILDING BLOCKS","10 大模块")} —</span>
       <div class="ov-strip-list">
         {strip.map((s) => <a href={`${b}/saeule/${s.slug}/`} class="ov-strip-item"><span class="ov-strip-dot" style={`background:${s.color}`}></span><span class="ov-strip-nr">{s.nr}</span> {s.name}</a>)}
       </div>
@@ -182,9 +185,9 @@ const branchen = [
 
 <!-- §01 DIAGNOSE -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§01 · {L("Diagnose","Diagnosis")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Wie viele Tabellen sind bei euch im Umlauf?","How many spreadsheets are in circulation?")}</h2>
-  <p class="ov-mono ov-sub rv1">{L("Wähl eine Zahl — wir sagen dir, wie tief das Chaos sitzt.","Pick a number — we'll tell you how deep the chaos runs.")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§01 · {L("Diagnose","Diagnosis","诊断")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Wie viele Tabellen sind bei euch im Umlauf?","How many spreadsheets are in circulation?","贵厂现在有多少张表格在流转？")}</h2>
+  <p class="ov-mono ov-sub rv1">{L("Wähl eine Zahl — wir sagen dir, wie tief das Chaos sitzt.","Pick a number — we'll tell you how deep the chaos runs.","选一个数字——我们来告诉您混乱有多深。")}</p>
   <div class="ov-diag rv1">
     {diag.map((o, i) => (
       <button type="button" class="diagopt ov-diagopt" data-i={i}>
@@ -199,9 +202,9 @@ const branchen = [
 <!-- EIN SYSTEM -->
 <section class="ov-dark ov-sysline">
   <div class="ov-wrap ov-sys-in">
-    <div class="ov-mono ov-kick-light rv">{L("Der Umschalt-Moment","The switch moment")}</div>
-    <h2 class="ov-sys-h rv1" set:html={L("Ein System.<br><span class='gold'>Eine Wahrheit.</span>","One system.<br><span class='gold'>One truth.</span>")}></h2>
-    <p class="ov-sys-p rv2">{L("Montagfrüh kein Abgleich von drei Listen mehr — ein Blick, und alle reden über dieselbe Zahl. Was gestern Stunden Tabellenpflege war, läuft heute von selbst mit.","No more reconciling three lists on Monday morning — one glance and everyone talks about the same number. What was hours of spreadsheet upkeep yesterday now runs along by itself.")}</p>
+    <div class="ov-mono ov-kick-light rv">{L("Der Umschalt-Moment","The switch moment","切换的那一刻")}</div>
+    <h2 class="ov-sys-h rv1" set:html={L("Ein System.<br><span class='gold'>Eine Wahrheit.</span>","One system.<br><span class='gold'>One truth.</span>","一套系统。<br><span class='gold'>一个真相。</span>")}></h2>
+    <p class="ov-sys-p rv2">{L("Montagfrüh kein Abgleich von drei Listen mehr — ein Blick, und alle reden über dieselbe Zahl. Was gestern Stunden Tabellenpflege war, läuft heute von selbst mit.","No more reconciling three lists on Monday morning — one glance and everyone talks about the same number. What was hours of spreadsheet upkeep yesterday now runs along by itself.","周一早上不必再核对三份清单——一眼即明，人人谈论同一个数字。昨天要花数小时维护的表格，今天自动同步运行。")}</p>
   </div>
 </section>
 
@@ -211,8 +214,8 @@ const branchen = [
     <div class="rv" style="display:flex; gap:16px; align-items:flex-start; max-width:84ch; margin:0 auto;">
       <span style="font-family:var(--font-mono); font-size:17px; color:#16463E; flex:none; margin-top:4px;">★</span>
       <div>
-        <p style="margin:0; font-size:clamp(18px,2vw,26px); line-height:1.45; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Ein produzierender Industriebetrieb aus der Steiermark führt seine gesamte Fertigung auf diesem Stack.","A manufacturing company in Styria runs its entire production on this stack.")}</p>
-        <p style="margin:12px 0 0; font-size:14px; line-height:1.6; color:#5C5E63;">{L("Kein Prototyp, keine Folien — gelebte Praxis. ","Not a prototype, not slides — lived practice. ")}<a class="navx" href={`${b}/einstieg/`}>{L("Wie der Einstieg läuft","How getting started works")} →</a></p>
+        <p style="margin:0; font-size:clamp(18px,2vw,26px); line-height:1.45; color:#1B1C1E; font-family:var(--font-head); font-weight:600;">{L("Ein produzierender Industriebetrieb aus der Steiermark führt seine gesamte Fertigung auf diesem Stack.","A manufacturing company in Styria runs its entire production on this stack.","一家位于施蒂利亚州的工业制造企业，其整个生产都运行在这套技术栈上。")}</p>
+        <p style="margin:12px 0 0; font-size:14px; line-height:1.6; color:#5C5E63;">{L("Kein Prototyp, keine Folien — gelebte Praxis. ","Not a prototype, not slides — lived practice. ","不是原型，不是幻灯片——而是切实的日常实践。 ")}<a class="navx" href={`${b}/einstieg/`}>{L("Wie der Einstieg läuft","How getting started works","入门流程一览")} →</a></p>
       </div>
     </div>
   </div>
@@ -220,9 +223,9 @@ const branchen = [
 
 <!-- FÜR WEN -->
 <section class="ov-wrap ov-sec ov-sec-tight2">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Für wen","Who it's for")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Gebaut für produzierende Betriebe.","Built for manufacturers.")}</h2>
-  <p class="ov-sub rv1">{L("Die Branche ist zweitrangig. Wenn ihr Maschinen lauft, Aufträge abwickelt und in Tabellen ertrinkt — passt es. Ein paar typische Fälle:","The industry is secondary. If you run machines, process orders and drown in spreadsheets — it fits. A few typical cases:")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Für wen","Who it's for","适合谁")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Gebaut für produzierende Betriebe.","Built for manufacturers.","为制造企业而生。")}</h2>
+  <p class="ov-sub rv1">{L("Die Branche ist zweitrangig. Wenn ihr Maschinen lauft, Aufträge abwickelt und in Tabellen ertrinkt — passt es. Ein paar typische Fälle:","The industry is secondary. If you run machines, process orders and drown in spreadsheets — it fits. A few typical cases:","行业并非关键。只要您运转机器、处理订单、又被表格淹没——它就合适。以下是几类典型场景：")}</p>
   <div class="ov-4col">
     {branchen.map((x) => (
       <div class="lift ov-card rv1">
@@ -232,46 +235,46 @@ const branchen = [
       </div>
     ))}
   </div>
-  <p class="rv2 ov-br-note">{L("Nicht dabei? Die Bausteine sind dieselben — egal welches Werk. ","Not listed? The building blocks are the same — whatever the works. ")}<a class="navx" href={`${b}/kontakt/`}>{L("Schick uns deine Pain-List","Send us your pain list")} →</a></p>
+  <p class="rv2 ov-br-note">{L("Nicht dabei? Die Bausteine sind dieselben — egal welches Werk. ","Not listed? The building blocks are the same — whatever the works. ","没找到您的行业？无论哪种工厂，模块都是相同的。 ")}<a class="navx" href={`${b}/kontakt/`}>{L("Schick uns deine Pain-List","Send us your pain list","把您的痛点清单发给我们")} →</a></p>
 </section>
 
 <!-- MEHR FÜRS WERK -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Mehr fürs Werk","More for the works")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Was sonst noch im System steckt.","What else lives in the system.")}</h2>
-  <p class="ov-sub rv1">{L("Über die Bausteine hinaus — die Themen, die im Alltag den Unterschied machen.","Beyond the building blocks — the topics that make the difference day to day.")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Mehr fürs Werk","More for the works","工厂的更多能力")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Was sonst noch im System steckt.","What else lives in the system.","系统里还藏着什么。")}</h2>
+  <p class="ov-sub rv1">{L("Über die Bausteine hinaus — die Themen, die im Alltag den Unterschied machen.","Beyond the building blocks — the topics that make the difference day to day.","超越模块本身——那些在日常中真正带来差别的主题。")}</p>
   <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; margin-top:22px;">
         <a class="lift rv1" href={`${b}/compliance/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Compliance & Sicherheit","Compliance & security")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("ISMS, ISO 27001 & 9001, NIS-2, lückenloses Audit.","ISMS, ISO 27001 & 9001, NIS-2, full audit trail.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Compliance & Sicherheit","Compliance & security","合规与安全")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("ISMS, ISO 27001 & 9001, NIS-2, lückenloses Audit.","ISMS, ISO 27001 & 9001, NIS-2, full audit trail.","ISMS、ISO 27001 与 9001、NIS-2，全程审计留痕。")}</span>
         </a>
         <a class="lift rv1" href={`${b}/instandhaltung/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Instandhaltung","Maintenance")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Anlagen, Prüffristen, Wartungspläne — QM-konform.","Assets, intervals, maintenance plans — QM-compliant.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Instandhaltung","Maintenance","维护")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Anlagen, Prüffristen, Wartungspläne — QM-konform.","Assets, intervals, maintenance plans — QM-compliant.","设备、检验周期、维护计划——符合质量管理要求。")}</span>
         </a>
         <a class="lift rv1" href={`${b}/kosten/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kosten & Controlling","Costing & controlling")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Lot-genaue Selbstkosten nach IFRS und HGB.","Lot-level cost under IFRS and HGB.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kosten & Controlling","Costing & controlling","成本与管控")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Lot-genaue Selbstkosten nach IFRS und HGB.","Lot-level cost under IFRS and HGB.","按 IFRS 与 HGB 精确到批次的成本核算。")}</span>
         </a>
         <a class="lift rv1" href={`${b}/kennzahlen/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kennzahlen","KPIs")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("27 Management-Kennzahlen aus echten Daten.","27 management KPIs from real data.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Kennzahlen","KPIs","关键指标（KPI）")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("27 Management-Kennzahlen aus echten Daten.","27 management KPIs from real data.","源自真实数据的 27 项管理关键指标。")}</span>
         </a>
         <a class="lift rv1" href={`${b}/app/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Werker-App","Shop-floor app")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Stempeln, Fertigung, NFC — offline-first.","Clocking, manufacturing, NFC — offline-first.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Werker-App","Shop-floor app","车间应用")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Stempeln, Fertigung, NFC — offline-first.","Clocking, manufacturing, NFC — offline-first.","打卡、生产、NFC——离线优先。")}</span>
         </a>
         <a class="lift rv1" href={`${b}/einstieg/`} style="display:block; text-decoration:none; border:1px solid #E2E8F0; border-left:3px solid #E6B23A; border-radius:12px; background:#fff; padding:16px 18px;">
-          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Einstieg & Förderung","Getting started & funding")}</span>
-          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Geförderter Start in drei schlanken Schritten.","A funded start in three lean steps.")}</span>
+          <span style="font-weight:700; font-size:15px; color:#1B1C1E; display:block; margin-bottom:5px; font-family:var(--font-head);">{L("Einstieg & Förderung","Getting started & funding","入门与补贴资助")}</span>
+          <span style="font-size:13px; line-height:1.5; color:#5C5E63; display:block;">{L("Geförderter Start in drei schlanken Schritten.","A funded start in three lean steps.","三个精简步骤，享补贴起步。")}</span>
         </a>
   </div>
 </section>
 
 <!-- §02 LÖSUNG -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§02 · {L("Lösung","Solution")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Fertig. Angelernt. Anpassbar.","Ready. Trained. Adaptable.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§02 · {L("Lösung","Solution","解决方案")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Fertig. Angelernt. Anpassbar.","Ready. Trained. Adaptable.","开箱即用。已调教。可适配。")}</h2>
   <div class="ov-3col">
     {angebot.map((c) => (
       <div class="lift tk ov-card rv1">
@@ -280,40 +283,40 @@ const branchen = [
       </div>
     ))}
   </div>
-  <div class="rv2 ov-more"><a class="navx ov-more-link" href="#saeulen">{L("Alle 10 Bausteine ansehen","See all 10 building blocks")} →</a></div>
+  <div class="rv2 ov-more"><a class="navx ov-more-link" href="#saeulen">{L("Alle 10 Bausteine ansehen","See all 10 building blocks","查看全部 10 个模块")} →</a></div>
 </section>
 
 <!-- §03 KI-FINDER -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§03 · {L("KI-Lösungsfinder","AI solution finder")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Beschreib deinen Bedarf — die KI findet den Baustein.","Describe your need — the AI finds the block.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§03 · {L("KI-Lösungsfinder","AI solution finder","AI 方案查找器")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Beschreib deinen Bedarf — die KI findet den Baustein.","Describe your need — the AI finds the block.","描述您的需求——AI 帮您找到对应模块。")}</h2>
   <div class="ov-finder rv1">
-    <input type="text" id="fx-input" class="ov-fx-input" placeholder={L("z. B. Niemand sieht, was die Maschinen machen","e.g. nobody sees what the machines do")} />
+    <input type="text" id="fx-input" class="ov-fx-input" placeholder={L("z. B. Niemand sieht, was die Maschinen machen","e.g. nobody sees what the machines do","例如：没人看得到机器在做什么")} />
     <div class="ov-fx-ex" id="fx-ex">{fxExamples.map((x) => <button type="button" class="ov-fx-chip">{x}</button>)}</div>
     <div id="fx-results" class="ov-fx-results"></div>
-    <p id="fx-hint" class="ov-mono ov-fx-hint">{L("Tipp deinen Bedarf ein oder wähl ein Beispiel — die passenden Bausteine erscheinen hier, nach Relevanz gerankt.","Type your need or pick an example — the matching blocks appear here, ranked by relevance.")}</p>
+    <p id="fx-hint" class="ov-mono ov-fx-hint">{L("Tipp deinen Bedarf ein oder wähl ein Beispiel — die passenden Bausteine erscheinen hier, nach Relevanz gerankt.","Type your need or pick an example — the matching blocks appear here, ranked by relevance.","输入您的需求或选择一个示例——匹配的模块将按相关度排序显示于此。")}</p>
   </div>
 </section>
 
 <!-- MIGRATION + SCHNITTSTELLEN -->
 <section class="ov-beige"><div class="ov-wrap ov-sec ov-2col">
   <div class="rv">
-    <div class="ov-head"><span class="ov-mono ov-kick">{L("Migration","Migration")}</span><span class="ov-hair"></span></div>
-    <h2 class="ov-h3b">{L("Eure Altdaten kommen mit.","Your legacy data comes along.")}</h2>
-    <p class="ov-card-d">{L("Tabellen, Insel-Programme, gewachsene Ordner — maschinenunterstützt migriert und sauber verknüpft. Kein Bei-null-Anfangen.","Spreadsheets, island apps, grown folders — machine-assisted migrated and cleanly linked. No starting from zero.")}</p>
+    <div class="ov-head"><span class="ov-mono ov-kick">{L("Migration","Migration","数据迁移")}</span><span class="ov-hair"></span></div>
+    <h2 class="ov-h3b">{L("Eure Altdaten kommen mit.","Your legacy data comes along.","贵厂的历史数据一并迁入。")}</h2>
+    <p class="ov-card-d">{L("Tabellen, Insel-Programme, gewachsene Ordner — maschinenunterstützt migriert und sauber verknüpft. Kein Bei-null-Anfangen.","Spreadsheets, island apps, grown folders — machine-assisted migrated and cleanly linked. No starting from zero.","表格、孤岛程序、日积月累的文件夹——借助机器迁移并整洁关联。无需从零开始。")}</p>
   </div>
   <div class="rv1">
-    <div class="ov-head"><span class="ov-mono ov-kick">{L("Schnittstellen","Interfaces")}</span><span class="ov-hair"></span></div>
-    <h2 class="ov-h3b">{L("Spricht mit allem, was zählt.","Talks to everything that matters.")}</h2>
+    <div class="ov-head"><span class="ov-mono ov-kick">{L("Schnittstellen","Interfaces","接口")}</span><span class="ov-hair"></span></div>
+    <h2 class="ov-h3b">{L("Spricht mit allem, was zählt.","Talks to everything that matters.","与一切要紧之物对话。")}</h2>
     <div class="ov-ifs">{interfaces.map((x) => <a class="ov-if taglink" href={tagHref(x.tag, lang)} title={x.d}>{x.l}</a>)}</div>
   </div>
 </div></section>
 
 <!-- SOUVERÄNITÄT -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Souveränität","Sovereignty")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Eure Daten. Eure Regeln. Euer Vorsprung.","Your data. Your rules. Your edge.")}</h2>
-  <p class="ov-sub rv1">{L("Digitale Souveränität ist der Schlüssel zur Wettbewerbsfähigkeit. Für ein Werk heißt das konkret sechs Dinge:","Digital sovereignty is the key to competitiveness. For a works that means six concrete things:")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("Souveränität","Sovereignty","自主可控（数据主权）")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Eure Daten. Eure Regeln. Euer Vorsprung.","Your data. Your rules. Your edge.","您的数据。您的规则。您的领先优势。")}</h2>
+  <p class="ov-sub rv1">{L("Digitale Souveränität ist der Schlüssel zur Wettbewerbsfähigkeit. Für ein Werk heißt das konkret sechs Dinge:","Digital sovereignty is the key to competitiveness. For a works that means six concrete things:","数字自主可控是竞争力的关键。对一家工厂而言，具体意味着六件事：")}</p>
   <div class="ov-3col">
     {souv.map((c) => (
       <div class="lift ov-card rv1"><div class="ov-mono ov-cardnr">{c.nr}</div><h3 class="ov-card-h">{c.t}</h3><p class="ov-card-d">{c.d}</p></div>
@@ -323,8 +326,8 @@ const branchen = [
 
 <!-- §04 PRAXIS -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§04 · {L("Aus der Praxis","From practice")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Vom Tabellen-Chaos zum laufenden System.","From spreadsheet chaos to a running system.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§04 · {L("Aus der Praxis","From practice","实践案例")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Vom Tabellen-Chaos zum laufenden System.","From spreadsheet chaos to a running system.","从表格乱局到稳定运行的系统。")}</h2>
   <div class="ov-3col">
     {caseSteps.map((c) => (
       <div class="rv1 ov-casecard"><div class="ov-mono ov-cardnr">{c.nr} —</div><h3 class="ov-card-h">{c.t}</h3><p class="ov-card-d">{c.d}</p></div>
@@ -344,43 +347,43 @@ const branchen = [
         </div>
       ))}
     </div>
-    <div class="rv2 ov-more"><a class="navx ov-more-gold" href="#demos">{L("Auswertungen live ansehen","See analytics live")} →</a></div>
+    <div class="rv2 ov-more"><a class="navx ov-more-gold" href="#demos">{L("Auswertungen live ansehen","See analytics live","在线查看分析")} →</a></div>
   </div>
 </section>
 
 <!-- PRÄZISION -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("System — Präzision & Kontrolle","System — precision & control")}</span><span class="ov-hair"></span><span class="ov-mono ov-kick-r">SELF-HOSTED · ON-PREM</span></div>
-  <h2 class="ov-h2 rv">{L("Vom Sensor bis zur Auswertung — alles im Blick.","From sensor to analysis — all in view.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">{L("System — Präzision & Kontrolle","System — precision & control","系统——精准与掌控")}</span><span class="ov-hair"></span><span class="ov-mono ov-kick-r">SELF-HOSTED · ON-PREM</span></div>
+  <h2 class="ov-h2 rv">{L("Vom Sensor bis zur Auswertung — alles im Blick.","From sensor to analysis — all in view.","从传感器到分析——尽在掌握。")}</h2>
   <div class="ov-2col ov-prec">
     <div class="rv1 tk ov-monitor">
-      <div class="ov-mon-top"><span>{L("LIVE-PRODUKTIONSÜBERWACHUNG","LIVE PRODUCTION MONITORING")}</span><span class="ioled ov-rec">● REC</span></div>
+      <div class="ov-mon-top"><span>{L("LIVE-PRODUKTIONSÜBERWACHUNG","LIVE PRODUCTION MONITORING","实时生产监控")}</span><span class="ioled ov-rec">● REC</span></div>
       <div class="ov-mon-list">
-        {machines.map((m) => <div class="ov-mon-row"><span class="ov-mono ov-mon-n">{m}</span><span class="ov-mono ov-mon-ok"><span class="led ov-led-g"></span>{L("läuft","running")}</span></div>)}
+        {machines.map((m) => <div class="ov-mon-row"><span class="ov-mono ov-mon-n">{m}</span><span class="ov-mono ov-mon-ok"><span class="led ov-led-g"></span>{L("läuft","running","运行中")}</span></div>)}
       </div>
     </div>
     <div class="ov-prec-side">
-      <div class="rv2 lift ov-card"><div class="ov-mono ov-kick">{L("Entwickler-First · Open API","Developer-first · Open API")}</div><h3 class="ov-card-h">{L("Voller Zugriff auf den Quellcode.","Full access to the source code.")}</h3><p class="ov-card-d">{L("Anpassungen auf Code-Ebene — keine versteckten Gebühren, kein Lock-in.","Customisations at code level — no hidden fees, no lock-in.")}</p></div>
-      <div class="rv3 lift ov-card"><div class="ov-mono ov-kick ov-kick-led"><span class="led ov-led-g"></span>{L("DSGVO-konform","GDPR-compliant")}</div><h3 class="ov-card-h">{L("Eure Infrastruktur.","Your infrastructure.")}</h3><p class="ov-card-d">{L("EU-Hosting · verschlüsseltes Backup · gespiegelte Systeme für maximale Ausfallsicherheit.","EU hosting · encrypted backup · mirrored systems for maximum resilience.")}</p></div>
+      <div class="rv2 lift ov-card"><div class="ov-mono ov-kick">{L("Entwickler-First · Open API","Developer-first · Open API","开发者优先 · 开放 API")}</div><h3 class="ov-card-h">{L("Voller Zugriff auf den Quellcode.","Full access to the source code.","完全访问源代码。")}</h3><p class="ov-card-d">{L("Anpassungen auf Code-Ebene — keine versteckten Gebühren, kein Lock-in.","Customisations at code level — no hidden fees, no lock-in.","代码层面的定制——没有隐藏费用，没有厂商锁定。")}</p></div>
+      <div class="rv3 lift ov-card"><div class="ov-mono ov-kick ov-kick-led"><span class="led ov-led-g"></span>{L("DSGVO-konform","GDPR-compliant","符合 GDPR")}</div><h3 class="ov-card-h">{L("Eure Infrastruktur.","Your infrastructure.","您的基础设施。")}</h3><p class="ov-card-d">{L("EU-Hosting · verschlüsseltes Backup · gespiegelte Systeme für maximale Ausfallsicherheit.","EU hosting · encrypted backup · mirrored systems for maximum resilience.","欧盟托管 · 加密备份 · 镜像系统，实现最高韧性。")}</p></div>
     </div>
   </div>
 </section>
 
 <!-- §05 DEMOS -->
 <section id="demos" class="ov-beige ov-anchor"><div class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§05 · {L("Spürbare Tiefe","Real depth")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Keine Folien. Klick rein.","No slides. Click in.")}</h2>
-  <p class="ov-sub rv1">{L("Echte, klickbare Systeme auf Daten einer Musterfirma. Kein Login. Schau, was schon läuft — und wie tief es geht.","Real, clickable systems on a sample company's data. No login. See what's running — and how deep it goes.")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§05 · {L("Spürbare Tiefe","Real depth","真正的深度")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Keine Folien. Klick rein.","No slides. Click in.","没有幻灯片。点进来看。")}</h2>
+  <p class="ov-sub rv1">{L("Echte, klickbare Systeme auf Daten einer Musterfirma. Kein Login. Schau, was schon läuft — und wie tief es geht.","Real, clickable systems on a sample company's data. No login. See what's running — and how deep it goes.","基于样板公司数据的真实、可点击系统。无需登录。看看已在运行的一切——以及它有多深入。")}</p>
   <div class="ov-demolist">
     {demos.map((d) => (
       <a href={d.href} target="_blank" rel="noopener" class="demorow ov-demorow rv1">
         <span class="ov-demo-dot" style={`background:${d.color}`}></span>
         <span><b class="ov-demo-t">{d.t}</b><span class="ov-demo-d">{d.d}</span></span>
-        <span class="ov-mono ov-demo-open">{L("Demo öffnen","Open demo")} <span class="arrowx">↗</span></span>
+        <span class="ov-mono ov-demo-open">{L("Demo öffnen","Open demo","打开演示")} <span class="arrowx">↗</span></span>
       </a>
     ))}
   </div>
-  <p class="ov-mono rv1" style="color:#92938F; margin-top:14px; font-size:12.5px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.")}</p>
+  <p class="ov-mono rv1" style="color:#92938F; margin-top:14px; font-size:12.5px;">{L("Alle Demos öffnen in einem neuen Tab — diese Seite bleibt offen.","All demos open in a new tab — this page stays open.","所有演示都在新标签页打开——本页面保持不变。")}</p>
 </div></section>
 
 <!-- PROZESS-SIM-TEASER -->
@@ -388,8 +391,8 @@ const branchen = [
 
 <!-- ZUM ERKUNDEN -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">★ {L("Zum Erkunden","To explore")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Geht tiefer rein.","Go deeper.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">★ {L("Zum Erkunden","To explore","深入探索")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Geht tiefer rein.","Go deeper.","再深入一层。")}</h2>
   <div class="ov-2col ov-explore">
     {explore.map((e) => (
       <a href={`${b}${e.p}`} class="exprow ov-exprow rv1"><span><b class="ov-exp-t">{e.t}</b><span class="ov-exp-d">{e.d}</span></span><span class="arrowx ov-exp-arr">→</span></a>
@@ -399,9 +402,9 @@ const branchen = [
 
 <!-- §06 STACK -->
 <section id="saeulen" class="ov-beige ov-anchor"><div class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§06 · {L("Der Stack","The stack")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Von der Maschine bis zur Auswertung.","From machine to analysis.")}</h2>
-  <p class="ov-sub rv1">{L("Zehn Bausteine, ein zusammenhängendes Ganzes — keine zehn Insellösungen. Filter nach Bereich:","Ten building blocks, one coherent whole — not ten islands. Filter by area:")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§06 · {L("Der Stack","The stack","技术栈")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Von der Maschine bis zur Auswertung.","From machine to analysis.","从机器到分析。")}</h2>
+  <p class="ov-sub rv1">{L("Zehn Bausteine, ein zusammenhängendes Ganzes — keine zehn Insellösungen. Filter nach Bereich:","Ten building blocks, one coherent whole — not ten islands. Filter by area:","十个模块，浑然一体——而非十个孤岛方案。按领域筛选：")}</p>
   <div class="ov-filters rv1" id="ov-filters">
     {filters.map(([k, lbl], i) => <button type="button" class={`filt ov-filt${i===0?" on":""}`} data-f={k}>{lbl} <span class="ov-filt-n">{fcount(k)}</span></button>)}
   </div>
@@ -418,8 +421,8 @@ const branchen = [
 
 <!-- §07 VERGLEICH -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§07 · {L("Der Vergleich","The comparison")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Zwei Sackgassen. Ein dritter Weg.","Two dead ends. One third way.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§07 · {L("Der Vergleich","The comparison","对比")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Zwei Sackgassen. Ein dritter Weg.","Two dead ends. One third way.","两条死胡同。一条第三路。")}</h2>
   <div class="ov-cmp">
     {vergleich.map((v) => (
       <div class={`rv1 ov-cmp-card${v.good?" good":""}`}><div class="ov-mono ov-cmp-tag">{v.tag}</div><h3 class="ov-cmp-t">{v.t}</h3><p class="ov-cmp-d">{v.d}</p></div>
@@ -429,9 +432,9 @@ const branchen = [
 
 <!-- §08 MITMACHEN -->
 <section class="ov-beige"><div class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§08 · {L("Menschen","People")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Ein System, das die Leute mitbauen.","A system the people build with.")}</h2>
-  <p class="ov-sub rv1">{L("Software wird hier nicht von oben verhängt. Die, die damit arbeiten, gestalten mit — und kriegen Hilfe genau dort, wo sie arbeiten.","Software isn't imposed from above. Those who work with it shape it — and get help right where they work.")}</p>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§08 · {L("Menschen","People","人")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Ein System, das die Leute mitbauen.","A system the people build with.","一套由使用者共同打造的系统。")}</h2>
+  <p class="ov-sub rv1">{L("Software wird hier nicht von oben verhängt. Die, die damit arbeiten, gestalten mit — und kriegen Hilfe genau dort, wo sie arbeiten.","Software isn't imposed from above. Those who work with it shape it — and get help right where they work.","软件不是自上而下强加的。使用它的人参与塑造它——并在工作现场获得帮助。")}</p>
   <div class="ov-4col">
     {mitmachen.map((m) => (
       <div class="lift ov-card rv1"><div class="ov-mm-k">{m.k}</div><h3 class="ov-card-h ov-mm-h">{m.t}</h3><p class="ov-card-d">{m.d}</p></div>
@@ -441,13 +444,13 @@ const branchen = [
 
 <!-- §09 TEAM -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§09 · {L("Wer dahinter steckt","Who's behind it")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§09 · {L("Wer dahinter steckt","Who's behind it","幕后团队")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
   <div class="ov-2col ov-team">
     <div class="rvx"><div class="tk ov-portrait"><span class="ov-mono ov-portrait-lab">PORTRAIT — DAVID FUCHS</span></div></div>
     <div class="rv1">
-      <h2 class="ov-team-h">{L("Head of the Crowd.","Head of the Crowd.")}</h2>
+      <h2 class="ov-team-h">{L("Head of the Crowd.","Head of the Crowd.","Head of the Crowd.")}</h2>
       <p class="ov-mono ov-team-name">DAVID FUCHS</p>
-      <p class="ov-team-bio">{L("Unternehmer, technischer Generalist, Systemdenker — 25 Jahre an der Naht zwischen Infrastruktur, Automatisierung und Geschäftsprozessen. Dahinter ein eingespieltes Team und eine ganze Crowd. Für euch: ein Ansprechpartner, der das Ganze überblickt — kein Abteilungs-Pingpong.","Entrepreneur, technical generalist, systems thinker — 25 years at the seam between infrastructure, automation and business processes. Behind him a tight-knit team and a whole crowd. For you: one contact who sees the whole — no departmental ping-pong.")}</p>
+      <p class="ov-team-bio">{L("Unternehmer, technischer Generalist, Systemdenker — 25 Jahre an der Naht zwischen Infrastruktur, Automatisierung und Geschäftsprozessen. Dahinter ein eingespieltes Team und eine ganze Crowd. Für euch: ein Ansprechpartner, der das Ganze überblickt — kein Abteilungs-Pingpong.","Entrepreneur, technical generalist, systems thinker — 25 years at the seam between infrastructure, automation and business processes. Behind him a tight-knit team and a whole crowd. For you: one contact who sees the whole — no departmental ping-pong.","企业家、技术通才、系统思考者——25 年深耕于基础设施、自动化与业务流程的交汇处。背后是一支默契的团队和一整个社区。对您而言：一位纵观全局的对接人——无需在各部门之间来回踢皮球。")}</p>
       <div class="ov-team-list">
         {team.map((t) => <div class="ov-team-item"><h3 class="ov-team-it-h">{t.t}</h3><p class="ov-card-d">{t.d}</p></div>)}
       </div>
@@ -458,53 +461,53 @@ const branchen = [
 <!-- HALTUNG -->
 <section class="ov-dark"><div class="ov-wrap ov-2col ov-halt rv">
   <div>
-    <div class="ov-mono ov-kick-light">{L("Haltung","Attitude")}</div>
-    <h2 class="ov-halt-h">{L("Wir arbeiten gerne — aber nicht mit jedem.","We like working — but not with everyone.")}</h2>
+    <div class="ov-mono ov-kick-light">{L("Haltung","Attitude","态度")}</div>
+    <h2 class="ov-halt-h">{L("Wir arbeiten gerne — aber nicht mit jedem.","We like working — but not with everyone.","我们乐于合作——但不是和所有人。")}</h2>
   </div>
   <div>
-    <p class="ov-halt-p">{L("Die Chemie muss stimmen. Wir packen viel an, aber nicht alles nur fürs Geld. Wer es auf die harte Tour will, sucht sich besser jemand anderen.","The chemistry has to fit. We take on a lot, but not everything just for money. If you want it the hard way, you're better off with someone else.")}</p>
+    <p class="ov-halt-p">{L("Die Chemie muss stimmen. Wir packen viel an, aber nicht alles nur fürs Geld. Wer es auf die harte Tour will, sucht sich besser jemand anderen.","The chemistry has to fit. We take on a lot, but not everything just for money. If you want it the hard way, you're better off with someone else.","彼此得投缘。我们承担很多，但不会只为钱什么都做。若您非要硬碰硬，还是另请高明为好。")}</p>
     <div class="ov-halt-chips">
-      <span class="ov-halt-chip">{L("Kurze Wege","Short paths")}</span>
-      <span class="ov-halt-chip">{L("Kommunikation ohne Umweg","Direct communication")}</span>
-      <span class="ov-halt-chip">{L("Alles nachvollziehbar","All traceable")}</span>
+      <span class="ov-halt-chip">{L("Kurze Wege","Short paths","沟通直接")}</span>
+      <span class="ov-halt-chip">{L("Kommunikation ohne Umweg","Direct communication","沟通不绕弯")}</span>
+      <span class="ov-halt-chip">{L("Alles nachvollziehbar","All traceable","一切可追溯")}</span>
     </div>
   </div>
 </div></section>
 
 <!-- §10 ABLAUF -->
 <section class="ov-wrap ov-sec">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§10 · {L("So läuft's ab","How it works")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Von der Pain-List zum laufenden System.","From pain list to a running system.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§10 · {L("So läuft's ab","How it works","流程是怎样的")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Von der Pain-List zum laufenden System.","From pain list to a running system.","从痛点清单到稳定运行的系统。")}</h2>
   <div class="ov-5col">
     {ablauf.map((a) => (
       <div class="rv1 ov-step"><div class="ov-step-top"><span class="ov-step-n">{a.nr}</span><span class="ov-step-line"></span></div><h3 class="ov-card-h ov-step-h">{a.t}</h3><p class="ov-card-d">{a.d}</p></div>
     ))}
   </div>
-  <div class="rv2 ov-more"><a class="ctagold ov-cta-pine" href={`${b}/kontakt/`}>{L("Pain-List schicken","Send pain list")} →</a></div>
+  <div class="rv2 ov-more"><a class="ctagold ov-cta-pine" href={`${b}/kontakt/`}>{L("Pain-List schicken","Send pain list","发送痛点清单")} →</a></div>
 </section>
 
 <!-- §11 AUFWAND -->
 <section class="ov-wrap ov-sec ov-sec-tight">
-  <div class="ov-head rv"><span class="ov-mono ov-kick">§11 · {L("Aufwand & Transparenz","Effort & transparency")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
-  <h2 class="ov-h2 rv">{L("Worauf ihr euch einlasst — vorab, ehrlich.","What you're getting into — upfront, honest.")}</h2>
+  <div class="ov-head rv"><span class="ov-mono ov-kick">§11 · {L("Aufwand & Transparenz","Effort & transparency","投入与透明")}</span><span class="ov-hair"></span><span class="ov-tick"></span></div>
+  <h2 class="ov-h2 rv">{L("Worauf ihr euch einlasst — vorab, ehrlich.","What you're getting into — upfront, honest.","您将面对什么——事先坦诚相告。")}</h2>
   <div class="ov-3col">
     {aufwand.map((c) => (
       <div class="lift ov-card rv1"><div class="ov-mono ov-cardnr">{c.nr}</div><h3 class="ov-card-h">{c.t}</h3><p class="ov-card-d">{c.d}</p></div>
     ))}
   </div>
-  <p class="rv2 ov-aufwand-note">{L("Was kostet das? Konkrete Zahlen mit der Lösungsskizze — ein fixes Angebot, keine Überraschungen.","What does it cost? Concrete figures with the solution sketch — a fixed quote, no surprises.")} <a class="navx" href={`${b}/faq/`}>{L("Häufige Fragen","FAQ")} →</a></p>
+  <p class="rv2 ov-aufwand-note">{L("Was kostet das? Konkrete Zahlen mit der Lösungsskizze — ein fixes Angebot, keine Überraschungen.","What does it cost? Concrete figures with the solution sketch — a fixed quote, no surprises.","花费多少？具体数字随解决方案草案一并给出——固定报价，绝无意外。")} <a class="navx" href={`${b}/faq/`}>{L("Häufige Fragen","FAQ","常见问题")} →</a></p>
 </section>
 
 <!-- PAIN-CTA -->
 <section class="ov-dark ov-cta-sec">
   <div class="glow ov-cta-glow"></div>
   <div class="ov-wrap ov-cta-in">
-    <div class="ov-mono ov-kick-light rv">Pain-List → {L("Lösung","Solution")}</div>
-    <h2 class="ov-cta-h rv1">{L("Schick uns deine Pain-List.","Send us your pain list.")}</h2>
-    <p class="ov-cta-p rv2">{L("Die drei nervigsten Tabellen. Das System, das ihr hasst. Der Ablauf, der jeden Montag schmerzt. Schreib's roh runter — wir melden uns mit einer konkreten Lösungsskizze. Kein Sales-Blabla.","The three most annoying spreadsheets. The system you hate. The routine that hurts every Monday. Jot it down raw — we'll come back with a concrete solution sketch. No sales fluff.")}</p>
+    <div class="ov-mono ov-kick-light rv">Pain-List → {L("Lösung","Solution","解决方案")}</div>
+    <h2 class="ov-cta-h rv1">{L("Schick uns deine Pain-List.","Send us your pain list.","把您的痛点清单发给我们。")}</h2>
+    <p class="ov-cta-p rv2">{L("Die drei nervigsten Tabellen. Das System, das ihr hasst. Der Ablauf, der jeden Montag schmerzt. Schreib's roh runter — wir melden uns mit einer konkreten Lösungsskizze. Kein Sales-Blabla.","The three most annoying spreadsheets. The system you hate. The routine that hurts every Monday. Jot it down raw — we'll come back with a concrete solution sketch. No sales fluff.","最烦人的三张表格。您最讨厌的那套系统。每周一都让人头疼的那道流程。原样写下来即可——我们会带着一份具体的解决方案草案回复您。绝无推销废话。")}</p>
     <div class="ov-cta-row rv2">
-      <a class="ctagold ov-cta-gold" href={`${b}/kontakt/`}>{L("Pain-List schicken","Send pain list")} →</a>
-      <a class="navx ov-cta-mail" href="mailto:hallo@datendrang.com">{L("oder direkt: hallo@datendrang.com","or email: hallo@datendrang.com")}</a>
+      <a class="ctagold ov-cta-gold" href={`${b}/kontakt/`}>{L("Pain-List schicken","Send pain list","发送痛点清单")} →</a>
+      <a class="navx ov-cta-mail" href="mailto:hallo@datendrang.com">{L("oder direkt: hallo@datendrang.com","or email: hallo@datendrang.com","或直接邮件：hallo@datendrang.com")}</a>
     </div>
   </div>
 </section>

@@ -4,83 +4,86 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const P = (path: string) => (de ? "" : "/en") + path;
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const P = (path: string) => (de ? "" : en ? "/en" : "/cn") + path;
 const ERP = "https://erp-demo.indystry.works/odoo";
 const TWIN = "https://twin-demo.indystry.works";
 const BI = "https://bi-demo.indystry.works";
 const shifts = [
-  { key: "frueh", name: L("Frühschicht", "Early shift"), time: "06–14" },
-  { key: "spaet", name: L("Spätschicht", "Late shift"), time: "14–22" },
-  { key: "nacht", name: L("Nachtschicht", "Night shift"), time: "22–06" },
+  { key: "frueh", name: L("Frühschicht", "Early shift", "早班"), time: "06–14" },
+  { key: "spaet", name: L("Spätschicht", "Late shift", "中班"), time: "14–22" },
+  { key: "nacht", name: L("Nachtschicht", "Night shift", "夜班"), time: "22–06" },
 ];
 type Scene = { sh: string; t: string; who: string; role: string; akt: string; text: string; href: string; cta: string; ext?: boolean };
 const scenes: Scene[] = [
   // FRÜHSCHICHT
-  { sh:"frueh", t:"06:30", who:"Frank", role:L("Schichtleiter","Shift lead"), akt:"kern",
-    text:L("Erster Kaffee, erster Blick auf den Leitstand. Sieben Maschinen grün — nur das Drehzentrum B1 blinkt gelb: „Wartung fällig“.","First coffee, first look at the control room. Seven machines green — only lathe B1 blinks amber: “maintenance due”."),
-    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
-  { sh:"frueh", t:"07:00", who:"Ali", role:L("Maschinenbediener","Operator"), akt:"kern",
-    text:L("Ali rüstet die CNC-Fräse A1, lädt das Programm für 200× Lagerbock NW-1001 und startet — Rückmeldung direkt an der Maschine.","Ali sets up CNC mill A1, loads the program for 200× bearing block NW-1001 and starts — feedback right at the machine."),
-    href:P("/anlage/"), cta:L("Maschine & Schaltschrank","Machine & cabinet") },
-  { sh:"frueh", t:"08:15", who:"Lena", role:L("Vertrieb Innendienst","Inside sales"), akt:"anbahnung",
-    text:L("Eine Anfrage von Alpentech wird zum Lead. Thomas spielt sie am Digital Twin durch, Lena schickt ein Angebot mit echtem Termin.","An inquiry from Alpentech becomes a lead. Thomas runs it through the digital twin, Lena sends a quote with a real date."),
-    href:TWIN, ext:true, cta:L("Digital Twin","Digital twin") },
-  { sh:"frueh", t:"09:30", who:"Bernd", role:L("Einkauf","Purchasing"), akt:"kern",
-    text:L("Das MRP rechnet den Materialbedarf aus dem Auftrag — Bernd bestätigt die Bestellvorschläge für Stahl mit zwei Klicks.","MRP computes material demand from the order — Bernd confirms the steel purchase suggestions in two clicks."),
-    href:ERP, ext:true, cta:L("Im ERP","In the ERP") },
-  { sh:"frueh", t:"10:00", who:"Jens", role:L("Instandhaltung","Maintenance"), akt:"kern",
-    text:L("Jens klickt von der Maschine in den Schaltschrank bis zum Stromlaufplan, prüft die Vibrationskurve — und plant B1 ein.","Jens clicks from the machine into the cabinet down to the wiring plan, checks the vibration trend — and schedules B1."),
-    href:P("/historian/"), cta:L("Historian","Historian") },
-  { sh:"frueh", t:"11:30", who:"Petra", role:L("Qualität","Quality"), akt:"kern",
-    text:L("Bei der Flanschplatte NW-2010 driftet die Maßhaltigkeit. Die BI sieht es vor der Endprüfung — Petra greift ein.","On flange plate NW-2010 the dimensions drift. BI sees it before final inspection — Petra steps in."),
-    href:BI, ext:true, cta:L("Process-Drift (BI)","Process drift (BI)") },
-  { sh:"frueh", t:"13:00", who:"Klaus", role:L("Lager & Versand","Warehouse & shipping"), akt:"kern",
-    text:L("Die 200 Lagerböcke sind fertig und geprüft. Klaus kommissioniert mit Echtzeit-Bestand — NW-1001 geht raus.","The 200 bearing blocks are done and inspected. Klaus picks with real-time stock — NW-1001 ships."),
-    href:ERP, ext:true, cta:L("Im ERP","In the ERP") },
+  { sh:"frueh", t:"06:30", who:"Frank", role:L("Schichtleiter","Shift lead","班组长"), akt:"kern",
+    text:L("Erster Kaffee, erster Blick auf den Leitstand. Sieben Maschinen grün — nur das Drehzentrum B1 blinkt gelb: „Wartung fällig“.","First coffee, first look at the control room. Seven machines green — only lathe B1 blinks amber: “maintenance due”.","第一杯咖啡，先看一眼中控室。七台机器全绿——只有车削中心 B1 在闪黄灯：「维护到期」。"),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room","中控室") },
+  { sh:"frueh", t:"07:00", who:"Ali", role:L("Maschinenbediener","Operator","机床操作员"), akt:"kern",
+    text:L("Ali rüstet die CNC-Fräse A1, lädt das Programm für 200× Lagerbock NW-1001 und startet — Rückmeldung direkt an der Maschine.","Ali sets up CNC mill A1, loads the program for 200× bearing block NW-1001 and starts — feedback right at the machine.","Ali 装调 CNC 铣床 A1，调入 200× 轴承座 NW-1001 的程序并启动——直接在机床上反馈。"),
+    href:P("/anlage/"), cta:L("Maschine & Schaltschrank","Machine & cabinet","机床与电控柜") },
+  { sh:"frueh", t:"08:15", who:"Lena", role:L("Vertrieb Innendienst","Inside sales","内勤销售"), akt:"anbahnung",
+    text:L("Eine Anfrage von Alpentech wird zum Lead. Thomas spielt sie am Digital Twin durch, Lena schickt ein Angebot mit echtem Termin.","An inquiry from Alpentech becomes a lead. Thomas runs it through the digital twin, Lena sends a quote with a real date.","来自 Alpentech 的询价转化为商机。Thomas 在数字孪生上完整演算了一遍，Lena 附上一个真实交期发出报价。"),
+    href:TWIN, ext:true, cta:L("Digital Twin","Digital twin","数字孪生") },
+  { sh:"frueh", t:"09:30", who:"Bernd", role:L("Einkauf","Purchasing","采购"), akt:"kern",
+    text:L("Das MRP rechnet den Materialbedarf aus dem Auftrag — Bernd bestätigt die Bestellvorschläge für Stahl mit zwei Klicks.","MRP computes material demand from the order — Bernd confirms the steel purchase suggestions in two clicks.","MRP 从订单算出物料需求——Bernd 两下点击即确认了钢材的采购建议。"),
+    href:ERP, ext:true, cta:L("Im ERP","In the ERP","在 ERP 中") },
+  { sh:"frueh", t:"10:00", who:"Jens", role:L("Instandhaltung","Maintenance","维护"), akt:"kern",
+    text:L("Jens klickt von der Maschine in den Schaltschrank bis zum Stromlaufplan, prüft die Vibrationskurve — und plant B1 ein.","Jens clicks from the machine into the cabinet down to the wiring plan, checks the vibration trend — and schedules B1.","Jens 从机床点进电控柜，再一路到电气原理图，查看振动趋势——随后为 B1 排入计划。"),
+    href:P("/historian/"), cta:L("Historian","Historian","历史数据库") },
+  { sh:"frueh", t:"11:30", who:"Petra", role:L("Qualität","Quality","质量"), akt:"kern",
+    text:L("Bei der Flanschplatte NW-2010 driftet die Maßhaltigkeit. Die BI sieht es vor der Endprüfung — Petra greift ein.","On flange plate NW-2010 the dimensions drift. BI sees it before final inspection — Petra steps in.","法兰板 NW-2010 的尺寸精度出现漂移。BI 在终检之前就发现了——Petra 及时介入。"),
+    href:BI, ext:true, cta:L("Process-Drift (BI)","Process drift (BI)","过程漂移（BI）") },
+  { sh:"frueh", t:"13:00", who:"Klaus", role:L("Lager & Versand","Warehouse & shipping","库存与发货"), akt:"kern",
+    text:L("Die 200 Lagerböcke sind fertig und geprüft. Klaus kommissioniert mit Echtzeit-Bestand — NW-1001 geht raus.","The 200 bearing blocks are done and inspected. Klaus picks with real-time stock — NW-1001 ships.","200 件轴承座已完工并检验合格。Klaus 依据实时库存拣货——NW-1001 发运出厂。"),
+    href:ERP, ext:true, cta:L("Im ERP","In the ERP","在 ERP 中") },
   // SPÄTSCHICHT
-  { sh:"spaet", t:"14:30", who:"Nadia", role:L("Schichtleiterin Spät","Late shift lead"), akt:"kern",
-    text:L("Schichtübergabe in 5 Minuten statt 30: Nadia liest am Leitstand ab, was läuft, was offen ist, wo B1 steht.","Handover in 5 minutes instead of 30: Nadia reads off the control room what's running, what's open, where B1 stands."),
-    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
-  { sh:"spaet", t:"15:30", who:L("Kunde","Customer"), role:"Helvetia Pumpen AG", akt:"nach",
-    text:L("Der Einkäufer beim Kunden öffnet das Portal: Auftrag geliefert, Rechnung offen, Servicevertrag aktiv — ohne eine Rückfrage.","The customer's buyer opens the portal: order delivered, invoice open, service contract active — without a single query."),
-    href:P("/portal/"), cta:L("Kundenportal","Customer portal") },
-  { sh:"spaet", t:"16:30", who:"Sven", role:L("Servicetechniker","Service tech"), akt:"nach",
-    text:L("Eine Reklamation trifft ein. Sven legt den Reparaturauftrag an; die KI-Suche zeigt sofort einen ähnlichen Altfall samt Lösung.","A complaint arrives. Sven opens the repair order; the AI search instantly surfaces a similar past case and its fix."),
-    href:P("/suche/"), cta:L("Frag die Firma","Ask the company") },
-  { sh:"spaet", t:"18:00", who:"Tomasz", role:L("Maschinenbediener Spät","Operator, late"), akt:"kern",
-    text:L("Serienlauf NW-2010 auf dem Laserschneider L1. Tomasz meldet Gut- und Ausschussmengen laufend zurück — die BI füllt sich in Echtzeit.","Series run NW-2010 on laser cutter L1. Tomasz reports good and scrap quantities continuously — BI fills up in real time."),
-    href:P("/anlage/"), cta:L("Anlage","Plant") },
-  { sh:"spaet", t:"20:30", who:"Mara", role:L("Qualität Spät","Quality, late"), akt:"kern",
-    text:L("Endprüfung der Charge: Maße, Oberfläche, Gewicht automatisch bewertet, Prüfprotokoll erzeugt. Kein Zettel, kein Suchen beim Audit.","Final inspection of the batch: dimensions, surface, weight auto-graded, inspection record generated. No paper, no audit search."),
-    href:BI, ext:true, cta:L("Qualität in der BI","Quality in BI") },
+  { sh:"spaet", t:"14:30", who:"Nadia", role:L("Schichtleiterin Spät","Late shift lead","中班班组长"), akt:"kern",
+    text:L("Schichtübergabe in 5 Minuten statt 30: Nadia liest am Leitstand ab, was läuft, was offen ist, wo B1 steht.","Handover in 5 minutes instead of 30: Nadia reads off the control room what's running, what's open, where B1 stands.","交接班从 30 分钟缩短到 5 分钟：Nadia 在中控室上一目了然——什么在运行、什么还没完成、B1 处于什么状态。"),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room","中控室") },
+  { sh:"spaet", t:"15:30", who:L("Kunde","Customer","客户"), role:"Helvetia Pumpen AG", akt:"nach",
+    text:L("Der Einkäufer beim Kunden öffnet das Portal: Auftrag geliefert, Rechnung offen, Servicevertrag aktiv — ohne eine Rückfrage.","The customer's buyer opens the portal: order delivered, invoice open, service contract active — without a single query.","客户的采购员打开门户：订单已交付、发票待付、服务合同有效——无需一次问询。"),
+    href:P("/portal/"), cta:L("Kundenportal","Customer portal","客户门户") },
+  { sh:"spaet", t:"16:30", who:"Sven", role:L("Servicetechniker","Service tech","服务技师"), akt:"nach",
+    text:L("Eine Reklamation trifft ein. Sven legt den Reparaturauftrag an; die KI-Suche zeigt sofort einen ähnlichen Altfall samt Lösung.","A complaint arrives. Sven opens the repair order; the AI search instantly surfaces a similar past case and its fix.","一条客诉到了。Sven 建立维修工单；AI 搜索立刻找出一个类似的旧案例及其解决方案。"),
+    href:P("/suche/"), cta:L("Frag die Firma","Ask the company","向公司提问") },
+  { sh:"spaet", t:"18:00", who:"Tomasz", role:L("Maschinenbediener Spät","Operator, late","中班机床操作员"), akt:"kern",
+    text:L("Serienlauf NW-2010 auf dem Laserschneider L1. Tomasz meldet Gut- und Ausschussmengen laufend zurück — die BI füllt sich in Echtzeit.","Series run NW-2010 on laser cutter L1. Tomasz reports good and scrap quantities continuously — BI fills up in real time.","NW-2010 在激光切割机 L1 上批量运行。Tomasz 持续回报良品与废品数量——BI 实时充实数据。"),
+    href:P("/anlage/"), cta:L("Anlage","Plant","设备") },
+  { sh:"spaet", t:"20:30", who:"Mara", role:L("Qualität Spät","Quality, late","中班质量"), akt:"kern",
+    text:L("Endprüfung der Charge: Maße, Oberfläche, Gewicht automatisch bewertet, Prüfprotokoll erzeugt. Kein Zettel, kein Suchen beim Audit.","Final inspection of the batch: dimensions, surface, weight auto-graded, inspection record generated. No paper, no audit search.","批次终检：尺寸、表面、重量自动评定，检验记录自动生成。没有纸单，审核时也无需翻找。"),
+    href:BI, ext:true, cta:L("Qualität in der BI","Quality in BI","BI 中的质量") },
   // NACHTSCHICHT
-  { sh:"nacht", t:"22:30", who:"Elias", role:L("Werker Nacht","Operator, night"), akt:"kern",
-    text:L("Schwach besetzte Nacht: Laser L1 läuft weiter, Elias überwacht drei Linien vom Leitstand aus statt herumzulaufen.","Thinly staffed night: laser L1 keeps running, Elias watches three lines from the control room instead of walking around."),
-    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
-  { sh:"nacht", t:"00:30", who:L("System · KI","System · AI"), role:L("Autonome Prognose","Autonomous prediction"), akt:"nach",
-    text:L("Mitten in der Nacht erkennt die Prognose steigende Vibration an Achse Y — und legt selbsttätig einen Wartungsauftrag an. Precognitive: der Ausfall wird verhindert, bevor er passiert.","In the middle of the night the prediction spots rising vibration on axis Y — and opens a maintenance order by itself. Precognitive: the failure is prevented before it happens."),
-    href:P("/anlage/"), cta:L("Prognose im Plan","Prediction in the plan") },
-  { sh:"nacht", t:"02:00", who:"Ravi", role:L("Instandhaltung Rufbereitschaft","On-call maintenance"), akt:"kern",
-    text:L("Ravi bekommt den Auftrag aufs Handy, kommt vorbereitet — das Lager ist schon reserviert. Tausch in 40 Minuten, die Linie steht nie still.","Ravi gets the order on his phone, arrives prepared — the bearing is already reserved. Swap in 40 minutes, the line never stops."),
-    href:P("/historian/"), cta:L("Zustandsdaten","Condition data") },
-  { sh:"nacht", t:"04:01", who:L("System","System"), role:"Historian", akt:"nach",
-    text:L("Jeder Messwert der Nacht ist sicher gespeichert. Um vier Uhr steht der Snapshot, aus dem morgens das GF-Cockpit rechnet.","Every reading of the night is safely stored. At four the snapshot is ready, from which the management cockpit computes in the morning."),
-    href:P("/status/"), cta:L("Betrieb & Backups","Ops & backups") },
-  { sh:"nacht", t:"05:30", who:"Frank", role:L("Schichtleiter","Shift lead"), akt:"kern",
-    text:L("Frank kommt zurück, Achse Y ist getauscht, alles grün. Übergabe an die Frühschicht — und der Tag beginnt von vorn.","Frank returns, axis Y is swapped, everything green. Handover to the early shift — and the day starts over."),
-    href:P("/leitstand/"), cta:L("Leitstand","Control room") },
+  { sh:"nacht", t:"22:30", who:"Elias", role:L("Werker Nacht","Operator, night","夜班作业员"), akt:"kern",
+    text:L("Schwach besetzte Nacht: Laser L1 läuft weiter, Elias überwacht drei Linien vom Leitstand aus statt herumzulaufen.","Thinly staffed night: laser L1 keeps running, Elias watches three lines from the control room instead of walking around.","值守人手不多的夜里：激光 L1 继续运行，Elias 在中控室监看三条产线，无需来回走动。"),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room","中控室") },
+  { sh:"nacht", t:"00:30", who:L("System · KI","System · AI","系统 · AI"), role:L("Autonome Prognose","Autonomous prediction","自主预测"), akt:"nach",
+    text:L("Mitten in der Nacht erkennt die Prognose steigende Vibration an Achse Y — und legt selbsttätig einen Wartungsauftrag an. Precognitive: der Ausfall wird verhindert, bevor er passiert.","In the middle of the night the prediction spots rising vibration on axis Y — and opens a maintenance order by itself. Precognitive: the failure is prevented before it happens.","深夜时分，预测发现 Y 轴振动上升——并自动建立一张维护工单。预知先行：故障在发生之前就被避免了。"),
+    href:P("/anlage/"), cta:L("Prognose im Plan","Prediction in the plan","计划中的预测") },
+  { sh:"nacht", t:"02:00", who:"Ravi", role:L("Instandhaltung Rufbereitschaft","On-call maintenance","维护值班"), akt:"kern",
+    text:L("Ravi bekommt den Auftrag aufs Handy, kommt vorbereitet — das Lager ist schon reserviert. Tausch in 40 Minuten, die Linie steht nie still.","Ravi gets the order on his phone, arrives prepared — the bearing is already reserved. Swap in 40 minutes, the line never stops.","Ravi 在手机上收到工单，有备而来——轴承已提前预留。40 分钟完成更换，产线从未停机。"),
+    href:P("/historian/"), cta:L("Zustandsdaten","Condition data","状态数据") },
+  { sh:"nacht", t:"04:01", who:L("System","System","系统"), role:"Historian", akt:"nach",
+    text:L("Jeder Messwert der Nacht ist sicher gespeichert. Um vier Uhr steht der Snapshot, aus dem morgens das GF-Cockpit rechnet.","Every reading of the night is safely stored. At four the snapshot is ready, from which the management cockpit computes in the morning.","夜里的每一个测量值都被安全存下。凌晨四点，快照就绪，清晨管理层驾驶舱便据此计算。"),
+    href:P("/status/"), cta:L("Betrieb & Backups","Ops & backups","运维与备份") },
+  { sh:"nacht", t:"05:30", who:"Frank", role:L("Schichtleiter","Shift lead","班组长"), akt:"kern",
+    text:L("Frank kommt zurück, Achse Y ist getauscht, alles grün. Übergabe an die Frühschicht — und der Tag beginnt von vorn.","Frank returns, axis Y is swapped, everything green. Handover to the early shift — and the day starts over.","Frank 回到岗位，Y 轴已更换，一切全绿。交接给早班——新的一天从头开始。"),
+    href:P("/leitstand/"), cta:L("Leitstand","Control room","中控室") },
 ];
 const aktColor: Record<string,string> = { anbahnung:"#1d4ed8", kern:"#16794a", nach:"#9a6b00" };
 const aktLabel: Record<string,string> = de
   ? { anbahnung:"Anbahnung", kern:"Auftrag → Lieferung", nach:"Nach der Lieferung" }
-  : { anbahnung:"Lead-in", kern:"Order → delivery", nach:"After delivery" };
+  : en
+  ? { anbahnung:"Lead-in", kern:"Order → delivery", nach:"After delivery" }
+  : { anbahnung:"商机导入", kern:"订单 → 交付", nach:"交付之后" };
 ---
 <section style="background:#123A33; color:#F4F6F5;" data-de={String(de)}>
   <div style="max-width:920px; margin:0 auto; padding:clamp(52px,8vw,104px) clamp(24px,5vw,56px) clamp(40px,5vw,60px);">
-    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ein Tag bei Nordwerk · 3 Schichten", "A day at Nordwerk · 3 shifts")}</p>
-    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{L("24 Stunden. Eine Datenkette.", "24 hours. One data chain.")}</h1>
-    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Von der Frühschicht bis tief in die Nacht — sogar wenn niemand da ist, denkt die Anlage mit. Wähl eine Schicht und sieh, wer was tut und in welchem System.", "From the early shift to deep into the night — even when nobody's there, the plant thinks along. Pick a shift and see who does what, in which system.")}</p>
+    <p style="font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#A6CFC5; margin:0 0 18px;">{L("Ein Tag bei Nordwerk · 3 Schichten", "A day at Nordwerk · 3 shifts", "Nordwerk 的一天 · 三个班次")}</p>
+    <h1 style="font-family:var(--font-head); font-weight:600; font-size:clamp(36px,6.5vw,72px); line-height:0.98; letter-spacing:-0.03em; margin:0 0 18px; max-width:18ch;">{L("24 Stunden. Eine Datenkette.", "24 hours. One data chain.", "24 小时。一条数据链。")}</h1>
+    <p style="font-size:clamp(17px,1.7vw,21px); line-height:1.6; color:#CADAD5; max-width:60ch; margin:0;">{L("Von der Frühschicht bis tief in die Nacht — sogar wenn niemand da ist, denkt die Anlage mit. Wähl eine Schicht und sieh, wer was tut und in welchem System.", "From the early shift to deep into the night — even when nobody's there, the plant thinks along. Pick a shift and see who does what, in which system.", "从早班一直到深夜——即使无人在场，设备也在一同思考。选一个班次，看看谁在做什么、用的是哪套系统。")}</p>
   </div>
 </section>
 
@@ -90,7 +93,7 @@ const aktLabel: Record<string,string> = de
       {shifts.map((s) => (
         <button class="shtab" data-sh={s.key}>{s.name} <span style="opacity:.6;">· {s.time}</span></button>
       ))}
-      <button class="shtab" data-sh="all">{L("Ganzer Tag", "Whole day")}</button>
+      <button class="shtab" data-sh="all">{L("Ganzer Tag", "Whole day", "全天")}</button>
     </div>
 
     <div class="tl">
@@ -111,8 +114,8 @@ const aktLabel: Record<string,string> = de
     </div>
 
     <div style="margin-top:clamp(40px,5vw,64px); border:1px solid #E2E8F0; border-radius:14px; background:#fff; padding:clamp(22px,3vw,32px); text-align:center;">
-      <p style="font-family:var(--font-head); font-weight:600; font-size:clamp(20px,2.5vw,26px); color:#1B1C1E; margin:0 0 8px;">{L("Drei Schichten, eine Wahrheit. Klick dich durch die ganze Firma.", "Three shifts, one truth. Click through the whole company.")}</p>
-      <a href={P("/demos/")} style="text-decoration:none; background:#123A33; color:#fff; font-weight:600; padding:13px 24px; border-radius:10px; display:inline-block; margin-top:8px;">{L("Zur Demo-Firma", "To the demo company")} →</a>
+      <p style="font-family:var(--font-head); font-weight:600; font-size:clamp(20px,2.5vw,26px); color:#1B1C1E; margin:0 0 8px;">{L("Drei Schichten, eine Wahrheit. Klick dich durch die ganze Firma.", "Three shifts, one truth. Click through the whole company.", "三个班次，同一份真相。点击浏览整家公司。")}</p>
+      <a href={P("/demos/")} style="text-decoration:none; background:#123A33; color:#fff; font-weight:600; padding:13px 24px; border-radius:10px; display:inline-block; margin-top:8px;">{L("Zur Demo-Firma", "To the demo company", "前往演示公司")} →</a>
     </div>
   </div>
 </section>

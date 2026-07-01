@@ -4,46 +4,47 @@
 interface Props { lang: "de" | "en" }
 const { lang } = Astro.props;
 const de = lang === "de";
-const L = (d: string, e: string) => (de ? d : e);
-const b = de ? "" : "/en";
+const en = lang === "en";
+const L = (d: string, e: string, c?: string) => (de ? d : en ? e : (c ?? e));
+const b = de ? "" : en ? "/en" : "/cn";
 const ERP="https://erp-demo.indystry.works/odoo", BI="https://bi-demo.indystry.works";
 const steps = [
-  { ph:L("Anbahnung","Lead-in"), t:L("Die Anfrage","The inquiry"),
-    x:L("Helvetia Pumpen fragt 200 Lagerböcke NW-1001 an. Die Anfrage landet als Lead im CRM — nichts geht verloren.","Helvetia Pumpen asks for 200 bearing blocks NW-1001. It lands as a lead in the CRM — nothing gets lost."),
-    l:"ERP / CRM", h:ERP, ext:true, vt:"flow", vd:{stages:[L("Neu","New"),L("Qualifiziert","Qualified"),L("Angebot","Quote"),L("Gewonnen","Won")], active:0} },
-  { ph:L("Anbahnung","Lead-in"), t:L("Das Angebot","The quote"),
-    x:L("Am Digital Twin werden Durchsatz, Ausbeute und Ausschuss durchgespielt — so steht ein belastbares Angebot mit echtem Termin.","On the digital twin throughput, yield and scrap are simulated — for a solid quote with a real date."),
-    l:L("Digital Twin","Digital twin"), h:`${b}/twin/`, vt:"bars", vd:{items:[{l:L("Durchsatz","Throughput"),v:103,max:140,u:"/h",c:"#16794a"},{l:L("Ausbeute","Yield"),v:96,max:100,u:"%",c:"#16794a"},{l:L("Ausschuss","Scrap"),v:4,max:20,u:"%",c:"#E6B23A"}]} },
-  { ph:L("Bestelleingang","Order intake"), t:L("Der Auftrag","The order"),
-    x:L("Der Kunde bestätigt. Mit einem Klick entstehen Fertigung und Lieferung — keine Doppelerfassung.","The customer confirms. One click creates production and delivery — no double entry."),
-    l:"ERP", h:ERP, ext:true, vt:"flow", vd:{stages:[L("Angebot","Quote"),L("Auftrag","Order"),L("Fertigung","Production"),L("Geliefert","Delivered"),L("Rechnung","Invoice")], active:1} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("Beschaffung","Procurement"),
-    x:L("Das MRP rechnet den Materialbedarf aus der Stückliste — Bestellung mit zwei Klicks.","MRP computes material demand from the BOM — order in two clicks."),
-    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Material","Material"),L("Menge/Stk","Qty/pc")], rows:[["Stahl-Block S235","2×"],["Normschraube M8","1×"]]} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("Fertigung","Production"),
-    x:L("Die CNC-Fräse A1 läuft. Im Leitstand siehst du live jede Maschine — auch dass B1 Wartung braucht.","CNC mill A1 runs. The control room shows every machine live — including B1 needing maintenance."),
-    l:L("Leitstand","Control room"), h:`${b}/leitstand/`, vt:"dots", vd:{items:[["A1","ok"],["A2","ok"],["B1","warn"],["M1","ok"],["M2","idle"],["P1","ok"],["L1","ok"],["K1","ok"]]} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("In die Anlage","Into the plant"),
-    x:L("Von der Maschine in den Schaltschrank — bis auf den animierten Stromlaufplan. Schalter und Leitungen in Aktion.","From the machine into the cabinet — down to the animated wiring plan."),
-    l:L("Anlage","Plant"), h:`${b}/anlage/`, vt:"flow", vd:{stages:[L("Maschine","Machine"),L("Schaltschrank","Cabinet"),L("Stromlaufplan","Wiring plan")], active:2} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("Der Zwilling","The twin"),
-    x:L("Echtbetrieb beobachten, übersteuern, Optimizer fragen — und die Ausfall-Prognose lesen.","Watch live operation, override, ask the optimizer — and read the failure prediction."),
-    l:L("Digital Twin","Digital twin"), h:`${b}/twin/`, vt:"bars", vd:{items:[{l:L("Temperatur","Temperature"),v:41,max:80,u:"°C",c:"#E6B23A"},{l:"Vibration",v:3.1,max:9,u:"mm/s",c:"#16794a"},{l:L("Restlebensd.","Rem. life"),v:48,max:120,u:L("Tage","days"),c:"#16794a"}]} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("Qualität","Quality"),
-    x:L("Die Charge wird geprüft und das Gefüge analysiert — automatisch gegen Grenzwerte bewertet.","The batch is inspected and the grain analysed — auto-graded against limits."),
-    l:L("Analyse","Analysis"), h:`${b}/analyse/`, vt:"table", vd:{head:[L("Merkmal","Feature"),L("Wert","Value"),"Status"], rows:[[L("Maßhaltigkeit","Dimension"),"50.04 mm","✓"],["Rauheit Ra","1.6 µm","✓"],[L("Gewicht","Weight"),"421 g","✓"]]} },
-  { ph:L("Auftrag → Lieferung","Order → delivery"), t:L("Versand","Shipping"),
-    x:L("Fertig und geprüft: mit Echtzeit-Bestand kommissioniert, Lieferschein gedruckt.","Done and inspected: picked with real-time stock, delivery note printed."),
-    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Position","Item"),L("Menge","Qty")], rows:[["NW-1001 · "+L("Lagerbock Typ A","Bearing block A"),"200 Stk"]], foot:[L("Lieferschein","Delivery note"),"LS-0042"]} },
-  { ph:L("Nach der Lieferung","After delivery"), t:L("Die Rechnung","The invoice"),
-    x:L("Aus der Lieferung wird per Klick die E-Rechnung — direkt an den Kunden, ohne Medienbruch.","The delivery becomes an e-invoice in one click — straight to the customer."),
-    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Position","Item"),L("Betrag","Amount")], rows:[["200× NW-1001","7.600,00 €"]], foot:[L("Summe (E-Rechnung)","Total (e-invoice)"),"7.600,00 €"]} },
-  { ph:L("Nach der Lieferung","After delivery"), t:L("Der Kunde","The customer"),
-    x:L("Im Self-Service-Portal sieht der Kunde Status, Rechnung und Servicevertrag — ohne Rückfrage.","In the self-service portal the customer sees status, invoice and service contract — without asking."),
-    l:L("Kundenportal","Customer portal"), h:`${b}/portal/`, vt:"table", vd:{head:[L("Im Portal","In portal"),"Status"], rows:[[L("Auftrag","Order"),L("geliefert","delivered")],[L("Rechnung","Invoice"),L("offen","open")],[L("Servicevertrag","Service contract"),L("aktiv","active")]]} },
-  { ph:L("Steuern","Steering"), t:L("Die Auswertung","The analytics"),
-    x:L("Im Cockpit: Auftrag → Liefertreue → Marge. Eine Wahrheit, die alle teilen.","In the cockpit: order → on-time → margin. One truth everyone shares."),
-    l:"BI", h:BI, ext:true, vt:"bars", vd:{items:[{l:"OEE",v:78,max:100,u:"%",c:"#16794a"},{l:L("Liefertreue","On-time"),v:96,max:100,u:"%",c:"#16794a"},{l:L("Ausschuss","Scrap"),v:4,max:20,u:"%",c:"#E6B23A"}]} },
+  { ph:L("Anbahnung","Lead-in","商机导入"), t:L("Die Anfrage","The inquiry","询价"),
+    x:L("Helvetia Pumpen fragt 200 Lagerböcke NW-1001 an. Die Anfrage landet als Lead im CRM — nichts geht verloren.","Helvetia Pumpen asks for 200 bearing blocks NW-1001. It lands as a lead in the CRM — nothing gets lost.","Helvetia Pumpen 询价 200 个轴承座 NW-1001。询价作为线索进入 CRM——不会遗漏任何信息。"),
+    l:"ERP / CRM", h:ERP, ext:true, vt:"flow", vd:{stages:[L("Neu","New","新建"),L("Qualifiziert","Qualified","已确认"),L("Angebot","Quote","报价"),L("Gewonnen","Won","赢单")], active:0} },
+  { ph:L("Anbahnung","Lead-in","商机导入"), t:L("Das Angebot","The quote","报价"),
+    x:L("Am Digital Twin werden Durchsatz, Ausbeute und Ausschuss durchgespielt — so steht ein belastbares Angebot mit echtem Termin.","On the digital twin throughput, yield and scrap are simulated — for a solid quote with a real date.","在数字孪生上模拟产量、良率与废品——从而给出带真实交期的可靠报价。"),
+    l:L("Digital Twin","Digital twin","数字孪生"), h:`${b}/twin/`, vt:"bars", vd:{items:[{l:L("Durchsatz","Throughput","产量"),v:103,max:140,u:"/h",c:"#16794a"},{l:L("Ausbeute","Yield","良率"),v:96,max:100,u:"%",c:"#16794a"},{l:L("Ausschuss","Scrap","废品"),v:4,max:20,u:"%",c:"#E6B23A"}]} },
+  { ph:L("Bestelleingang","Order intake","订单录入"), t:L("Der Auftrag","The order","订单"),
+    x:L("Der Kunde bestätigt. Mit einem Klick entstehen Fertigung und Lieferung — keine Doppelerfassung.","The customer confirms. One click creates production and delivery — no double entry.","客户确认后，一键生成生产与交付——无需重复录入。"),
+    l:"ERP", h:ERP, ext:true, vt:"flow", vd:{stages:[L("Angebot","Quote","报价"),L("Auftrag","Order","订单"),L("Fertigung","Production","生产"),L("Geliefert","Delivered","已交付"),L("Rechnung","Invoice","发票")], active:1} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("Beschaffung","Procurement","采购"),
+    x:L("Das MRP rechnet den Materialbedarf aus der Stückliste — Bestellung mit zwei Klicks.","MRP computes material demand from the BOM — order in two clicks.","MRP 根据物料清单计算物料需求——两次点击即可下单。"),
+    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Material","Material","物料"),L("Menge/Stk","Qty/pc","数量／件")], rows:[["Stahl-Block S235","2×"],["Normschraube M8","1×"]]} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("Fertigung","Production","生产"),
+    x:L("Die CNC-Fräse A1 läuft. Im Leitstand siehst du live jede Maschine — auch dass B1 Wartung braucht.","CNC mill A1 runs. The control room shows every machine live — including B1 needing maintenance.","CNC 铣床 A1 正在运行。中控室实时显示每台设备——包括 B1 需要维护。"),
+    l:L("Leitstand","Control room","中控室"), h:`${b}/leitstand/`, vt:"dots", vd:{items:[["A1","ok"],["A2","ok"],["B1","warn"],["M1","ok"],["M2","idle"],["P1","ok"],["L1","ok"],["K1","ok"]]} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("In die Anlage","Into the plant","进入设备"),
+    x:L("Von der Maschine in den Schaltschrank — bis auf den animierten Stromlaufplan. Schalter und Leitungen in Aktion.","From the machine into the cabinet — down to the animated wiring plan.","从设备深入到电气柜——直至动态电气原理图。开关与线路实时可见。"),
+    l:L("Anlage","Plant","设备"), h:`${b}/anlage/`, vt:"flow", vd:{stages:[L("Maschine","Machine","设备"),L("Schaltschrank","Cabinet","电气柜"),L("Stromlaufplan","Wiring plan","电气原理图")], active:2} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("Der Zwilling","The twin","孪生体"),
+    x:L("Echtbetrieb beobachten, übersteuern, Optimizer fragen — und die Ausfall-Prognose lesen.","Watch live operation, override, ask the optimizer — and read the failure prediction.","观察实时运行、手动干预、向优化器提问——并查看故障预测。"),
+    l:L("Digital Twin","Digital twin","数字孪生"), h:`${b}/twin/`, vt:"bars", vd:{items:[{l:L("Temperatur","Temperature","温度"),v:41,max:80,u:"°C",c:"#E6B23A"},{l:"Vibration",v:3.1,max:9,u:"mm/s",c:"#16794a"},{l:L("Restlebensd.","Rem. life","剩余寿命"),v:48,max:120,u:L("Tage","days","天"),c:"#16794a"}]} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("Qualität","Quality","质量"),
+    x:L("Die Charge wird geprüft und das Gefüge analysiert — automatisch gegen Grenzwerte bewertet.","The batch is inspected and the grain analysed — auto-graded against limits.","对批次进行检验并分析组织结构——自动对照限值判定。"),
+    l:L("Analyse","Analysis","分析"), h:`${b}/analyse/`, vt:"table", vd:{head:[L("Merkmal","Feature","特征"),L("Wert","Value","数值"),"Status"], rows:[[L("Maßhaltigkeit","Dimension","尺寸精度"),"50.04 mm","✓"],["Rauheit Ra","1.6 µm","✓"],[L("Gewicht","Weight","重量"),"421 g","✓"]]} },
+  { ph:L("Auftrag → Lieferung","Order → delivery","订单 → 交付"), t:L("Versand","Shipping","发货"),
+    x:L("Fertig und geprüft: mit Echtzeit-Bestand kommissioniert, Lieferschein gedruckt.","Done and inspected: picked with real-time stock, delivery note printed.","完工并检验合格：按实时库存拣货，打印送货单。"),
+    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Position","Item","项目"),L("Menge","Qty","数量")], rows:[["NW-1001 · "+L("Lagerbock Typ A","Bearing block A","轴承座 A 型"),"200 Stk"]], foot:[L("Lieferschein","Delivery note","送货单"),"LS-0042"]} },
+  { ph:L("Nach der Lieferung","After delivery","交付之后"), t:L("Die Rechnung","The invoice","发票"),
+    x:L("Aus der Lieferung wird per Klick die E-Rechnung — direkt an den Kunden, ohne Medienbruch.","The delivery becomes an e-invoice in one click — straight to the customer.","交付一键生成电子发票——直接发送给客户，无介质中断。"),
+    l:"ERP", h:ERP, ext:true, vt:"table", vd:{head:[L("Position","Item","项目"),L("Betrag","Amount","金额")], rows:[["200× NW-1001","7.600,00 €"]], foot:[L("Summe (E-Rechnung)","Total (e-invoice)","合计（电子发票）"),"7.600,00 €"]} },
+  { ph:L("Nach der Lieferung","After delivery","交付之后"), t:L("Der Kunde","The customer","客户"),
+    x:L("Im Self-Service-Portal sieht der Kunde Status, Rechnung und Servicevertrag — ohne Rückfrage.","In the self-service portal the customer sees status, invoice and service contract — without asking.","在自助门户中，客户无需询问即可查看状态、发票和服务合同。"),
+    l:L("Kundenportal","Customer portal","客户门户"), h:`${b}/portal/`, vt:"table", vd:{head:[L("Im Portal","In portal","门户中"),"Status"], rows:[[L("Auftrag","Order","订单"),L("geliefert","delivered","已交付")],[L("Rechnung","Invoice","发票"),L("offen","open","未结")],[L("Servicevertrag","Service contract","服务合同"),L("aktiv","active","生效中")]]} },
+  { ph:L("Steuern","Steering","管控"), t:L("Die Auswertung","The analytics","分析"),
+    x:L("Im Cockpit: Auftrag → Liefertreue → Marge. Eine Wahrheit, die alle teilen.","In the cockpit: order → on-time → margin. One truth everyone shares.","在驾驶舱中：订单 → 准时交付率 → 利润率。人人共享的同一份事实。"),
+    l:"BI", h:BI, ext:true, vt:"bars", vd:{items:[{l:"OEE",v:78,max:100,u:"%",c:"#16794a"},{l:L("Liefertreue","On-time","准时交付率"),v:96,max:100,u:"%",c:"#16794a"},{l:L("Ausschuss","Scrap","废品"),v:4,max:20,u:"%",c:"#E6B23A"}]} },
 ];
 const STC: Record<string,string> = { ok:"#16794a", warn:"#E6B23A", idle:"#92938F" };
 function viz(s: any): string {
@@ -57,12 +58,12 @@ function viz(s: any): string {
 ---
 <section class="tj-hero">
   <div class="tj-hero-in">
-    <p class="tj-eyebrow">{L("Der rote Faden","The thread")}</p>
-    <h1 class="tj-h1">{L("Eine Bestellung, der ganze Weg.","One order, the whole way.")}</h1>
-    <p class="tj-lead">{L("Folge dem Lagerbock NW-1001 durch die ganze Firma — jeder Schritt mit Diagramm und Live-Link.","Follow bearing block NW-1001 through the whole company — every step with a diagram and a live link.")}</p>
+    <p class="tj-eyebrow">{L("Der rote Faden","The thread","主线")}</p>
+    <h1 class="tj-h1">{L("Eine Bestellung, der ganze Weg.","One order, the whole way.","一张订单，走完全程。")}</h1>
+    <p class="tj-lead">{L("Folge dem Lagerbock NW-1001 durch die ganze Firma — jeder Schritt mit Diagramm und Live-Link.","Follow bearing block NW-1001 through the whole company — every step with a diagram and a live link.","跟随轴承座 NW-1001 走遍整个企业——每一步都配有图表和实时链接。")}</p>
     <div class="tj-meta">
       <span class="tj-pill"><span class="tj-pill-dot"></span>NW-1001</span>
-      <span class="tj-scroll">{L("scrollen, der Faden folgt","scroll, the thread follows")} ↓</span>
+      <span class="tj-scroll">{L("scrollen, der Faden folgt","scroll, the thread follows","向下滚动，主线随行")} ↓</span>
     </div>
   </div>
 </section>
@@ -81,10 +82,10 @@ function viz(s: any): string {
         <article class="tj-card">
           <div class="tj-text">
             <span class="tj-ph">{s.ph}</span>
-            <p class="tj-step-n">{L("Schritt","Step")} {i + 1} / {steps.length}</p>
+            <p class="tj-step-n">{L("Schritt","Step","步骤")} {i + 1} / {steps.length}</p>
             <h2 class="tj-t">{s.t}</h2>
             <p class="tj-x">{s.x}</p>
-            <a class="tj-live" href={s.h} target={s.ext ? "_blank" : undefined} rel={s.ext ? "noopener" : undefined}>{L("Jetzt live ansehen","See it live now")} · {s.l} {s.ext ? "↗" : "→"}</a>
+            <a class="tj-live" href={s.h} target={s.ext ? "_blank" : undefined} rel={s.ext ? "noopener" : undefined}>{L("Jetzt live ansehen","See it live now","立即在线查看")} · {s.l} {s.ext ? "↗" : "→"}</a>
           </div>
           <div class="tj-viz" set:html={viz(s)} />
         </article>
